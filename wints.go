@@ -54,7 +54,7 @@ func jsonRequest(w http.ResponseWriter, r *http.Request, j interface{}) error {
 }
 
 func pullConventions() {
-	ticker := time.NewTicker(10 * time.Second)
+	ticker := time.NewTicker(60 * time.Second)
 	quit := make(chan struct{})
 	go func() {
 		for {
