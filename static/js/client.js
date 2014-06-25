@@ -10,7 +10,7 @@ $( document ).ready(function () {
 });
 
 function login() {
-    $.post("/my/login", JSON.stringify({Email: $("#login").val(), Password : $("#password").val()})
+    $.post("/login", JSON.stringify({Email: $("#login").val(), Password : $("#password").val()})
     , function(data, status) {
             $("#err").html("");
             sessionStorage.setItem("email", $("#login").val());

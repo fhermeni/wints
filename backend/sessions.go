@@ -3,6 +3,9 @@ package backend
 import (
 	_ "github.com/lib/pq"
 	"time"
+	"code.google.com/p/go.crypto/bcrypt"
+	"database/sql"
+	"errors"
 )
 
 const (
@@ -21,7 +24,12 @@ type Session struct {
 	Uid int
 }
 
-/*func OpenSession(db *sql.DB, p Profile) (Session,error) {
+type Credential struct {
+	Email string
+	Password string
+}
+
+func OpenSession(db *sql.DB, email string) ([]byte,error) {
 
 	//Get the token and the new deadline
 	tok, err := bcrypt.GenerateFromPassword([]byte(time.Now().String()), bcrypt.MinCost)
@@ -29,33 +37,33 @@ type Session struct {
 	last := time.Now().Add(d)
 
 	//Update if possible
-	res, err := db.Exec(updateSession, p.UID, tok, last)
+	res, err := db.Exec(updateSession, email, tok, last)
 	if err != nil {
-		return Session{}, err
+		return nil, err
 	}
 	nb, err := res.RowsAffected()
 	if err != nil {
-		return Session{}, err
+		return nil, err
 	}
 	if nb == 1 {
 		//session already existed so it was a refresh
-		return Session{string(tok), last, p.Role, p.UID}, nil
+		return tok, nil
 	}
 
-	res, err = db.Exec(makeSession, p.UID, tok, last)
+	res, err = db.Exec(makeSession, email, tok, last)
 	if err != nil {
-		return Session{}, err
+		return nil, err
 	}
 	nb, err = res.RowsAffected()
 	if err != nil {
-		return Session{}, err
+		return nil, err
 	}
 	if nb != 1 {
-		return Session{}, errors.New("Unable to store the session")
+		return nil, errors.New("Unable to store the session")
 	}
-	return Session{string(tok), last, p.Role, p.UID}, nil
+	return tok, nil
 }
-
+                               /*
 func CloseSession(db *sql.DB, uid int) error {
 	res, err := db.Exec(deleteSession, uid)
 	if err != nil {

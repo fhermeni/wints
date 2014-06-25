@@ -36,6 +36,19 @@ type Student struct {
 	Promotion string
 }
 
+func Register(db *sql.DB, c Credential) error {
+	var uid int
+	var p []byte
+	var username,r string
+	err := db.QueryRow(selectUser, c.Email).Scan(&uid, &username, &p,&r)
+	if err != nil {
+		return err
+	}
+	if (bcrypt.CompareHashAndPassword(p, []byte(c.Password)) != nil) {
+		return errors.New("Unknown user or incorrect password")
+	}
+	return nil
+}
 
 func newUser(db *sql.DB, p Person) error {
 	newPassword := rand_str(8)

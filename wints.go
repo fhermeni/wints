@@ -118,6 +118,7 @@ func GetAllConventions(w http.ResponseWriter, r *http.Request) {
 	jsonReply(w, conventions)
 }
 
+
 func GetAdmins(w http.ResponseWriter, r *http.Request) {
 	admins, err := backend.Admins(DB)
 	if err != nil {
@@ -126,6 +127,30 @@ func GetAdmins(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Printf("%s\n", admins)
 	jsonReply(w, admins)
+}
+
+func Login(w http.ResponseWriter, r *http.Request) {
+	var cred backend.Credential
+	if jsonRequest(w, r, &cred) != nil {
+		return
+	}
+	err := backend.Register(DB, cred)
+	if err != nil {
+		http.Error(w, "Unknown username or incorrect password", http.StatusUnauthorized)
+		log.Printf("Error at login: %s\n", err)
+		return
+	}
+	tok, err := backend.OpenSession(DB, cred.Email)
+	if err != nil {
+		reportError(w, "Error at opening session", err)
+		return
+	}
+	s, _ := store.Get(r, "wints")
+	s.Values["token"] = tok
+	s.Values["email"] = cred.Email
+	s.Save(r, w)
+	w.Header().Add("X-AUTH-TOKEN", string(tok))
+	return
 }
 
 func CommitPendingConvention(w http.ResponseWriter, r *http.Request) {
@@ -166,7 +191,7 @@ func main() {
 		log.Fatalf("%s\n", err)
 	}
 
-	pullConventions()
+	//pullConventions()
 
 	//Rest stuff
 	r := mux.NewRouter()
@@ -178,7 +203,7 @@ func main() {
 	r.HandleFunc("/conventions/", GetAllConventions).Methods("GET")
 	r.HandleFunc("/conventions/", CommitPendingConvention).Methods("POST")
 	r.HandleFunc("/admins/", GetAdmins).Methods("GET")
-
+	r.HandleFunc("/login", Login).Methods("POST")
 	// handle all requests by serving a file of the same name
 	fs := http.Dir("static/")
 	fileHandler := http.FileServer(fs)
