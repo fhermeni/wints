@@ -193,7 +193,7 @@ func main() {
 		log.Fatalf("%s\n", err)
 	}
 
-	//pullConventions()
+	pullConventions()
 
 	//Rest stuff
 	r := mux.NewRouter()
