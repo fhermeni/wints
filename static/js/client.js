@@ -18,7 +18,9 @@ function login() {
             sessionStorage.setItem("role", data.Role);
             window.location.href = "/static/" + data.Role + "-dashboard.html"
         }
-    ).fail(function (data) {
+    ).done(function () {
+            console.log(arguments);
+    }).fail(function (data) {
             $("#err").html("<div class='alert alert-danger'>" + data.responseText + "</div>");
         })
 }

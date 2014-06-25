@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	selectUser = "select uid,username,password,role from users where email=$1"
+	selectUser = "select email,password from users where email=$1"
 	changePassword = "update users set password=$2 where uid=$1"
 )
 

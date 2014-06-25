@@ -125,7 +125,6 @@ func GetAdmins(w http.ResponseWriter, r *http.Request) {
 		log.Printf("Error: %s\n", err)
 		return
 	}
-	log.Printf("%s\n", admins)
 	jsonReply(w, admins)
 }
 
