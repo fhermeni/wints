@@ -184,7 +184,7 @@ func main() {
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", fileHandler))
 	http.Handle("/", r)
 	log.Println("Daemon started")
-	err := http.ListenAndServe(":" + os.Getenv("PORT"), nil)
+	err = http.ListenAndServe(":" + os.Getenv("PORT"), nil)
 	if err != nil {
 		log.Fatalf("%s\n", err)
 	}
