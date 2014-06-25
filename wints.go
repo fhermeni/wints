@@ -160,7 +160,10 @@ func CommitPendingConvention(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	DB, _ = sql.Open("postgres", "user=fhermeni dbname=wints host=localhost password=wints sslmode=disable")
+	DB, err := sql.Open("postgres", os.Getenv("DATABASE_URL"))
+	if err != nil {
+		log.Fatalf("%s\n", err)
+	}
 
 	pullConventions()
 
