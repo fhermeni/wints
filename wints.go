@@ -133,10 +133,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	if jsonRequest(w, r, &cred) != nil {
 		return
 	}
-	err := backend.Register(DB, cred)
+	u, err := backend.Register(DB, cred)
 	if err != nil {
 		http.Error(w, "Unknown username or incorrect password", http.StatusUnauthorized)
-		log.Printf("Error at login: %s\n", err)
 		return
 	}
 	tok, err := backend.OpenSession(DB, cred.Email)
@@ -149,7 +148,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	s.Values["email"] = cred.Email
 	s.Save(r, w)
 	w.Header().Add("X-AUTH-TOKEN", string(tok))
-	return
+	jsonReply(w, u)
 }
 
 func CommitPendingConvention(w http.ResponseWriter, r *http.Request) {
@@ -186,6 +185,9 @@ func main() {
 
 	var err error
 	dbURL := os.Getenv("DATABASE_URL")
+	if len(dbURL) == 0 {
+		dbURL = "user=fhermeni dbname=wints host=localhost password=wints sslmode=disable"
+	}
 	log.Println(dbURL)
 	DB, err = sql.Open("postgres", dbURL)
 	if err != nil {

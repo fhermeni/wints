@@ -22,7 +22,7 @@ type Person struct {
 	Tel string
 }
 
-type Admin struct {
+type User struct {
 	P Person
 	Privs []string
 }
@@ -36,18 +36,26 @@ type Student struct {
 	Promotion string
 }
 
-func Register(db *sql.DB, c Credential) error {
-	var uid int
-	var p []byte
-	var username,r string
-	err := db.QueryRow(selectUser, c.Email).Scan(&uid, &username, &p,&r)
+func Register(db *sql.DB, c Credential) (User, error) {
+	var fn, ln, tel,p string
+	err := db.QueryRow("select firstname, lastname, tel, password from users where email=$1", c.Email).Scan(&fn, &ln, &tel, &p)
 	if err != nil {
-		return err
+		return User{}, errors.New("Unknown user or incorrect password")
 	}
-	if (bcrypt.CompareHashAndPassword(p, []byte(c.Password)) != nil) {
-		return errors.New("Unknown user or incorrect password")
+	if (bcrypt.CompareHashAndPassword([]byte(p), []byte(c.Password)) != nil) {
+		return User{}, errors.New("Unknown user or incorrect password")
 	}
-	return nil
+	rows, err := db.Query("select role from privs where email=$1", c.Email)
+	if err != nil {
+		return User{}, nil
+	}
+	roles := make([]string, 0, 0)
+	var r string
+	for rows.Next() {
+		rows.Scan(&r)
+		roles = append(roles, r)
+	}
+	return User{Person{fn, ln, c.Email, tel}, roles}, nil
 }
 
 func newUser(db *sql.DB, p Person) error {
@@ -166,21 +174,21 @@ func GetStudent(db *sql.DB, email string) (Student, error) {
 	return Student{p, promo}, nil
 }
 
-func Admins(db *sql.DB) ([]Admin, error) {
+func Admins(db *sql.DB) ([]User, error) {
 	rows, err := db.Query("select firstname, lastname, users.email, tel, role from users,roles where roles.email=users.email and role != 'student'")
-	admins := make([]Admin, 0, 0)
+	admins := make([]User, 0, 0)
 	if err != nil {
 		log.Printf("Error: %s\n", err)
 		return admins, err
 	}
 	var fn, ln, email, tel, role string
-	managers := make(map[string]Admin)
+	managers := make(map[string]User)
 	for rows.Next() {
 		rows.Scan(&fn, &ln, &email, &tel, &role)
 		m, ok := managers[email]
 		if !ok {
 			p := Person{fn, ln, email, tel}
-			m = Admin{p, make([]string, 0, 0)}
+			m = User{p, make([]string, 0, 0)}
 			managers[email] = m
 			log.Printf("%s\n", m)
 		} else {
