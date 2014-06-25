@@ -1,0 +1,22 @@
+{
+    "student": {
+        "firstname" : "Fabien",
+        "lastname" : "Hermenier",
+        "email" : "fabien.hermenier@unice.fr"
+    },
+    "aTutor": {
+        "firstname" : "Sébastien",
+        "lastname" : "Mosser",
+        "email" : "sebastien.mosser@unice.fr"
+    },
+    "cTutor" :{
+        "firstname" : "Zach",
+        "lastname" : "Holman",
+        "email" : "holman@github.com"
+    },
+    "answers" : {
+        "q1" : 1,
+        "q2" : 0,
+        "q3" : "Rien à redire"
+    }
+}

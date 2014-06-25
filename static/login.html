@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Authentification</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="css/flat-ui.css" rel="stylesheet">
+    <script src="js/jquery-2.1.0.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/client.js"></script>
+    <script src="js/bootstrap-select.js"></script>
+    <script src="js/bootstrap-switch.js"></script>
+    <script src="js/flatui-checkbox.js"></script>
+    <script src="js/flatui-radio.js"></script>
+    <script src="js/jquery.tagsinput.js"></script>
+    <script src="js/jquery.placeholder.js"></script>
+
+</head>
+<body class="login-background">
+<div class="container">
+    <div class="login">
+        <div class="login-screen">
+                <div class="login-icon">
+                    <img src="img/LOGO_UNS_couleurs_web.png" style="background: #edeff1; padding: 5px; width: 128px"/>
+                    <h4>Welcome to <small>Wints</small></h4>
+                </div>
+                <div class="login-form">
+                    <div class="form-group">
+                        <input id="login" class="form-control login-field" placeholder="Email" type="text"/>
+                        <label class="login-field-icon fui-user" for="login"></label>
+                    </div>
+
+                    <div class="form-group" id="group-password">
+                        <input id="password" class="form-control login-field" placeholder="Password" type="password"/>
+                        <label class="login-field-icon fui-lock" for="login"></label>
+                    </div>
+                    <a class="btn btn-primary btn-lg btn-block" onclick="login()">Log in</a>
+                    <a class="login-link" href="#">Lost your password</a>
+                </div>
+                <!--<div id="err"></div>-->
+        </div>
+    </div>
+</div>
+</body>
+</html>

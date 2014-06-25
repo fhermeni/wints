@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Supervised students</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/bootstrap.css" rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="css/flat-ui.css">
+    <script src="js/jquery-2.1.0.min.js"></script>
+    <script src="js/purl.js"></script>
+    <script src="js/flatui-radio.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/bootstrap-select.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/profile.js"></script>
+    <script src="js/conventions.js"></script>
+</head>
+<body>
+<div class="container">
+    <nav class="navbar navbar-inverse" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <div class="navbar-brand lang" id="title">Convention aligner</div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="text-right">
+        <small><span id="completed">NB</span>% completed</small>
+    </div>
+    <div class="progress">
+        <div id="progress" class="progress-bar progress-bar-success" style="width: 0;"></div>
+    </div>
+
+    <div id="nothing">
+        <h3 class="text-center">No conventions to align !</h3>
+    </div>
+    <div id="alignment-box">
+        <div class="text-center">
+            <h3 id="student"></h3>
+            <span id="from"></span> to <span id="to"></span>: <a id="companyWWW"><span id="company"></span></a>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-5 col-lg-offset-1">
+                <h6>Tutor in the convention</h6>
+
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="th-tutor-fn">Firstname</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="input-sm form-control" id="th-tutor-fn">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="th-tutor-ln">Lastname</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="input-sm form-control" id="th-tutor-ln">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="th-tutor-email">Email</label>
+                        <div class="col-sm-6">
+                            <input type="email" class="input-sm form-control" id="th-tutor-email">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="th-tutor-tel">Tel</label>
+                        <div class="col-sm-6">
+                            <input type="text" class="input-sm form-control" id="th-tutor-tel">
+                        </div>
+                    </div>
+                </form>
+                <div class="text-center">
+                    <button class="btn-wide btn btn-lg text-center" onclick="pickTheory()">Choose</button>
+                </div>
+
+            </div>
+            <div class="col-sm-2 text-center">
+                <h1>OR</h1>
+            </div>
+            <div class="col-sm-4 text-center">
+                <h6>Available tutor(s)</h6>
+                <label for="known-tutor-selector"></label><select id="known-tutor-selector">
+                <option value="fabien.hermenier@unice.fr">Fabien Hermenier</option>
+            </select>
+                <div class="">
+                    <button id="btn-choose-known" class="btn-wide btn btn-lg text-center" onclick="pickKnown()">Choose
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="footer text-center">
+    <div class="container">
+        <p>© University Nice Sophia Antipolis 2013-2014</p>
+        <p><a href="http://validator.w3.org/check">
+            <img src="http://www.w3.org/html/logo/downloads/HTML5_Logo_64.png" alt="html5-validator"
+                 style="height: 50px"></a>
+        </p>
+    </div>
+</footer>
+</body>
+</html>

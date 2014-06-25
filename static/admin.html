@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Supervised students</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="css/bootstrap.css" rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="css/flat-ui.css">
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/jquery-2.1.0.min.js"></script>
+    <script src="js/purl.js"></script>
+    <script src="js/flatui-radio.js"></script>
+    <script src="js/flatui-checkbox.js"></script>
+    <script src="js/jquery.tagsinput.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/bootstrap-select.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/profile.js"></script>
+    <script src="js/conventions.js"></script>
+    <script src="js/jquery.tablesorter.min.js"></script>
+
+</head>
+<body>
+<div class="container">
+    <nav class="navbar navbar-default" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <div class="navbar-brand lang" id="title">Administration</div>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-collapse-01">
+                <ul id="menu-pages" class="nav navbar-nav">
+                    <li class="active"><a onclick="showPage(this, 'conventions');">Internships</a></li>
+                    <li><a onclick="showPage(this, 'assignments')">Tutors</a></li>
+                    <li><a onclick="showPage(this, 'privileges')">Privileges</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- list conventions -->
+    <div class="page" id="conventions" data-url="conventions">
+        <h3><span id="nb-conventions"></span> conventions <span id="pending"></span></h3>
+        <button class="btn-sm btn" onclick="sendMail('checkbox-mail-students')"><span class="fui-mail"></span> mail selection</button>
+        <table class="table-condensed table-hover tablesorter" id="table-conventions">
+            <thead>
+                <tr>
+                    <th><label class='checkbox'><input type='checkbox' data-toggle='checkbox'/></label></th>
+                    <th>Student</th>
+                    <th>Promotion</th>
+                    <th>Major</th>
+                    <th>Supervisor</th>
+                    <th>Tutor</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="table-conventions-body"></tbody>
+        </table>
+    </div>
+
+    <!-- pending page -->
+    <div id="pending" data-url="pending" class="page" style="display: none">
+        <div class="text-right">
+            <small><span id="completed">NB</span>% completed</small>
+        </div>
+        <div class="progress">
+            <div id="progress" class="progress-bar progress-bar-success" style="width: 0;"></div>
+        </div>
+
+        <div id="nothing">
+            <h3 class="text-center">No conventions to align !</h3>
+        </div>
+        <div id="alignment-box">
+            <div class="text-center">
+                <h3 id="student"></h3>
+                <span id="from"></span> to <span id="to"></span>: <a id="companyWWW"><span id="company"></span></a>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-5 col-lg-offset-1">
+                    <h6>Tutor in the convention</h6>
+
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="th-tutor-fn">Firstname</label>
+
+                            <div class="col-sm-6">
+                                <input type="text" class="input-sm form-control" id="th-tutor-fn">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="th-tutor-ln">Lastname</label>
+
+                            <div class="col-sm-6">
+                                <input type="text" class="input-sm form-control" id="th-tutor-ln">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="th-tutor-email">Email</label>
+
+                            <div class="col-sm-6">
+                                <input type="email" class="input-sm form-control" id="th-tutor-email">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="th-tutor-tel">Tel</label>
+
+                            <div class="col-sm-6">
+                                <input type="text" class="input-sm form-control" id="th-tutor-tel">
+                            </div>
+                        </div>
+                    </form>
+                    <div class="text-center">
+                        <button class="btn-wide btn btn-lg text-center" onclick="pickTheory()">Choose</button>
+                    </div>
+
+                </div>
+                <div class="col-sm-2 text-center">
+                    <h1>OR</h1>
+                </div>
+                <div class="col-sm-4 text-center">
+                    <h6>Available tutor(s)</h6>
+                    <label for="known-tutor-selector"></label><select id="known-tutor-selector">
+                    <option value="fabien.hermenier@unice.fr">Fabien Hermenier</option>
+                </select>
+
+                    <div class="">
+                        <button id="btn-choose-known" class="btn-wide btn btn-lg text-center" onclick="pickKnown()">
+                            Choose
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Students per tutor -->
+    <div id="assignments" data-url="assignments" class="page" style="display: none">
+        <h3><span id="nb-tutors"></span> Tutors</h3>
+        <button class="btn-sm btn"><span class="fui-mail"></span> mail selection</button>
+        <table class="table-condensed table-hover tablesorter" id="table-assignments">
+            <thead>
+            <tr>
+                <th><label class='checkbox'><input type='checkbox' data-toggle='checkbox'/></label></th>
+                <th>Tutor</th>
+                <th>Count</th>
+                <th>Students</th>
+            </tr>
+            </thead>
+            <tbody id="table-assignments-body"></tbody>
+        </table>
+    </div>
+
+    <div class="modal fade" id="student-details">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body form-horizontal">
+                    <h3 id="infos-student-name"></h3>
+                    <dl class="dl-horizontal">
+                        <dt>Promotion</dt>
+                        <dd id="infos-student-promotion"></dd>
+
+                        <dt>Major</dt>
+                        <dd id="infos-student-major"></dd>
+
+                        <dt class="glyphicon glyphicon-earphone"></dt>
+                        <dd id="infos-student-tel"></dd>
+                    </dl>
+
+                    <h5>Company: <small id="infos-company-name"></small></h5>
+                    <dl class="dl-horizontal">
+                        <dt>Period</dt>
+                        <dd id="infos-company-period"></dd>
+
+                        <dt>Midterm report</dt>
+                        <dd id="infos-company-midterm"></dd>
+                    </dl>
+
+                    <h5>Supervisor: <small id="infos-sup-name"></small></h5>
+                    <dl class="dl-horizontal">
+                        <dt class="glyphicon glyphicon-earphone"></dt>
+                        <dd id="infos-sup-tel"></dd>
+                    </dl>
+
+                    <h5>Tutor: <small id="infos-tutor-name"></small></h5>
+                    <dl class="dl-horizontal">
+                        <dt class="glyphicon glyphicon-earphone"></dt>
+                        <dd id="infos-tutor-tel"></dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privileges -->
+    <div id="privileges" data-url="privileges" class="page" style="display: none">
+    <h3>Privileges</h3>
+        <div id="table-privileges-body"></div>
+    </div>
+<footer class="footer text-center">
+    <div class="container">
+        <p>© University Nice Sophia Antipolis 2013-2014</p>
+
+        <p><a href="http://validator.w3.org/check">
+            <img src="img/HTML5_Logo_64.png" alt="html5-validator"
+                 style="height: 50px"></a>
+        </p>
+    </div>
+</footer>
+</body>
+</html>

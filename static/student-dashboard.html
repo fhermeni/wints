@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Student Dashboard</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link href="css/flat-ui.css" rel="stylesheet">
+    <script src="js/jquery-2.1.0.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/logout.js"></script>
+    <script src="js/templates.js"></script>
+    <script src="js/student-dashboard.js"></script>
+    <script src="js/jquery.tagsinput.js"></script>
+    <script src="js/profile.js"></script>
+</head>
+<body>
+<div class="container-fluid">
+    <nav class="navbar navbar-default" role="navigation">
+        <div container-fluid>
+            <div class="navbar-header">
+                <div class="navbar-brand">
+                    My applications
+                </div>
+            </div>
+
+            <div class="nav navbar-nav navbar-left">
+                <a href="#" class="navbar-brand">
+                    <span id="promotion"></span>
+                    <span id="user"></span>
+                </a>
+            </div>
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#" onclick="showProfileEditor()" title="Edit your profile"><span class="fui-user"></span></a></li>
+                    <li><a href="#" onclick="logout()"><span class="glyphicon glyphicon-log-out"></span></a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div id="err"></div>
+        <div class="text-center">
+        <button class="btn btn-success btn-hg" onclick="showNewApplicationModal()">
+            <span class="glyphicon glyphicon-plus-sign"></span> New application
+        </button>
+        </div>
+            <h4>Pending Applications</h4>
+        <table class="table table-condensed">
+            <thead>
+                <tr>
+                    <th>Company</th>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Interviews</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="openApplications">
+            <tr>
+                <td><a href="#" class="glyphicon glyphicon-edit"></a> IBM</td>
+                <td>12/04/2014</td>
+                <td>Super boite qui fait des trucs bien et tout</td>
+                <td>12/04/2014, 20/04/2014</td>
+                <td>
+                    <a href="#" onclick="showEditApplicationModal(0)" class="label label-success"><i class="glyphicon glyphicon-ok"></i> Accepted</a>
+                    <a href="#" onclick="showEditApplicationModal(1)" class="label label-danger"><i class="glyphicon glyphicon-remove"></i>Rejected</a>
+                </td>
+            </tr>
+            <tr>
+                <td><a href="#" class="glyphicon glyphicon-edit"></a>IBM</td>
+                <td>12/04/2014</td>
+                <td>Super boite</td>
+                <td></td>
+                <td>
+                    <a href="#" onclick="showEditApplicationModal(2)" class="label label-success"><i class="glyphicon glyphicon-ok"></i> Accepted</a>
+                    <a href="#" onclick="showEditApplicationModal(3)" class="label label-danger"><i class="glyphicon glyphicon-remove"></i>Rejected</a>
+                </td>
+
+            </tr>
+            <tr>
+                <td><a href="#" class="glyphicon glyphicon-edit"></a>IBM</td>
+                <td>12/04/2014</td>
+                <td>Super boite</td>
+                <td></td>
+                <td>
+                    <a href="#" class="label label-success"><i class="glyphicon glyphicon-ok"></i> Accepted</a>
+                    <a href="#" class="label label-danger"><i class="glyphicon glyphicon-remove"></i>Rejected</a>
+                </td>
+
+            </tr>
+            </tbody>
+        </table>
+
+        <h4>Closed Applications</h4>
+            <table class="table table-condensed">
+                <thead>
+                <tr>
+                    <th>Company</th>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Interviews</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="closedApplications">
+                <tr>
+                    <td><a href="#" class="glyphicon glyphicon-edit"></a> IBM</td>
+                    <td>12/04/2014</td>
+                    <td>Super boite qui fait des trucs bien et tout</td>
+                    <td>12/04/2014, 20/04/2014</td>
+                    <td>
+                        <a href="#" class="label label-success"><i class="glyphicon glyphicon-ok"></i> Re-open</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td><a href="#" class="glyphicon glyphicon-edit"></a>IBM</td>
+                    <td>12/04/2014</td>
+                    <td>Super boite</td>
+                    <td></td>
+                    <td>
+                        <a href="#" class="label label-success"><i class="glyphicon glyphicon-ok"></i> Re-open</a>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td><a href="#" class="glyphicon glyphicon-edit"></a>IBM</td>
+                    <td>12/04/2014</td>
+                    <td>Super boite</td>
+                    <td></td>
+                    <td>
+                        <a href="#" class="label label-success"><i class="glyphicon glyphicon-ok"></i> Re-open</a>
+                    </td>
+
+                </tr>
+                </tbody>
+            </table>
+
+    <div class="modal fade" id="applicationEditor">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Application Editor</h3>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label for="appCompany" class="control-label col-sm-3">Company</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="appCompany" placeholder="company name"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                            <label for="appShort" class="control-label col-sm-3">Short description</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="appShort" placeholder="short description"/>
+                            </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="appDate" class="control-label col-sm-3">Date</label>
+                        <div class="col-sm-9">
+                            <input type="date" id="appDate" class="form-control"/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="appNote" class="control-label col-sm-3">Note</label>
+                        <div class="col-sm-6">
+                            <textarea id="appNote" rows="9" class="form-control"></textarea>
+                        </div>
+                    </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="submitApplication()">Save</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="profileEditor">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Settings</h4>
+                </div>
+
+                <div class="modal-body">
+
+                    <h6>Profile</h6>
+                    <div class="form-horizontal">
+                        <div id="profileEditor-err"></div>
+                        <div class="form-group">
+                            <label for="fullname" class="col-sm-3 control-label">Full Name</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="fullname" placeholder="Full Name"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="col-sm-3 control-label">Email</label>
+                            <div class="col-sm-9">
+                                <input type="email" class="form-control" id="email"/>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="updateProfile()">Update the profile</button>
+                    </div>
+                    <h6>Password</h6>
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label for="current-password" class="col-sm-3 control-label">Current</label>
+                            <div class="col-sm-9">
+                                <input type="password" class="form-control" id="current-password"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password1" class="col-sm-3 control-label">New</label>
+                            <div class="col-sm-9">
+                                <input type="password" class="form-control" id="password1"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password2" class="col-sm-3 control-label">Confirmation</label>
+                            <div class="col-sm-9">
+                                <input type="password" class="form-control" id="password2"/>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="updatePassword()">Update the password</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

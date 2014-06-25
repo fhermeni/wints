@@ -1,0 +1,10 @@
+{
+ 	"ALD" : [{"name": "Sebastien Mosser", "email" : "sebastien.mosser@unice.fr"},
+ 			 {"name" : "Philippe Collet", "email" : "Philippe.Collet@unice.fr"}], 	
+ 	"IHM" : [{"name": "Anne-Marie Pinna","email": "pinna@polytech.unice.fr"}],
+ 	"IAM" : [{"name": "Stephane Lavirotte", "email": "stephane@lavirotte.com"}],
+ 	"CSSR" : [{"name": "Karima Boudaoud", "email": "karima.boudaoud@unice.fr"}],
+ 	"KIS" : [{"name": "Catherine Faron", "email": "catherine.faron@inria.fr"}],
+ 	"VIM" : [{"name": "Lionel Fillatre", "email": "lionel.fillatre@i3s.unice.fr"}],
+ 	"IMAFA" : [{"name": "Anne-Marie Hughes","email":"amhc@wanadoo.fr"}]
+}

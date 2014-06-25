@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Survey</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/flat-ui.css">
+    <link rel="stylesheet" href="css/survey.css" >
+    <script src="js/jquery-2.1.0.min.js"></script>
+    <script src="js/purl.js"></script>
+    <script src="js/flatui-radio.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/bootstrap-select.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/profile.js"></script>
+    <script src="survey/midterm.json"></script>
+    <script src="js/survey.js"></script>
+</head>
+<body>
+<div class="container">
+    <nav class="navbar navbar-inverse" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <div class="navbar-brand lang" id="title">
+                </div>
+            </div>
+            <p class="navbar-text" id="student"></p>
+            <div class="navbar-right">
+                <select id="supported_languages"></select>
+            </div>
+        </div>
+    </nav>
+    <div class="form">
+        <div id="survey">Loading ...</div>
+    </div>
+    <div class="text-center mbl">
+        <button class="btn btn-primary btn-hg lang" onclick="submit()" id="submit">Valider</button>
+        <span id="dlg"></span>
+    </div>
+</div>
+<footer class="footer text-center">
+    <div class="container">
+        <p>© University Nice Sophia Antipolis 2013-2014</p>
+        <p><a href="http://validator.w3.org/check">
+            <img src="http://www.w3.org/html/logo/downloads/HTML5_Logo_64.png" alt="html5-validator" style="height: 50px"></a>
+        </p>
+    </div>
+</footer>
+</body>
+</html>

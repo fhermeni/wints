@@ -1,0 +1,74 @@
+.login-background {
+    background-color: #1abc9c;
+}
+
+#profileEditor .modal-dialog {
+    width: 500px;
+}
+.action_button{
+    padding: 5px;
+    cursor: pointer;
+}
+
+tbody {
+    font-size: 80%;
+}
+.app-granted {
+    background-color: #dff0d8;
+}
+
+.status-granted {
+    background-color: #5cb85c;
+}
+
+.status-pending {
+    background-color: #5bc0de;
+}
+
+.app-open {
+    background-color: inherit;
+}
+
+.status-open {
+    background-color: #f0ad4e;
+}
+
+.app-denied {
+      background-color: #f2dede;
+}
+
+.status-rejected {
+    background-color: #d9534f;
+}
+
+.login {
+    margin-top: 100px;
+}
+
+.clickable {
+    cursor : pointer;
+}
+.stat-type {
+    padding-right: 20px;
+    padding-left: 3px;
+}
+
+label.checkbox {
+    margin-right: 7px;
+    padding-left: 23px;
+    display: inline;
+}
+
+label.selector {
+    font-size: 14px;
+    margin-right: 7px;
+    padding-left: 3px;
+}
+
+label.selector a {
+    color: inherit;
+}
+
+.footer {
+    margin-top: 50px;
+}

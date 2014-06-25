@@ -1,0 +1,218 @@
+{
+    "languages" : { "fr": "Français", "en": "English" },
+    "title" : { "fr": "Évaluation intermédiaire", "en" : "Midterm evaluation"},
+    "yes": { "fr": "Oui", "en": "Yes"},
+    "no": { "fr": "Non", "en": "No"},
+    "submit" : {"fr": "Soumettre", "en": "Submit"},
+    "missing" : {"fr": "Champs requis non-renseignés", "en":"Missing required field"},
+    "student" : {"fr" : "Étudiant", "en" : "Student"},
+    "aTutor" : {"fr" : "Tuteur enseignant", "en" : "Academic tutor"},
+    "cTutor" : {"fr" : "Tuteur entreprise", "en" : "Company tutor"},
+    "questions" : [
+        {
+            "id": "c0", "type": "com",
+            "txt": {
+                "fr": "Ponctualité au travail",
+                "en": "At work"
+            }
+        },
+        {
+            "id": "q1","type": "bin","required" : true,
+            "txt": {
+                "fr": "Le stagiaire s'est-il informé de lui-même des horaires à respecter ?",
+                "en": "informs whatever ?"
+            }
+        },
+        {
+            "id": "q2","type": "bin","required" : true,
+            "txt": {
+                "fr": "Est-il ponctuel ?",
+                "en": "On time ?"
+            }
+
+        },
+        {
+            "id": "q3", "type": "txt",
+            "txt": {
+                "fr": "Commentaires:",
+                "en": "Comments:"
+            }
+        },
+
+
+        {
+            "id":"c1", "type":"com",
+            "txt":{
+                "fr" : "Intégration dans l'entreprise",
+                "en" : "foo"
+            }
+        },
+        {
+            "id": "q4","type": "bin","required" : true,
+            "txt": {
+                "fr": "Le stagiaire a-t-il cherché dès le début à nouer des connaissances ?",
+                "en": "informs whatever ?"
+            }
+        },
+        {
+            "id": "q5","type": "bin","required" : true,
+            "txt": {
+                "fr": "Cherche-t-il à communiquer avec les autres ?",
+                "en": "informs whatever ?"
+            }
+        },
+        {
+            "id": "q6","type": "bin","required" : true,
+            "txt": {
+                "fr": "D'après vous, est-il déjà bien intégré parmi les membres de votre service ?",
+                "en": "informs whatever ?"
+            }
+        },
+        {
+            "id": "q7", "type": "txt",
+            "txt": {
+                "fr": "Commentaires:",
+                "en": "Comments:"
+            }
+        },
+
+
+        {
+            "id":"c2", "type":"com",
+            "txt":{
+                "fr" : "Travail",
+                "en" : "foo"
+            }
+        },
+        {
+            "id": "q8","type": "bin","required" : true,
+            "txt": {
+                "fr": "Est-il intéressé par son travail ?",
+                "en": "informs whatever ?"
+            }
+        },
+        {
+            "id": "q9","type": "bin","required" : true,
+            "txt": {
+                "fr": "S'est-il préoccupé des méthodes de travail de l'entreprise ?",
+                "en": "informs whatever ?"
+            }
+        },
+        {
+            "id": "q10","type": "bin","required" : true,
+            "txt": {
+                "fr": "La quantité de travail fournie est elle satisfaisante ?",
+                "en": "informs whatever ?"
+            }
+        },
+        {
+            "id": "q11","type": "bin","required" : true,
+            "txt": {
+                "fr": "Respecte-t-il les délais ?",
+                "en": "informs whatever ?"
+            }
+        },
+        {
+            "id": "q12", "type": "txt",
+            "txt": {
+                "fr": "Commentaires:",
+                "en": "Comments:"
+            }
+        },
+
+
+        {
+            "id": "c3", "type": "com",
+            "txt": {
+                "fr": "Compétences techniques",
+                "en": "Technical skills"
+            }
+        },
+        {
+            "id": "q13","type": "bin","required" : true,
+            "txt": {
+                "fr": "Possède-t-il les compétences techniques nécessaires pour son travail ?",
+                "en": "Needed skills"
+            }
+        },
+        {
+            "id": "q14", "type": "txt","pre": ["q13_no"], "required" : true,
+            "txt": {
+                "fr": "Si non, précisez les lacunes ?",
+                "en": "Missing skills ?"
+            }
+        },
+        {
+            "id": "q15", "type": "bin", "required" : true,
+            "txt": {
+                "fr": "A-t-il eu besoin d'apprendre une nouvelle technique ou un nouveau logiciel ?",
+                "en": "Need for new softwares ?"
+            }
+        },
+        {
+            "id": "q16", "type": "txt","pre": ["q15_yes"], "required" : true,
+            "txt": {
+                "fr": "Si oui, lesquels ?",
+                "en": "Which one ?"
+            }
+        },
+        {
+            "id": "q17", "type": "txt","pre": ["q15_yes"], "required" : true,
+            "txt": {
+                "fr": "Si oui, a-t-il montré sa capacité à apprendre ?",
+                "en": "Skill to learn ?"
+            }
+        },
+        {
+            "id": "q18", "type": "bin","required" : true,
+            "txt": {
+                "fr": "Cherche-t-il à améliorer ses compétences dans certains domaines ?",
+                "en": "Willing to learn ?"
+            }
+        },
+        {
+            "id": "q19", "type": "bin","required" : true,
+            "txt": {
+                "fr": "Est-il autonomone ?",
+                "en": "Autonomous ?"
+            }
+        },
+        {
+            "id": "q20", "type": "bin", "required" : true,
+            "txt": {
+                "fr": "Cherche-t-il à aider les autres ?",
+                "en": "Help this others ?"
+            }
+        },
+        {
+            "id": "q21", "type": "txt",
+            "txt": {
+                "fr": "Commentaires:",
+                "en": "Comments:"
+            }
+        },
+
+        {
+            "id": "c4", "type": "com",
+            "txt": {
+                "fr": "Évaluation globale",
+                "en": "At work"
+            }
+        },
+        {
+            "id": "q22","type": "bin","required" : true,
+            "txt": {
+                "fr": "Etes-vous globalement satisfait du début du stage ?",
+                "en": "informs whatever ?"
+            }
+        },
+        {
+            "id": "q23","type": "txt","required" : true,
+            "txt": {
+                "fr": "Quels sont d'après-vous les points forts et les points faibles de ce stagiaire ?",
+                "en": "On time ?"
+            }
+
+        }
+    ]
+}
