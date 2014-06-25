@@ -12,8 +12,8 @@ const (
 	sessionDuration = "24h"
 	wipeSessions = "delete from sessions"
 	deleteSession = "delete from sessions where uid=$1"
-	makeSession = "insert into sessions(uid, token, last) values($1, $2, $3)"
-	updateSession = "update sessions set token=$2, last=$3 where uid=$1"
+	makeSession = "insert into sessions(mail, token, last) values($1, $2, $3)"
+	updateSession = "update sessions set token=$2, last=$3 where email=$1"
 	selectUIDFromToken = "select uid, last from sessions where token=$1"
 )
 
