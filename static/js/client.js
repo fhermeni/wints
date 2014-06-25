@@ -12,6 +12,7 @@ $( document ).ready(function () {
 function login() {
     var jqr =$.post("/login", JSON.stringify({Email: $("#login").val(), Password :$("#password").val()}))
         .done(function(/*data, status*/) {
+            console.log(arguments)
             $("#err").html("");
             sessionStorage.setItem("email", $("#login").val());
             sessionStorage.setItem("token", data.Token);

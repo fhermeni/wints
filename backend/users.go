@@ -47,7 +47,7 @@ func Register(db *sql.DB, c Credential) (User, error) {
 	}
 	rows, err := db.Query("select role from privs where email=$1", c.Email)
 	if err != nil {
-		return User{}, nil
+		return User{}, err
 	}
 	roles := make([]string, 0, 0)
 	var r string
