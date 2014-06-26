@@ -35,12 +35,18 @@
                     <li class="majorItem" style="display: none;"><a onclick="showPage(this, 'conventions');">Internships</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li class="adminItem" style="display: none;">Administration
-                        <ul>
+                    <li class="dropdown adminItem" style="display: none">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Administration <span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
                             <li class="adminItem" style="display: none;"><a onclick="showPage(this, 'assignments')">Tutors</a></li>
                             <li class="rootItem" style="display: none;"><a onclick="showPage(this, 'privileges')">Permissions</a></li>
                         </ul>
                     </li>
+
+                    <!--<li class="adminItem" style="display: none;">Administration
+                        <ul>
+                        </ul>
+                    </li>    -->
 
                     <li><a href="#" onclick="logout()" title="logout"><span class="glyphicon glyphicon-log-out"></span></a></li>
                 </ul>
