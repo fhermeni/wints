@@ -27,6 +27,25 @@ type User struct {
 	Privs []string
 }
 
+func (u User) isAdmin() bool {
+	for _,p := range u.Privs {
+		if (p == "admin" || p == "root") {
+			return true;
+		}
+	}
+	return false;
+}
+
+func (u User) isTutor() bool {
+	for _,p := range u.Privs {
+		if (p == "tutor") {
+			return true;
+		}
+	}
+	return false;
+}
+
+
 func (p Person) String() string {
 	return p.Firstname + " " + p.Lastname + " (" + p.Email + ")";
 }
@@ -40,13 +59,16 @@ func Register(db *sql.DB, c Credential) (User, error) {
 	var fn, ln, tel,p string
 	err := db.QueryRow("select firstname, lastname, tel, password from users where email=$1", c.Email).Scan(&fn, &ln, &tel, &p)
 	if err != nil {
+		log.Printf("Unknown user %s: ‰s\n", c.Email, err)
 		return User{}, errors.New("Unknown user or incorrect password")
 	}
 	if (bcrypt.CompareHashAndPassword([]byte(p), []byte(c.Password)) != nil) {
+		log.Printf("Bas paddword for %s: ‰s\n", c.Email, err)
 		return User{}, errors.New("Unknown user or incorrect password")
 	}
-	rows, err := db.Query("select role from privs where email=$1", c.Email)
+	rows, err := db.Query("select role from roles where email=$1", c.Email)
 	if err != nil {
+		log.Printf("Error while getting the roles for %s:%s\n", c.Email, err)
 		return User{}, err
 	}
 	roles := make([]string, 0, 0)
@@ -201,4 +223,26 @@ func Admins(db *sql.DB) ([]User, error) {
 		admins = append(admins, v)
 	}
 	return admins, nil
+}
+
+func NewPassword(db *sql.DB, uid int, oldPassword, newPassword []byte) error {
+//Get the password
+var p []byte
+err := db.QueryRow("select password from users where uid=$1", uid).Scan(&p)
+if err != nil {
+return err
+}
+if (bcrypt.CompareHashAndPassword(p, oldPassword) != nil) {
+return &BackendError{http.StatusConflict, "incorrect old password"}
+}
+
+hash, err := bcrypt.GenerateFromPassword(newPassword, bcrypt.MinCost)
+if err != nil {
+return err
+}
+_, err = db.Exec(changePassword, hash)
+if err != nil {
+return err
+}
+return nil
 }

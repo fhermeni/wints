@@ -283,7 +283,52 @@ func GetConventions(db *sql.DB) ([]Convention, error) {
 		conventions = append(conventions, c)
 	}
 	return conventions, nil
+}
 
+func GetConventions2(db *sql.DB, u User) ([]Convention, error) {
+	var rows *sql.Rows
+	var err error
+	if (u.isAdmin()) {
+		sql := "select stu.firstname, stu.lastname, stu.email, stu.tel, students.promotion, startTime, endTime, tut.firstname, tut.lastname, tut.email, tut.tel," +
+				"midTermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel " +
+				" from internships, users as stu, users as tut, students where students.email = stu.email and internships.student = stu.email and tut.email = internships.tutor";
+		rows, err = db.Query(sql)
+	} else if (u.isTutor()) {
+		sql := "select stu.firstname, stu.lastname, stu.email, stu.tel, students.promotion, startTime, endTime, tut.firstname, tut.lastname, tut.email, tut.tel," +
+				"midTermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel " +
+				" from internships, users as stu, users as tut, students where students.email = stu.email and internships.student = stu.email and tut.email = $1";
+		rows, err = db.Query(sql, u.P.Email)
+	} else {
+		//TODO: major admin
+		return make([]Convention, 0, 0), errors.New("Unsupported operation")
+	}
+
+	conventions := make([]Convention, 0, 0)
+	if err != nil {
+		return conventions, err
+	}
+
+	var stuFn, stuLn, stuMail, stuTel, promo string
+	var tutorFn, tutorLn, tutorTel, tutorEmail string
+	var supFn, supLn, supTel, supEmail, company, companyWWW string
+	var start, end, midDeadline time.Time
+
+
+	defer rows.Close()
+	for rows.Next() {
+		rows.Scan(&stuFn, &stuLn, &stuMail, &stuTel, &promo, &start, &end,
+			&tutorFn, &tutorLn, &tutorEmail, &tutorTel, &midDeadline,
+			&company, &companyWWW, &supFn, &supLn, &supEmail, &supTel)
+		if err != nil {
+			return conventions, err
+		}
+		stu := Student{Person{stuFn, stuLn, stuMail, stuTel}, promo}
+		tutor := Person{tutorFn, tutorLn, tutorEmail, tutorTel}
+		sup := Person{supFn, supLn, supEmail, supTel}
+		c :=  Convention{stu, sup, tutor, company, companyWWW, start, end, midDeadline}
+		conventions = append(conventions, c)
+	}
+	return conventions, nil
 }
 
 
@@ -336,3 +381,17 @@ func getRawConventions(year int, Promotion string) ([]Convention, error) {
 	}
 	return RawConventions, nil
 }
+
+
+/**
+ Policy to access conventions
+ - tutor: access only to my conventions
+ - major: access to conventions of my major
+ - admin: all conventions
+ - root: all conventions
+
+ - view survey: tutor & +
+ - view midterm report comment: tutor & +
+ - write/grade midterm report: tutor
+
+ */

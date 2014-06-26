@@ -83,6 +83,7 @@ type PendingConventionMsg struct {
 	Pending int
 	Total int
 }
+
 func RandomPendingConvention(w http.ResponseWriter, r *http.Request) {
 	c, err := backend.PeekRawConvention(DB)
 	if err != nil && err != sql.ErrNoRows {
@@ -147,8 +148,20 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	s.Values["token"] = tok
 	s.Values["email"] = cred.Email
 	s.Save(r, w)
-	w.Header().Add("X-AUTH-TOKEN", string(tok))
+	w.Header().Add("X-auth-token", string(tok))
 	jsonReply(w, u)
+}
+
+func Logout(w http.ResponseWriter, r *http.Request) {
+	token := r.Header.Get("X-auth-token")
+	if (len(token) == 0) {
+		http.Error(w, "X-auth-token is missing", http.StatusUnauthorized)
+		return
+	}
+	err := backend.CloseSession(DB, token)
+	if err != nil {
+		log.Printf("Unable to logout: %s\n", err)
+	}
 }
 
 func CommitPendingConvention(w http.ResponseWriter, r *http.Request) {
@@ -181,6 +194,38 @@ func CommitPendingConvention(w http.ResponseWriter, r *http.Request) {
 	backend.RescanPending(DB, c)
 }
 
+type PasswordRenewal struct {
+	OldPassword []byte
+	NewPassword []byte
+}
+
+func ChangePassword(w http.ResponseWriter, r *http.Request, uid int) {
+	var p PasswordRenewal
+	if jsonRequest(w, r, &p) != nil {
+		return
+	}
+
+	err := backend.NewPassword(DB, uid, p.OldPassword, p.NewPassword)
+	if err != nil {
+		reportError(w, "", err)
+	}
+}
+
+func RequireToken(cb func(http.ResponseWriter, *http.Request, int)) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		token := r.Header.Get("X-auth-token")
+		if (token == "") {
+			http.Error(w, "Header 'X-auth-token' is missing", http.StatusForbidden)
+		}
+		uid, err := backend.CheckSession(DB, token)
+		if err != nil {
+			http.Error(w, "Invalid session token", http.StatusUnauthorized)
+		}
+		cb(w, r, uid)
+	}
+}
+
+
 func main() {
 
 	var err error
@@ -193,6 +238,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("%s\n", err)
 	}
+	backend.NewTutor(DB, backend.Person{"Fabien", "Hermenier", "fabien.hermenier@unice.fr", "0662496455"})
 
 	pullConventions()
 
@@ -207,6 +253,8 @@ func main() {
 	r.HandleFunc("/conventions/", CommitPendingConvention).Methods("POST")
 	r.HandleFunc("/admins/", GetAdmins).Methods("GET")
 	r.HandleFunc("/login", Login).Methods("POST")
+	r.HandleFunc("/logout", Logout).Methods("POST")
+	r.HandleFunc("/my/password", RequireToken(ChangePassword)).Methods("POST")
 	// handle all requests by serving a file of the same name
 	fs := http.Dir("static/")
 	fileHandler := http.FileServer(fs)

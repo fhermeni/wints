@@ -3,39 +3,28 @@
 */
 
 $( document ).ready(function () {
-    if (sessionStorage.getItem("role")) {
-        window.location.href = "/";
-        window.location.href = "/static/" + sessionStorage.getItem("role") + "-dashboard.html";
-    }
+    /*if (sessionStorage.getItem("homepage")) {
+        window.location.href = sessionStorage.getItem("homepage");
+    } */
 });
 
 function login() {
     var jqr =$.post("/login", JSON.stringify({Email: $("#login").val(), Password :$("#password").val()}))
-        .done(function(/*data, status*/) {
-            console.log(arguments)
+        .done(function(data) {
+            //debugger;
             $("#err").html("");
-            sessionStorage.setItem("email", $("#login").val());
-            sessionStorage.setItem("token", data.Token);
-            sessionStorage.setItem("role", data.Role);
-            window.location.href = "/static/" + data.Role + "-dashboard.html"
+            sessionStorage.setItem("User", JSON.stringify(data));
+            sessionStorage.setItem("token", jqr.getResponseHeader("X-auth-token"));
+            if (data.Privs[0] == "student") {
+                sessionStorage.setItem("homepage", "student.html");
+                window.location.href = "/static/student.html";
+            } else {
+                sessionStorage.setItem("homepage", "admin.html");
+                window.location.href = "/static/admin.html";
+            }
+
         })
         .fail(function (data) {
             $("#err").html("<div class='alert alert-danger'>" + data.responseText + "</div>");
-                console.log("fail " + arguments);
         });
-        /*.done(function( data ) {
-            alert( "Data Loaded: " + data );
-        });*/
-
-    /*var jqr = $.postJSON("/login", JSON.stringify({Email: $("#login").val(), Password : $("#password").val()})
-    , function(data, status) {
-            $("#err").html("");
-            sessionStorage.setItem("email", $("#login").val());
-            sessionStorage.setItem("token", data.Token);
-            sessionStorage.setItem("role", data.Role);
-            window.location.href = "/static/" + data.Role + "-dashboard.html"
-        }
-    ,function (data) {
-            $("#err").html("<div class='alert alert-danger'>" + data.responseText + "</div>");
-        });*/
 }

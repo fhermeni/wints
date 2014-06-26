@@ -16,6 +16,7 @@
     <script src="js/bootstrap.min.js"></script>
     <script src="js/bootstrap-select.js"></script>
     <script src="js/common.js"></script>
+    <script src="js/logout.js"></script>
     <script src="js/profile.js"></script>
     <script src="js/conventions.js"></script>
     <script src="js/jquery.tablesorter.min.js"></script>
@@ -26,27 +27,61 @@
     <nav class="navbar navbar-default" role="navigation">
         <div class="container-fluid">
             <div class="navbar-header">
-                <div class="navbar-brand lang" id="title">Administration</div>
+                <div class="navbar-brand" id="fullname">Fullname</div>
             </div>
             <div class="collapse navbar-collapse" id="navbar-collapse-01">
                 <ul id="menu-pages" class="nav navbar-nav">
-                    <li class="active"><a onclick="showPage(this, 'conventions');">Internships</a></li>
-                    <li><a onclick="showPage(this, 'assignments')">Tutors</a></li>
-                    <li><a onclick="showPage(this, 'privileges')">Privileges</a></li>
+                    <li class="active tutorItem" style="display: none;"><a onclick="showPage(this, 'myStudents');">My students</a></li>
+                    <li class="majorItem" style="display: none;"><a onclick="showPage(this, 'conventions');">Internships</a></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li class="adminItem" style="display: none;">Administration
+                        <ul>
+                            <li class="adminItem" style="display: none;"><a onclick="showPage(this, 'assignments')">Tutors</a></li>
+                            <li class="rootItem" style="display: none;"><a onclick="showPage(this, 'privileges')">Permissions</a></li>
+                        </ul>
+                    </li>
+
+                    <li><a href="#" onclick="logout()" title="logout"><span class="glyphicon glyphicon-log-out"></span></a></li>
                 </ul>
             </div>
         </div>
     </nav>
 
+    <!-- the students I am supervising -->
+    <div class="page" id="myStudents" data-url="myStudents">
+    <h3>Tutored students</h3>
+
+        <button class="btn-sm btn" onclick="sendMail('checkbox-mail-myStudents')"><span class="fui-mail"></span> mail selection</button>
+        <table class="table-condensed table-hover tablesorter" id="table-myStudents">
+            <thead>
+                <tr>
+                    <th><label class='checkbox' id="general-checkbox-myStudents"><input id="bar" type='checkbox' data-toggle='checkbox'/></label></th>
+                    <th>Student</th>
+                    <th>Promotion</th>
+                    <th>Major</th>
+                    <th>Company</th>
+                    <th>Supervisor</th>
+                    <th>Midterm report<br>due date</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="table-myStudents-body">
+                <tr>
+                    <td colspan="8" class="text-center">Loading ...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
     <!-- list conventions -->
-    <div class="page" id="conventions" data-url="conventions">
-        <h3><span id="nb-conventions"></span> conventions <span id="pending"></span></h3>
+    <div class="page" id="conventions" data-url="conventions" style="display: none">
+        <h3><span id="nb-conventions"></span> Internships <span id="pending"></span></h3>
         <button class="btn-sm btn" onclick="sendMail('checkbox-mail-students')"><span class="fui-mail"></span> mail selection</button>
         <table class="table-condensed table-hover tablesorter" id="table-conventions">
             <thead>
                 <tr>
-                    <th><label class='checkbox'><input type='checkbox' data-toggle='checkbox'/></label></th>
+                    <th><label class='checkbox' id="general-checkbox-conventions"><input id="foo" type='checkbox' data-toggle='checkbox'/></label></th>
                     <th>Student</th>
                     <th>Promotion</th>
                     <th>Major</th>
@@ -55,7 +90,11 @@
                     <th>Actions</th>
                 </tr>
             </thead>
-            <tbody id="table-conventions-body"></tbody>
+            <tbody id="table-conventions-body">
+                <tr>
+                    <td colspan="7" class="text-center">Loading ...</td>
+                </tr>
+            </tbody>
         </table>
     </div>
 
@@ -143,13 +182,17 @@
         <table class="table-condensed table-hover tablesorter" id="table-assignments">
             <thead>
             <tr>
-                <th><label class='checkbox'><input type='checkbox' data-toggle='checkbox'/></label></th>
+                <th><label class='checkbox'><input id="general-checkbox-tutors" type='checkbox' data-toggle='checkbox'/></label></th>
                 <th>Tutor</th>
                 <th>Count</th>
                 <th>Students</th>
             </tr>
             </thead>
-            <tbody id="table-assignments-body"></tbody>
+            <tbody id="table-assignments-body">
+            <tr>
+                <td colspan="4" class="text-center">Loading ...</td>
+            </tr>
+            </tbody>
         </table>
     </div>
 
@@ -196,7 +239,7 @@
 
     <!-- Privileges -->
     <div id="privileges" data-url="privileges" class="page" style="display: none">
-    <h3>Privileges</h3>
+    <h3>Permissions</h3>
         <div id="table-privileges-body"></div>
     </div>
 <footer class="footer text-center">
