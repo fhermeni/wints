@@ -234,9 +234,12 @@ function getAllConventions() {
                 buf += "<td>" + formatStudent(stu.P, true) + "</td>";
                 buf += "<td>" + stu.Promotion + "</td>";
                 buf += "<td>" + stu.Major + "</td>";
-                buf += "<td>" + formatPerson(sup) + "</td>";
-                buf += "<td>" + formatPerson(tut) + "</td>";
-                buf += "<td><span class='fui-search' onclick=\"showDetails('" + stu.P.Email + "')\"></span> <span class='fui-chat'></span></td>";
+                buf += "<td>" + formatPerson(sup, true) + "</td>";
+                buf += "<td>" + formatPerson(tut, true) + "</td>";
+                //buf += "<td><span class='fui-search' onclick=\"showDetails('" + stu.P.Email + "')\"></span> <span class='fui-chat'></span></td>";
+                buf += "<td>" + df(c.MidtermReport) + "</td>";
+                buf += "<td> ? </td>";
+                buf += "<td><span class=\'fui-new\'></span> <span class=\'fui-chat\'></span></td>";
                 buf += "</tr>";
             });
             $("#table-conventions-body").html(buf);
@@ -256,15 +259,19 @@ function displayMyStudents() {
     myStudents.forEach(function (c) {
         var stu = c.Stu;
         buf += "<tr>";
-        buf += "<td><label class='checkbox checkbox-mail-students'><input type='checkbox' data-toggle='checkbox' value='" + stu.P.Email + "'/></label></td>";
+        buf += "<td><label class='checkbox checkbox-mail-myStudents'><input type='checkbox' data-toggle='checkbox' value='" + stu.P.Email + "'/></label></td>";
         buf += "<td>" + formatStudent(stu.P, true) + "</td>";
         buf += "<td>" + stu.Promotion + "</td>";
         buf += "<td>" + stu.Major + "</td>";
         buf += "<td>" + formatCompany(c.Company, c.CompanyWWW, true) + "</td>";
         buf += "<td>" + formatPerson(c.Sup, true) + "</td>";
+        buf += "<td>" + df(c.MidtermReport) + "</td>";
+        buf += "<td> ? </td>";
+        buf += "<td><span class=\'fui-new\'></span> <span class=\'fui-chat\'></span></td>";
         buf += "</tr>";
     });
     $("#table-myStudents-body").html(buf);
+    $(':checkbox').checkbox();
 }
 
 function generalCheckboxConventionToggle() {
@@ -316,7 +323,6 @@ function generalCheckboxTutorsToggle() {
     var nextState = $("#general-checkbox-tutors").find(":checked").length > 0 ? "check" : "uncheck";
     $(".checkbox-mail-tutors").checkbox(nextState);
 }
-
 
 function showDetails(s) {
     $("#student-details").modal('show');

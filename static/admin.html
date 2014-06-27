@@ -24,11 +24,11 @@
 </head>
 <body>
 <div class="container">
-    <nav class="navbar navbar-inverse navbar-embossed" role="navigation">
+    <nav class="navbar navbar-default navbar-embossed" role="navigation">
         <div class="container-fluid">
             <div class="navbar-header">
                 <div class="navbar-brand">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="fullname">Fullname</span> <span class="dropdown-arrow"></span></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="fullname">Fullname</span> <span class="dropdown-arrow-inverse"></span></a>
                     <ul class="dropdown-menu" role="menu">
                         <li><a href="#"><span class="fui-new"></span> Edit profile</a></li>
                         <li class="divider"></li>
@@ -63,14 +63,18 @@
         <table class="table-condensed table-hover tablesorter" id="table-myStudents">
             <thead>
                 <tr>
-                    <th><label class='checkbox' id="general-checkbox-myStudents"><input id="bar" type='checkbox' data-toggle='checkbox'/></label></th>
-                    <th>Student</th>
-                    <th>Promotion</th>
-                    <th>Major</th>
-                    <th>Company</th>
-                    <th>Supervisor</th>
-                    <th>Midterm report<br>due date</th>
-                    <th>Actions</th>
+                    <th rowspan="2"><label class='checkbox' id="general-checkbox-myStudents"><input id="bar" type='checkbox' data-toggle='checkbox'/></label></th>
+                    <th rowspan="2">Student</th>
+                    <th rowspan="2">Promotion</th>
+                    <th rowspan="2">Major</th>
+                    <th rowspan="2">Company</th>
+                    <th rowspan="2">Supervisor</th>
+                    <th colspan="3">Midterm evaluation</th>
+                </tr>
+                <tr>
+                    <th><small>due date</small></th>
+                    <th><small>grade</small></th>
+                    <th><small>resources</small></th>
                 </tr>
             </thead>
             <tbody id="table-myStudents-body">
@@ -88,14 +92,20 @@
         <table class="table-condensed table-hover tablesorter" id="table-conventions">
             <thead>
                 <tr>
-                    <th><label class='checkbox' id="general-checkbox-conventions"><input id="foo" type='checkbox' data-toggle='checkbox'/></label></th>
-                    <th>Student</th>
-                    <th>Promotion</th>
-                    <th>Major</th>
-                    <th>Supervisor</th>
-                    <th>Tutor</th>
-                    <th>Actions</th>
+                    <th rowspan="2"><label class='checkbox' id="general-checkbox-conventions"><input id="foo" type='checkbox' data-toggle='checkbox'/></label></th>
+                    <th rowspan="2">Student</th>
+                    <th rowspan="2">Promotion</th>
+                    <th rowspan="2">Major</th>
+                    <th rowspan="2">Supervisor</th>
+                    <th rowspan="2">Tutor</th>
+                    <th colspan="3">Midterm evaluation</th>
                 </tr>
+                <tr>
+                    <th><small>due date</small></th>
+                    <th><small>grade</small></th>
+                    <th><small>resources</small></th>
+                </tr>
+
             </thead>
             <tbody id="table-conventions-body">
                 <tr>
