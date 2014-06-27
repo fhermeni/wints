@@ -212,9 +212,6 @@ func Admins(db *sql.DB) ([]User, error) {
 			p := Person{fn, ln, email, tel}
 			m = User{p, make([]string, 0, 0)}
 			managers[email] = m
-			log.Printf("%s\n", m)
-		} else {
-			log.Printf("else: %s\n", m)
 		}
 		m.Privs = append(m.Privs, role)
 		managers[email] = m

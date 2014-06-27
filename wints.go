@@ -60,7 +60,6 @@ func pullConventions() {
 		for {
 			select {
 			case <-ticker.C:
-				log.Println("Refreshing conventions")
 				conventions, err := backend.GetAllRawConventions()
 				if err != nil {
 					log.Printf("%s\n", err)

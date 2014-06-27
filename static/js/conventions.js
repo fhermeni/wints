@@ -9,10 +9,11 @@ var pendingConvention;
 var conventions;
 var known;
 var myStudents;
-
+var user;
 $( document ).ready(function () {
     //Check access
     var u = JSON.parse(sessionStorage.getItem("User"));
+    user = u;
     if (!u) {
         window.location.href = "/";
     }
@@ -29,7 +30,6 @@ $( document ).ready(function () {
         isAdmin = isAdmin || p == "root" || p =="admin";
         isMajor = isMajor || p == "root" || p == "admin";
     });
-    console.log(isTutor + " " + isAdmin + " " + isRoot);
     if (isTutor) { $(".tutorItem").show();}
     if (isAdmin) { $(".adminItem").show();}
     if (isMajor) { $(".majorItem").show();}
@@ -191,6 +191,16 @@ function formatPerson(p, truncate) {
     return "<a href='mailto:" + p.Email + "' title='" + fn + "'>" +  name + "</a>";
 }
 
+function formatStudent(p, truncate) {
+    var name = p.Lastname + " " + p.Firstname;
+    var fn = name;
+    if (truncate && name.length > 30) {
+        name = name.substring(0, 27) + "...";
+    }
+    return "<a onclick=\"showDetails('" + p.Email + "')\">" + name + "</a>";
+}
+
+
 function formatCompany(n, www, truncate) {
     if (truncate && n.length > 20) {
         n = n.substring(0, 17) + "...";
@@ -215,13 +225,13 @@ function getAllConventions() {
                 var stu = c.Stu;
                 stu.Major = stu.Major == undefined ? "?" : stu.Major;
                 var tut = c.Tutor;
-                if (tut.Email == sessionStorage.getItem("User").P.Email) {
+                if (tut.Email == user.P.Email) {
                     myStudents.push(c);
                 }
                 var sup = c.Sup;
                 buf += "<tr>";
                 buf += "<td><label class='checkbox checkbox-mail-students'><input type='checkbox' data-toggle='checkbox' value='" + stu.P.Email + "'/></label></td>";
-                buf += "<td>" + formatPerson(stu.P, true) + "</td>";
+                buf += "<td>" + formatStudent(stu.P, true) + "</td>";
                 buf += "<td>" + stu.Promotion + "</td>";
                 buf += "<td>" + stu.Major + "</td>";
                 buf += "<td>" + formatPerson(sup) + "</td>";
@@ -235,6 +245,7 @@ function getAllConventions() {
             $(':checkbox').checkbox();
             $("#general-checkbox-conventions").on('toggle', generalCheckboxConventionToggle);
             makeAssignments();
+            displayMyStudents();
         }
 
     }).fail(function() {})
@@ -242,12 +253,15 @@ function getAllConventions() {
 
 function displayMyStudents() {
     var buf = "";
-    myStudents.forEach(function (s) {
+    myStudents.forEach(function (c) {
+        var stu = c.Stu;
         buf += "<tr>";
         buf += "<td><label class='checkbox checkbox-mail-students'><input type='checkbox' data-toggle='checkbox' value='" + stu.P.Email + "'/></label></td>";
-        buf += "<td>" + formatPerson(s.Stu.P, true) + "</td>";
+        buf += "<td>" + formatStudent(stu.P, true) + "</td>";
         buf += "<td>" + stu.Promotion + "</td>";
         buf += "<td>" + stu.Major + "</td>";
+        buf += "<td>" + formatCompany(c.Company, c.CompanyWWW, true) + "</td>";
+        buf += "<td>" + formatPerson(c.Sup, true) + "</td>";
         buf += "</tr>";
     });
     $("#table-myStudents-body").html(buf);

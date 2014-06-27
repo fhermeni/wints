@@ -121,7 +121,7 @@ func RescanPending(db *sql.DB, c Convention) error {
 		c.Begin = begin
 		c.End = end
 		c.Stu.P.Email = student
-		log.Printf("Got %s\n", student, c)
+		//log.Printf("Got %s\n", student, c)
 		err = RegisterInternship(db, c, true)
 	}
 	return nil
@@ -132,7 +132,7 @@ func RegisterInternship(db *sql.DB, c Convention, move bool) error {
 	_, err := db.Exec("insert into internships (student, startTime, endTime, tutor, midtermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)",
 		c.Stu.P.Email, c.Begin, c.End, c.Tutor.Email, c.Begin.Add(TWO_MONTHS), c.Company, c.CompanyWWW, supervisor.Firstname, supervisor.Lastname, supervisor.Email, supervisor.Tel)
 	if err != nil {
-		log.Printf("%s\n", c)
+		log.Printf("Error: %s\n", c)
 		return err
 	}
 	if move {
@@ -163,17 +163,19 @@ func RegisterPendingInternship(db *sql.DB, c Convention) error {
 func GetAllRawConventions() ([]Convention, error) {
 	year := time.Now().Year()
 	Promotions := []string{"Master%20IFI", "Master%20IMAFA", "MAM%205", "SI%205"}
+	stats := make([]string, 4, 4)
 	conventions := make([]Convention, 0, 0)
-	for _, Promotion := range Promotions {
+	for i, Promotion := range Promotions {
 		cc, err := getRawConventions(year, Promotion)
-		log.Printf("%d conventions from %s\n", len(cc), Promotion)
 		if err != nil {
 			return conventions, err
 		}
+		stats[i] = fmt.Sprintf("%d %s",len(cc), Promotion)
 		for _, c := range cc {
 			conventions = append(conventions, c)
 		}
 	}
+	log.Printf("Parsed conventions: %s\n", strings.Join(stats, ", "))
 	return conventions, nil
 }
 
