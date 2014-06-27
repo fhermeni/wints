@@ -256,29 +256,6 @@
                             <button type="button" class="btn btn-success" onclick="updateProfile()">Update</button>
                         </div>
                     </div>
-                   <!-- <h6>Password</h6>
-                    <div class="form-horizontal">
-                        <div class="form-group">
-                            <label for="current-password" class="col-sm-3 control-label">Current</label>
-                            <div class="col-sm-9">
-                                <input type="password" class="form-control" id="current-password"/>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="password1" class="col-sm-3 control-label">New</label>
-                            <div class="col-sm-9">
-                                <input type="password" class="form-control" id="password1"/>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="password2" class="col-sm-3 control-label">Confirmation</label>
-                            <div class="col-sm-9">
-                                <input type="password" class="form-control" id="password2"/>
-                            </div>
-                        </div>
-                        <button type="button" class="btn btn-primary" onclick="updatePassword()">Update the password</button>
-                    </div> -->
-
                 </div>
             </div>
         </div>
@@ -291,10 +268,14 @@
                     <h3 id="infos-student-name"></h3>
                     <dl class="dl-horizontal">
                         <dt>Promotion</dt>
-                        <dd id="infos-student-promotion"></dd>
+                        <dd>
+                           <select id="infos-student-promotion"></select>
+                        </dd>
 
                         <dt>Major</dt>
-                        <dd id="infos-student-major"></dd>
+                        <dd>
+                            <select id="infos-student-major"></select>
+                        </dd>
 
                         <dt class="glyphicon glyphicon-earphone"></dt>
                         <dd id="infos-student-tel"></dd>

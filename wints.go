@@ -211,6 +211,18 @@ func ChangeProfile(w http.ResponseWriter, r *http.Request, email string) {
 	jsonReply(w, backend.Person{p.Firstname, p.Lastname, email, p.Tel})
 }
 
+func UpdatePromotion(w http.ResponseWriter, r *http.Request, email string) {
+
+}
+
+func UpdateMajor(w http.ResponseWriter, r *http.Request, email string) {
+
+}
+
+func UpdateMidtermDeadline(w http.ResponseWriter, r *http.Request, email string) {
+
+}
+
 type PasswordRenewal struct {
 	OldPassword []byte
 	NewPassword []byte
@@ -242,7 +254,6 @@ func RequireToken(cb func(http.ResponseWriter, *http.Request, string)) http.Hand
 	}
 }
 
-
 func main() {
 
 	var err error
@@ -268,6 +279,9 @@ func main() {
 	r.HandleFunc("/conventions/_random", RequireToken(RandomPendingConvention)).Methods("GET")
 	r.HandleFunc("/conventions/", RequireToken(GetAllConventions)).Methods("GET")
 	r.HandleFunc("/conventions/", RequireToken(CommitPendingConvention)).Methods("POST")
+	r.HandleFunc("/conventions/{email}/major", RequireToken(UpdateMajor)).Methods("POST")
+	r.HandleFunc("/conventions/{email}/promotion", RequireToken(UpdatePromotion)).Methods("POST")
+	r.HandleFunc("/conventions/{email}/midtermDeadline", RequireToken(UpdateMidtermDeadline)).Methods("POST")
 	r.HandleFunc("/admins/", RequireToken(GetAdmins)).Methods("GET")
 	r.HandleFunc("/login", Login).Methods("POST")
 	r.HandleFunc("/profile", RequireToken(ChangeProfile)).Methods("POST")

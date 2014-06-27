@@ -10,9 +10,22 @@ var conventions;
 var known;
 var myStudents;
 var user;
+
+function fillSelect(id, opts) {
+    var b = "";
+    opts.forEach(function (o) {
+       b += "<option value='" + o + "'>" + o + "</option>";
+    });
+    $("#" + id).html(b);
+}
+
 $( document ).ready(function () {
     //Check access
     user = JSON.parse(sessionStorage.getItem("User"));
+
+    fillSelect("infos-student-promotion", ["Master IFI", "Master IMAFA", "MAM 5", "SI 5"]);
+    fillSelect("infos-student-major", ['al','ihm','vim','ubinet','kis','cssr','imafa']);
+
     if (!user) {
         window.location.href = "/";
     }
@@ -66,6 +79,7 @@ function success() {
     $("#alignment-box").hide();
     $("#nothing").show();
 }
+
 function drawProfile(c) {
     $("#pending").html("<a onclick=\"showPage(this,'pending')\" class=\"badge\">" + pending + "</a>");
     $("#alignment-box").show();
@@ -198,7 +212,6 @@ function formatStudent(p, truncate) {
     return "<a href='#' onclick=\"showDetails('" + p.Email + "')\">" + name + "</a>";
 }
 
-
 function formatCompany(n, www, truncate) {
     if (truncate && n.length > 20) {
         n = n.substring(0, 17) + "...";
@@ -261,7 +274,6 @@ function toggleConventionCheckboxes() {
 
 }
 
-
 function displayMyStudents() {
     var buf = "";
     myStudents.forEach(function (c) {
@@ -300,29 +312,32 @@ function generateMailto(cl, btn) {
         checked.each(function (i, e) {
             emails.push($(e).val());
         });
-        var b = $("#" + btn);
-        b.attr("href","mailto:" + emails.join(","));
+        $("#" + btn).attr("href","mailto:" + emails.join(","));
+    } else {
+        $("#" + btn).attr("href","#");
     }
 }
 
 function makeAssignments() {
     var tutors = {};
+    var persons = {};
     if (conventions.length == 0) {
         $("#table-assignments-body").find("tr td").html("No tutors to display");
     } else {
         conventions.forEach(function (c) {
             var t = c.Tutor;
             ft = formatPerson(t);
-            if (!tutors[ft]) {
-                tutors[ft] = [];
+            if (!tutors[t.Email]) {
+                tutors[t.Email] = [];
+                persons[t.Email] = t;
             }
-            tutors[ft].push(formatStudent(c.Stu.P, true));
+            tutors[t.Email].push(formatStudent(c.Stu.P, true));
         });
         var buf = "";
         Object.keys(tutors).forEach(function (k) {
             buf += "<tr>";
-            buf += "<td><label class='checkbox'><input type='checkbox' class='checkbox-mail-tutors' data-toggle='checkbox'/></label></td>";
-            buf += "<td>" + k + "</td>";
+            buf += "<td><label class='checkbox'><input type='checkbox' class='checkbox-mail-tutors' data-toggle='checkbox' value='" + k + "'/></label></td>";
+            buf += "<td>" + formatPerson(persons[k]) + "</td>";
             buf += "<td>" + tutors[k].length + "</td>";
             buf += "<td>" + tutors[k].join(", ") + "</td>";
             buf += "</tr>";
@@ -335,7 +350,6 @@ function makeAssignments() {
         $('.checkbox-mail-tutors').checkbox().on('toggle', function() {
             return generateMailto("checkbox-mail-tutors", 'btn-mail-tutors');
         });
-
     }
 }
 
@@ -351,8 +365,15 @@ function showDetails(s) {
         if (c.Stu.P.Email == s) {
             $("#infos-student-name").html(formatPerson(c.Stu.P));
             $("#infos-student-tel").html(c.Stu.P.Tel);
-            $("#infos-student-major").html(c.Stu.Major);
-            $("#infos-student-promotion").html(c.Stu.Promotion);
+            $("#infos-student-major").val(c.Stu.Major)
+                .on("change", function() {
+                    updateMajor(c.Stu.P.Email)
+                });
+            $("#infos-student-promotion").val(c.Stu.Promotion)
+                .on("change", function() {
+                    updatePromotion(c.Stu.P.Email)
+                })
+            ;
 
             $("#infos-sup-name").html(formatPerson(c.Sup));
             $("#infos-sup-tel").html(c.Sup.Tel);
@@ -368,9 +389,40 @@ function showDetails(s) {
     });
 }
 
+function updatePromotion(email) {
+    postWithToken("/conventions/" + email + "/promotion",$("#infos-student-promotion").val(),
+    function() {
+        console.log("ok")
+    },
+    function () {
+        console.log(arguments)
+    }
+    );
+}
+
+function updateMajor(email) {
+    postWithToken("/conventions/" + email + "/major",$("#infos-student-major").val(),
+        function() {
+            console.log("ok")
+        },
+        function () {
+            console.log(arguments)
+        }
+    );
+}
+
+function updateMidtermDeadline(email) {
+    postWithToken("/conventions/" + email + "/midtermDeadline",$("#infos-student-midtermDeadline").val(),
+        function() {
+            console.log("ok")
+        },
+        function () {
+            console.log(arguments)
+        }
+    );
+}
 
 function showPrivileges() {
-    var admins;
     var buf = "";
     getWithToken("/admins/", function(data) {
         var buf = "<dl class='dl-horizontal'>";
