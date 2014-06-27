@@ -24,27 +24,23 @@
 </head>
 <body>
 <div class="container">
-    <nav class="navbar navbar-default navbar-embossed" role="navigation">
+    <nav class="navbar navbar-default navbar-embossed navbar-inverse" role="navigation">
         <div class="container-fluid">
-            <div class="navbar-header">
-                <div class="navbar-brand">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="fullname">Fullname</span> <span class="dropdown-arrow-inverse"></span></a>
-                    <ul class="dropdown-menu" role="menu">
-                        <li><a href="#"><span class="fui-new"></span> Edit profile</a></li>
-                        <li class="divider"></li>
-                        <li><a onclick="logout()"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
-                    </ul>
-
-                </div>
-            </div>
-            <div class="collapse navbar-collapse" id="navbar-collapse-01">
-                <ul id="menu-pages" class="nav navbar-nav">
-                    <li class="active tutorItem" style="display: none;"><a onclick="showPage(this, 'myStudents');">My students</a></li>
+            <!--<div class="navbar-header"></div>-->
+            <div>
+                <ul id="menu-pages" class="nav navbar-nav navbar-left">
+                    <li><a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="fullname">Fullname</span><b class="caret"></b></a><span class="dropdown-arrow"></span>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#"><span class="fui-new"></span> Edit profile</a></li>
+                            <li><a onclick="logout()"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                        </ul>
+                    </li>
+                    <li class="tutorItem" style="display: none;"><a onclick="showPage(this, 'myStudents');">My students</a></li>
                     <li class="majorItem" style="display: none;"><a onclick="showPage(this, 'conventions');">Internships</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li class="dropdown adminItem" style="display: none">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Administration <span class="dropdown-arrow-inverse"></span></a>
+                    <li class="adminItem" style="display: none">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="fui-gear"></span><b class="caret"></b></a><span class="dropdown-arrow"></span>
                         <ul class="dropdown-menu" role="menu">
                             <li class="adminItem" style="display: none;"><a onclick="showPage(this, 'assignments')">Tutors</a></li>
                             <li class="rootItem" style="display: none;"><a onclick="showPage(this, 'privileges')">Permissions</a></li>
@@ -259,14 +255,14 @@
     <h3>Permissions</h3>
         <div id="table-privileges-body"></div>
     </div>
-<footer class="footer text-center">
+<footer class="footer text-right">
     <div class="container">
         <p>© University Nice Sophia Antipolis 2013-2014</p>
 
-        <p><a href="http://validator.w3.org/check">
+        <!--<p><a href="http://validator.w3.org/check">
             <img src="img/HTML5_Logo_64.png" alt="html5-validator"
                  style="height: 50px"></a>
-        </p>
+        </p>-->
     </div>
 </footer>
 </body>

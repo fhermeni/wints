@@ -179,7 +179,7 @@ function showPage(li, id) {
         }
     });
     $("#menu-pages").find("li").removeClass("active");
-    $(li).addClass("active");
+    $(li.parentNode).addClass("active");
 }
 
 function formatPerson(p, truncate) {
