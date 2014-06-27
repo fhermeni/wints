@@ -219,7 +219,7 @@ function formatCompany(n, www, truncate) {
         n = n.substring(0, 17) + "...";
     }
     if (www != "") {
-        return "<a href='" + www + "'>" + n + "</a>";
+        return "<a target='_blank' href='" + www + "'>" + n + "</a>";
     }
     return n;
 }
@@ -243,7 +243,7 @@ function getAllConventions() {
                 }
                 var sup = c.Sup;
                 buf += "<tr>";
-                buf += "<td><label class='checkbox checkbox-mail-students'><input type='checkbox' data-toggle='checkbox' value='" + stu.P.Email + "'/></label></td>";
+                buf += "<td><label class='checkbox'><input type='checkbox' class='checkbox-mail-conventions' data-toggle='checkbox' value='" + stu.P.Email + "'/></label></td>";
                 buf += "<td>" + formatStudent(stu.P, true) + "</td>";
                 buf += "<td>" + stu.Promotion + "</td>";
                 buf += "<td>" + stu.Major + "</td>";
@@ -259,20 +259,25 @@ function getAllConventions() {
             $("#nb-conventions").html(conventions.length);
             $("#table-conventions").tablesorter({headers: {0: {"sorter": false}}});
             $(':checkbox').checkbox();
-            $("#general-checkbox-conventions").on('toggle', generalCheckboxConventionToggle);
+            $("#general-checkbox-conventions").on('toggle', toggleConventionCheckboxes);
             makeAssignments();
             displayMyStudents();
         }
-
     })
 }
+
+function toggleConventionCheckboxes() {
+    var nextState = $("#general-checkbox-conventions").find(":checked").length > 0 ? "check" : "uncheck";
+    $(".checkbox-mail-conventions").checkbox(nextState);
+}
+
 
 function displayMyStudents() {
     var buf = "";
     myStudents.forEach(function (c) {
         var stu = c.Stu;
         buf += "<tr>";
-        buf += "<td><label class='checkbox checkbox-mail-myStudents'><input type='checkbox' data-toggle='checkbox' value='" + stu.P.Email + "'/></label></td>";
+        buf += "<td><label class='checkbox'><input class='checkbox-mail-myStudents' type='checkbox' data-toggle='checkbox' value='" + stu.P.Email + "'/></label></td>";
         buf += "<td>" + formatStudent(stu.P, true) + "</td>";
         buf += "<td>" + stu.Promotion + "</td>";
         buf += "<td>" + stu.Major + "</td>";
@@ -286,11 +291,13 @@ function displayMyStudents() {
     $("#table-myStudents-body").html(buf);
     $("#table-myStudents").tablesorter({headers: {0: {"sorter": false}}});
     $(':checkbox').checkbox();
+    $('#general-checkbox-myStudents').on('toggle', toggleMyStudentCheckboxes);
 }
 
-function generalCheckboxConventionToggle() {
-    var nextState = $("#general-checkbox-conventions").find(":checked").length > 0 ? "check" : "uncheck";
-    $(".checkbox-mail-students").checkbox(nextState);
+function toggleMyStudentCheckboxes() {
+
+    var nextState = $("#general-checkbox-myStudents:checked").length > 0 ? "check" : "uncheck";
+    $(".checkbox-mail-myStudents").checkbox(nextState);
 }
 
 function sendMail(cl) {
@@ -300,7 +307,9 @@ function sendMail(cl) {
         checked.each(function (i, e) {
             emails.push($(e).val());
         });
-        window.location.href = "mailto:" + emails.join(",");
+        var foo = $("<a href='mailto:" + emails.join(",") + "'>foo</a>");
+        foo[0].click();
+        console.log(foo);
     }
 }
 function makeAssignments() {
@@ -314,12 +323,12 @@ function makeAssignments() {
             if (!tutors[ft]) {
                 tutors[ft] = [];
             }
-            tutors[ft].push(formatPerson(c.Stu.P, true));
+            tutors[ft].push(formatStudent(c.Stu.P, true));
         });
         var buf = "";
         Object.keys(tutors).forEach(function (k) {
             buf += "<tr>";
-            buf += "<td><label class='checkbox checkbox-mail-tutors'><input type='checkbox' data-toggle='checkbox'/></label></td>";
+            buf += "<td><label class='checkbox'><input type='checkbox' class='checkbox-mail-tutors' data-toggle='checkbox'/></label></td>";
             buf += "<td>" + k + "</td>";
             buf += "<td>" + tutors[k].length + "</td>";
             buf += "<td>" + tutors[k].join(", ") + "</td>";
@@ -329,12 +338,12 @@ function makeAssignments() {
         $("#table-assignments").tablesorter({headers: {0: {"sorter": false}}});
         $("#nb-tutors").html(Object.keys(tutors).length);
         $(':checkbox').checkbox();
-        $("#general-checkbox-tutors").checkbox().on('toggle', generalCheckboxTutorsToggle);
+        $("#general-checkbox-tutors").checkbox().on('toggle', toggleTutorCheckboxes);
     }
 }
 
-function generalCheckboxTutorsToggle() {
-    var nextState = $("#general-checkbox-tutors").find(":checked").length > 0 ? "check" : "uncheck";
+function toggleTutorCheckboxes() {
+    var nextState = $("#general-checkbox-tutors:checked").length > 0 ? "check" : "uncheck";
     $(".checkbox-mail-tutors").checkbox(nextState);
 }
 
