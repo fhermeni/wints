@@ -4355,7 +4355,7 @@ body.vjs-full-window {
   animation: sharp 2s ease infinite;
 }
 .login {
-  background: url(../images/login/imac.png) 0 0 no-repeat;
+  /*background: url(../images/login/imac.png) 0 0 no-repeat;*/
   background-size: 940px 778px;
   color: #ffffff;
   margin-bottom: 77px;
