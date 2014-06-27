@@ -56,22 +56,7 @@ function pickOne() {
             committed = total - pending;
             drawProfile(data)
         }
-    })
-    /*$.get("/conventions/_random", function(data) {
-        total = data.Total;
-        pending = data.Pending;
-        pendingConvention = data.C;
-        if (pending == 0) {
-           success();
-        } else {
-            known = data.Known;
-            known.sort(function (a, b) {
-                return a.Lastname.localeCompare(b.Lastname);
-            });
-            committed = total - pending;
-            drawProfile(data)
-        }
-    }).fail(function() {})  */
+    });
 }
 
 function success() {
@@ -249,7 +234,6 @@ function getAllConventions() {
                 buf += "<td>" + stu.Major + "</td>";
                 buf += "<td>" + formatPerson(sup, true) + "</td>";
                 buf += "<td>" + formatPerson(tut, true) + "</td>";
-                //buf += "<td><span class='fui-search' onclick=\"showDetails('" + stu.P.Email + "')\"></span> <span class='fui-chat'></span></td>";
                 buf += "<td>" + df(c.MidtermReport) + "</td>";
                 buf += "<td> ? </td>";
                 buf += "<td><span class=\'fui-new\'></span> <span class=\'fui-chat\'></span></td>";
@@ -262,6 +246,10 @@ function getAllConventions() {
             $("#general-checkbox-conventions").on('toggle', toggleConventionCheckboxes);
             makeAssignments();
             displayMyStudents();
+            $('.checkbox-mail-conventions').checkbox().on('toggle', function() {
+                return generateMailto("checkbox-mail-conventions", 'btn-mail-conventions');
+            });
+
         }
     })
 }
@@ -269,6 +257,8 @@ function getAllConventions() {
 function toggleConventionCheckboxes() {
     var nextState = $("#general-checkbox-conventions").find(":checked").length > 0 ? "check" : "uncheck";
     $(".checkbox-mail-conventions").checkbox(nextState);
+    generateMailto("checkbox-mail-conventions", 'btn-mail-conventions');
+
 }
 
 
@@ -292,26 +282,29 @@ function displayMyStudents() {
     $("#table-myStudents").tablesorter({headers: {0: {"sorter": false}}});
     $(':checkbox').checkbox();
     $('#general-checkbox-myStudents').on('toggle', toggleMyStudentCheckboxes);
+    $('.checkbox-mail-myStudents').checkbox().on('toggle', function() {
+       return generateMailto("checkbox-mail-myStudents", 'btn-mail-myStudents');
+    });
 }
 
 function toggleMyStudentCheckboxes() {
-
     var nextState = $("#general-checkbox-myStudents:checked").length > 0 ? "check" : "uncheck";
     $(".checkbox-mail-myStudents").checkbox(nextState);
+    generateMailto("checkbox-mail-myStudents", 'btn-mail-myStudents');
 }
 
-function sendMail(cl) {
-    var checked = $("." + cl + " :checked");
+function generateMailto(cl, btn) {
+    var checked = $("." + cl + ":checked");
     if (checked.length > 0) {
         var emails = [];
         checked.each(function (i, e) {
             emails.push($(e).val());
         });
-        var foo = $("<a href='mailto:" + emails.join(",") + "'>foo</a>");
-        foo[0].click();
-        console.log(foo);
+        var b = $("#" + btn);
+        b.attr("href","mailto:" + emails.join(","));
     }
 }
+
 function makeAssignments() {
     var tutors = {};
     if (conventions.length == 0) {
@@ -339,12 +332,17 @@ function makeAssignments() {
         $("#nb-tutors").html(Object.keys(tutors).length);
         $(':checkbox').checkbox();
         $("#general-checkbox-tutors").checkbox().on('toggle', toggleTutorCheckboxes);
+        $('.checkbox-mail-tutors').checkbox().on('toggle', function() {
+            return generateMailto("checkbox-mail-tutors", 'btn-mail-tutors');
+        });
+
     }
 }
 
 function toggleTutorCheckboxes() {
     var nextState = $("#general-checkbox-tutors:checked").length > 0 ? "check" : "uncheck";
     $(".checkbox-mail-tutors").checkbox(nextState);
+    generateMailto("checkbox-mail-tutors", 'btn-mail-tutors');
 }
 
 function showDetails(s) {
@@ -374,7 +372,6 @@ function showDetails(s) {
 function showPrivileges() {
     var admins;
     var buf = "";
-    //$.get("/admins/", function(data) {
     getWithToken("/admins/", function(data) {
         var buf = "<dl class='dl-horizontal'>";
         data.forEach(function (a) {
