@@ -15,3 +15,23 @@ jQuery.extend({
         });
     }
 });
+
+
+function postWithToken(url, data, successCb, errorCb) {
+    var jqr = $.ajax({
+        method: "POST",
+        url: url,
+        data: JSON.stringify(data),
+        headers: {"X-auth-token" : sessionStorage.getItem("token")},
+    }).done(updateCb).fail(errorCb);
+    return jqr;
+}
+
+function getWithToken(url, successCb, errorCb) {
+    var jqr = $.ajax({
+        method: "GET",
+        url: url,
+        headers: {"X-auth-token" : sessionStorage.getItem("token")},
+    }).done(successCb).fail(errorCb);
+    return jqr;
+}

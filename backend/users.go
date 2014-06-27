@@ -11,24 +11,24 @@ import (
 )
 
 const (
-	selectUser = "select email,password from users where email=$1"
+	selectUser     = "select email,password from users where email=$1"
 	changePassword = "update users set password=$2 where uid=$1"
 )
 
 type Person struct {
 	Firstname string
-	Lastname string
-	Email string
-	Tel string
+	Lastname  string
+	Email     string
+	Tel       string
 }
 
 type User struct {
-	P Person
+	P     Person
 	Privs []string
 }
 
 func (u User) isAdmin() bool {
-	for _,p := range u.Privs {
+	for _, p := range u.Privs {
 		if (p == "admin" || p == "root") {
 			return true;
 		}
@@ -37,7 +37,7 @@ func (u User) isAdmin() bool {
 }
 
 func (u User) isTutor() bool {
-	for _,p := range u.Privs {
+	for _, p := range u.Privs {
 		if (p == "tutor") {
 			return true;
 		}
@@ -51,12 +51,12 @@ func (p Person) String() string {
 }
 
 type Student struct {
- 	P Person
+	P         Person
 	Promotion string
 }
 
 func Register(db *sql.DB, c Credential) (User, error) {
-	var fn, ln, tel,p string
+	var fn, ln, tel, p string
 	err := db.QueryRow("select firstname, lastname, tel, password from users where email=$1", c.Email).Scan(&fn, &ln, &tel, &p)
 	if err != nil {
 		log.Printf("Unknown user %s: ‰s\n", c.Email, err)
@@ -107,11 +107,11 @@ func NewStudent(db *sql.DB, s Student) error {
 	if err != nil {
 		return err
 	}
-	_,err = db.Exec("insert into roles(email,role) values($1,'student')", s.P.Email)
+	_, err = db.Exec("insert into roles(email,role) values($1,'student')", s.P.Email)
 	if err != nil {
 		return err
 	}
-	res, err := db.Exec("insert into students(email, promotion) values($1,$2)",s.P.Email, s.Promotion)
+	res, err := db.Exec("insert into students(email, promotion) values($1,$2)", s.P.Email, s.Promotion)
 	if err != nil {
 		return err
 	}
@@ -130,7 +130,7 @@ func NewTutor(db *sql.DB, p Person) error {
 	if err != nil {
 		return err
 	}
-	_,err = db.Exec("insert into roles(email,role) values($1,'tutor')", p.Email)
+	_, err = db.Exec("insert into roles(email,role) values($1,'tutor')", p.Email)
 	if err != nil {
 		return err
 	}
@@ -188,7 +188,7 @@ func GetPerson(db *sql.DB, email string) (Person, error) {
 
 func GetStudent(db *sql.DB, email string) (Student, error) {
 	var fn, ln, tel, promo string
-	err := db.QueryRow("select firstname, lastname, tel, promotion from students, users where students.email = users.email and users.email=$1",email).Scan(&fn, &ln, &tel, &promo)
+	err := db.QueryRow("select firstname, lastname, tel, promotion from students, users where students.email = users.email and users.email=$1", email).Scan(&fn, &ln, &tel, &promo)
 	if err != nil {
 		return Student{}, err
 	}
@@ -223,23 +223,28 @@ func Admins(db *sql.DB) ([]User, error) {
 }
 
 func NewPassword(db *sql.DB, uid int, oldPassword, newPassword []byte) error {
-//Get the password
-var p []byte
-err := db.QueryRow("select password from users where uid=$1", uid).Scan(&p)
-if err != nil {
-return err
-}
-if (bcrypt.CompareHashAndPassword(p, oldPassword) != nil) {
-return &BackendError{http.StatusConflict, "incorrect old password"}
+	//Get the password
+	var p []byte
+	err := db.QueryRow("select password from users where uid=$1", uid).Scan(&p)
+	if err != nil {
+		return err
+	}
+	if (bcrypt.CompareHashAndPassword(p, oldPassword) != nil) {
+		return &BackendError{http.StatusConflict, "incorrect old password"}
+	}
+
+	hash, err := bcrypt.GenerateFromPassword(newPassword, bcrypt.MinCost)
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec(changePassword, hash)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-hash, err := bcrypt.GenerateFromPassword(newPassword, bcrypt.MinCost)
-if err != nil {
-return err
-}
-_, err = db.Exec(changePassword, hash)
-if err != nil {
-return err
-}
-return nil
+func SetProfile(db *sql.DB, email, fn, ln, tel string) error {
+	_, err := db.Exec("update users set firstname=$1, lastname=$2, tel=$3 where email=$4", fn, ln, tel, email)
+	return err
 }

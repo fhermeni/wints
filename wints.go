@@ -83,7 +83,7 @@ type PendingConventionMsg struct {
 	Total int
 }
 
-func RandomPendingConvention(w http.ResponseWriter, r *http.Request) {
+func RandomPendingConvention(w http.ResponseWriter, r *http.Request, email string) {
 	c, err := backend.PeekRawConvention(DB)
 	if err != nil && err != sql.ErrNoRows {
 		log.Printf("Error2: %s\n", err)
@@ -109,7 +109,7 @@ func RandomPendingConvention(w http.ResponseWriter, r *http.Request) {
 	jsonReply(w, PendingConventionMsg{c, known, nbPending, nbPending + nbCommitted})
 }
 
-func GetAllConventions(w http.ResponseWriter, r *http.Request) {
+func GetAllConventions(w http.ResponseWriter, r *http.Request, email string) {
 	conventions, err := backend.GetConventions(DB)
 	if err != nil {
 		log.Printf("Error: %s\n", err)
@@ -119,7 +119,7 @@ func GetAllConventions(w http.ResponseWriter, r *http.Request) {
 }
 
 
-func GetAdmins(w http.ResponseWriter, r *http.Request) {
+func GetAdmins(w http.ResponseWriter, r *http.Request, email string) {
 	admins, err := backend.Admins(DB)
 	if err != nil {
 		log.Printf("Error: %s\n", err)
@@ -151,7 +151,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	jsonReply(w, u)
 }
 
-func Logout(w http.ResponseWriter, r *http.Request) {
+func Logout(w http.ResponseWriter, r *http.Request, email string) {
 	token := r.Header.Get("X-auth-token")
 	if (len(token) == 0) {
 		http.Error(w, "X-auth-token is missing", http.StatusUnauthorized)
@@ -163,7 +163,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func CommitPendingConvention(w http.ResponseWriter, r *http.Request) {
+func CommitPendingConvention(w http.ResponseWriter, r *http.Request, email string) {
 	var c backend.Convention
 	err := jsonRequest(w, r, &c)
 	if err != nil {
@@ -193,6 +193,24 @@ func CommitPendingConvention(w http.ResponseWriter, r *http.Request) {
 	backend.RescanPending(DB, c)
 }
 
+type PersonUpdate struct {
+	Firstname string
+	Lastname string
+	Tel string
+}
+
+func ChangeProfile(w http.ResponseWriter, r *http.Request, email string) {
+	log.Printf("Permission check")
+	var p PersonUpdate
+	if jsonRequest(w, r, &p) != nil {
+		return
+	}
+	err := backend.SetProfile(DB, email, p.Firstname, p.Lastname, p.Tel)
+	reportError(w, "", err)
+
+	jsonReply(w, backend.Person{p.Firstname, p.Lastname, email, p.Tel})
+}
+
 type PasswordRenewal struct {
 	OldPassword []byte
 	NewPassword []byte
@@ -210,17 +228,17 @@ func ChangePassword(w http.ResponseWriter, r *http.Request, uid int) {
 	}
 }
 
-func RequireToken(cb func(http.ResponseWriter, *http.Request, int)) http.HandlerFunc {
+func RequireToken(cb func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		token := r.Header.Get("X-auth-token")
 		if (token == "") {
 			http.Error(w, "Header 'X-auth-token' is missing", http.StatusForbidden)
 		}
-		uid, err := backend.CheckSession(DB, token)
+		email, err := backend.CheckSession(DB, token)
 		if err != nil {
 			http.Error(w, "Invalid session token", http.StatusUnauthorized)
 		}
-		cb(w, r, uid)
+		cb(w, r, email)
 	}
 }
 
@@ -247,13 +265,14 @@ func main() {
 	r.HandleFunc("/", rootHandler)
 
 	//User mgnt
-	r.HandleFunc("/conventions/_random", RandomPendingConvention).Methods("GET")
-	r.HandleFunc("/conventions/", GetAllConventions).Methods("GET")
-	r.HandleFunc("/conventions/", CommitPendingConvention).Methods("POST")
-	r.HandleFunc("/admins/", GetAdmins).Methods("GET")
+	r.HandleFunc("/conventions/_random", RequireToken(RandomPendingConvention)).Methods("GET")
+	r.HandleFunc("/conventions/", RequireToken(GetAllConventions)).Methods("GET")
+	r.HandleFunc("/conventions/", RequireToken(CommitPendingConvention)).Methods("POST")
+	r.HandleFunc("/admins/", RequireToken(GetAdmins)).Methods("GET")
 	r.HandleFunc("/login", Login).Methods("POST")
-	r.HandleFunc("/logout", Logout).Methods("POST")
-	r.HandleFunc("/my/password", RequireToken(ChangePassword)).Methods("POST")
+	r.HandleFunc("/profile", RequireToken(ChangeProfile)).Methods("POST")
+	r.HandleFunc("/logout", RequireToken(Logout)).Methods("POST")
+	//r.HandleFunc("/my/password", RequireToken(ChangePassword)).Methods("POST")
 	// handle all requests by serving a file of the same name
 	fs := http.Dir("static/")
 	fileHandler := http.FileServer(fs)

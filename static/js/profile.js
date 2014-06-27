@@ -3,24 +3,34 @@
  */
 
 function showProfileEditor() {
-    $("#fullname").val(user.sessionStorage["fullname"])
-    $("#email").val(sessionStorage["email"])
-    $("#profileEditor").modal('show')
-    $("#profileEditor-err").html("")
+    console.log(user);
+    $("#lbl-firstname").val(user.P.Firstname);
+    $("#lbl-lastname").val(user.P.Lastname);
+    $("#lbl-tel").val(user.P.Tel);
+    //$("#lbl-email").val(user.P.Email);
+    $("#profileEditor").modal('show');
 }
 
 function updateProfile() {
-    $.postJSON("/my/profile", JSON.stringify({Fullname: $("#fullname").val(), Email: $("#email").val()}), updateCb, errorCb);
+    var body = {Firstname: $("#lbl-firstname").val(), Lastname: $("#lbl-lastname").val(), Tel: $("#lbl-tel").val()};
+    console.log(body);
+    var jqr = $.ajax({
+        method: "POST",
+        url: "/profile",
+        data: JSON.stringify(body),
+        headers: {"X-auth-token" : sessionStorage.getItem("token")},
+    }).done(updateCb).fail(errorCb());
 }
 
 function updateCb(data, resp, xhr ) {
     if (xhr.status == 200 && xhr.readyState == 4) {
         var fn = $("#fullname").val();
         $("#profileEditor-err").html("");
-        sessionStorage["fullname"] = fn;
-        sessionStorage["email"] = $("#email").val();
-        $("#user").html(fn);
+        user.P = data;
+        sessionStorage.setItem("user", JSON.stringify(user));
+        $("#fullname").html(user.P.Firstname + " " + user.P.Lastname);
         $("#profileEditor").modal('hide');
+        $("#profileEditor-err").html("");
     } else {
         $("#profileEditor-err").html("<div class='alert alert-danger'>" + res.responseText + "</div>")
     }

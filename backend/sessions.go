@@ -85,22 +85,22 @@ func WipeSessions(db *sql.DB) error {
 	return err
 }
 
-func CheckSession(db *sql.DB, token string) (int, error) {
+func CheckSession(db *sql.DB, token string) (string, error) {
 	rows, err := db.Query(selectUIDFromToken, token)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 	defer rows.Close()
 	if !rows.Next() {
-		return 0, &BackendError{http.StatusUnauthorized, "Invalid session token"}
+		return "", &BackendError{http.StatusUnauthorized, "Invalid session token"}
 	}
-	var uid int
+	var email string
 	var last time.Time
-	rows.Scan(&uid, &last)
+	rows.Scan(&email, &last)
 	//Check if the token is fresh enough
 	if (time.Now().After(last)) {
-		return 0, &BackendError{http.StatusGone, "The session expired"}
+		return "", &BackendError{http.StatusGone, "The session expired"}
 	}
-	return uid, nil
+	return email, nil
 }
 

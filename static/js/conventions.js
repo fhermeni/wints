@@ -12,19 +12,17 @@ var myStudents;
 var user;
 $( document ).ready(function () {
     //Check access
-    var u = JSON.parse(sessionStorage.getItem("User"));
-    user = u;
-    if (!u) {
+    user = JSON.parse(sessionStorage.getItem("User"));
+    if (!user) {
         window.location.href = "/";
     }
-
-    $("#fullname").html(u.P.Firstname + " " + u.P.Lastname);
+    $("#fullname").html(user.P.Firstname + " " + user.P.Lastname);
 
     var isAdmin = false;
     var isTutor = false;
     var isRoot = false;
     var isMajor = false;
-    u.Privs.forEach(function (p) {
+    user.Privs.forEach(function (p) {
         isRoot = isRoot || p == "root";
         isTutor = isTutor || p == "tutor";
         isAdmin = isAdmin || p == "root" || p =="admin";
@@ -44,7 +42,22 @@ $( document ).ready(function () {
 });
 
 function pickOne() {
-    $.get("/conventions/_random", function(data) {
+    getWithToken("/conventions/_random", function(data) {
+        total = data.Total;
+        pending = data.Pending;
+        pendingConvention = data.C;
+        if (pending == 0) {
+            success();
+        } else {
+            known = data.Known;
+            known.sort(function (a, b) {
+                return a.Lastname.localeCompare(b.Lastname);
+            });
+            committed = total - pending;
+            drawProfile(data)
+        }
+    })
+    /*$.get("/conventions/_random", function(data) {
         total = data.Total;
         pending = data.Pending;
         pendingConvention = data.C;
@@ -58,7 +71,7 @@ function pickOne() {
             committed = total - pending;
             drawProfile(data)
         }
-    }).fail(function() {})
+    }).fail(function() {})  */
 }
 
 function success() {
@@ -213,7 +226,7 @@ function formatCompany(n, www, truncate) {
 
 function getAllConventions() {
     myStudents = [];
-    $.get("/conventions/", function(data) {
+    getWithToken("/conventions/", function(data) {
         conventions = data;
         var buf = "";
         if (conventions.length == 0) {
@@ -221,6 +234,7 @@ function getAllConventions() {
             $("#table-assignments-body").find("tr td").html("No tutors to display");
             $("#table-myStudents-body").find("tr td").html("No tutored students");
         } else {
+            console.log(conventions);
             conventions.forEach(function (c) {
                 var stu = c.Stu;
                 stu.Major = stu.Major == undefined ? "?" : stu.Major;
@@ -242,6 +256,7 @@ function getAllConventions() {
                 buf += "<td><span class=\'fui-new\'></span> <span class=\'fui-chat\'></span></td>";
                 buf += "</tr>";
             });
+            console.log(buf);
             $("#table-conventions-body").html(buf);
             $("#nb-conventions").html(conventions.length);
             $("#table-conventions").tablesorter({headers: {0: {"sorter": false}}});
@@ -251,7 +266,7 @@ function getAllConventions() {
             displayMyStudents();
         }
 
-    }).fail(function() {})
+    })
 }
 
 function displayMyStudents() {
@@ -352,7 +367,8 @@ function showDetails(s) {
 function showPrivileges() {
     var admins;
     var buf = "";
-    $.get("/admins/", function(data) {
+    //$.get("/admins/", function(data) {
+    getWithToken("/admins/", function(data) {
         var buf = "<dl class='dl-horizontal'>";
         data.forEach(function (a) {
          buf += "<dt>" + formatPerson(a.P, true) + "</dt>";
