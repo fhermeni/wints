@@ -31,12 +31,12 @@
                 <ul id="menu-pages" class="nav navbar-nav navbar-left">
                     <li><a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="fullname">Fullname</span><b class="caret"></b></a><span class="dropdown-arrow"></span>
                         <ul class="dropdown-menu" role="menu">
-                            <li><a href="#"><span class="fui-new"></span> Edit profile</a></li>
+                            <li><a href="#" onclick="showProfileEditor()"><span class="fui-new"></span> Edit profile</a></li>
                             <li><a onclick="logout()"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
                         </ul>
                     </li>
                     <li class="tutorItem" style="display: none;"><a onclick="showPage(this, 'myStudents');">My students</a></li>
-                    <li class="majorItem" style="display: none;"><a onclick="showPage(this, 'conventions');">Internships</a></li>
+                    <li class="majorItem" style="display: none;"><a onclick="showPage(this, 'conventions');">Watchlist</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li class="adminItem" style="display: none">
@@ -209,6 +209,86 @@
         </table>
     </div>
 
+    <!-- Privileges -->
+    <div id="privileges" data-url="privileges" class="page" style="display: none">
+    <h3>Permissions</h3>
+        <div id="table-privileges-body"></div>
+    </div>
+<footer class="footer text-right">
+    <div class="container">
+        <p>© University Nice Sophia Antipolis 2013-2014</p>
+    </div>
+</footer>
+
+<!-- the modals -->
+    <div class="modal fade" id="profileEditor">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Profile editor</h4>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="form-horizontal">
+                        <div id="profileEditor-err"></div>
+                        <div class="form-group">
+                            <label for="lbl-firstname" class="col-sm-3 control-label">Firstname</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="lbl-firstname" placeholder="firstname"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="lbl-lastname" class="col-sm-3 control-label">Lastname</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="lbl-lastname" placeholder="lastname"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="lbl-email" class="col-sm-3 control-label">Email</label>
+                            <div class="col-sm-9">
+                                <input type="email" class="form-control" id="lbl-email" placeholder="email"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="lbl-tel" class="col-sm-3 control-label">Telephon</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="lbl-tel" placeholder="telephon"/>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn btn-primary" onclick="updateProfile()">Update the profile</button>
+                    </div>
+                    <h6>Password</h6>
+                    <div class="form-horizontal">
+                        <div class="form-group">
+                            <label for="current-password" class="col-sm-3 control-label">Current</label>
+                            <div class="col-sm-9">
+                                <input type="password" class="form-control" id="current-password"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password1" class="col-sm-3 control-label">New</label>
+                            <div class="col-sm-9">
+                                <input type="password" class="form-control" id="password1"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password2" class="col-sm-3 control-label">Confirmation</label>
+                            <div class="col-sm-9">
+                                <input type="password" class="form-control" id="password2"/>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-primary" onclick="updatePassword()">Update the password</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="student-details">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -249,21 +329,5 @@
             </div>
         </div>
     </div>
-
-    <!-- Privileges -->
-    <div id="privileges" data-url="privileges" class="page" style="display: none">
-    <h3>Permissions</h3>
-        <div id="table-privileges-body"></div>
-    </div>
-<footer class="footer text-right">
-    <div class="container">
-        <p>© University Nice Sophia Antipolis 2013-2014</p>
-
-        <!--<p><a href="http://validator.w3.org/check">
-            <img src="img/HTML5_Logo_64.png" alt="html5-validator"
-                 style="height: 50px"></a>
-        </p>-->
-    </div>
-</footer>
 </body>
 </html>

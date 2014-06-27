@@ -3,7 +3,7 @@
  */
 
 function showProfileEditor() {
-    $("#fullname").val(sessionStorage["fullname"])
+    $("#fullname").val(user.sessionStorage["fullname"])
     $("#email").val(sessionStorage["email"])
     $("#profileEditor").modal('show')
     $("#profileEditor-err").html("")
@@ -11,14 +11,6 @@ function showProfileEditor() {
 
 function updateProfile() {
     $.postJSON("/my/profile", JSON.stringify({Fullname: $("#fullname").val(), Email: $("#email").val()}), updateCb, errorCb);
-    /*
-        status: ok
-        errors: {
-               fullname: ""
-               password: ""
-               email: ""
-        }
-     */
 }
 
 function updateCb(data, resp, xhr ) {

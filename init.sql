@@ -10,7 +10,7 @@ drop type if exists app_status;
 drop table if exists users;
 drop type if exists role;
 -- user
-create table users(email text UNIQUE,
+create table users(email text UNIQUE ON UPDATE UPDATE,
 				  username text,
 				  firstname text,
 				  lastname text,

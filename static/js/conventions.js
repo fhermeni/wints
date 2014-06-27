@@ -197,7 +197,7 @@ function formatStudent(p, truncate) {
     if (truncate && name.length > 30) {
         name = name.substring(0, 27) + "...";
     }
-    return "<a onclick=\"showDetails('" + p.Email + "')\">" + name + "</a>";
+    return "<a href='#' onclick=\"showDetails('" + p.Email + "')\">" + name + "</a>";
 }
 
 
