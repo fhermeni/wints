@@ -234,7 +234,6 @@ function getAllConventions() {
             $("#table-assignments-body").find("tr td").html("No tutors to display");
             $("#table-myStudents-body").find("tr td").html("No tutored students");
         } else {
-            console.log(conventions);
             conventions.forEach(function (c) {
                 var stu = c.Stu;
                 stu.Major = stu.Major == undefined ? "?" : stu.Major;
@@ -256,7 +255,6 @@ function getAllConventions() {
                 buf += "<td><span class=\'fui-new\'></span> <span class=\'fui-chat\'></span></td>";
                 buf += "</tr>";
             });
-            console.log(buf);
             $("#table-conventions-body").html(buf);
             $("#nb-conventions").html(conventions.length);
             $("#table-conventions").tablesorter({headers: {0: {"sorter": false}}});
@@ -286,6 +284,7 @@ function displayMyStudents() {
         buf += "</tr>";
     });
     $("#table-myStudents-body").html(buf);
+    $("#table-myStudents").tablesorter({headers: {0: {"sorter": false}}});
     $(':checkbox').checkbox();
 }
 
@@ -343,7 +342,6 @@ function showDetails(s) {
     $("#student-details").modal('show');
     conventions.forEach(function (c) {
         if (c.Stu.P.Email == s) {
-            console.log(c);
             $("#infos-student-name").html(formatPerson(c.Stu.P));
             $("#infos-student-tel").html(c.Stu.P.Tel);
             $("#infos-student-major").html(c.Stu.Major);
