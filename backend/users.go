@@ -50,10 +50,7 @@ func (p Person) String() string {
 	return p.Firstname + " " + p.Lastname + " (" + p.Email + ")";
 }
 
-type Student struct {
-	P         Person
-	Promotion string
-}
+
 
 func Register(db *sql.DB, c Credential) (User, error) {
 	var fn, ln, tel, p string
@@ -101,29 +98,7 @@ func newUser(db *sql.DB, p Person) error {
 	return &BackendError{http.StatusConflict, "User already exists"}
 }
 
-func NewStudent(db *sql.DB, s Student) error {
-	log.Printf("Creating student %s\n", s)
-	err := newUser(db, s.P)
-	if err != nil {
-		return err
-	}
-	_, err = db.Exec("insert into roles(email,role) values($1,'student')", s.P.Email)
-	if err != nil {
-		return err
-	}
-	res, err := db.Exec("insert into students(email, promotion) values($1,$2)", s.P.Email, s.Promotion)
-	if err != nil {
-		return err
-	}
-	nb, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if nb != 1 {
-		return errors.New("Unable to declare the student")
-	}
-	return nil
-}
+
 
 func NewTutor(db *sql.DB, p Person) error {
 	err := newUser(db, p)
@@ -138,21 +113,7 @@ func NewTutor(db *sql.DB, p Person) error {
 	return err
 }
 
-func Students(db *sql.DB) ([]Student, error) {
-	sql := "select firstname, lastname, email, tel, promotion from users,students where role='tutor' and users.emails = student.email"
-	rows, err := db.Query(sql)
-	students := make([]Student, 0, 0)
-	if err != nil {
-		return students, nil
-	}
-	defer rows.Close()
-	var fn, ln, email, tel, p string
-	for rows.Next() {
-		rows.Scan(&fn, &ln, &email, &tel, &p)
-		students = append(students, Student{Person{fn, ln, email, tel}, p})
-	}
-	return students, nil
-}
+
 
 func Tutors(db *sql.DB) ([]Person, error) {
 	sql := "select firstname, lastname, roles.email, tel from users,roles where roles.email = users.email and role='tutor'"
@@ -186,15 +147,6 @@ func GetPerson(db *sql.DB, email string) (Person, error) {
 	return Person{fn, ln, email, tel}, err
 }
 
-func GetStudent(db *sql.DB, email string) (Student, error) {
-	var fn, ln, tel, promo string
-	err := db.QueryRow("select firstname, lastname, tel, promotion from students, users where students.email = users.email and users.email=$1", email).Scan(&fn, &ln, &tel, &promo)
-	if err != nil {
-		return Student{}, err
-	}
-	p := Person{fn, ln, email, tel}
-	return Student{p, promo}, nil
-}
 
 func Admins(db *sql.DB) ([]User, error) {
 	rows, err := db.Query("select firstname, lastname, users.email, tel, role from users,roles where roles.email=users.email and role != 'student'")

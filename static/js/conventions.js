@@ -14,7 +14,8 @@ var user;
 function fillSelect(id, opts) {
     var b = "";
     opts.forEach(function (o) {
-       b += "<option value='" + o + "'>" + o + "</option>";
+        var unquoted = o.replace(/\"/g, "");
+       b += "<option value='" + unquoted + "'>" + unquoted + "</option>";
     });
     $("#" + id).html(b);
 }
@@ -23,8 +24,8 @@ $( document ).ready(function () {
     //Check access
     user = JSON.parse(sessionStorage.getItem("User"));
 
-    fillSelect("infos-student-promotion", ["Master IFI", "Master IMAFA", "MAM 5", "SI 5"]);
-    fillSelect("infos-student-major", ['al','ihm','vim','ubinet','kis','cssr','imafa']);
+    //fillSelect("infos-student-promotion", ["Master IFI", "Master IMAFA", "MAM 5", "SI 5"]);
+    fillSelect("infos-student-major", ['?', 'al','ihm','vim','ubinet','kis','cssr','imafa']);
 
     if (!user) {
         window.location.href = "/";
@@ -203,6 +204,10 @@ function formatPerson(p, truncate) {
     return "<a href='mailto:" + p.Email + "' title='" + fn + "'>" +  name + "</a>";
 }
 
+function formatMajor(s) {
+    return s.Major==undefined ? s.Major : "?";
+}
+
 function formatStudent(p, truncate) {
     var name = p.Lastname + " " + p.Firstname;
     var fn = name;
@@ -234,7 +239,6 @@ function getAllConventions() {
         } else {
             conventions.forEach(function (c) {
                 var stu = c.Stu;
-                stu.Major = stu.Major == undefined ? "?" : stu.Major;
                 var tut = c.Tutor;
                 if (tut.Email == user.P.Email) {
                     myStudents.push(c);
@@ -248,7 +252,7 @@ function getAllConventions() {
                 buf += "<td>" + formatPerson(sup, true) + "</td>";
                 buf += "<td>" + formatPerson(tut, true) + "</td>";
                 buf += "<td>" + df(c.MidtermReport) + "</td>";
-                buf += "<td> ? </td>";
+                buf += "<td> " + formatMajor(stu) +  "</td>";
                 buf += "<td><span class=\'fui-new\'></span> <span class=\'fui-chat\'></span></td>";
                 buf += "</tr>";
             });
@@ -286,7 +290,7 @@ function displayMyStudents() {
         buf += "<td>" + formatCompany(c.Company, c.CompanyWWW, true) + "</td>";
         buf += "<td>" + formatPerson(c.Sup, true) + "</td>";
         buf += "<td>" + df(c.MidtermReport) + "</td>";
-        buf += "<td> ? </td>";
+        buf += "<td>" + formatMajor(stu) + "</td>";
         buf += "<td><span class=\'fui-new\'></span> <span class=\'fui-chat\'></span></td>";
         buf += "</tr>";
     });
@@ -369,12 +373,7 @@ function showDetails(s) {
                 .on("change", function() {
                     updateMajor(c.Stu.P.Email)
                 });
-            $("#infos-student-promotion").val(c.Stu.Promotion)
-                .on("change", function() {
-                    updatePromotion(c.Stu.P.Email)
-                })
-            ;
-
+            $("#infos-student-promotion").html(c.Stu.Promotion);
             $("#infos-sup-name").html(formatPerson(c.Sup));
             $("#infos-sup-tel").html(c.Sup.Tel);
             $("#infos-company-name").html(formatCompany(c.Company, c.CompanyWWW));
@@ -401,18 +400,7 @@ function updatePromotion(email) {
 }
 
 function updateMajor(email) {
-    postWithToken("/conventions/" + email + "/major",$("#infos-student-major").val(),
-        function() {
-            console.log("ok")
-        },
-        function () {
-            console.log(arguments)
-        }
-    );
-}
-
-function updateMidtermDeadline(email) {
-    postWithToken("/conventions/" + email + "/midtermDeadline",$("#infos-student-midtermDeadline").val(),
+    postRawWithToken("/conventions/" + email + "/major",$("#infos-student-major").val(),
         function() {
             console.log("ok")
         },

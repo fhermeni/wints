@@ -23,7 +23,18 @@ function postWithToken(url, data, successCb, errorCb) {
         url: url,
         data: JSON.stringify(data),
         headers: {"X-auth-token" : sessionStorage.getItem("token")},
-    }).done(updateCb).fail(errorCb);
+    }).done(successCb).fail(errorCb);
+    return jqr;
+}
+
+function postRawWithToken(url, data, successCb, errorCb) {
+    var jqr = $.ajax({
+        method: "POST",
+        url: url,
+        data: data,
+        contentType: "text/plain",
+        headers: {"X-auth-token" : sessionStorage.getItem("token")}
+    }).done(successCb).fail(errorCb);
     return jqr;
 }
 

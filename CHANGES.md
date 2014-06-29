@@ -23,3 +23,5 @@
 - notify student by mail
 
 - company survey && student|advisor notification
+
+- another page with 2 tables: one with received grades, one with delayed, one with no hurry ?

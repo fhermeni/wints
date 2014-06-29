@@ -11,6 +11,7 @@ import (
 	"log"
 	"time"
 	"os"
+	"io/ioutil"
 )
 
 var DB *sql.DB
@@ -212,16 +213,42 @@ func ChangeProfile(w http.ResponseWriter, r *http.Request, email string) {
 }
 
 func UpdatePromotion(w http.ResponseWriter, r *http.Request, email string) {
-
+	//TODO: permission
+	p, err := ioutil.ReadAll(r.Body)
+	target,_ := mux.Vars(r)["email"]
+	if err != nil {
+		reportError(w, "", err)
+	}
+	err = backend.SetPromotion(DB, target, string(p))
+	if err != nil {
+		reportError(w, "", err)
+	}
 }
 
 func UpdateMajor(w http.ResponseWriter, r *http.Request, email string) {
-
+	//TODO: permission
+	target,_ := mux.Vars(r)["email"]
+	m, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		reportError(w, "", err)
+	}
+	err = backend.SetMajor(DB, target, string(m))
+	if err != nil {
+		reportError(w, "", err)
+	}
 }
 
-func UpdateMidtermDeadline(w http.ResponseWriter, r *http.Request, email string) {
-
-}
+/*func UpdateMidtermDeadline(w http.ResponseWriter, r *http.Request, email string) {
+	//TODO: permission
+	d, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		reportError(w, "", err)
+	}
+	err = backend.SetMidtermDeadline(DB, email, d)
+	if err != nil {
+		reportError(w, "", err)
+	}
+}     */
 
 type PasswordRenewal struct {
 	OldPassword []byte
@@ -281,7 +308,7 @@ func main() {
 	r.HandleFunc("/conventions/", RequireToken(CommitPendingConvention)).Methods("POST")
 	r.HandleFunc("/conventions/{email}/major", RequireToken(UpdateMajor)).Methods("POST")
 	r.HandleFunc("/conventions/{email}/promotion", RequireToken(UpdatePromotion)).Methods("POST")
-	r.HandleFunc("/conventions/{email}/midtermDeadline", RequireToken(UpdateMidtermDeadline)).Methods("POST")
+	//r.HandleFunc("/conventions/{email}/midtermDeadline", RequireToken(UpdateMidtermDeadline)).Methods("POST")
 	r.HandleFunc("/admins/", RequireToken(GetAdmins)).Methods("GET")
 	r.HandleFunc("/login", Login).Methods("POST")
 	r.HandleFunc("/profile", RequireToken(ChangeProfile)).Methods("POST")
