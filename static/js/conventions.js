@@ -166,9 +166,13 @@ function pickBestMatching(tutor) {
     return res;
 }
 
-function df(d) {
+function df(d, active) {
     var date = new Date(Date.parse(d));
-    return date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
+    var str = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
+    if (active && date < new Date()) {
+        return "<span class='late'> " + str + "</span>";
+    }
+    return str;
 }
 
 function pickTheory() {
@@ -200,7 +204,6 @@ function pickKnown() {
 }
 
 function showPage(li, id) {
-    console.log(id);
     $(".page").each(function (idx, d){
         if (d.id == id) {
             d.style.display = "block";
@@ -217,7 +220,6 @@ function showPage(li, id) {
 }
 
 function refresh() {
-    console.log("refresh " + currentPage);
     if (currentPage == "myStudents") {
         displayMyStudents();
     } else if (currentPage == "conventions") {
@@ -392,6 +394,7 @@ function displayPendingMajors() {
                 buf += "</tr>";
         });
         $("#table-majors-body").html(buf);
+        $("#table-majors").tablesorter();
     }
 }
 

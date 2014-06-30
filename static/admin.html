@@ -46,7 +46,6 @@
 <div class="container">
     <nav class="navbar navbar-default navbar-embossed navbar-inverse" role="navigation">
         <div class="container-fluid">
-            <!--<div class="navbar-header"></div>-->
             <div>
                 <ul id="menu-pages" class="nav navbar-nav navbar-left">
                     <li><a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="fullname">Fullname</span><b class="caret"></b></a><span class="dropdown-arrow"></span>
@@ -62,8 +61,8 @@
                     <li class="majorItem adminItem" style="display: none">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">To align</span><b class="caret"></b></a><span class="dropdown-arrow"></span>
                         <ul class="dropdown-menu" role="menu">
-                            <li class="adminItem" style="display: none;"><a onclick="showPage(this, 'pending')">Tutors</a></li>
-                            <li class="rootItem" style="display: none;"><a onclick="showPage(this, 'majors')">Majors</a></li>
+                            <li class="adminItem" style="display: none;"><a onclick="showPage(undefined, 'pending')">Tutors</a></li>
+                            <li class="rootItem" style="display: none;"><a onclick="showPage(undefined, 'majors')">Majors</a></li>
                         </ul>
                     </li>
                     <li class="adminItem" style="display: none">
@@ -147,7 +146,7 @@
 
     <div id="majors" data-url="majors" class="page" style="display: none">
         <h3>Students without a major</h3>
-        <table class="table table-condensed table-hover">
+        <table class="table table-condensed table-hover" id="table-majors">
             <thead>
             <tr>
                 <th>Student</th>
