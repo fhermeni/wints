@@ -238,18 +238,6 @@ func UpdateMajor(w http.ResponseWriter, r *http.Request, email string) {
 	}
 }
 
-/*func UpdateMidtermDeadline(w http.ResponseWriter, r *http.Request, email string) {
-	//TODO: permission
-	d, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		reportError(w, "", err)
-	}
-	err = backend.SetMidtermDeadline(DB, email, d)
-	if err != nil {
-		reportError(w, "", err)
-	}
-}     */
-
 type PasswordRenewal struct {
 	OldPassword []byte
 	NewPassword []byte
@@ -307,13 +295,10 @@ func main() {
 	r.HandleFunc("/conventions/", RequireToken(GetAllConventions)).Methods("GET")
 	r.HandleFunc("/conventions/", RequireToken(CommitPendingConvention)).Methods("POST")
 	r.HandleFunc("/conventions/{email}/major", RequireToken(UpdateMajor)).Methods("POST")
-	r.HandleFunc("/conventions/{email}/promotion", RequireToken(UpdatePromotion)).Methods("POST")
-	//r.HandleFunc("/conventions/{email}/midtermDeadline", RequireToken(UpdateMidtermDeadline)).Methods("POST")
 	r.HandleFunc("/admins/", RequireToken(GetAdmins)).Methods("GET")
 	r.HandleFunc("/login", Login).Methods("POST")
 	r.HandleFunc("/profile", RequireToken(ChangeProfile)).Methods("POST")
 	r.HandleFunc("/logout", RequireToken(Logout)).Methods("POST")
-	//r.HandleFunc("/my/password", RequireToken(ChangePassword)).Methods("POST")
 	// handle all requests by serving a file of the same name
 	fs := http.Dir("static/")
 	fileHandler := http.FileServer(fs)

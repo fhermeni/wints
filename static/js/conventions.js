@@ -25,7 +25,6 @@ $( document ).ready(function () {
     //Check access
     user = JSON.parse(sessionStorage.getItem("User"));
 
-    //fillSelect("infos-student-promotion", ["Master IFI", "Master IMAFA", "MAM 5", "SI 5"]);
     fillSelect("infos-student-major", ['?', 'al','ihm','vim','ubinet','kis','cssr','imafa']);
 
     if (!user) {
@@ -96,7 +95,7 @@ function drawProfile(c) {
     var from = c.C.Begin;
     var to = c.C.End;
 
-    var formattedStudent = "<a href='mailto:" + student.P.Email + "'>" + student.P.Firstname + " " + student.P.Lastname + "(" + student.Promotion + ")</a>";
+    var formattedStudent = "<a href='mailto:" + student.P.Email + "'>" + student.P.Firstname + " " + student.P.Lastname + " (" + student.Promotion + ")</a>";
     $("#student").html(formattedStudent);
     $("#company").html(company);
     $("#companyWWW").attr("href",companyWWW);
@@ -175,14 +174,16 @@ function ackPick(){
 }
 
 function pickKnown() {
-    var tEmail = $("#known-tutor-selector").val();    ;
+    var tEmail = $("#known-tutor-selector").val();
     known.forEach(function (t) {
         if (t.Email == tEmail)  {
             pendingConvention.Tutor = t;
             return false
         }
     });
-    $.postJSON("/conventions/", JSON.stringify(pendingConvention), ackPick, nackPick);
+    debugger;
+    postWithToken("/conventions/", pendingConvention, ackPick, nackPick);
+    //$.postJSON("/conventions/", JSON.stringify(pendingConvention), ackPick, nackPick);
 }
 
 function showPage(li, id) {

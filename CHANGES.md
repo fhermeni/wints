@@ -4,10 +4,9 @@
 - mailto: OK
 - update profile OK
 - error reporting
+- permissions
 - adapt convention:
-    - major
-    - promotion
-    - midterm deadline
+    - major OK
 
 
 ## Version 2.0 ##
