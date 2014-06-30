@@ -8,8 +8,9 @@ var committed = 0;
 var pendingConvention;
 var conventions;
 var known;
-var myStudents;
 var user;
+
+var currentPage;
 
 function fillSelect(id, opts) {
     var b = "";
@@ -46,13 +47,16 @@ $( document ).ready(function () {
     if (isAdmin) { $(".adminItem").show();}
     if (isMajor) { $(".majorItem").show();}
     if (isRoot) { $(".rootItem").show();}
+
     if (isAdmin) {
-        getAllConventions();
+        //getAllConventions();
         pickOne();
     }
     if (isRoot) {
         showPrivileges();
     }
+    getAllConventions();
+    currentPage = "myStudents";
 });
 
 function pickOne() {
@@ -129,7 +133,6 @@ function drawProfile(c) {
 }
 
 function pickBestMatching(tutor) {
-
     var th_ln = tutor.toLowerCase();
     var res = undefined;
     known.forEach(function (t) {
@@ -193,7 +196,22 @@ function showPage(li, id) {
     });
     $("#menu-pages").find("li").removeClass("active");
     $(li.parentNode).addClass("active");
+
+    currentPage = id;
+    refresh();
 }
+
+function refresh() {
+    console.log("refresh " + currentPage);
+    if (currentPage == "myStudents") {
+        displayMyStudents();
+    } else if (currentPage == "conventions") {
+        displayMyConventions();
+    } else if (currentPage == "tutors") {
+        displayTutors();
+    }
+}
+
 
 function formatPerson(p, truncate) {
     var name = p.Lastname + " "  + p.Firstname;
@@ -206,6 +224,13 @@ function formatPerson(p, truncate) {
 
 function formatMajor(s) {
     return s.Major==undefined ? s.Major : "?";
+}
+
+function truncate(str, size) {
+    if (str.length > size) {
+        return str.substring(0, 27) + "...";
+    }
+    return str;
 }
 
 function formatStudent(p, truncate) {
@@ -228,47 +253,49 @@ function formatCompany(n, www, truncate) {
 }
 
 function getAllConventions() {
-    myStudents = [];
     getWithToken("/conventions/", function(data) {
         conventions = data;
-        var buf = "";
+    }
+    );
+}
+
+function displayMyConventions() {
+
         if (conventions.length == 0) {
             $("#table-conventions-body").find("tr td").html("No conventions to display");
             $("#table-assignments-body").find("tr td").html("No tutors to display");
             $("#table-myStudents-body").find("tr td").html("No tutored students");
         } else {
+            var tpl = $('#row-my-conventions').html();
+            Mustache.parse(tpl);   // optional, speeds up future uses
+            var buf = "";
             conventions.forEach(function (c) {
-                var stu = c.Stu;
-                var tut = c.Tutor;
-                if (tut.Email == user.P.Email) {
-                    myStudents.push(c);
-                }
-                var sup = c.Sup;
-                buf += "<tr>";
-                buf += "<td><label class='checkbox'><input type='checkbox' class='checkbox-mail-conventions' data-toggle='checkbox' value='" + stu.P.Email + "'/></label></td>";
-                buf += "<td>" + formatStudent(stu.P, true) + "</td>";
-                buf += "<td>" + stu.Promotion + "</td>";
-                buf += "<td>" + stu.Major + "</td>";
-                buf += "<td>" + formatPerson(sup, true) + "</td>";
-                buf += "<td>" + formatPerson(tut, true) + "</td>";
-                buf += "<td>" + df(c.MidtermReport) + "</td>";
-                buf += "<td> " + formatMajor(stu) +  "</td>";
-                buf += "<td><span class=\'fui-new\'></span> <span class=\'fui-chat\'></span></td>";
-                buf += "</tr>";
+                var data = {
+                    email: c.Stu.P.Email,
+                    student: truncate(c.Stu.P.Firstname + " " + c.Stu.P.Lastname, 30),
+                    promotion: c.Stu.Promotion,
+                    major: c.Stu.Major,
+                    sup: c.Sup,
+                    supFullname: truncate(c.Sup.Firstname + " " + c.Sup.Lastname),
+                    tutor: c.Tutor,
+                    tutorFullname: truncate(c.Tutor.Firstname + " " + c.Tutor.Lastname),
+                    midtermReport: df(c.MidtermReport),
+                    grade: "?"
+                };
+                buf  += Mustache.render(tpl, data);
             });
-            $("#table-conventions-body").html(buf);
+            $('#table-conventions-body').html(buf);
             $("#nb-conventions").html(conventions.length);
             $("#table-conventions").tablesorter({headers: {0: {"sorter": false}}});
             $(':checkbox').checkbox();
             $("#general-checkbox-conventions").on('toggle', toggleConventionCheckboxes);
-            makeAssignments();
+            displayTutors();
             displayMyStudents();
             $('.checkbox-mail-conventions').checkbox().on('toggle', function() {
                 return generateMailto("checkbox-mail-conventions", 'btn-mail-conventions');
             });
 
         }
-    })
 }
 
 function toggleConventionCheckboxes() {
@@ -280,19 +307,22 @@ function toggleConventionCheckboxes() {
 
 function displayMyStudents() {
     var buf = "";
-    myStudents.forEach(function (c) {
-        var stu = c.Stu;
-        buf += "<tr>";
-        buf += "<td><label class='checkbox'><input class='checkbox-mail-myStudents' type='checkbox' data-toggle='checkbox' value='" + stu.P.Email + "'/></label></td>";
-        buf += "<td>" + formatStudent(stu.P, true) + "</td>";
-        buf += "<td>" + stu.Promotion + "</td>";
-        buf += "<td>" + stu.Major + "</td>";
-        buf += "<td>" + formatCompany(c.Company, c.CompanyWWW, true) + "</td>";
-        buf += "<td>" + formatPerson(c.Sup, true) + "</td>";
-        buf += "<td>" + df(c.MidtermReport) + "</td>";
-        buf += "<td>" + formatMajor(stu) + "</td>";
-        buf += "<td><span class=\'fui-new\'></span> <span class=\'fui-chat\'></span></td>";
-        buf += "</tr>";
+    conventions.forEach(function (c) {
+        var tut = c.Tutor;
+        if (tut.Email == user.P.Email) {
+            var stu = c.Stu;
+            buf += "<tr>";
+            buf += "<td><label class='checkbox'><input class='checkbox-mail-myStudents' type='checkbox' data-toggle='checkbox' value='" + stu.P.Email + "'/></label></td>";
+            buf += "<td>" + formatStudent(stu.P, true) + "</td>";
+            buf += "<td>" + stu.Promotion + "</td>";
+            buf += "<td>" + stu.Major + "</td>";
+            buf += "<td>" + formatCompany(c.Company, c.CompanyWWW, true) + "</td>";
+            buf += "<td>" + formatPerson(c.Sup, true) + "</td>";
+            buf += "<td>" + df(c.MidtermReport) + "</td>";
+            buf += "<td>" + formatMajor(stu) + "</td>";
+            buf += "<td><span class=\'fui-new\'></span> <span class=\'fui-chat\'></span></td>";
+            buf += "</tr>";
+        }
     });
     $("#table-myStudents-body").html(buf);
     $("#table-myStudents").tablesorter({headers: {0: {"sorter": false}}});
@@ -322,7 +352,7 @@ function generateMailto(cl, btn) {
     }
 }
 
-function makeAssignments() {
+function displayTutors() {
     var tutors = {};
     var persons = {};
     if (conventions.length == 0) {
@@ -388,21 +418,17 @@ function showDetails(s) {
     });
 }
 
-function updatePromotion(email) {
-    postWithToken("/conventions/" + email + "/promotion",$("#infos-student-promotion").val(),
-    function() {
-        console.log("ok")
-    },
-    function () {
-        console.log(arguments)
-    }
-    );
-}
-
 function updateMajor(email) {
-    postRawWithToken("/conventions/" + email + "/major",$("#infos-student-major").val(),
+    var m = $("#infos-student-major").val();
+    postRawWithToken("/conventions/" + email + "/major", m,
         function() {
-            console.log("ok")
+            conventions.forEach(function (c) {
+                if (c.Stu.P.Email == email) {
+                    c.Stu.Major = m;
+                    return false;
+                }
+            });
+            refresh();
         },
         function () {
             console.log(arguments)

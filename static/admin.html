@@ -20,7 +20,27 @@
     <script src="js/profile.js"></script>
     <script src="js/conventions.js"></script>
     <script src="js/jquery.tablesorter.min.js"></script>
+    <script src="js/mustache.js"></script>
+    <script type="x-tmpl-mustache" id="row-my-conventions">
+        <tr>
+            <td>
+                <label class='checkbox'>
+                    <input type='checkbox' class='checkbox-mail-conventions' data-toggle='checkbox' value='{{email}}'/>
+                </label>
+            </td>
 
+            <td><a href='#' onclick="showDetails('{{email}}')">{{student}}</a></td>
+            <td>{{promotion}}</td>
+            <td>{{major}}</td>
+            <td><a href='mailto:{{sup.Email}}' title='{{sup.Firstname}} {{sup.Lastname}}'>{{supFullname}}</a></td>
+            <td><a href='mailto:{{tutor.Email}}' title='{{tutor.Firstname}} {{tutor.Lastname}}'>{{tutorFullname}}</a></td>
+            <td>{{midtermReport}}</td>
+            <td>{{grade}}</td>
+            <td>
+                <span class='fui-new'></span> <span class='fui-chat'></span>
+            </td>
+        </tr>
+    </script>
 </head>
 <body>
 <div class="container">
