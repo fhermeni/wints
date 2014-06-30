@@ -4,7 +4,10 @@
 - mailto: OK
 - update profile OK
 - error reporting
-- permissions
+- permissions: -(students, tutor), major, admin, root
+  major: see all conventions + manipulate major
+  admin: pending conventions
+  root: users permission
 - tutor alignment OK
 - major alignment OK
 

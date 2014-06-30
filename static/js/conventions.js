@@ -224,7 +224,7 @@ function refresh() {
         displayMyStudents();
     } else if (currentPage == "conventions") {
         displayMyConventions();
-    } else if (currentPage == "tutors") {
+    } else if (currentPage == "assignments") {
         displayTutors();
     } else if (currentPage == "majors") {
         displayPendingMajors();
@@ -315,8 +315,6 @@ function displayMyConventions() {
             $("#table-conventions").tablesorter({headers: {0: {"sorter": false}}});
             $(':checkbox').checkbox();
             $("#general-checkbox-conventions").on('toggle', toggleConventionCheckboxes);
-            displayTutors();
-            displayMyStudents();
             $('.checkbox-mail-conventions').checkbox().on('toggle', function() {
                 return generateMailto("checkbox-mail-conventions", 'btn-mail-conventions');
             });
