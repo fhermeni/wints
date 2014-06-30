@@ -32,6 +32,7 @@ $( document ).ready(function () {
     }
     $("#fullname").html(user.P.Firstname + " " + user.P.Lastname);
 
+
     var isAdmin = false;
     var isTutor = false;
     var isRoot = false;
@@ -196,8 +197,9 @@ function showPage(li, id) {
         }
     });
     $("#menu-pages").find("li").removeClass("active");
-    $(li.parentNode).addClass("active");
-
+    if (li) {
+        $(li.parentNode).addClass("active");
+    }
     currentPage = id;
     refresh();
 }
@@ -256,6 +258,13 @@ function formatCompany(n, www, truncate) {
 function getAllConventions() {
     getWithToken("/conventions/", function(data) {
         conventions = data;
+
+        if (conventions.length == 0) {
+            $("#waiting").html("Nothing to display");
+        } else {
+            $("#waiting").hide();
+            showPage(undefined, "myStudents");
+        }
     }
     );
 }

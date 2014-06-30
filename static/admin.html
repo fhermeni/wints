@@ -71,8 +71,15 @@
         </div>
     </nav>
 
+    <div class="page text-center" id="waiting" data-url="waiting">
+        <div>
+            <img src="img/spinner.gif" alt="spinner"/>
+        </div>
+        <h5>Loading data ...</h5>
+    </div>
+
     <!-- the students I am supervising -->
-    <div class="page" id="myStudents" data-url="myStudents">
+    <div class="page" id="myStudents" data-url="myStudents" style="display: none">
     <h3>Tutored students</h3>
 
         <a id='btn-mail-myStudents' class="btn-sm btn-primary"><span class="fui-mail"></span> mail selection</a>
@@ -234,12 +241,6 @@
     <h3>Permissions</h3>
         <div id="table-privileges-body"></div>
     </div>
-<footer class="footer text-right">
-    <div class="container">
-        <p>© University Nice Sophia Antipolis 2013-2014</p>
-    </div>
-</footer>
-
 <!-- the modals -->
     <div class="modal fade" id="profileEditor">
         <div class="modal-dialog">
@@ -323,6 +324,11 @@
             </div>
         </div>
     </div>
+</div>
+<footer>
+    <div class="container">
+        <p>© University Nice Sophia Antipolis 2013-2014</p>
     </div>
+</footer>
 </body>
 </html>
