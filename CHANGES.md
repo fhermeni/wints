@@ -5,8 +5,8 @@
 - update profile OK
 - error reporting
 - permissions
-- adapt convention:
-    - major OK
+- tutor alignment OK
+- major alignment OK
 
 
 ## Version 2.0 ##

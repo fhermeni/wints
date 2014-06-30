@@ -69,3 +69,8 @@ label.selector a {
     color: inherit;
 }
 
+footer {
+    margin-top: 50px;
+    text-align: right;
+}
+

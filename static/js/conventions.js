@@ -21,6 +21,19 @@ function fillSelect(id, opts) {
     $("#" + id).html(b);
 }
 
+function options(current, opts) {
+    var b = "";
+    opts.forEach(function (o) {
+        var unquoted = o.replace(/\"/g, "");
+        if (unquoted == current) {
+            b += "<option value='" + unquoted + "' selected>" + unquoted + "</option>";
+        } else {
+            b += "<option value='" + unquoted + "'>" + unquoted + "</option>";
+        }
+    });
+    return b;
+}
+
 $( document ).ready(function () {
     //Check access
     user = JSON.parse(sessionStorage.getItem("User"));
@@ -86,7 +99,6 @@ function success() {
 }
 
 function drawProfile(c) {
-    $("#pending").html("<a onclick=\"showPage(this,'pending')\" class=\"badge\">" + pending + "</a>");
     $("#alignment-box").show();
     $("#nothing").hide();
     var student = c.C.Stu;
@@ -212,6 +224,8 @@ function refresh() {
         displayMyConventions();
     } else if (currentPage == "tutors") {
         displayTutors();
+    } else if (currentPage == "majors") {
+        displayPendingMajors();
     }
 }
 
@@ -362,6 +376,42 @@ function generateMailto(cl, btn) {
     }
 }
 
+function displayPendingMajors() {
+    if (conventions.length == 0) {
+        $("#table-majors-body").find("tr td").html("Nothing to display");
+    } else {
+        var buf = "";
+        conventions.forEach(function (c) {
+                buf += "<tr>";
+                buf += "<td>" + formatStudent(c.Stu.P) + "</td>";
+                buf += "<td>" + c.Stu.Promotion + "</td>";
+                var id = "major-" + c.Stu.P.Email;
+                buf += "<td><select id='" + id + "' onchange=\"updateMajor2(this,'" + c.Stu.P.Email + "')\">";
+                buf += options(c.Stu.Major, ['?', 'al','ihm','vim','ubinet','kis','cssr','imafa']);
+                buf += "</select></td>";
+                buf += "</tr>";
+        });
+        $("#table-majors-body").html(buf);
+    }
+}
+
+function updateMajor2(s, email) {
+    var m = $(s).val();
+    postRawWithToken("/conventions/" + email + "/major", m,
+        function() {
+            conventions.forEach(function (c) {
+                if (c.Stu.P.Email == email) {
+                    c.Stu.Major = m;
+                    return false;
+                }
+            });
+        },
+        function () {
+            console.log(arguments)
+        }
+    );
+}
+
 function displayTutors() {
     var tutors = {};
     var persons = {};
@@ -397,6 +447,7 @@ function displayTutors() {
     }
 }
 
+
 function toggleTutorCheckboxes() {
     var nextState = $("#general-checkbox-tutors:checked").length > 0 ? "check" : "uncheck";
     $(".checkbox-mail-tutors").checkbox(nextState);
@@ -427,6 +478,7 @@ function showDetails(s) {
         }
     });
 }
+
 
 function updateMajor(email) {
     var m = $("#infos-student-major").val();

@@ -59,6 +59,13 @@
                     <li class="majorItem" style="display: none;"><a onclick="showPage(this, 'conventions');">Watchlist</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
+                    <li class="majorItem adminItem" style="display: none">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">To align</span><b class="caret"></b></a><span class="dropdown-arrow"></span>
+                        <ul class="dropdown-menu" role="menu">
+                            <li class="adminItem" style="display: none;"><a onclick="showPage(this, 'pending')">Tutors</a></li>
+                            <li class="rootItem" style="display: none;"><a onclick="showPage(this, 'majors')">Majors</a></li>
+                        </ul>
+                    </li>
                     <li class="adminItem" style="display: none">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="fui-gear"></span><b class="caret"></b></a><span class="dropdown-arrow"></span>
                         <ul class="dropdown-menu" role="menu">
@@ -83,7 +90,7 @@
     <h3>Tutored students</h3>
 
         <a id='btn-mail-myStudents' class="btn-sm btn-primary"><span class="fui-mail"></span> mail selection</a>
-        <table class="table-condensed table-hover tablesorter" id="table-myStudents">
+        <table class="table table-condensed table-hover tablesorter" id="table-myStudents">
             <thead>
                 <tr>
                     <th rowspan="2"><label class='checkbox'><input id="general-checkbox-myStudents" type='checkbox' data-toggle='checkbox'/></label></th>
@@ -110,9 +117,9 @@
 
     <!-- list conventions -->
     <div class="page" id="conventions" data-url="conventions" style="display: none">
-        <h3><span id="nb-conventions"></span> Internships <span id="pending"></span></h3>
+        <h3><span id="nb-conventions"></span> Internships</h3>
         <a id='btn-mail-conventions' class="btn-sm btn-primary"><span class="fui-mail"></span> mail selection</a>
-        <table class="table-condensed table-hover tablesorter" id="table-conventions">
+        <table class="table table-condensed table-hover tablesorter" id="table-conventions">
             <thead>
                 <tr>
                     <th rowspan="2"><label class='checkbox' id="general-checkbox-conventions"><input id="foo" type='checkbox' data-toggle='checkbox'/></label></th>
@@ -137,6 +144,23 @@
             </tbody>
         </table>
     </div>
+
+    <div id="majors" data-url="majors" class="page" style="display: none">
+        <h3>Students without a major</h3>
+        <table class="table table-condensed table-hover">
+            <thead>
+            <tr>
+                <th>Student</th>
+                <th>Promotion</th>
+                <th>Major</th>
+            </tr>
+            </thead>
+            <tbody id="table-majors-body">
+
+            </tbody>
+        </table>
+    </div>
+
 
     <!-- pending page -->
     <div id="pending" data-url="pending" class="page" style="display: none">
@@ -241,6 +265,7 @@
     <h3>Permissions</h3>
         <div id="table-privileges-body"></div>
     </div>
+
 <!-- the modals -->
     <div class="modal fade" id="profileEditor">
         <div class="modal-dialog">
