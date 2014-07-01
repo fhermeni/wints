@@ -61,7 +61,6 @@
                     <li class="majorItem adminItem" style="display: none">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">To align</span><b class="caret"></b></a><span class="dropdown-arrow"></span>
                         <ul class="dropdown-menu" role="menu">
-                            <li class="adminItem" style="display: none;"><a onclick="showPage(undefined, 'pending')">Tutors</a></li>
                             <li class="rootItem" style="display: none;"><a onclick="showPage(undefined, 'majors')">Majors</a></li>
                         </ul>
                     </li>
@@ -146,7 +145,7 @@
 
     <div id="majors" data-url="majors" class="page" style="display: none">
         <h3>Students without a major</h3>
-        <table class="table table-condensed table-hover" id="table-majors">
+        <!--<table class="table table-condensed table-hover" id="table-majors">
             <thead>
             <tr>
                 <th>Student</th>
@@ -157,7 +156,8 @@
             <tbody id="table-majors-body">
 
             </tbody>
-        </table>
+        </table>  -->
+        <div class="row" id="table-majors-body"></div>
     </div>
 
 
@@ -261,8 +261,10 @@
 
     <!-- Privileges -->
     <div id="privileges" data-url="privileges" class="page" style="display: none">
-    <h3>Permissions</h3>
-        <button href="#new-user" data-toggle='modal' class="btn btn-lg btn-success"><span class="fui-user"></span> add user</button>
+    <h3>Permissions
+    <small><button href="#new-user" data-toggle='modal' class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> add user</button></small>
+    </h3>
+
         <div id="table-privileges-body"></div>
     </div>
 

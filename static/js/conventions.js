@@ -200,7 +200,6 @@ function pickKnown() {
     });
     debugger;
     postWithToken("/conventions/", pendingConvention, ackPick, nackPick);
-    //$.postJSON("/conventions/", JSON.stringify(pendingConvention), ackPick, nackPick);
 }
 
 function showPage(li, id) {
@@ -226,8 +225,10 @@ function refresh() {
         displayMyConventions();
     } else if (currentPage == "assignments") {
         displayTutors();
-    } else if (currentPage == "majors") {
+    } /*else if (currentPage == "majors") {
         displayPendingMajors();
+    } */else {
+        console.log("Unsupported operation on '" + currentPage + "'");
     }
 }
 
@@ -286,7 +287,6 @@ function getAllConventions() {
 }
 
 function displayMyConventions() {
-
         if (conventions.length == 0) {
             $("#table-conventions-body").find("tr td").html("No conventions to display");
             $("#table-assignments-body").find("tr td").html("No tutors to display");
@@ -376,42 +376,6 @@ function generateMailto(cl, btn) {
     }
 }
 
-function displayPendingMajors() {
-    if (conventions.length == 0) {
-        $("#table-majors-body").find("tr td").html("Nothing to display");
-    } else {
-        var buf = "";
-        conventions.forEach(function (c) {
-                buf += "<tr>";
-                buf += "<td>" + formatStudent(c.Stu.P) + "</td>";
-                buf += "<td>" + c.Stu.Promotion + "</td>";
-                var id = "major-" + c.Stu.P.Email;
-                buf += "<td><select id='" + id + "' onchange=\"updateMajor2(this,'" + c.Stu.P.Email + "')\">";
-                buf += options(c.Stu.Major, ['?', 'al','ihm','vim','ubinet','kis','cssr','imafa']);
-                buf += "</select></td>";
-                buf += "</tr>";
-        });
-        $("#table-majors-body").html(buf);
-        $("#table-majors").tablesorter();
-    }
-}
-
-function updateMajor2(s, email) {
-    var m = $(s).val();
-    postRawWithToken("/conventions/" + email + "/major", m,
-        function() {
-            conventions.forEach(function (c) {
-                if (c.Stu.P.Email == email) {
-                    c.Stu.Major = m;
-                    return false;
-                }
-            });
-        },
-        function () {
-            console.log(arguments)
-        }
-    );
-}
 
 function displayTutors() {
     var tutors = {};
@@ -480,14 +444,13 @@ function showDetails(s) {
     });
 }
 
-
 function updateMajor(email) {
-    var m = $("#infos-student-major").val();
-    postRawWithToken("/conventions/" + email + "/major", m,
+    var val = $("#infos-student-major").val();
+    postRawWithToken("/conventions/" + email + "/major",val,
         function() {
             conventions.forEach(function (c) {
                 if (c.Stu.P.Email == email) {
-                    c.Stu.Major = m;
+                    c.Stu.Major = val;
                     return false;
                 }
             });
@@ -502,14 +465,15 @@ function updateMajor(email) {
 function showPrivileges() {
     var buf = "";
     getWithToken("/admins/", function(data) {
-        var buf = "<dl class='dl-horizontal'>";
+        var buf = "";
         data.forEach(function (a) {
-         buf += "<dt>" + formatPerson(a.P, true) + "</dt>";
-         buf += "<dd>";
-         buf += "<input class='tagsinput' value='"+ a.Privs.join(",") + "'/>";
-         buf += "</dd>";
-         });
-        buf += "</dl>";
+            buf += "<div class='col-md-4'>";
+            buf += "<div class='form-group'>";
+            buf += "<label for='lbl-" + a.P.Email + "' class='col-md-8 control-label'>" + formatPerson(a.P, true) + "</label>";
+            buf += "<span class='col-md-4'><select><option>admin</option><option>root</option><option>major</option></select></span>";
+            buf += "</div>";
+            buf += "</div>";
+        });
         $("#table-privileges-body").html(buf);
         $(".tagsinput").tagsInput();
     });
