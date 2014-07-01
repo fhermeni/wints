@@ -490,7 +490,7 @@ function setPrivilege(select, email) {
     }, function () { console.log(arguments)});
 }
 
-function newUser() {
+function newUser(m) {
     var d = {
         Firstname: $("#lbl-nu-fn").val(),
         Lastname: $("#lbl-nu-ln").val(),
@@ -499,7 +499,8 @@ function newUser() {
         Priv: $("#lbl-nu-priv").val()
     };
     postWithToken("/users/", d, function() {
-        refresh();
+        $(m).hide()
+
     },
     function() {console.log(args)});
 }

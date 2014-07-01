@@ -26,7 +26,7 @@ create table students(email text PRIMARY KEY REFERENCES users(email),
 );
 
 -- major_adm
-create type role as enum('student', 'tutor', 'admin', 'root', 'al','ihm','vim','ubinet','kis','cssr','imafa');
+create type role as enum('student', 'tutor', 'admin', 'root', 'major');
 create table roles(email text,
 					   role text,
 					   constraint pk_major_adm PRIMARY KEY (email, role)

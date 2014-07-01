@@ -115,8 +115,8 @@ func NewTutor(db *sql.DB, p Person) error {
 
 
 
-func Tutors(db *sql.DB) ([]Person, error) {
-	sql := "select firstname, lastname, roles.email, tel from users,roles where roles.email = users.email and role='tutor'"
+func AvailableTutors(db *sql.DB) ([]Person, error) {
+	sql := "select firstname, lastname, email, tel from users where email not in (select email from students)"
 	rows, err := db.Query(sql)
 	tutors := make([]Person, 0, 0)
 	if err != nil {
@@ -149,7 +149,7 @@ func GetPerson(db *sql.DB, email string) (Person, error) {
 
 
 func Admins(db *sql.DB) ([]User, error) {
-	rows, err := db.Query("select firstname, lastname, users.email, tel, role from users,roles where roles.email=users.email and role != 'student'")
+	rows, err := db.Query("select firstname, lastname, users.email, tel, role from users,roles where users.email = roles.email and users.email not in (select email from students);")
 	admins := make([]User, 0, 0)
 	if err != nil {
 		log.Printf("Error: %s\n", err)

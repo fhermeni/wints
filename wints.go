@@ -102,7 +102,7 @@ func RandomPendingConvention(w http.ResponseWriter, r *http.Request, email strin
 		return
 	}
 	nbCommitted := len(cc)
-	known, err := backend.Tutors(DB)
+	known, err := backend.AvailableTutors(DB)
 	if err != nil {
 		log.Printf("Error: %s\n", err)
 		return

@@ -36,22 +36,6 @@ func NewStudent(db *sql.DB, s Student) error {
 	return nil
 }
 
-func Students(db *sql.DB) ([]Student, error) {
-	sql := "select firstname, lastname, email, tel, promotion, major from users,students where role='tutor' and users.emails = student.email"
-	rows, err := db.Query(sql)
-	students := make([]Student, 0, 0)
-	if err != nil {
-		return students, nil
-	}
-	defer rows.Close()
-	var fn, ln, email, tel, p, m string
-	for rows.Next() {
-		rows.Scan(&fn, &ln, &email, &tel, &p, &m)
-		students = append(students, Student{Person{fn, ln, email, tel}, p, m})
-	}
-	return students, nil
-}
-
 func GetStudent(db *sql.DB, email string) (Student, error) {
 	var fn, ln, tel, promo, major string
 	err := db.QueryRow("select firstname, lastname, tel, promotion, major from students, users where students.email = users.email and users.email=$1", email).Scan(&fn, &ln, &tel, &promo, &major)
