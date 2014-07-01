@@ -14,7 +14,7 @@ type Student struct {
 
 func NewStudent(db *sql.DB, s Student) error {
 	log.Printf("Creating student %s\n", s)
-	err := newUser(db, s.P)
+	err := NewUser(db, s.P)
 	if err != nil {
 		return err
 	}

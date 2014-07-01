@@ -77,7 +77,7 @@ func Register(db *sql.DB, c Credential) (User, error) {
 	return User{Person{fn, ln, c.Email, tel}, roles}, nil
 }
 
-func newUser(db *sql.DB, p Person) error {
+func NewUser(db *sql.DB, p Person) error {
 	newPassword := rand_str(8)
 	log.Printf("New password for user '%s %s': %s\n", p.Firstname, p.Lastname, newPassword)
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.MinCost)
@@ -101,7 +101,7 @@ func newUser(db *sql.DB, p Person) error {
 
 
 func NewTutor(db *sql.DB, p Person) error {
-	err := newUser(db, p)
+	err := NewUser(db, p)
 	if err != nil {
 		return err
 	}
@@ -198,5 +198,10 @@ func NewPassword(db *sql.DB, uid int, oldPassword, newPassword []byte) error {
 
 func SetProfile(db *sql.DB, email, fn, ln, tel string) error {
 	_, err := db.Exec("update users set firstname=$1, lastname=$2, tel=$3 where email=$4", fn, ln, tel, email)
+	return err
+}
+
+func GrantPrivilege(db *sql.DB, email, priv string) error {
+	_, err := db.Exec("insert into roles(email, role) values ($1, $2)", email, priv)
 	return err
 }

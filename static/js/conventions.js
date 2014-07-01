@@ -470,11 +470,36 @@ function showPrivileges() {
             buf += "<div class='col-md-4'>";
             buf += "<div class='form-group'>";
             buf += "<label for='lbl-" + a.P.Email + "' class='col-md-8 control-label'>" + formatPerson(a.P, true) + "</label>";
-            buf += "<span class='col-md-4'><select><option>admin</option><option>root</option><option>major</option></select></span>";
+            buf += "<span class='col-md-4'>";
+            buf += "<select onchange=\"setPrivilege(this, '" + a.P.Email + "')\">";
+            buf += options(a.Privs[0], ["","admin", "root"]);
+            buf += "</select>";
             buf += "</div>";
             buf += "</div>";
         });
         $("#table-privileges-body").html(buf);
         $(".tagsinput").tagsInput();
     });
+}
+
+function setPrivilege(select, email) {
+    var val = $(select).val();
+    console.log("Set permission of " + email + " to " + val);
+    postRawWithToken("/users/" + email + "/roles/", val, function() {
+        console.log("ok");
+    }, function () { console.log(arguments)});
+}
+
+function newUser() {
+    var d = {
+        Firstname: $("#lbl-nu-fn").val(),
+        Lastname: $("#lbl-nu-ln").val(),
+        Tel: $("#lbl-nu-tel").val(),
+        Email: $("#lbl-nu-email").val(),
+        Priv: $("#lbl-nu-priv").val()
+    };
+    postWithToken("/users/", d, function() {
+        refresh();
+    },
+    function() {console.log(args)});
 }

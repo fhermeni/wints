@@ -129,6 +129,33 @@ func GetAdmins(w http.ResponseWriter, r *http.Request, email string) {
 	jsonReply(w, admins)
 }
 
+type NewUser struct {
+	Firstname string
+	Lastname string
+	Tel string
+	Email string
+	Priv string
+}
+
+func NewAdmin(w http.ResponseWriter, r *http.Request, email string) {
+	var nu NewUser
+	err := jsonRequest(w, r, &nu)
+	if err != nil {
+		return
+	}
+	p := backend.Person{nu.Firstname, nu.Lastname, nu.Email, nu.Tel}
+	err = backend.NewUser(DB, p)
+	if err != nil {
+		reportError(w, "", err)
+		return
+	}
+	err = backend.GrantPrivilege(DB, nu.Email, nu.Priv);
+	if err != nil {
+		reportError(w, "", err)
+		return
+	}
+}
+
 func Login(w http.ResponseWriter, r *http.Request) {
 	var cred backend.Credential
 	if jsonRequest(w, r, &cred) != nil {
@@ -255,6 +282,19 @@ func ChangePassword(w http.ResponseWriter, r *http.Request, uid int) {
 	}
 }
 
+func GrantRole(w http.ResponseWriter, r *http.Request, email string) {
+	//TODO: permission
+	target,_ := mux.Vars(r)["email"]
+	role, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		reportError(w, "", err)
+	}
+	err = backend.GrantPrivilege(DB, target, string(role))
+	if err != nil {
+		reportError(w, "", err)
+	}
+}
+
 func RequireToken(cb func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		token := r.Header.Get("X-auth-token")
@@ -290,12 +330,13 @@ func main() {
 
 	r.HandleFunc("/", rootHandler)
 
-	//User mgnt
 	r.HandleFunc("/conventions/_random", RequireToken(RandomPendingConvention)).Methods("GET")
 	r.HandleFunc("/conventions/", RequireToken(GetAllConventions)).Methods("GET")
 	r.HandleFunc("/conventions/", RequireToken(CommitPendingConvention)).Methods("POST")
 	r.HandleFunc("/conventions/{email}/major", RequireToken(UpdateMajor)).Methods("POST")
 	r.HandleFunc("/admins/", RequireToken(GetAdmins)).Methods("GET")
+	r.HandleFunc("/users/", RequireToken(NewAdmin)).Methods("POST")
+	r.HandleFunc("/users/{email}/roles/", RequireToken(GrantRole)).Methods("POST")
 	r.HandleFunc("/login", Login).Methods("POST")
 	r.HandleFunc("/profile", RequireToken(ChangeProfile)).Methods("POST")
 	r.HandleFunc("/logout", RequireToken(Logout)).Methods("POST")
