@@ -55,19 +55,14 @@
                         </ul>
                     </li>
                     <li class="tutorItem" style="display: none;"><a onclick="showPage(this, 'myStudents');">My students</a></li>
-                    <li class="majorItem" style="display: none;"><a onclick="showPage(this, 'conventions');">Watchlist</a></li>
+                    <li class="majorItem adminItem rootItem" style="display: none;"><a onclick="showPage(this, 'conventions');">Watchlist</a></li>
+                    <li class="adminItem rootItem" style="display: none;"><a onclick="showPage(undefined, 'pending')">Pending conventions</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li class="majorItem adminItem" style="display: none">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">To align</span><b class="caret"></b></a><span class="dropdown-arrow"></span>
-                        <ul class="dropdown-menu" role="menu">
-                            <li class="rootItem" style="display: none;"><a onclick="showPage(undefined, 'majors')">Majors</a></li>
-                        </ul>
-                    </li>
-                    <li class="adminItem" style="display: none">
+                    <li class="adminItem rootItem" style="display: none">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="fui-gear"></span><b class="caret"></b></a><span class="dropdown-arrow"></span>
                         <ul class="dropdown-menu" role="menu">
-                            <li class="adminItem" style="display: none;"><a onclick="showPage(this, 'assignments')">Tutors</a></li>
+                            <li class="adminItem rootItem" style="display: none;"><a onclick="showPage(this, 'assignments')">Tutors</a></li>
                             <li class="rootItem" style="display: none;"><a onclick="showPage(this, 'privileges')">Permissions</a></li>
                         </ul>
                     </li>
@@ -142,24 +137,6 @@
             </tbody>
         </table>
     </div>
-
-    <div id="majors" data-url="majors" class="page" style="display: none">
-        <h3>Students without a major</h3>
-        <!--<table class="table table-condensed table-hover" id="table-majors">
-            <thead>
-            <tr>
-                <th>Student</th>
-                <th>Promotion</th>
-                <th>Major</th>
-            </tr>
-            </thead>
-            <tbody id="table-majors-body">
-
-            </tbody>
-        </table>  -->
-        <div class="row" id="table-majors-body"></div>
-    </div>
-
 
     <!-- pending page -->
     <div id="pending" data-url="pending" class="page" style="display: none">
@@ -242,7 +219,7 @@
     <div id="assignments" data-url="assignments" class="page" style="display: none">
         <h3><span id="nb-tutors"></span> Tutors</h3>
         <a id='btn-mail-tutors' class="btn-sm btn-primary"><span class="fui-mail"></span> mail selection</a>
-        <table class="table-condensed table-hover tablesorter" id="table-assignments">
+        <table class="table table-condensed table-hover tablesorter" id="table-assignments">
             <thead>
             <tr>
                 <th><label class='checkbox'><input id="general-checkbox-tutors" type='checkbox' data-toggle='checkbox'/></label></th>

@@ -15,7 +15,7 @@ function login() {
             $("#err").html("");
             sessionStorage.setItem("User", JSON.stringify(data));
             sessionStorage.setItem("token", jqr.getResponseHeader("X-auth-token"));
-            if (data.Privs[0] == "student") {
+            if (data.Role == "") {
                 sessionStorage.setItem("homepage", "student.html");
                 window.location.href = "/static/student.html";
             } else {

@@ -45,53 +45,36 @@ $( document ).ready(function () {
     }
     $("#fullname").html(user.P.Firstname + " " + user.P.Lastname);
 
+    $("." + user.Role + "Item").show();
+    $(".tutorItem").show();
 
-    var isAdmin = false;
-    var isTutor = false;
-    var isRoot = false;
-    var isMajor = false;
-    user.Privs.forEach(function (p) {
-        isRoot = isRoot || p == "root";
-        isTutor = isTutor || p == "tutor";
-        isAdmin = isAdmin || p == "root" || p =="admin";
-        isMajor = isMajor || p == "root" || p == "admin";
-    });
-    if (isTutor) { $(".tutorItem").show();}
-    if (isAdmin) { $(".adminItem").show();}
-    if (isMajor) { $(".majorItem").show();}
-    if (isRoot) { $(".rootItem").show();}
-
-    if (isAdmin) {
-        //getAllConventions();
-        pickOne();
-    }
-    if (isRoot) {
-        showPrivileges();
-    }
     getAllConventions();
     currentPage = "myStudents";
 });
 
 function pickOne() {
     getWithToken("/conventions/_random", function(data) {
-        total = data.Total;
-        pending = data.Pending;
-        pendingConvention = data.C;
-        if (pending == 0) {
+        if (data.length == 0) {
             success();
         } else {
-            known = data.Known;
-            known.sort(function (a, b) {
-                return a.Lastname.localeCompare(b.Lastname);
-            });
-            committed = total - pending;
-            drawProfile(data)
+            total = data.Total;
+            pending = data.Pending;
+            pendingConvention = data.C;
+            if (pending == 0) {
+                success();
+            } else {
+                known = data.Known;
+                known.sort(function (a, b) {
+                    return a.Lastname.localeCompare(b.Lastname);
+                });
+                committed = total - pending;
+                drawProfile(data)
+            }
         }
     });
 }
 
 function success() {
-    $("#pending").html("");
     $("#completed").html(100);
     $("#progress").css("width", "100%");
     $("#alignment-box").hide();
@@ -135,8 +118,10 @@ function drawProfile(c) {
         var best = pickBestMatching(tutor.Lastname);
 
         $("#known-tutor-selector").html(options);
-        $("#known-tutor-selector option[value='" + best.Email +"']").attr("selected", "selected");
-        $("#btn-choose-known").show();
+        if (best) {
+            $("#known-tutor-selector option[value='" + best.Email + "']").attr("selected", "selected");
+            $("#btn-choose-known").show();
+        }
 
     }
 
@@ -180,7 +165,7 @@ function pickTheory() {
     pendingConvention.Tutor.Lastname = $("#th-tutor-ln").val();
     pendingConvention.Tutor.Email = $("#th-tutor-email").val();
     pendingConvention.Tutor.Tel = $("#th-tutor-tel").val();
-    $.postJSON("/conventions/", JSON.stringify(pendingConvention), ackPick, nackPick);
+    postWithToken("/conventions/", pendingConvention, ackPick, nackPick);
 }
 
 function nackPick(){
@@ -225,9 +210,11 @@ function refresh() {
         displayMyConventions();
     } else if (currentPage == "assignments") {
         displayTutors();
-    } /*else if (currentPage == "majors") {
-        displayPendingMajors();
-    } */else {
+    } else if (currentPage == "privileges") {
+        showPrivileges();
+    } else if (currentPage == "pending") {
+        pickOne();
+    } else {
         console.log("Unsupported operation on '" + currentPage + "'");
     }
 }
@@ -472,7 +459,7 @@ function showPrivileges() {
             buf += "<label for='lbl-" + a.P.Email + "' class='col-md-8 control-label'>" + formatPerson(a.P, true) + "</label>";
             buf += "<span class='col-md-4'>";
             buf += "<select onchange=\"setPrivilege(this, '" + a.P.Email + "')\">";
-            buf += options(a.Privs[0], ["","admin", "root"]);
+            buf += options(a.Role, ["","admin", "root"]);
             buf += "</select>";
             buf += "</div>";
             buf += "</div>";

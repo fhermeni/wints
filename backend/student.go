@@ -18,11 +18,7 @@ func NewStudent(db *sql.DB, s Student) error {
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec("insert into roles(email,role) values($1,'student')", s.P.Email)
-	if err != nil {
-		return err
-	}
-	res, err := db.Exec("insert into students(email, promotion) values($1,$2)", s.P.Email, s.Promotion)
+	res, err := db.Exec("insert into students(email, promotion, major) values($1,$2,$3)", s.P.Email, s.Promotion, "?")
 	if err != nil {
 		return err
 	}

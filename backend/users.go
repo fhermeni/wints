@@ -24,32 +24,17 @@ type Person struct {
 
 type User struct {
 	P     Person
-	Privs []string
+	Role  string
 }
-
-func (u User) isAdmin() bool {
-	for _, p := range u.Privs {
-		if (p == "admin" || p == "root") {
-			return true;
-		}
-	}
-	return false;
-}
-
-func (u User) isTutor() bool {
-	for _, p := range u.Privs {
-		if (p == "tutor") {
-			return true;
-		}
-	}
-	return false;
-}
-
 
 func (p Person) String() string {
 	return p.Firstname + " " + p.Lastname + " (" + p.Email + ")";
 }
 
+
+func (u User) String() string {
+	return u.P.String() + ": " + u.Role;
+}
 
 
 func Register(db *sql.DB, c Credential) (User, error) {
@@ -60,21 +45,27 @@ func Register(db *sql.DB, c Credential) (User, error) {
 		return User{}, errors.New("Unknown user or incorrect password")
 	}
 	if (bcrypt.CompareHashAndPassword([]byte(p), []byte(c.Password)) != nil) {
-		log.Printf("Bas paddword for %s: ‰s\n", c.Email, err)
+		log.Printf("Bad password for %s\n", c.Email)
 		return User{}, errors.New("Unknown user or incorrect password")
 	}
+
+	var r string
 	rows, err := db.Query("select role from roles where email=$1", c.Email)
 	if err != nil {
-		log.Printf("Error while getting the roles for %s:%s\n", c.Email, err)
-		return User{}, err
+		log.Printf("Unable to get the role: %s\n", err)
+		return User{}, nil
 	}
-	roles := make([]string, 0, 0)
-	var r string
-	for rows.Next() {
-		rows.Scan(&r)
-		roles = append(roles, r)
+	if !rows.Next() {
+		r = ""
+	} else {
+		err = rows.Scan(&r)
+		if err != nil {
+			log.Printf("Unable to get the role: %s\n", err)
+			return User{}, nil
+		}
+
 	}
-	return User{Person{fn, ln, c.Email, tel}, roles}, nil
+	return User{Person{fn, ln, c.Email, tel}, r}, nil
 }
 
 func NewUser(db *sql.DB, p Person) error {
@@ -105,11 +96,6 @@ func NewTutor(db *sql.DB, p Person) error {
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec("insert into roles(email,role) values($1,'tutor')", p.Email)
-	if err != nil {
-		return err
-	}
-
 	return err
 }
 
@@ -156,20 +142,9 @@ func Admins(db *sql.DB) ([]User, error) {
 		return admins, err
 	}
 	var fn, ln, email, tel, role string
-	managers := make(map[string]User)
 	for rows.Next() {
 		rows.Scan(&fn, &ln, &email, &tel, &role)
-		m, ok := managers[email]
-		if !ok {
-			p := Person{fn, ln, email, tel}
-			m = User{p, make([]string, 0, 0)}
-			managers[email] = m
-		}
-		m.Privs = append(m.Privs, role)
-		managers[email] = m
-	}
-	for _, v := range managers {
-		admins = append(admins, v)
+		admins = append(admins, User{Person{fn, ln, email, tel}, role})
 	}
 	return admins, nil
 }

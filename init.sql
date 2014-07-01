@@ -8,9 +8,10 @@ drop table if exists roles;
 drop table if exists logs;
 drop type if exists app_status;
 drop table if exists users;
-drop type if exists role;
+drop type if exists e_roles;
+
 -- user
-create table users(email text UNIQUE ON UPDATE UPDATE,
+create table users(email text PRIMARY KEY,
 				  username text,
 				  firstname text,
 				  lastname text,
@@ -26,10 +27,9 @@ create table students(email text PRIMARY KEY REFERENCES users(email),
 );
 
 -- major_adm
-create type role as enum('student', 'tutor', 'admin', 'root', 'major');
-create table roles(email text,
-					   role text,
-					   constraint pk_major_adm PRIMARY KEY (email, role)
+create type e_roles as enum('major', 'admin', 'root');
+create table roles(email text PRIMARY KEY REFERENCES users(email),
+		  role e_roles
 );
 
 -- applications

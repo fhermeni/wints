@@ -55,20 +55,24 @@ func jsonRequest(w http.ResponseWriter, r *http.Request, j interface{}) error {
 }
 
 func pullConventions() {
+	conventions, err := backend.GetAllRawConventions()
+	if err != nil {
+		log.Printf("%s\n", err)
+	} else {
+		for _,c := range conventions {
+			backend.InspectRawConvention(DB, c)
+		}
+	}
+}
+
+func daemonConventionsPuller() {
 	ticker := time.NewTicker(time.Hour)
 	quit := make(chan struct{})
 	go func() {
 		for {
 			select {
 			case <-ticker.C:
-				conventions, err := backend.GetAllRawConventions()
-				if err != nil {
-					log.Printf("%s\n", err)
-				} else {
-					for _,c := range conventions {
-						backend.InspectRawConvention(DB, c)
-					}
-				}
+				pullConventions();
 			case <-quit:
 				ticker.Stop()
 				return
@@ -93,18 +97,18 @@ func RandomPendingConvention(w http.ResponseWriter, r *http.Request, email strin
 
 	nbPending, err := backend.CountPending(DB)
 	if err != nil {
-		log.Printf("Error: %s\n", err)
+		log.Printf("Error at counting: %s\n", err)
 		return
 	}
 	cc, err := backend.GetConventions(DB)
 	if err != nil {
-		log.Printf("Error: %s\n", err)
+		log.Printf("Error at getting: %s\n", err)
 		return
 	}
 	nbCommitted := len(cc)
 	known, err := backend.AvailableTutors(DB)
 	if err != nil {
-		log.Printf("Error: %s\n", err)
+		log.Printf("Error at getting tutors: %s\n", err)
 		return
 	}
 	jsonReply(w, PendingConventionMsg{c, known, nbPending, nbPending + nbCommitted})
@@ -113,7 +117,8 @@ func RandomPendingConvention(w http.ResponseWriter, r *http.Request, email strin
 func GetAllConventions(w http.ResponseWriter, r *http.Request, email string) {
 	conventions, err := backend.GetConventions(DB)
 	if err != nil {
-		log.Printf("Error: %s\n", err)
+		log.Printf("Error here: %s\n", err)
+		jsonReply(w,make([]backend.Convention, 0, 0))
 		return
 	}
 	jsonReply(w, conventions)
@@ -123,7 +128,7 @@ func GetAllConventions(w http.ResponseWriter, r *http.Request, email string) {
 func GetAdmins(w http.ResponseWriter, r *http.Request, email string) {
 	admins, err := backend.Admins(DB)
 	if err != nil {
-		log.Printf("Error: %s\n", err)
+		log.Printf("Error admins: %s\n", err)
 		return
 	}
 	jsonReply(w, admins)
@@ -162,6 +167,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	u, err := backend.Register(DB, cred)
+	log.Printf("Login %s\n", u)
 	if err != nil {
 		http.Error(w, "Unknown username or incorrect password", http.StatusUnauthorized)
 		return
@@ -324,6 +330,7 @@ func main() {
 	backend.NewTutor(DB, backend.Person{"Fabien", "Hermenier", "fabien.hermenier@unice.fr", "0662496455"})
 
 	pullConventions()
+	daemonConventionsPuller();
 
 	//Rest stuff
 	r := mux.NewRouter()
