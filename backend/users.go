@@ -89,13 +89,12 @@ func NewUser(db *sql.DB, p Person) error {
 	return &BackendError{http.StatusConflict, "User already exists"}
 }
 
-
-
 func NewTutor(db *sql.DB, p Person) error {
 	err := NewUser(db, p)
 	if err != nil {
 		return err
 	}
+	_, err = db.Exec("insert into roles(email, role) values ($1, $2)", p.Email, "")
 	return err
 }
 
@@ -134,16 +133,33 @@ func GetPerson(db *sql.DB, email string) (Person, error) {
 }
 
 
+func Role(db *sql.DB, email string) (string, error) {
+	rows, err := db.Query("select email, role from roles where email=$1", email)
+	if err != nil {
+		return "", err
+	}
+	if !rows.Next()  {
+		return "", nil
+	}
+	var r string
+	rows.Scan(&r)
+	return r, nil
+}
 func Admins(db *sql.DB) ([]User, error) {
-	rows, err := db.Query("select firstname, lastname, users.email, tel, role from users,roles where users.email = roles.email and users.email not in (select email from students);")
+	rows, err := db.Query("select firstname, lastname, users.email, tel from users where users.email not in (select email from students)")
 	admins := make([]User, 0, 0)
 	if err != nil {
 		log.Printf("Error: %s\n", err)
 		return admins, err
 	}
-	var fn, ln, email, tel, role string
+	var fn, ln, email, tel string
 	for rows.Next() {
-		rows.Scan(&fn, &ln, &email, &tel, &role)
+		rows.Scan(&fn, &ln, &email, &tel)
+		//Get the role if exists
+		role, err := Role(db, email)
+		if err != nil {
+			return admins, err
+		}
 		admins = append(admins, User{Person{fn, ln, email, tel}, role})
 	}
 	return admins, nil
@@ -178,5 +194,10 @@ func SetProfile(db *sql.DB, email, fn, ln, tel string) error {
 
 func GrantPrivilege(db *sql.DB, email, priv string) error {
 	_, err := db.Exec("insert into roles(email, role) values ($1, $2)", email, priv)
+	return err
+}
+
+func SetPrivilege(db *sql.DB, email, priv string) error {
+	_, err := db.Exec("update roles(email, role) set role=$2 where email=$1", email, priv)
 	return err
 }

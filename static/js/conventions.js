@@ -453,16 +453,15 @@ function showPrivileges() {
     var buf = "";
     getWithToken("/admins/", function(data) {
         var buf = "";
+        var tpl = $('#row-admin').html();
+        Mustache.parse(tpl);   // optional, speeds up future uses
         data.forEach(function (a) {
-            buf += "<div class='col-md-4'>";
-            buf += "<div class='form-group'>";
-            buf += "<label for='lbl-" + a.P.Email + "' class='col-md-8 control-label'>" + formatPerson(a.P, true) + "</label>";
-            buf += "<span class='col-md-4'>";
-            buf += "<select onchange=\"setPrivilege(this, '" + a.P.Email + "')\">";
-            buf += options(a.Role, ["","admin", "root"]);
-            buf += "</select>";
-            buf += "</div>";
-            buf += "</div>";
+            console.log(a);
+            var data = {
+                email: a.P.Email,
+                fullname : a.P.Firstname + " " + a.P.Lastname
+            };
+            buf += Mustache.render(tpl,data);
         });
         $("#table-privileges-body").html(buf);
         $(".tagsinput").tagsInput();

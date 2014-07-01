@@ -58,6 +58,8 @@ func InspectRawConvention(db *sql.DB, c Convention) {
 	_, err := GetConvention(db, stu.P.Email)
 	if err == nil {
 		return
+	} else {
+		log.Printf("Hey: %s\n", err)
 	}
 	//Check for a pending convention
 	_, err = GetPendingConvention(db, stu.P.Email)
@@ -130,7 +132,7 @@ func RegisterInternship(db *sql.DB, c Convention, move bool) error {
 	_, err := db.Exec("insert into internships (student, startTime, endTime, tutor, midtermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)",
 		c.Stu.P.Email, c.Begin, c.End, c.Tutor.Email, c.Begin.Add(TWO_MONTHS), c.Company, c.CompanyWWW, supervisor.Firstname, supervisor.Lastname, supervisor.Email, supervisor.Tel)
 	if err != nil {
-		log.Printf("Error: %s\n", c)
+		log.Printf("Error: %s %s\n", c, err)
 		return err
 	}
 	if move {
@@ -232,7 +234,7 @@ func GetPendingConvention(db *sql.DB, email string) (Convention, error) {
 }
 
 func GetConvention(db *sql.DB, email string) (Convention, error) {
-	sql := "select stu.firstname, stu.lastname, stu.tel, students.promotion, students.major startTime, endTime, tut.firstname, tut.lastname, tut.email, tut.tel,"+
+	sql := "select stu.firstname, stu.lastname, stu.tel, students.promotion, students.major, startTime, endTime, tut.firstname, tut.lastname, tut.email, tut.tel,"+
 	"midTermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel "+
 	" from internships, users as stu, users as tut, students where students.email = $1 and stu.email = $1 and internships.student = $1 and tut.email = internships.tutor";
 

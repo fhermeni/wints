@@ -41,6 +41,25 @@
             </td>
         </tr>
     </script>
+    <script type="x-tmpl-mustache" id="row-admin">
+        <div class='col-md-4'>
+            <div class='form-group'>
+                <label for='lbl-{{email}}' class='col-md-8 control-label'>
+                    <a href="mailto:{{email}}">
+                        {{fullname}}
+                    </a>
+                </label>
+                <span class='col-md-4'>
+                    <select onchange="setPrivilege(this, '{{email}}')">
+                        <option></option>
+                        <option>major</option>
+                        <option>admin</option>
+                        <option>root</option>
+                    </select>
+                </span>
+            </div>
+        </div>
+    </script>
 </head>
 <body>
 <div class="container">
