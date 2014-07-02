@@ -42,19 +42,18 @@
         </tr>
     </script>
     <script type="x-tmpl-mustache" id="row-admin">
-        <div class='col-md-4'>
+        <div class='col-md-6'>
             <div class='form-group'>
-                <label for='lbl-{{email}}' class='col-md-8 control-label'>
-                    <a href="mailto:{{email}}">
-                        {{fullname}}
-                    </a>
+                <label for='lbl-{{email}}' class='col-md-7 control-label'>
+                    <a class="btn btn-xs btn-danger fui-cross" href="#" onclick="rmUser(this,'{{email}}')"></a>
+                    <a href="mailto:{{email}}">{{fullname}}</a>
                 </label>
-                <span class='col-md-4'>
+                <span class='col-md-3'>
                     <select onchange="setPrivilege(this, '{{email}}')">
-                        <option></option>
-                        <option>major</option>
-                        <option>admin</option>
-                        <option>root</option>
+                        <option value="" {{no}}>None</option>
+                        <option value="major" {{major}}>Major</option>
+                        <option value="admin" {{admin}}>Admin</option>
+                        <option value="root" {{root}}>Root</option>
                     </select>
                 </span>
             </div>

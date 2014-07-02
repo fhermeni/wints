@@ -4,19 +4,19 @@ drop table if exists interviews;
 drop table if exists applications;
 drop table if exists students;
 drop table if exists sessions;
-drop table if exists roles;
 drop table if exists logs;
 drop type if exists app_status;
 drop table if exists users;
 drop type if exists e_roles;
 
 -- user
+create type e_roles as enum('', 'major', 'admin', 'root');
 create table users(email text PRIMARY KEY,
-				  username text,
 				  firstname text,
 				  lastname text,
 				  tel text,
-				  password text
+				  password text,
+				  role e_roles
 				  );
 
 -- students
@@ -24,12 +24,6 @@ create table students(email text PRIMARY KEY REFERENCES users(email),
 					  major text,
 					  promotion text,
 					  last_action timestamp
-);
-
--- major_adm
-create type e_roles as enum('major', 'admin', 'root');
-create table roles(email text PRIMARY KEY REFERENCES users(email),
-		  role e_roles
 );
 
 -- applications

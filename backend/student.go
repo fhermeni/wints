@@ -7,7 +7,7 @@ import (
 )
 
 type Student struct {
-	P         Person
+	P         User
 	Promotion string
 	Major string
 }
@@ -38,7 +38,7 @@ func GetStudent(db *sql.DB, email string) (Student, error) {
 	if err != nil {
 		return Student{}, err
 	}
-	p := Person{fn, ln, email, tel}
+	p := User{fn, ln, email, tel, ""}
 	return Student{p, promo, major}, nil
 }
 

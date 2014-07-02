@@ -15,8 +15,8 @@ import (
 
 type Convention struct {
 	Stu        Student
-	Sup        Person
-	Tutor      Person
+	Sup        User
+	Tutor      User
 	Company    string
 	CompanyWWW string
 	Begin      time.Time
@@ -58,8 +58,6 @@ func InspectRawConvention(db *sql.DB, c Convention) {
 	_, err := GetConvention(db, stu.P.Email)
 	if err == nil {
 		return
-	} else {
-		log.Printf("Hey: %s\n", err)
 	}
 	//Check for a pending convention
 	_, err = GetPendingConvention(db, stu.P.Email)
@@ -76,7 +74,7 @@ func InspectRawConvention(db *sql.DB, c Convention) {
 	}
 
 	tutor := c.Tutor
-	_, err = GetPerson(db, tutor.Email)
+	_, err = GetUser(db, tutor.Email)
 	if err == nil {
 		err = RegisterInternship(db, c, false)
 		if err != nil {
@@ -195,9 +193,9 @@ func PeekRawConvention(db * sql.DB) (Convention, error) {
 	if err != nil {
 		return Convention{}, err
 	}
-	stu := Student{Person{stuFn, stuLn, stuEmail, stuTel}, promo, ""}
-	tutor := Person{tutorFn, tutorLn, tutorEmail, tutorTel}
-	sup := Person{supFn, supLn, supEmail, supTel}
+	stu := Student{User{stuFn, stuLn, stuEmail, stuTel,""}, promo, ""}
+	tutor := User{tutorFn, tutorLn, tutorEmail, tutorTel, ""}
+	sup := User{supFn, supLn, supEmail, supTel, ""}
 	return Convention{stu, sup, tutor, company, companyWWW, start, end, midDeadline}, nil
 }
 
@@ -227,9 +225,9 @@ func GetPendingConvention(db *sql.DB, email string) (Convention, error) {
 	if err != nil {
 		return Convention{}, err
 	}
-	stu := Student{Person{stuFn, stuLn, email, stuTel}, promo, ""}
-	tutor := Person{tutorFn, tutorLn, tutorEmail, tutorTel}
-	sup := Person{supFn, supLn, supEmail, supTel}
+	stu := Student{User{stuFn, stuLn, email, stuTel, ""}, promo, ""}
+	tutor := User{tutorFn, tutorLn, tutorEmail, tutorTel, ""}
+	sup := User{supFn, supLn, supEmail, supTel, ""}
 	return Convention{stu, sup, tutor, company, companyWWW, start, end, midDeadline}, nil
 }
 
@@ -249,9 +247,9 @@ func GetConvention(db *sql.DB, email string) (Convention, error) {
 	if err != nil {
 		return Convention{}, err
 	}
-	stu := Student{Person{stuFn, stuLn, email, stuTel}, promo, major}
-	tutor := Person{tutorFn, tutorLn, tutorEmail, tutorTel}
-	sup := Person{supFn, supLn, supEmail, supTel}
+	stu := Student{User{stuFn, stuLn, email, stuTel, ""}, promo, major}
+	tutor := User{tutorFn, tutorLn, tutorEmail, tutorTel,""}
+	sup := User{supFn, supLn, supEmail, supTel, ""}
 	return Convention{stu, sup, tutor, company, companyWWW, start, end, midDeadline}, nil
 }
 
@@ -280,9 +278,9 @@ func GetConventions(db *sql.DB) ([]Convention, error) {
 		if err != nil {
 			return conventions, err
 		}
-		stu := Student{Person{stuFn, stuLn, stuMail, stuTel}, promo, major}
-		tutor := Person{tutorFn, tutorLn, tutorEmail, tutorTel}
-		sup := Person{supFn, supLn, supEmail, supTel}
+		stu := Student{User{stuFn, stuLn, stuMail, stuTel,""}, promo, major}
+		tutor := User{tutorFn, tutorLn, tutorEmail, tutorTel, ""}
+		sup := User{supFn, supLn, supEmail, supTel, ""}
 		c :=  Convention{stu, sup, tutor, company, companyWWW, start, end, midDeadline}
 		conventions = append(conventions, c)
 	}
@@ -301,7 +299,7 @@ func GetConventions2(db *sql.DB, u User) ([]Convention, error) {
 		sql := "select stu.firstname, stu.lastname, stu.email, stu.tel, students.promotion, students.major, startTime, endTime, tut.firstname, tut.lastname, tut.email, tut.tel," +
 				"midTermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel " +
 				" from internships, users as stu, users as tut, students where students.email = stu.email and internships.student = stu.email and tut.email = $1";
-		rows, err = db.Query(sql, u.P.Email)
+		rows, err = db.Query(sql, u.Email)
 	}
 
 	conventions := make([]Convention, 0, 0)
@@ -323,9 +321,9 @@ func GetConventions2(db *sql.DB, u User) ([]Convention, error) {
 		if err != nil {
 			return conventions, err
 		}
-		stu := Student{Person{stuFn, stuLn, stuMail, stuTel}, promo, major}
-		tutor := Person{tutorFn, tutorLn, tutorEmail, tutorTel}
-		sup := Person{supFn, supLn, supEmail, supTel}
+		stu := Student{User{stuFn, stuLn, stuMail, stuTel, ""}, promo, major}
+		tutor := User{tutorFn, tutorLn, tutorEmail, tutorTel,""}
+		sup := User{supFn, supLn, supEmail, supTel,""}
 		c :=  Convention{stu, sup, tutor, company, companyWWW, start, end, midDeadline}
 		conventions = append(conventions, c)
 	}
@@ -361,10 +359,10 @@ func getRawConventions(year int, Promotion string) ([]Convention, error) {
 			fmt.Println("Error:", err)
 			return nil, err
 		}
-		p := Person{strings.TrimSpace(record[stuFn]), strings.TrimSpace(record[stuLn]), strings.TrimSpace(record[stuEmail]), strings.TrimSpace(record[stuTel])}
+		p := User{strings.TrimSpace(record[stuFn]), strings.TrimSpace(record[stuLn]), strings.TrimSpace(record[stuEmail]), strings.TrimSpace(record[stuTel]), ""}
 		stu := Student{p, strings.TrimSpace(record[stuPromotion]), ""}
-		supervisor := Person{strings.TrimSpace(record[supervisorFn]), strings.TrimSpace(record[supervisorLn]), strings.TrimSpace(record[supervisorEmail]), strings.TrimSpace(record[supervisorTel])}
-		tutor := Person{strings.TrimSpace(record[tutorFn]), strings.TrimSpace(record[tutorLn]), strings.TrimSpace(record[tutorEmail]), strings.TrimSpace(record[tutorTel])}
+		supervisor := User{strings.TrimSpace(record[supervisorFn]), strings.TrimSpace(record[supervisorLn]), strings.TrimSpace(record[supervisorEmail]), strings.TrimSpace(record[supervisorTel]), ""}
+		tutor := User{strings.TrimSpace(record[tutorFn]), strings.TrimSpace(record[tutorLn]), strings.TrimSpace(record[tutorEmail]), strings.TrimSpace(record[tutorTel]), ""}
 		startTime, err := time.Parse("02/01/2006", strings.TrimSpace(record[begin]))
 		if err != nil {
 			return nil, err

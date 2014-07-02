@@ -46,3 +46,12 @@ function getWithToken(url, successCb, errorCb) {
     }).done(successCb).fail(errorCb);
     return jqr;
 }
+
+function deleteWithToken(url, successCb, errorCb) {
+    var jqr = $.ajax({
+        method: "DELETE",
+        url: url,
+        headers: {"X-auth-token" : sessionStorage.getItem("token")},
+    }).done(successCb).fail(errorCb);
+    return jqr;
+}

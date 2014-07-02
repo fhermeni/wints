@@ -83,7 +83,7 @@ func daemonConventionsPuller() {
 
 type PendingConventionMsg struct {
 	C backend.Convention
-	Known []backend.Person
+	Known []backend.User
 	Pending int
 	Total int
 }
@@ -148,16 +148,19 @@ func NewAdmin(w http.ResponseWriter, r *http.Request, email string) {
 	if err != nil {
 		return
 	}
-	p := backend.Person{nu.Firstname, nu.Lastname, nu.Email, nu.Tel}
+	p := backend.User{nu.Firstname, nu.Lastname, nu.Email, nu.Tel, nu.Priv}
 	err = backend.NewUser(DB, p)
 	if err != nil {
 		reportError(w, "", err)
 		return
 	}
-	err = backend.GrantPrivilege(DB, nu.Email, nu.Priv);
+}
+
+func RmUser(w http.ResponseWriter, r *http.Request, email string) {
+	target,_ := mux.Vars(r)["email"]
+	err := backend.RmUser(DB, target)
 	if err != nil {
 		reportError(w, "", err)
-		return
 	}
 }
 
@@ -204,9 +207,9 @@ func CommitPendingConvention(w http.ResponseWriter, r *http.Request, email strin
 		return
 	}
 	tEmail := c.Tutor.Email
-	_, err = backend.GetPerson(DB, tEmail)
+	_, err = backend.GetUser(DB, tEmail)
 	if err != nil {
-		err = backend.NewTutor(DB, c.Tutor)
+		err = backend.NewUser(DB, c.Tutor)
 		log.Printf("Register the new tutor %s\n", c.Tutor)
 		if err != nil {
 			log.Printf("Unable to register the new tutor %s: %s\n", c.Tutor, err)
@@ -240,9 +243,10 @@ func ChangeProfile(w http.ResponseWriter, r *http.Request, email string) {
 		return
 	}
 	err := backend.SetProfile(DB, email, p.Firstname, p.Lastname, p.Tel)
+	u, err := backend.GetUser(DB, email)
 	reportError(w, "", err)
 
-	jsonReply(w, backend.Person{p.Firstname, p.Lastname, email, p.Tel})
+	jsonReply(w, u)
 }
 
 func UpdatePromotion(w http.ResponseWriter, r *http.Request, email string) {
@@ -276,7 +280,7 @@ type PasswordRenewal struct {
 	NewPassword []byte
 }
 
-func ChangePassword(w http.ResponseWriter, r *http.Request, uid int) {
+/*func ChangePassword(w http.ResponseWriter, r *http.Request, uid int) {
 	var p PasswordRenewal
 	if jsonRequest(w, r, &p) != nil {
 		return
@@ -286,7 +290,7 @@ func ChangePassword(w http.ResponseWriter, r *http.Request, uid int) {
 	if err != nil {
 		reportError(w, "", err)
 	}
-}
+}         */
 
 func GrantRole(w http.ResponseWriter, r *http.Request, email string) {
 	//TODO: permission
@@ -322,14 +326,13 @@ func main() {
 	if len(dbURL) == 0 {
 		dbURL = "user=fhermeni dbname=wints host=localhost password=wints sslmode=disable"
 	}
-	log.Println(dbURL)
 	DB, err = sql.Open("postgres", dbURL)
 	if err != nil {
 		log.Fatalf("%s\n", err)
 	}
-	backend.NewTutor(DB, backend.Person{"Fabien", "Hermenier", "fabien.hermenier@unice.fr", "0662496455"})
+	backend.NewUser(DB, backend.User{"Fabien", "Hermenier", "fabien.hermenier@unice.fr", "0662496455", "root"})
 
-	pullConventions()
+	go pullConventions()
 	daemonConventionsPuller();
 
 	//Rest stuff
@@ -344,6 +347,7 @@ func main() {
 	r.HandleFunc("/admins/", RequireToken(GetAdmins)).Methods("GET")
 	r.HandleFunc("/users/", RequireToken(NewAdmin)).Methods("POST")
 	r.HandleFunc("/users/{email}/roles/", RequireToken(GrantRole)).Methods("POST")
+	r.HandleFunc("/users/{email}", RequireToken(RmUser)).Methods("DELETE")
 	r.HandleFunc("/login", Login).Methods("POST")
 	r.HandleFunc("/profile", RequireToken(ChangeProfile)).Methods("POST")
 	r.HandleFunc("/logout", RequireToken(Logout)).Methods("POST")

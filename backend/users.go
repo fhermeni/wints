@@ -15,31 +15,22 @@ const (
 	changePassword = "update users set password=$2 where uid=$1"
 )
 
-type Person struct {
+type User struct {
 	Firstname string
 	Lastname  string
 	Email     string
 	Tel       string
+	Role	  string
 }
 
-type User struct {
-	P     Person
-	Role  string
-}
-
-func (p Person) String() string {
+func (p User) String() string {
 	return p.Firstname + " " + p.Lastname + " (" + p.Email + ")";
 }
 
 
-func (u User) String() string {
-	return u.P.String() + ": " + u.Role;
-}
-
-
 func Register(db *sql.DB, c Credential) (User, error) {
-	var fn, ln, tel, p string
-	err := db.QueryRow("select firstname, lastname, tel, password from users where email=$1", c.Email).Scan(&fn, &ln, &tel, &p)
+	var fn, ln, tel, p, r string
+	err := db.QueryRow("select firstname, lastname, tel, password, role from users where email=$1", c.Email).Scan(&fn, &ln, &tel, &p, &r)
 	if err != nil {
 		log.Printf("Unknown user %s: ‰s\n", c.Email, err)
 		return User{}, errors.New("Unknown user or incorrect password")
@@ -49,33 +40,17 @@ func Register(db *sql.DB, c Credential) (User, error) {
 		return User{}, errors.New("Unknown user or incorrect password")
 	}
 
-	var r string
-	rows, err := db.Query("select role from roles where email=$1", c.Email)
-	if err != nil {
-		log.Printf("Unable to get the role: %s\n", err)
-		return User{}, nil
-	}
-	if !rows.Next() {
-		r = ""
-	} else {
-		err = rows.Scan(&r)
-		if err != nil {
-			log.Printf("Unable to get the role: %s\n", err)
-			return User{}, nil
-		}
-
-	}
-	return User{Person{fn, ln, c.Email, tel}, r}, nil
+	return User{fn, ln, c.Email, tel, r}, nil
 }
 
-func NewUser(db *sql.DB, p Person) error {
+func NewUser(db *sql.DB, p User) error {
 	newPassword := rand_str(8)
 	log.Printf("New password for user '%s %s': %s\n", p.Firstname, p.Lastname, newPassword)
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.MinCost)
 	if err != nil {
 		return err
 	}
-	res, err := db.Exec("insert into users(email, firstname, lastname, tel, password) values ($1,$2,$3,$4,$5)", p.Email, p.Firstname, p.Lastname, p.Tel, hashedPassword)
+	res, err := db.Exec("insert into users(email, firstname, lastname, tel, password, role) values ($1,$2,$3,$4,$5,$6)", p.Email, p.Firstname, p.Lastname, p.Tel, hashedPassword, p.Role)
 	if err != nil {
 		return err;
 	}
@@ -89,29 +64,23 @@ func NewUser(db *sql.DB, p Person) error {
 	return &BackendError{http.StatusConflict, "User already exists"}
 }
 
-func NewTutor(db *sql.DB, p Person) error {
-	err := NewUser(db, p)
-	if err != nil {
-		return err
-	}
-	_, err = db.Exec("insert into roles(email, role) values ($1, $2)", p.Email, "")
-	return err
+func RmUser(db *sql.DB, email string) error {
+	_,err := db.Exec("DELETE FROM users where email=$1", email)
+ 	return err
 }
 
-
-
-func AvailableTutors(db *sql.DB) ([]Person, error) {
-	sql := "select firstname, lastname, email, tel from users where email not in (select email from students)"
+func AvailableTutors(db *sql.DB) ([]User, error) {
+	sql := "select firstname, lastname, email, tel, role from users where email not in (select email from students)"
 	rows, err := db.Query(sql)
-	tutors := make([]Person, 0, 0)
+	tutors := make([]User, 0, 0)
 	if err != nil {
 		return tutors, nil
 	}
 	defer rows.Close()
-	var fn, ln, email, tel string
+	var fn, ln, email, tel, role string
 	for rows.Next() {
-		rows.Scan(&fn, &ln, &email, &tel)
-		tutors = append(tutors, Person{fn, ln, email, tel})
+		rows.Scan(&fn, &ln, &email, &tel, &role)
+		tutors = append(tutors, User{fn, ln, email, tel, role})
 	}
 	return tutors, nil
 }
@@ -126,49 +95,33 @@ func rand_str(str_size int) string {
 	return string(bytes)
 }
 
-func GetPerson(db *sql.DB, email string) (Person, error) {
-	var fn, ln, tel string
-	err := db.QueryRow("select firstname, lastname, tel from users where email=$1", email).Scan(&fn, &ln, &tel)
-	return Person{fn, ln, email, tel}, err
+func GetUser(db *sql.DB, email string) (User, error) {
+	var fn, ln, tel, role string
+	err := db.QueryRow("select firstname, lastname, tel, role from users where email=$1", email).Scan(&fn, &ln, &tel, &role)
+	return User{fn, ln, email, tel, role}, err
 }
 
 
-func Role(db *sql.DB, email string) (string, error) {
-	rows, err := db.Query("select email, role from roles where email=$1", email)
-	if err != nil {
-		return "", err
-	}
-	if !rows.Next()  {
-		return "", nil
-	}
-	var r string
-	rows.Scan(&r)
-	return r, nil
-}
 func Admins(db *sql.DB) ([]User, error) {
-	rows, err := db.Query("select firstname, lastname, users.email, tel from users where users.email not in (select email from students)")
+	rows, err := db.Query("select firstname, lastname, users.email, tel, role from users where users.email not in (select email from students)")
 	admins := make([]User, 0, 0)
 	if err != nil {
 		log.Printf("Error: %s\n", err)
 		return admins, err
 	}
-	var fn, ln, email, tel string
+	var fn, ln, email, tel, role string
 	for rows.Next() {
-		rows.Scan(&fn, &ln, &email, &tel)
+		rows.Scan(&fn, &ln, &email, &tel, &role)
 		//Get the role if exists
-		role, err := Role(db, email)
-		if err != nil {
-			return admins, err
-		}
-		admins = append(admins, User{Person{fn, ln, email, tel}, role})
+		admins = append(admins, User{fn, ln, email, tel, role})
 	}
 	return admins, nil
 }
 
-func NewPassword(db *sql.DB, uid int, oldPassword, newPassword []byte) error {
+func NewPassword(db *sql.DB, email string, oldPassword, newPassword []byte) error {
 	//Get the password
 	var p []byte
-	err := db.QueryRow("select password from users where uid=$1", uid).Scan(&p)
+	err := db.QueryRow("select password from users where email=$1", email).Scan(&p)
 	if err != nil {
 		return err
 	}
@@ -193,11 +146,6 @@ func SetProfile(db *sql.DB, email, fn, ln, tel string) error {
 }
 
 func GrantPrivilege(db *sql.DB, email, priv string) error {
-	_, err := db.Exec("insert into roles(email, role) values ($1, $2)", email, priv)
-	return err
-}
-
-func SetPrivilege(db *sql.DB, email, priv string) error {
-	_, err := db.Exec("update roles(email, role) set role=$2 where email=$1", email, priv)
+	_, err := db.Exec("update users set role=$2 where email=$1", email, priv)
 	return err
 }

@@ -3,13 +3,17 @@
 - listings OK
 - mailto: OK
 - update profile OK
+- tutor alignment OK
+- major alignment OK
 - error reporting
 - permissions: -(students, tutor), major, admin, root
   major: see all conventions + manipulate major
   admin: pending conventions
   root: users permission
-- tutor alignment OK
-- major alignment OK
+- new user
+- delete user
+- logging
+- init mode
 
 
 ## Version 2.0 ##

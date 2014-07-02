@@ -43,7 +43,7 @@ $( document ).ready(function () {
     if (!user) {
         window.location.href = "/";
     }
-    $("#fullname").html(user.P.Firstname + " " + user.P.Lastname);
+    $("#fullname").html(user.Firstname + " " + user.Lastname);
 
     $("." + user.Role + "Item").show();
     $(".tutorItem").show();
@@ -127,6 +127,7 @@ function drawProfile(c) {
 
         $("#completed").html(Math.ceil(100 * committed / total));
         $("#progress").css("width", Math.ceil(100 * committed / total) + "%");
+    $("select").selectpicker({style: 'btn-sm btn-success', menuStyle: 'dropdown-inverse'});
 }
 
 function pickBestMatching(tutor) {
@@ -183,7 +184,6 @@ function pickKnown() {
             return false
         }
     });
-    debugger;
     postWithToken("/conventions/", pendingConvention, ackPick, nackPick);
 }
 
@@ -320,7 +320,7 @@ function displayMyStudents() {
     var buf = "";
     conventions.forEach(function (c) {
         var tut = c.Tutor;
-        if (tut.Email == user.P.Email) {
+        if (tut.Email == user.Email) {
             var stu = c.Stu;
             buf += "<tr>";
             buf += "<td><label class='checkbox'><input class='checkbox-mail-myStudents' type='checkbox' data-toggle='checkbox' value='" + stu.P.Email + "'/></label></td>";
@@ -451,29 +451,31 @@ function updateMajor(email) {
 
 function showPrivileges() {
     var buf = "";
+    var admins;
     getWithToken("/admins/", function(data) {
+        admins = data
         var buf = "";
         var tpl = $('#row-admin').html();
         Mustache.parse(tpl);   // optional, speeds up future uses
         data.forEach(function (a) {
-            console.log(a);
             var data = {
-                email: a.P.Email,
-                fullname : a.P.Firstname + " " + a.P.Lastname
+                email: a.Email,
+                fullname : a.Firstname + " " + a.Lastname
             };
+            data[a.Role] = "selected";
             buf += Mustache.render(tpl,data);
         });
         $("#table-privileges-body").html(buf);
         $(".tagsinput").tagsInput();
+        $("select").selectpicker({style: 'btn-sm btn-primary', menuStyle: 'dropdown-inverse'});
     });
+
 }
 
 function setPrivilege(select, email) {
     var val = $(select).val();
     console.log("Set permission of " + email + " to " + val);
-    postRawWithToken("/users/" + email + "/roles/", val, function() {
-        console.log("ok");
-    }, function () { console.log(arguments)});
+    postRawWithToken("/users/" + email + "/roles/", val, function() {}, function () { console.log(arguments)});
 }
 
 function newUser(m) {
@@ -485,8 +487,16 @@ function newUser(m) {
         Priv: $("#lbl-nu-priv").val()
     };
     postWithToken("/users/", d, function() {
-        $(m).hide()
-
+        $("#new-user").hide()
     },
     function() {console.log(args)});
+}
+
+
+function rmUser(btn, m) {
+    deleteWithToken("/users/" + m, function() {
+        $(btn).parent().parent().parent().remove();
+    }, function() {
+        console.log(arguments)
+    });
 }
