@@ -42,32 +42,6 @@ func GetStudent(db *sql.DB, email string) (Student, error) {
 	return Student{p, promo, major}, nil
 }
 
-func SetPromotion(db *sql.DB, email string, p string) error {
-	res, err := db.Exec("update students set promotion=$2 where email=$1", email, p)
-	if err != nil {
-		return err
-	}
-	nb, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if nb != 1 {
-		return errors.New("Unknown student '" + email + "'\n")
-	}
-	return nil
-}
-
 func SetMajor(db *sql.DB, email string, m string) error {
-	res, err := db.Exec("update students set major=$2 where email=$1", email, m)
-	if err != nil {
-		return err
-	}
-	nb, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if nb != 1 {
-		return errors.New("Unknown student '" + email + "'\n")
-	}
-	return nil
+	return SingleUpdate(db, "update students set major=$2 where email=$1", email, m)
 }

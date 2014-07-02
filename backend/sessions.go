@@ -4,9 +4,9 @@ import (
 	_ "github.com/lib/pq"
 	"time"
 	"code.google.com/p/go.crypto/bcrypt"
-	"database/sql"
 	"errors"
 	"net/http"
+	"database/sql"
 )
 
 const (
@@ -17,13 +17,6 @@ const (
 	updateSession = "update sessions set token=$2, last=$3 where email=$1"
 	selectUIDFromToken = "select email, last from sessions where token=$1"
 )
-
-type Session struct {
-	Token string
-	Last time.Time
-	Role string
-	Uid int
-}
 
 type Credential struct {
 	Email string
@@ -38,24 +31,16 @@ func OpenSession(db *sql.DB, email string) ([]byte,error) {
 	last := time.Now().Add(d)
 
 	//Update if possible
-	res, err := db.Exec(updateSession, email, tok, last)
+	err = SingleUpdate(db, updateSession, email, tok, last)
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := db.Exec(makeSession, email, tok, last)
 	if err != nil {
 		return nil, err
 	}
 	nb, err := res.RowsAffected()
-	if err != nil {
-		return nil, err
-	}
-	if nb == 1 {
-		//session already existed so it was a refresh
-		return tok, nil
-	}
-
-	res, err = db.Exec(makeSession, email, tok, last)
-	if err != nil {
-		return nil, err
-	}
-	nb, err = res.RowsAffected()
 	if err != nil {
 		return nil, err
 	}

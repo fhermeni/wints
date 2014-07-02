@@ -330,6 +330,22 @@ func GetConventions2(db *sql.DB, u User) ([]Convention, error) {
 	return conventions, nil
 }
 
+func cleanUser(fn, ln, email, tel string) User {
+	return User{
+		cleanName(fn),
+		cleanName(ln),
+		cleanName(email),
+		cleanName(tel),
+		""}
+}
+
+func cleanName(str string) string {
+	return strings.ToTitle(strings.ToLower(strings.TrimSpace(str)))
+}
+
+func clean(str string) string {
+	return strings.TrimSpace(str)
+}
 
 func getRawConventions(year int, Promotion string) ([]Convention, error) {
 	client := &http.Client{}
@@ -359,10 +375,10 @@ func getRawConventions(year int, Promotion string) ([]Convention, error) {
 			fmt.Println("Error:", err)
 			return nil, err
 		}
-		p := User{strings.TrimSpace(record[stuFn]), strings.TrimSpace(record[stuLn]), strings.TrimSpace(record[stuEmail]), strings.TrimSpace(record[stuTel]), ""}
-		stu := Student{p, strings.TrimSpace(record[stuPromotion]), ""}
-		supervisor := User{strings.TrimSpace(record[supervisorFn]), strings.TrimSpace(record[supervisorLn]), strings.TrimSpace(record[supervisorEmail]), strings.TrimSpace(record[supervisorTel]), ""}
-		tutor := User{strings.TrimSpace(record[tutorFn]), strings.TrimSpace(record[tutorLn]), strings.TrimSpace(record[tutorEmail]), strings.TrimSpace(record[tutorTel]), ""}
+		p := cleanUser(record[stuFn], record[stuLn], record[stuEmail], record[stuTel])
+		stu := Student{p, clean(record[stuPromotion]), ""}
+		supervisor := cleanUser(record[supervisorFn], record[supervisorLn], record[supervisorEmail], record[supervisorTel])
+		tutor := cleanUser(record[tutorFn], record[tutorLn], record[tutorEmail], record[tutorTel])
 		startTime, err := time.Parse("02/01/2006", strings.TrimSpace(record[begin]))
 		if err != nil {
 			return nil, err
@@ -382,29 +398,5 @@ func getRawConventions(year int, Promotion string) ([]Convention, error) {
 }
 
 func SetMidtermDeadline(db *sql.DB, email string, d time.Time) error {
-	res, err := db.Exec("update conventions set midtermDeadline=$2 where email=$1", email, d)
-	if err != nil {
-		return err
-	}
-	nb, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if nb != 1 {
-		return errors.New("Unknown student '" + email + "'\n")
-	}
-	return nil
+	return SingleUpdate(db, "update conventions set midtermDeadline=$2 where email=$1", email, d)
 }
-
-/**
- Policy to access conventions
- - tutor: access only to my conventions
- - major: access to conventions of my major
- - admin: all conventions
- - root: all conventions
-
- - view survey: tutor & +
- - view midterm report comment: tutor & +
- - write/grade midterm report: tutor
-
- */

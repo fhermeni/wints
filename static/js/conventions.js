@@ -452,7 +452,7 @@ function updateMajor(email) {
 function showPrivileges() {
     var buf = "";
     var admins;
-    getWithToken("/admins/", function(data) {
+    getWithToken("/users/", function(data) {
         admins = data
         var buf = "";
         var tpl = $('#row-admin').html();

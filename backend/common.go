@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"time"
 	"log"
+	"errors"
 )
 
 func StoreLog(db *sql.DB, uid int, message string) {
@@ -24,3 +25,35 @@ type BackendError struct {
 func (err *BackendError) Error() string {
 	return err.message
 }
+
+func SingleUpdate(db *sql.DB, q string, args ...interface{}) error {
+	res, err := db.Exec(q, args...)
+	if err != nil {
+		return err
+	}
+	nb, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if nb != 1 {
+		return errors.New("No updates")
+	}
+	return nil
+}
+
+/*
+func SetMajor(db *sql.DB, email string, m string) error {
+	res, err := db.Exec("update students set major=$2 where email=$1", email, m)
+	if err != nil {
+		return err
+	}
+	nb, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if nb != 1 {
+		return errors.New("Unknown student '" + email + "'\n")
+	}
+	return nil
+}
+ */

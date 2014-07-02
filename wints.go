@@ -106,7 +106,7 @@ func RandomPendingConvention(w http.ResponseWriter, r *http.Request, email strin
 		return
 	}
 	nbCommitted := len(cc)
-	known, err := backend.AvailableTutors(DB)
+	known, err := backend.Admins(DB)
 	if err != nil {
 		log.Printf("Error at getting tutors: %s\n", err)
 		return
@@ -249,18 +249,6 @@ func ChangeProfile(w http.ResponseWriter, r *http.Request, email string) {
 	jsonReply(w, u)
 }
 
-func UpdatePromotion(w http.ResponseWriter, r *http.Request, email string) {
-	//TODO: permission
-	p, err := ioutil.ReadAll(r.Body)
-	target,_ := mux.Vars(r)["email"]
-	if err != nil {
-		reportError(w, "", err)
-	}
-	err = backend.SetPromotion(DB, target, string(p))
-	if err != nil {
-		reportError(w, "", err)
-	}
-}
 
 func UpdateMajor(w http.ResponseWriter, r *http.Request, email string) {
 	//TODO: permission
@@ -319,6 +307,26 @@ func RequireToken(cb func(http.ResponseWriter, *http.Request, string)) http.Hand
 	}
 }
 
+func RequireRole(cb func(http.ResponseWriter, *http.Request, string), role string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		token := r.Header.Get("X-auth-token")
+		if (token == "") {
+			http.Error(w, "Header 'X-auth-token' is missing", http.StatusForbidden)
+		}
+		email, err := backend.CheckSession(DB, token)
+		if err != nil {
+			http.Error(w, "Invalid session token", http.StatusUnauthorized)
+		}
+
+		u, _ := backend.GetUser(DB, email)
+		if u.CompatibleRole(role) {
+			cb(w, r, email)
+		} else {
+			http.Error(w, "This operation requires '" + role + "' right but got only '" + u.Role + "'", http.StatusUnauthorized)
+		}
+	}
+}
+
 func main() {
 
 	var err error
@@ -330,7 +338,11 @@ func main() {
 	if err != nil {
 		log.Fatalf("%s\n", err)
 	}
-	backend.NewUser(DB, backend.User{"Fabien", "Hermenier", "fabien.hermenier@unice.fr", "0662496455", "root"})
+
+	if len(os.Args) > 1 && os.Args[1] == "-i" {
+		backend.NewUser(DB, backend.User{"R", "oot", "root@localhost", "0662496455", "root"})
+		return
+	}
 
 	go pullConventions()
 	daemonConventionsPuller();
@@ -340,14 +352,14 @@ func main() {
 
 	r.HandleFunc("/", rootHandler)
 
-	r.HandleFunc("/conventions/_random", RequireToken(RandomPendingConvention)).Methods("GET")
-	r.HandleFunc("/conventions/", RequireToken(GetAllConventions)).Methods("GET")
-	r.HandleFunc("/conventions/", RequireToken(CommitPendingConvention)).Methods("POST")
-	r.HandleFunc("/conventions/{email}/major", RequireToken(UpdateMajor)).Methods("POST")
-	r.HandleFunc("/admins/", RequireToken(GetAdmins)).Methods("GET")
-	r.HandleFunc("/users/", RequireToken(NewAdmin)).Methods("POST")
-	r.HandleFunc("/users/{email}/roles/", RequireToken(GrantRole)).Methods("POST")
-	r.HandleFunc("/users/{email}", RequireToken(RmUser)).Methods("DELETE")
+	r.HandleFunc("/conventions/_random", RequireRole(RandomPendingConvention, "admin")).Methods("GET")
+	r.HandleFunc("/conventions/", RequireRole(GetAllConventions,"major")).Methods("GET")
+	r.HandleFunc("/conventions/", RequireRole(CommitPendingConvention,"admin")).Methods("POST")
+	r.HandleFunc("/conventions/{email}/major", RequireRole(UpdateMajor, "major")).Methods("POST")
+	r.HandleFunc("/users/", RequireRole(GetAdmins, "admin")).Methods("GET")
+	r.HandleFunc("/users/", RequireRole(NewAdmin, "root")).Methods("POST")
+	r.HandleFunc("/users/{email}/roles/", RequireRole(GrantRole, "root")).Methods("POST")
+	r.HandleFunc("/users/{email}", RequireRole(RmUser, "root")).Methods("DELETE")
 	r.HandleFunc("/login", Login).Methods("POST")
 	r.HandleFunc("/profile", RequireToken(ChangeProfile)).Methods("POST")
 	r.HandleFunc("/logout", RequireToken(Logout)).Methods("POST")

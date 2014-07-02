@@ -10,8 +10,8 @@
   major: see all conventions + manipulate major
   admin: pending conventions
   root: users permission
-- new user
-- delete user
+- new user OK
+- delete user OK
 - logging
 - init mode
 

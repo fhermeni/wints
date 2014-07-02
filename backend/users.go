@@ -10,11 +10,6 @@ import (
 	"net/http"
 )
 
-const (
-	selectUser     = "select email,password from users where email=$1"
-	changePassword = "update users set password=$2 where uid=$1"
-)
-
 type User struct {
 	Firstname string
 	Lastname  string
@@ -27,6 +22,18 @@ func (p User) String() string {
 	return p.Firstname + " " + p.Lastname + " (" + p.Email + ")";
 }
 
+func (p User) CompatibleRole(r string) bool {
+	if (p.Role == "root") {
+		return true
+	}
+	if p.Role == "admin" && r != "root" {
+		return true;
+	}
+	if p.Role == "major" && r == "major" {
+		return true;
+	}
+	return false;
+}
 
 func Register(db *sql.DB, c Credential) (User, error) {
 	var fn, ln, tel, p, r string
@@ -69,22 +76,6 @@ func RmUser(db *sql.DB, email string) error {
  	return err
 }
 
-func AvailableTutors(db *sql.DB) ([]User, error) {
-	sql := "select firstname, lastname, email, tel, role from users where email not in (select email from students)"
-	rows, err := db.Query(sql)
-	tutors := make([]User, 0, 0)
-	if err != nil {
-		return tutors, nil
-	}
-	defer rows.Close()
-	var fn, ln, email, tel, role string
-	for rows.Next() {
-		rows.Scan(&fn, &ln, &email, &tel, &role)
-		tutors = append(tutors, User{fn, ln, email, tel, role})
-	}
-	return tutors, nil
-}
-
 func rand_str(str_size int) string {
 	alphanum := "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz$_-!@&,;:/"
 	var bytes = make([]byte, str_size)
@@ -101,7 +92,6 @@ func GetUser(db *sql.DB, email string) (User, error) {
 	return User{fn, ln, email, tel, role}, err
 }
 
-
 func Admins(db *sql.DB) ([]User, error) {
 	rows, err := db.Query("select firstname, lastname, users.email, tel, role from users where users.email not in (select email from students)")
 	admins := make([]User, 0, 0)
@@ -109,6 +99,7 @@ func Admins(db *sql.DB) ([]User, error) {
 		log.Printf("Error: %s\n", err)
 		return admins, err
 	}
+	defer rows.Close()
 	var fn, ln, email, tel, role string
 	for rows.Next() {
 		rows.Scan(&fn, &ln, &email, &tel, &role)
@@ -133,19 +124,13 @@ func NewPassword(db *sql.DB, email string, oldPassword, newPassword []byte) erro
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec(changePassword, hash)
-	if err != nil {
-		return err
-	}
-	return nil
+	return SingleUpdate(db, "update users set password=$2 where email=$1", hash, email)
 }
 
 func SetProfile(db *sql.DB, email, fn, ln, tel string) error {
-	_, err := db.Exec("update users set firstname=$1, lastname=$2, tel=$3 where email=$4", fn, ln, tel, email)
-	return err
+	return SingleUpdate(db, "update users set firstname=$1, lastname=$2, tel=$3 where email=$4", fn, ln, tel, email)
 }
 
 func GrantPrivilege(db *sql.DB, email, priv string) error {
-	_, err := db.Exec("update users set role=$2 where email=$1", email, priv)
-	return err
+	return SingleUpdate(db, "update users set role=$2 where email=$1", email, priv)
 }
