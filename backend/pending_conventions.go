@@ -14,8 +14,6 @@ import (
 
 const (
 	ADMIN_URL       = "http://conventions.polytech.unice.fr/admin/admin.cgi"
-	LOGIN           = "stage"
-	PASSWORD        = "epu2009"
 	stuPromotion    = 1
 	stuFn           = 5
 	stuLn           = 6
@@ -57,24 +55,22 @@ func CountPending(db *sql.DB) (int, error) {
 	return nb, nil
 }
 
-func PullConventions(db *sql.DB) {
-	err := InspectRawConventions2(db,
-							LOGIN,
-							PASSWORD,
+func PullConventions(db *sql.DB, url, login, password string) {
+	err := InspectRawConventions2(db,url, login,password,
 						[]string{"Master%20IFI", "Master%20IMAFA", "MAM%205", "SI%205"}, time.Now().Year())
 	if err != nil {
 		log.Printf("Unable to pull the conventions: %s\n", err)
 	}
 }
 
-func DaemonConventionsPuller(db *sql.DB) {
+func DaemonConventionsPuller(db *sql.DB, url, login, password string) {
 	ticker := time.NewTicker(time.Hour)
 	quit := make(chan struct{})
 	go func() {
 		for {
 			select {
 			case <-ticker.C:
-				PullConventions(db);
+				PullConventions(db, url, login, password);
 			case <-quit:
 				ticker.Stop()
 				return
@@ -119,7 +115,6 @@ func PeekRawConvention(db * sql.DB) (Convention, error) {
 }
 
 func InspectRawConvention(db *sql.DB, c Convention) error {
-	stu := c.Stu
 	_, err := GetStudent(db, c.Stu.P.Email)
 	if err == nil {
 		//The student is known, ie. there is already either a pending or a committed convention
@@ -178,9 +173,9 @@ func RegisterPendingInternship(db *sql.DB, c Convention) error {
 	return err
 }
 
-func InspectRawConventions2(db *sql.DB, login, password string, promotions []string, year int ) error {
+func InspectRawConventions2(db *sql.DB, url, login, password string, promotions []string, year int ) error {
 	for _, p := range promotions {
-		err := getRawConventions2(db, login, password, year, p)
+		err := getRawConventions2(db, url, login, password, year, p)
 		if err != nil {
 			return err
 		}
@@ -188,14 +183,14 @@ func InspectRawConventions2(db *sql.DB, login, password string, promotions []str
 	return nil
 }
 
-func getRawConventions2(db *sql.DB, login, password string, year int, promotion string) error {
+func getRawConventions2(db *sql.DB, url, login, password string, year int, promotion string) error {
 	client := &http.Client{}
 
-	req, err := http.NewRequest("GET", ADMIN_URL+"?action=down&filiere="+promotion+"&annee="+strconv.Itoa(year), nil)
+	req, err := http.NewRequest("GET", url+"?action=down&filiere="+promotion+"&annee="+strconv.Itoa(year), nil)
 	if err != nil {
 		return err
 	}
-	req.SetBasicAuth(LOGIN, PASSWORD)
+	req.SetBasicAuth(login, password)
 
 	res, err := client.Do(req)
 	if err != nil {
