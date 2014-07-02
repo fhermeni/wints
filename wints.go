@@ -355,7 +355,7 @@ func main() {
 
 	r.HandleFunc("/", rootHandler)
 
-	r.HandleFunc("/conventions/_random", RequireRole(RandomPendingConvention, "admin")).Methods("GET")
+	r.HandleFunc("/pending/_random", RequireRole(RandomPendingConvention, "admin")).Methods("GET")
 	r.HandleFunc("/conventions/", RequireRole(GetAllConventions,"major")).Methods("GET")
 	r.HandleFunc("/conventions/", RequireRole(CommitPendingConvention,"admin")).Methods("POST")
 	r.HandleFunc("/conventions/{email}/major", RequireRole(UpdateMajor, "major")).Methods("POST")

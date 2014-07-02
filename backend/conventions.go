@@ -334,13 +334,13 @@ func cleanUser(fn, ln, email, tel string) User {
 	return User{
 		cleanName(fn),
 		cleanName(ln),
-		cleanName(email),
-		cleanName(tel),
+		clean(email),
+		clean(tel),
 		""}
 }
 
 func cleanName(str string) string {
-	return strings.ToTitle(strings.ToLower(strings.TrimSpace(str)))
+	return strings.Title(strings.ToLower(strings.TrimSpace(str)))
 }
 
 func clean(str string) string {

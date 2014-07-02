@@ -11,6 +11,8 @@ function logout() {
         sessionStorage.clear();
         window.location.href = "/"
     }).fail(function (){
+        sessionStorage.clear();
+        window.location.href = "/"
         console.log(arguments);
         console.log("Unable to log out: " + data.responseText)
 

@@ -50,10 +50,24 @@ $( document ).ready(function () {
 
     getAllConventions();
     currentPage = "myStudents";
+    if (user.Role == "admin" || user.Role == "root") {
+        showPendingCounter();
+    }
 });
 
+function showPendingCounter() {
+    getWithToken("/pending/_random", function(data) {
+        console.log(data);
+        if (data.Pending > 0) {
+                $("#pending-counter").html(" <span class='navbar-new'>" + data.Pending + "</span>");
+        } else {
+                $("#pending-counter").html("");
+        }
+    });
+}
+
 function pickOne() {
-    getWithToken("/conventions/_random", function(data) {
+    getWithToken("/pending/_random", function(data) {
         if (data.length == 0) {
             success();
         } else {
@@ -63,6 +77,7 @@ function pickOne() {
             if (pending == 0) {
                 success();
             } else {
+                $("#pending-counter").html(" <span class='navbar-new'>" + data.Pending + "</span>");
                 known = data.Known;
                 known.sort(function (a, b) {
                     return a.Lastname.localeCompare(b.Lastname);
@@ -79,6 +94,7 @@ function success() {
     $("#progress").css("width", "100%");
     $("#alignment-box").hide();
     $("#nothing").show();
+    $("#pending-counter").html("");
 }
 
 function drawProfile(c) {
@@ -174,6 +190,7 @@ function nackPick(){
 
 function ackPick(){
     pickOne();
+    getAllConventions();
 }
 
 function pickKnown() {
@@ -261,13 +278,16 @@ function formatCompany(n, www, truncate) {
 
 function getAllConventions() {
     getWithToken("/conventions/", function(data) {
-        conventions = data;
-
-        if (conventions.length == 0) {
-            $("#waiting").html("Nothing to display");
+        if (!conventions) {
+            conventions = data;
+            if (conventions.length == 0) {
+                $("#waiting").html("Nothing to display");
+            } else {
+                $("#waiting").hide();
+                showPage(undefined, "myStudents");
+            }
         } else {
-            $("#waiting").hide();
-            showPage(undefined, "myStudents");
+            conventions = data;
         }
     }
     );
@@ -277,7 +297,6 @@ function displayMyConventions() {
         if (conventions.length == 0) {
             $("#table-conventions-body").find("tr td").html("No conventions to display");
             $("#table-assignments-body").find("tr td").html("No tutors to display");
-            $("#table-myStudents-body").find("tr td").html("No tutored students");
         } else {
             var tpl = $('#row-my-conventions').html();
             Mustache.parse(tpl);   // optional, speeds up future uses
@@ -335,7 +354,10 @@ function displayMyStudents() {
             buf += "</tr>";
         }
     });
-    $("#table-myStudents-body").html(buf);
+    if (buf.length == 0) {
+        $("#table-myStudents-body").find("tr td").html("No tutored students");
+        return;
+    }
     $("#table-myStudents").tablesorter({headers: {0: {"sorter": false}}});
     $(':checkbox').checkbox();
     $('#general-checkbox-myStudents').on('toggle', toggleMyStudentCheckboxes);
@@ -388,6 +410,10 @@ function displayTutors() {
             buf += "<td>" + tutors[k].join(", ") + "</td>";
             buf += "</tr>";
         });
+        if (buf.length == 0) {
+            $("#table-assignments-body").find("tr td").html("No tutors to display");
+            return;
+        }
         $("#table-assignments-body").html(buf);
         $("#table-assignments").tablesorter({headers: {0: {"sorter": false}}});
         $("#nb-tutors").html(Object.keys(tutors).length);
