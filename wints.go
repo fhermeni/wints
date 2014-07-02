@@ -9,18 +9,17 @@ import (
 	"github.com/gorilla/sessions"
 	"encoding/json"
 	"log"
-	"time"
 	"os"
-	"io/ioutil"
 	"errors"
+	"strconv"
 )
 
 var DB *sql.DB
 var store = sessions.NewCookieStore([]byte("wints"))
 
-func reportError(w http.ResponseWriter, header string, err error) {
+func reportIfError(w http.ResponseWriter, header string, err error) bool {
 	if err == nil {
-		return
+		return false
 	}
 	if be, ok := err.(*backend.BackendError); ok {
 		http.Error(w, be.Error(), be.Status)
@@ -28,20 +27,18 @@ func reportError(w http.ResponseWriter, header string, err error) {
 		http.Error(w, "", http.StatusInternalServerError)
 		log.Printf("%s: %s\n", header, err.Error())
 	}
+	return true
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "static/login.html", 301)
-	log.Printf("%s %s %s %d", r.RemoteAddr, r.Method, r.URL, 200)
 }
 
 func jsonReply(w http.ResponseWriter, j interface{}) {
 	w.Header().Set("Content-type","application/json; charset=utf-8")
 	enc := json.NewEncoder(w)
 	err := enc.Encode(j)
-	if err != nil {
-		reportError(w, "Error while serialising response", err)
-	}
+	reportIfError(w, "Error while serialising response", err)
 }
 
 func jsonRequest(w http.ResponseWriter, r *http.Request, j interface{}) error {
@@ -53,33 +50,6 @@ func jsonRequest(w http.ResponseWriter, r *http.Request, j interface{}) error {
 		return  err
 	}
 	return nil
-}
-
-func pullConventions() {
-	conventions, err := backend.GetAllRawConventions()
-	if err != nil {
-		log.Printf("%s\n", err)
-	} else {
-		for _,c := range conventions {
-			backend.InspectRawConvention(DB, c)
-		}
-	}
-}
-
-func daemonConventionsPuller() {
-	ticker := time.NewTicker(time.Hour)
-	quit := make(chan struct{})
-	go func() {
-		for {
-			select {
-			case <-ticker.C:
-				pullConventions();
-			case <-quit:
-				ticker.Stop()
-				return
-			}
-		}
-	}()
 }
 
 type PendingConventionMsg struct {
@@ -97,42 +67,33 @@ func RandomPendingConvention(w http.ResponseWriter, r *http.Request, email strin
 	}
 
 	nbPending, err := backend.CountPending(DB)
-	if err != nil {
-		log.Printf("Error at counting: %s\n", err)
+	if reportIfError(w, "Unable to count pending conventions", err) {
 		return
 	}
 	cc, err := backend.GetConventions(DB)
-	if err != nil {
-		log.Printf("Error at getting: %s\n", err)
+	if reportIfError(w, "Unable to get the conventions", err) {
 		return
 	}
 	nbCommitted := len(cc)
 	known, err := backend.Admins(DB)
-	if err != nil {
-		log.Printf("Error at getting tutors: %s\n", err)
-		return
+	if !reportIfError(w, "Unable to get the possible tutors", err) {
+		jsonReply(w, PendingConventionMsg{c, known, nbPending, nbPending + nbCommitted})
 	}
-	jsonReply(w, PendingConventionMsg{c, known, nbPending, nbPending + nbCommitted})
 }
 
 func GetAllConventions(w http.ResponseWriter, r *http.Request, email string) {
 	conventions, err := backend.GetConventions(DB)
-	if err != nil {
-		log.Printf("Error here: %s\n", err)
-		jsonReply(w,make([]backend.Convention, 0, 0))
-		return
+	if !reportIfError(w, "Unable to get the conventions ", err) {
+		jsonReply(w, conventions)
 	}
-	jsonReply(w, conventions)
 }
 
 
 func GetAdmins(w http.ResponseWriter, r *http.Request, email string) {
 	admins, err := backend.Admins(DB)
-	if err != nil {
-		log.Printf("Error admins: %s\n", err)
-		return
+	if !reportIfError(w, "Unable to get the possible admins", err) {
+		jsonReply(w, admins)
 	}
-	jsonReply(w, admins)
 }
 
 type NewUser struct {
@@ -151,18 +112,13 @@ func NewAdmin(w http.ResponseWriter, r *http.Request, email string) {
 	}
 	p := backend.User{nu.Firstname, nu.Lastname, nu.Email, nu.Tel, nu.Priv}
 	err = backend.NewUser(DB, p)
-	if err != nil {
-		reportError(w, "", err)
-		return
-	}
+	reportIfError(w, "", err)
 }
 
 func RmUser(w http.ResponseWriter, r *http.Request, email string) {
 	target,_ := mux.Vars(r)["email"]
 	err := backend.RmUser(DB, target)
-	if err != nil {
-		reportError(w, "", err)
-	}
+	reportIfError(w, "", err)
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -171,17 +127,18 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	u, err := backend.Register(DB, cred)
-	log.Printf("Login %s\n", u)
 	if err != nil {
 		http.Error(w, "Unknown username or incorrect password", http.StatusUnauthorized)
 		return
 	}
 	tok, err := backend.OpenSession(DB, cred.Email)
-	if err != nil {
-		reportError(w, "Error at opening session", err)
+	if reportIfError(w, "Unable to open the session", err) {
 		return
 	}
-	s, _ := store.Get(r, "wints")
+	s, err := store.Get(r, "wints")
+	if reportIfError(w, "Unable to get the session identifier", err) {
+		return
+	}
 	s.Values["token"] = tok
 	s.Values["email"] = cred.Email
 	s.Save(r, w)
@@ -196,9 +153,7 @@ func Logout(w http.ResponseWriter, r *http.Request, email string) {
 		return
 	}
 	err := backend.CloseSession(DB, token)
-	if err != nil {
-		log.Printf("Unable to logout: %s\n", err)
-	}
+	reportIfError(w, "Unable to logout", err)
 }
 
 func CommitPendingConvention(w http.ResponseWriter, r *http.Request, email string) {
@@ -211,21 +166,12 @@ func CommitPendingConvention(w http.ResponseWriter, r *http.Request, email strin
 	_, err = backend.GetUser(DB, tEmail)
 	if err != nil {
 		err = backend.NewUser(DB, c.Tutor)
-		log.Printf("Register the new tutor %s\n", c.Tutor)
-		if err != nil {
-			log.Printf("Unable to register the new tutor %s: %s\n", c.Tutor, err)
+		if reportIfError(w, "Unable to register the tutor " + c.Tutor.String(), err) {
 			return
 		}
-	} else {
-		log.Println("No need to register the tutor. Already in")
 	}
 	err = backend.RegisterInternship(DB, c, true);
-	if err != nil {
-		log.Printf("Unable to register the internship: %s\n", err)
-		return
-	}
-	if err != nil {
-		log.Printf("Error: %s\n", err)
+	if reportIfError(w, "Unable to register the internship", err) {
 		return
 	}
 	backend.RescanPending(DB, c)
@@ -249,9 +195,9 @@ func ChangeProfile(w http.ResponseWriter, r *http.Request, email string) {
 	}
 	err := backend.SetProfile(DB, email, p.Firstname, p.Lastname, p.Tel)
 	u, err := backend.GetUser(DB, email)
-	reportError(w, "", err)
-
-	jsonReply(w, u)
+	if !reportIfError(w, "", err) {
+		jsonReply(w, u)
+	}
 }
 
 type PasswordRenewal struct {
@@ -272,31 +218,26 @@ func ChangePassword(w http.ResponseWriter, r *http.Request, email string) {
 	}
 
 	err := backend.NewPassword(DB, email, []byte(p.OldPassword), []byte(p.NewPassword))
-	if err != nil {
-		reportError(w, "", err)
-	}
+	reportIfError(w, "", err)
 }
 
 func UpdateMajor(w http.ResponseWriter, r *http.Request, email string) {
 	target,_ := mux.Vars(r)["email"]
-	m, err := ioutil.ReadAll(r.Body)
+	m, err := requiredContent(w, r)
 	if err != nil {
-		reportError(w, "", err)
+		return
 	}
 	err = backend.SetMajor(DB, target, string(m))
-	if err != nil {
-		reportError(w, "", err)
-	}
+	reportIfError(w, "", err)
 }
 
 func requiredContent(w http.ResponseWriter, r *http.Request) ([]byte, error) {
-	cnt, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		reportError(w, "", err)
+	cnt, err := requiredContent(w, r)
+	if reportIfError(w, "", err) {
 		return []byte{}, err
 	}
 	if len(cnt) == 0 {
-		reportError(w, "", errors.New("Missing request body"))
+		reportIfError(w, "", errors.New("Missing request body"))
 	}
 	return cnt, nil
 }
@@ -308,9 +249,7 @@ func GrantRole(w http.ResponseWriter, r *http.Request, email string) {
 		return
 	}
 	err = backend.GrantPrivilege(DB, target, string(role))
-	if err != nil {
-		reportError(w, "", err)
-	}
+	reportIfError(w, "", err)
 }
 
 func RequireToken(cb func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
@@ -349,14 +288,14 @@ func RequireRole(cb func(http.ResponseWriter, *http.Request, string), role strin
 
 func main() {
 
-	var err error
-	dbURL := os.Getenv("DATABASE_URL")
-	if len(dbURL) == 0 {
-		dbURL = "user=fhermeni dbname=wints host=localhost password=wints sslmode=disable"
-	}
-	DB, err = sql.Open("postgres", dbURL)
+	cfg, err := backend.ReadConfig("./wints.conf")
 	if err != nil {
-		log.Fatalf("%s\n", err)
+		log.Fatalln(err.Error())
+	}
+
+	DB, err = sql.Open("postgres", cfg.DBurl)
+	if err != nil {
+		log.Fatalln(err.Error())
 	}
 
 	if len(os.Args) > 1 && os.Args[1] == "-i" {
@@ -364,8 +303,8 @@ func main() {
 		return
 	}
 
-	go pullConventions()
-	daemonConventionsPuller();
+	//go backend.PullConventions(DB)
+	//backend.DaemonConventionsPuller(DB);
 
 	//Rest stuff
 	r := mux.NewRouter()
@@ -384,13 +323,12 @@ func main() {
 	r.HandleFunc("/users/{email}/", RequireToken(ChangeProfile)).Methods("POST")
 	r.HandleFunc("/login", Login).Methods("POST")
 	r.HandleFunc("/logout", RequireToken(Logout)).Methods("POST")
-	// handle all requests by serving a file of the same name
 	fs := http.Dir("static/")
 	fileHandler := http.FileServer(fs)
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", fileHandler))
 	http.Handle("/", r)
 	log.Println("Daemon started")
-	err = http.ListenAndServe(":" + os.Getenv("PORT"), nil)
+	err = http.ListenAndServe(":" + strconv.Itoa(cfg.Port), nil)
 	if err != nil {
 		log.Fatalf("%s\n", err)
 	}

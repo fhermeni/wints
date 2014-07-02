@@ -40,20 +40,3 @@ func SingleUpdate(db *sql.DB, q string, args ...interface{}) error {
 	}
 	return nil
 }
-
-/*
-func SetMajor(db *sql.DB, email string, m string) error {
-	res, err := db.Exec("update students set major=$2 where email=$1", email, m)
-	if err != nil {
-		return err
-	}
-	nb, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if nb != 1 {
-		return errors.New("Unknown student '" + email + "'\n")
-	}
-	return nil
-}
- */
