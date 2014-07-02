@@ -4,7 +4,6 @@ import (
 	_ "github.com/lib/pq"
 	"time"
 	"code.google.com/p/go.crypto/bcrypt"
-	"errors"
 	"net/http"
 	"database/sql"
 )
@@ -36,16 +35,9 @@ func OpenSession(db *sql.DB, email string) ([]byte,error) {
 		return tok, err
 	}
 
-	res, err := db.Exec(makeSession, email, tok, last)
+	err = SingleUpdate(db, makeSession, email, tok, last)
 	if err != nil {
 		return nil, err
-	}
-	nb, err := res.RowsAffected()
-	if err != nil {
-		return nil, err
-	}
-	if nb != 1 {
-		return nil, errors.New("Unable to store the session")
 	}
 	return tok, nil
 }

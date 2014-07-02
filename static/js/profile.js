@@ -20,6 +20,44 @@ function updateProfile() {
     }).done(updateCb).fail(errorCb());
 }
 
+function updatePassword() {
+    var ok = true
+    if ($("#lbl-old-password").val().length == 0) {
+        $("#lbl-old-password").parent().parent().addClass("has-error");
+        ok = false;
+    } else {
+        $("#lbl-old-password").parent().parent().removeClass("has-error");
+    }
+
+    if ($("#lbl-password1").val() != $("#lbl-password2").val() || $("#lbl-password1").val() == 0) {
+        $("#lbl-password1").parent().parent().addClass("has-error");
+        $("#lbl-password2").parent().parent().addClass("has-error");
+        ok = false;
+    } else {
+        $("#lbl-password1").parent().parent().removeClass("has-error");
+        $("#lbl-password2").parent().parent().removeClass("has-error");
+    }
+    if (ok) {
+        $("#profileEditor-password-err").html();
+        var body = {
+            OldPassword: $("#lbl-old-password").val(),
+            NewPassword: $("#lbl-password1").val()
+        };
+        console.log(body);
+        /*var jqr = $.ajax({
+            method: "POST",
+            url: "/users/" + user.Email + "/password",
+            data: JSON.stringify(body),
+            headers: {"X-auth-token": sessionStorage.getItem("token")}
+        }).done(function () {
+            console.log("ok")
+        }).fail(function () {
+            console.log(arguments)
+        });         */
+        postWithToken("/users/" + user.Email + "/password", body, function() {console.log("ok"), function() {console.log(arguments)}})
+    }
+}
+
 function updateCb(data, resp, xhr ) {
     if (xhr.status == 200 && xhr.readyState == 4) {
         var fn = $("#fullname").val();

@@ -3,7 +3,7 @@
 */
 
 $( document ).ready(function () {
-    if (sessionStorage.getItem("homepage")) {
+    if (sessionStorage.getItem("homepage") && sessionStorage.getItem("token")) {
         window.location.href = sessionStorage.getItem("homepage");
     }
 });

@@ -128,7 +128,7 @@ func NewPassword(db *sql.DB, email string, oldPassword, newPassword []byte) erro
 	if err != nil {
 		return err
 	}
-	return SingleUpdate(db, "update users set password=$2 where email=$1", hash, email)
+	return SingleUpdate(db, "update users set password=$2 where email=$1", email, hash)
 }
 
 func SetProfile(db *sql.DB, email, fn, ln, tel string) error {

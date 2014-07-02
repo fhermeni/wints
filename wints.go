@@ -48,7 +48,7 @@ func jsonRequest(w http.ResponseWriter, r *http.Request, j interface{}) error {
 	dec := json.NewDecoder(r.Body)
 	err := dec.Decode(&j)
 	if err != nil {
-		log.Printf("Bad JSON message format: %s", r.Body)
+		log.Printf("Bad JSON message format: %s", err)
 		http.Error(w, "Bad JSON message format", http.StatusBadRequest)
 		return  err
 	}
@@ -254,6 +254,28 @@ func ChangeProfile(w http.ResponseWriter, r *http.Request, email string) {
 	jsonReply(w, u)
 }
 
+type PasswordRenewal struct {
+	OldPassword string
+	NewPassword string
+}
+
+func ChangePassword(w http.ResponseWriter, r *http.Request, email string) {
+	target,_ := mux.Vars(r)["email"]
+	if target != email {
+		http.Error(w, "You cannot update the profile of another person", http.StatusForbidden)
+		return
+	}
+
+	var p PasswordRenewal
+	if jsonRequest(w, r, &p) != nil {
+		return
+	}
+
+	err := backend.NewPassword(DB, email, []byte(p.OldPassword), []byte(p.NewPassword))
+	if err != nil {
+		reportError(w, "", err)
+	}
+}
 
 func UpdateMajor(w http.ResponseWriter, r *http.Request, email string) {
 	target,_ := mux.Vars(r)["email"]
@@ -265,11 +287,6 @@ func UpdateMajor(w http.ResponseWriter, r *http.Request, email string) {
 	if err != nil {
 		reportError(w, "", err)
 	}
-}
-
-type PasswordRenewal struct {
-	OldPassword []byte
-	NewPassword []byte
 }
 
 func requiredContent(w http.ResponseWriter, r *http.Request) ([]byte, error) {
@@ -363,7 +380,7 @@ func main() {
 	r.HandleFunc("/users/", RequireRole(NewAdmin, "root")).Methods("POST")
 	r.HandleFunc("/users/{email}/roles/", RequireRole(GrantRole, "root")).Methods("POST")
 	r.HandleFunc("/users/{email}", RequireRole(RmUser, "root")).Methods("DELETE")
-	//r.HandleFunc("/users/{email}/password", RequireToken(ChangePassword)).Methods("DELETE")
+	r.HandleFunc("/users/{email}/password", RequireToken(ChangePassword)).Methods("POST")
 	r.HandleFunc("/users/{email}/", RequireToken(ChangeProfile)).Methods("POST")
 	r.HandleFunc("/login", Login).Methods("POST")
 	r.HandleFunc("/logout", RequireToken(Logout)).Methods("POST")

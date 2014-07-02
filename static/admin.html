@@ -268,7 +268,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Profile editor</h4>
+                    <h4 class="modal-title">Profile Editor</h4>
                 </div>
 
                 <div class="modal-body">
@@ -296,6 +296,34 @@
 
                         <div class="text-right">
                             <button type="button" class="btn btn-success" onclick="updateProfile()">Update</button>
+                        </div>
+                    </div>
+
+                    <h5>Change password</h5>
+                    <div class="form-horizontal">
+                        <div id="profileEditor-password-err"></div>
+                        <div class="form-group">
+                            <label for="lbl-old-password" class="col-sm-3 control-label">Current</label>
+                            <div class="col-sm-9">
+                                <input type="password" class="form-control" id="lbl-old-password"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="lbl-password1" class="col-sm-3 control-label">New</label>
+                            <div class="col-sm-9">
+                                <input type="password" class="form-control" id="lbl-password1"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="lbl-password2" class="col-sm-3 control-label">Confirmation</label>
+                            <div class="col-sm-9">
+                                <input type="password" class="form-control" id="lbl-password2"/>
+                            </div>
+                        </div>
+
+                        <div class="text-right">
+                            <button type="button" class="btn btn-success" onclick="updatePassword()">Update</button>
                         </div>
                     </div>
                 </div>

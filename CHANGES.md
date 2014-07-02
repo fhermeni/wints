@@ -6,15 +6,17 @@
 - tutor alignment OK
 - major alignment OK
 - error reporting
-- permissions: -(students, tutor), major, admin, root
+- permissions: -(students, tutor), major, admin, root   OK
   major: see all conventions + manipulate major
   admin: pending conventions
   root: users permission
 - new user OK
 - delete user OK
 - logging
-- init mode
-
+- init mode OK
+- hide static pages, stay inside "/", rest API in "rest/v1/"
+- confirmation for sensible data
+- change password OK
 
 ## Version 2.0 ##
 

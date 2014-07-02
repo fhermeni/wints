@@ -57,7 +57,6 @@ $( document ).ready(function () {
 
 function showPendingCounter() {
     getWithToken("/pending/_random", function(data) {
-        console.log(data);
         if (data.Pending > 0) {
                 $("#pending-counter").html(" <span class='navbar-new'>" + data.Pending + "</span>");
         } else {
