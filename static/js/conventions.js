@@ -453,7 +453,7 @@ function showPrivileges() {
     var buf = "";
     var admins;
     getWithToken("/users/", function(data) {
-        admins = data
+        admins = data;
         var buf = "";
         var tpl = $('#row-admin').html();
         Mustache.parse(tpl);   // optional, speeds up future uses

@@ -4,19 +4,17 @@
 
 function showProfileEditor() {
     console.log(user);
-    $("#lbl-firstname").val(user.P.Firstname);
-    $("#lbl-lastname").val(user.P.Lastname);
-    $("#lbl-tel").val(user.P.Tel);
-    //$("#lbl-email").val(user.P.Email);
+    $("#lbl-firstname").val(user.Firstname);
+    $("#lbl-lastname").val(user.Lastname);
+    $("#lbl-tel").val(user.Tel);
     $("#profileEditor").modal('show');
 }
 
 function updateProfile() {
     var body = {Firstname: $("#lbl-firstname").val(), Lastname: $("#lbl-lastname").val(), Tel: $("#lbl-tel").val()};
-    console.log(body);
     var jqr = $.ajax({
         method: "POST",
-        url: "/profile",
+        url: "/users/" + user.Email + "/",
         data: JSON.stringify(body),
         headers: {"X-auth-token" : sessionStorage.getItem("token")},
     }).done(updateCb).fail(errorCb());
@@ -26,9 +24,9 @@ function updateCb(data, resp, xhr ) {
     if (xhr.status == 200 && xhr.readyState == 4) {
         var fn = $("#fullname").val();
         $("#profileEditor-err").html("");
-        user.P = data;
+        user = data;
         sessionStorage.setItem("user", JSON.stringify(user));
-        $("#fullname").html(user.P.Firstname + " " + user.P.Lastname);
+        $("#fullname").html(user.Firstname + " " + user.Lastname);
         $("#profileEditor").modal('hide');
         $("#profileEditor-err").html("");
     } else {

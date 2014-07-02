@@ -12,6 +12,7 @@ import (
 	"time"
 	"os"
 	"io/ioutil"
+	"errors"
 )
 
 var DB *sql.DB
@@ -237,7 +238,11 @@ type PersonUpdate struct {
 }
 
 func ChangeProfile(w http.ResponseWriter, r *http.Request, email string) {
-	log.Printf("Permission check")
+	target,_ := mux.Vars(r)["email"]
+	if target != email {
+		http.Error(w, "You cannot update the profile of another person", http.StatusForbidden)
+		return
+	}
 	var p PersonUpdate
 	if jsonRequest(w, r, &p) != nil {
 		return
@@ -251,7 +256,6 @@ func ChangeProfile(w http.ResponseWriter, r *http.Request, email string) {
 
 
 func UpdateMajor(w http.ResponseWriter, r *http.Request, email string) {
-	//TODO: permission
 	target,_ := mux.Vars(r)["email"]
 	m, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -268,24 +272,23 @@ type PasswordRenewal struct {
 	NewPassword []byte
 }
 
-/*func ChangePassword(w http.ResponseWriter, r *http.Request, uid int) {
-	var p PasswordRenewal
-	if jsonRequest(w, r, &p) != nil {
-		return
-	}
-
-	err := backend.NewPassword(DB, uid, p.OldPassword, p.NewPassword)
+func requiredContent(w http.ResponseWriter, r *http.Request) ([]byte, error) {
+	cnt, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		reportError(w, "", err)
+		return []byte{}, err
 	}
-}         */
+	if len(cnt) == 0 {
+		reportError(w, "", errors.New("Missing request body"))
+	}
+	return cnt, nil
+}
 
 func GrantRole(w http.ResponseWriter, r *http.Request, email string) {
-	//TODO: permission
 	target,_ := mux.Vars(r)["email"]
-	role, err := ioutil.ReadAll(r.Body)
+	role, err := requiredContent(w, r)
 	if err != nil {
-		reportError(w, "", err)
+		return
 	}
 	err = backend.GrantPrivilege(DB, target, string(role))
 	if err != nil {
@@ -360,8 +363,9 @@ func main() {
 	r.HandleFunc("/users/", RequireRole(NewAdmin, "root")).Methods("POST")
 	r.HandleFunc("/users/{email}/roles/", RequireRole(GrantRole, "root")).Methods("POST")
 	r.HandleFunc("/users/{email}", RequireRole(RmUser, "root")).Methods("DELETE")
+	//r.HandleFunc("/users/{email}/password", RequireToken(ChangePassword)).Methods("DELETE")
+	r.HandleFunc("/users/{email}/", RequireToken(ChangeProfile)).Methods("POST")
 	r.HandleFunc("/login", Login).Methods("POST")
-	r.HandleFunc("/profile", RequireToken(ChangeProfile)).Methods("POST")
 	r.HandleFunc("/logout", RequireToken(Logout)).Methods("POST")
 	// handle all requests by serving a file of the same name
 	fs := http.Dir("static/")

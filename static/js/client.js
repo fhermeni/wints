@@ -3,9 +3,9 @@
 */
 
 $( document ).ready(function () {
-    /*if (sessionStorage.getItem("homepage")) {
+    if (sessionStorage.getItem("homepage")) {
         window.location.href = sessionStorage.getItem("homepage");
-    } */
+    }
 });
 
 function login() {

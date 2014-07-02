@@ -10,6 +10,10 @@ import (
 	"net/http"
 )
 
+const (
+	changePassword = "update users set password=$2 where uid=$1"
+)
+
 type User struct {
 	Firstname string
 	Lastname  string

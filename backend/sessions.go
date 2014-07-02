@@ -32,8 +32,8 @@ func OpenSession(db *sql.DB, email string) ([]byte,error) {
 
 	//Update if possible
 	err = SingleUpdate(db, updateSession, email, tok, last)
-	if err != nil {
-		return nil, err
+	if err == nil {
+		return tok, err
 	}
 
 	res, err := db.Exec(makeSession, email, tok, last)
