@@ -3,6 +3,36 @@
  */
 //Collect rest queries
 
+
+var ROOT_API = "/api/v1/";
+
+function callWithToken(method, url, successCb, errorCb) {
+    return $.ajax({
+        method: method,
+        url: ROOT_API + url,
+        headers: {"X-auth-token" : localStorage.getItem("token")}
+    }).done(successCb).fail(errorCb);
+}
+
+function postWithToken(url, data, successCb, errorCb) {
+    return $.ajax({
+        method: "POST",
+        url: ROOT_API + url,
+        data: JSON.stringify(data),
+        headers: {"X-auth-token" : localStorage.getItem("token")}
+    }).done(successCb).fail(errorCb);
+}
+
+function postRawWithToken(url, data, successCb, errorCb) {
+    return $.ajax({
+        method: "POST",
+        url: ROOT_API + url,
+        data: data,
+        contentType: "text/plain",
+        headers: {"X-auth-token" : localStorage.getItem("token")}
+    }).done(successCb).fail(errorCb);
+}
+
 function defaultCb(no) {
     if (no != undefined) {
         return no;
@@ -14,7 +44,7 @@ function defaultCb(no) {
 
 //Convention management
 function randomPending(ok, no) {
-    getWithToken("/pending/_random", defaultCb(ok), defaultCb(no));
+    callWithToken("GET", "/pending/_random", defaultCb(ok), defaultCb(no));
 }
 
 function commitPendingConvention(c, ok, no) {
@@ -22,7 +52,7 @@ function commitPendingConvention(c, ok, no) {
 }
 
 function getConventions(ok, no) {
-    getWithToken("/conventions/",defaultCb(ok), defaultCb(no));
+    callWithToken("GET", "/conventions/",defaultCb(ok), defaultCb(no));
 }
 
 //User management
@@ -31,11 +61,11 @@ function createUser(ok, no) {
 }
 
 function deleteUser(email, ok, no) {
-    deleteWithToken("/users/" + email, defaultCb(ok),  defaultCb(no));
+    callWithToken("GET", "/users/" + email, defaultCb(ok),  defaultCb(no));
 }
 
 function getUsers(ok, no) {
-    getWithToken("/users/", defaultCb(ok), defaultCb(no));
+    callWithToken("GET", "/users/", defaultCb(ok), defaultCb(no));
 }
 
 function setPrivilege(email, p, ok, no) {
