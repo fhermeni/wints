@@ -4,7 +4,7 @@
 //Collect rest queries
 
 
-var ROOT_API = "/api/v1/";
+var ROOT_API = "/api/v1";
 
 function callWithToken(method, url, successCb, errorCb) {
     return $.ajax({
@@ -48,6 +48,7 @@ function randomPending(ok, no) {
 }
 
 function commitPendingConvention(c, ok, no) {
+    console.log(c);
     postWithToken("/conventions/", c, defaultCb(ok), defaultCb(no));
 }
 
@@ -74,4 +75,13 @@ function setPrivilege(email, p, ok, no) {
 
 function setMajor(email, p, ok, no) {
     postRawWithToken("/users/" + email + "/role", p, defaultCb(ok), defaultCb(no));
+}
+
+//Profile management
+function setProfile(fn, ln, tel, ok, no) {
+    postWithToken("/users/" + user.Email + "/", {Firstname: fn, Lastname:ln, Tel: tel}, defaultCb(ok), defaultCb(no))
+}
+
+function setPassword(oldP, newP, ok, no) {
+    postWithToken("/users/" + user.Email + "/password", {OldPassword:oldP, NewPassword:newP}, defaultCb(ok), defaultCb(no));
 }

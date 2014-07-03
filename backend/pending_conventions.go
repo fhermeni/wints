@@ -115,6 +115,28 @@ func PeekRawConvention(db * sql.DB) (Convention, error) {
 	return ScanPendingConvention(rows)
 }
 
+func GetRawConventions(db *sql.DB) ([]Convention, error) {
+	sql := "select users.firstname, users.lastname, users.email, users.tel, students.promotion, startTime, endTime, tutorFn, " +
+			"tutorLn, tutorEmail, tutorTel, midTermDeadline," +
+			"company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel" +
+			" from pending_internships, users, students where students.email = pending_internships.student and users.email = pending_internships.student"
+
+	rows, err := db.Query(sql)
+	cc := make([]Convention, 0, 0)
+	if err != nil {
+		return cc, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		c, err := ScanPendingConvention(rows)
+		if err != nil {
+			return cc, err
+		}
+		cc = append(cc, c)
+	}
+ 	return cc, err;
+}
+
 func InspectRawConvention(db *sql.DB, c Convention) error {
 	_, err := GetStudent(db, c.Stu.P.Email)
 	if err == nil {

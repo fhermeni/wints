@@ -12,6 +12,7 @@ import (
 	"os"
 	"errors"
 	"strconv"
+	"math/rand"
 )
 
 const (
@@ -59,28 +60,16 @@ type PendingConventionMsg struct {
 	C backend.Convention
 	Known []backend.User
 	Pending int
-	Total int
 }
 
 func RandomPendingConvention(w http.ResponseWriter, r *http.Request, email string) {
-	c, err := backend.PeekRawConvention(DB)
-	if err != nil && err != sql.ErrNoRows {
-		log.Printf("Error2: %s\n", err)
-		return
-	}
+	cc, err := backend.GetRawConventions(DB)
 
-	nbPending, err := backend.CountPending(DB)
-	if reportIfError(w, "Unable to count pending conventions", err) {
-		return
-	}
-	cc, err := backend.GetConventions(DB)
-	if reportIfError(w, "Unable to get the conventions", err) {
-		return
-	}
-	nbCommitted := len(cc)
+	nb := len(cc)
+	c := cc[rand.Intn(nb)];
 	known, err := backend.Admins(DB)
 	if !reportIfError(w, "Unable to get the possible tutors", err) {
-		jsonReply(w, PendingConventionMsg{c, known, nbPending, nbPending + nbCommitted})
+		jsonReply(w, PendingConventionMsg{c, known, nb})
 	}
 }
 

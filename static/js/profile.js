@@ -3,7 +3,6 @@
  */
 
 function showProfileEditor() {
-    console.log(user);
     $("#lbl-firstname").val(user.Firstname);
     $("#lbl-lastname").val(user.Lastname);
     $("#lbl-tel").val(user.Tel);
@@ -11,17 +10,11 @@ function showProfileEditor() {
 }
 
 function updateProfile() {
-    var body = {Firstname: $("#lbl-firstname").val(), Lastname: $("#lbl-lastname").val(), Tel: $("#lbl-tel").val()};
-    var jqr = $.ajax({
-        method: "POST",
-        url: "/users/" + user.Email + "/",
-        data: JSON.stringify(body),
-        headers: {"X-auth-token" : localStorage.getItem("token")},
-    }).done(updateCb).fail(errorCb());
+    setProfile( $("#lbl-firstname").val(),  $("#lbl-lastname").val(),  $("#lbl-tel").val(), updateCb, errorCb);
 }
 
 function updatePassword() {
-    var ok = true
+    var ok = true;
     if ($("#lbl-old-password").val().length == 0) {
         $("#lbl-old-password").parent().parent().addClass("has-error");
         ok = false;
@@ -43,18 +36,7 @@ function updatePassword() {
             OldPassword: $("#lbl-old-password").val(),
             NewPassword: $("#lbl-password1").val()
         };
-        console.log(body);
-        /*var jqr = $.ajax({
-            method: "POST",
-            url: "/users/" + user.Email + "/password",
-            data: JSON.stringify(body),
-            headers: {"X-auth-token": sessionStorage.getItem("token")}
-        }).done(function () {
-            console.log("ok")
-        }).fail(function () {
-            console.log(arguments)
-        });         */
-        postWithToken("/users/" + user.Email + "/password", body, function() {console.log("ok"), function() {console.log(arguments)}})
+        setPassword($("#lbl-old-password").val(), $("#lbl-password1").val());
     }
 }
 
@@ -73,7 +55,5 @@ function updateCb(data, resp, xhr ) {
 }
 
 function errorCb(data, resp, xhr ) {
-    console.log(xhr);
-    console.log(resp);
     $("#profileEditor-err").html("<div class='alert alert-danger'>" + resp + "</div>")
 }

@@ -1,9 +1,5 @@
-var total = 0;
-var pending = 0;
-var committed = 0;
 var pendingConvention;
 var conventions;
-var known;
 var user;
 
 var currentPage;
@@ -63,22 +59,21 @@ function showPendingCounter() {
 
 function pickOne() {
     randomPending(function(data) {
+        console.log(data);
         if (data.length == 0) {
             success();
         } else {
-            total = data.Total;
-            pending = data.Pending;
+            var pending = data.Pending;
             pendingConvention = data.C;
             if (pending == 0) {
                 success();
             } else {
-                $("#pending-counter").html(" <span class='navbar-new'>" + data.Pending + "</span>");
-                known = data.Known;
-                known.sort(function (a, b) {
+                $("#pending-counter").html(" <span class='navbar-new'>" + pending + "</span>");
+                var kn = data.Known;
+                kn.sort(function (a, b) {
                     return a.Lastname.localeCompare(b.Lastname);
                 });
-                committed = total - pending;
-                drawProfile(data)
+                drawProfile(data, kn)
             }
         }
     });
@@ -92,7 +87,7 @@ function success() {
     $("#pending-counter").html("");
 }
 
-function drawProfile(c) {
+function drawProfile(c, kn) {
     $("#alignment-box").show();
     $("#nothing").hide();
     var student = c.C.Stu;
@@ -115,36 +110,36 @@ function drawProfile(c) {
     $("#th-tutor-email").val(tutor.Email);
     $("#promotion").html(student.Promotion);
 
-    if (known.length == 0) {
+    if (kn.length == 0) {
         $("#known-tutor-email").html("");
         $("#known-tutor-selector").html("<option>No tutor available</option>");
         $("#btn-choose-known").hide();
     } else {
         var options = "";
-        known.forEach(function (t) {
+        kn.forEach(function (t) {
             options += ("<option value='" + t.Email + "'>" + t.Firstname + " " + t.Lastname + "</option>");
         });
 
 
-        var best = pickBestMatching(tutor.Lastname);
+        var best = pickBestMatching(tutor.Lastname, kn);
 
         $("#known-tutor-selector").html(options);
         if (best) {
             $("#known-tutor-selector option[value='" + best.Email + "']").attr("selected", "selected");
             $("#btn-choose-known").show();
         }
-
     }
 
-        $("#completed").html(Math.ceil(100 * committed / total));
-        $("#progress").css("width", Math.ceil(100 * committed / total) + "%");
+    var completion = Math.ceil(100 * conventions.length / (c.Pending + conventions.length));
+    $("#completed").html(completion);
+    $("#progress").css("width", completion + "%");
     $("select").selectpicker({style: 'btn-sm btn-success', menuStyle: 'dropdown-inverse'});
 }
 
-function pickBestMatching(tutor) {
+function pickBestMatching(tutor, kn) {
     var th_ln = tutor.toLowerCase();
     var res = undefined;
-    known.forEach(function (t) {
+    kn.forEach(function (t) {
         var known_ln  = t.Lastname.toLowerCase();
         if (th_ln.indexOf(known_ln) > -1 || known_ln.indexOf(th_ln) > -1) {
             res = t;
@@ -153,7 +148,7 @@ function pickBestMatching(tutor) {
     });
     if (res == undefined) {
         var firstLetter = tutor[0].toLowerCase();
-        known.forEach(function (t) {
+        kn.forEach(function (t) {
             var knownFirstLetter = t.Lastname[0].toLowerCase();
             if (firstLetter >= knownFirstLetter) {
                 res =  t;
@@ -186,23 +181,13 @@ function ackPick(){
 }
 
 function pickKnown() {
-    var tEmail = $("#known-tutor-selector").val();
-    known.forEach(function (t) {
-        if (t.Email == tEmail)  {
-            pendingConvention.Tutor = t;
-            return false;
-        }
-    });
+    pendingConvention.Tutor.Email = $("#known-tutor-selector").val();
     commitPendingConvention(pendingConvention, ackPick());
 }
 
 function showPage(li, id) {
     $(".page").each(function (idx, d){
-        if (d.id == id) {
-            d.style.display = "block";
-        } else {
-            d.style.display = "none";
-        }
+        d.style.display = d.id == id ? "block" : "none";
     });
     $("#menu-pages").find("li").removeClass("active");
     if (li) {
@@ -228,15 +213,6 @@ function refresh() {
     }
 }
 
-
-function formatPerson(p, truncate) {
-    var name = p.Lastname + " "  + p.Firstname;
-    var fn = name;
-    if (truncate && name.length > 30) {
-        name = name.substring(0, 27) + "...";
-    }
-    return "<a href='mailto:" + p.Email + "' title='" + fn + "'>" +  name + "</a>";
-}
 
 function formatMajor(s) {
     return s.Major==undefined ? s.Major : "?";
@@ -290,23 +266,10 @@ function displayMyConventions() {
             $("#table-conventions-body").find("tr td").html("No conventions to display");
             $("#table-assignments-body").find("tr td").html("No tutors to display");
         } else {
-            var tpl = $('#row-my-conventions').html();
-            Mustache.parse(tpl);   // optional, speeds up future uses
+            var tpl = Handlebars.compile($('#row-my-conventions').html());
             var buf = "";
             conventions.forEach(function (c) {
-                var data = {
-                    email: c.Stu.P.Email,
-                    student: truncate(c.Stu.P.Firstname + " " + c.Stu.P.Lastname, 30),
-                    promotion: c.Stu.Promotion,
-                    major: c.Stu.Major,
-                    sup: c.Sup,
-                    supFullname: truncate(c.Sup.Firstname + " " + c.Sup.Lastname),
-                    tutor: c.Tutor,
-                    tutorFullname: truncate(c.Tutor.Firstname + " " + c.Tutor.Lastname),
-                    midtermReport: df(c.MidtermReport),
-                    grade: "?"
-                };
-                buf  += Mustache.render(tpl, data);
+                buf  += tpl(c);
             });
             $('#table-conventions-body').html(buf);
             $("#nb-conventions").html(conventions.length);
@@ -328,10 +291,14 @@ function toggleConventionCheckboxes() {
 }
 
 function displayMyStudents() {
+    var tpl = Handlebars.compile($('#row-my-students').html());
     var buf = "";
     conventions.forEach(function (c) {
         var tut = c.Tutor;
         if (tut.Email == user.Email) {
+            buf += tpl(c);
+        }
+/*
             var stu = c.Stu;
             buf += "<tr>";
             buf += "<td><label class='checkbox'><input class='checkbox-mail-myStudents' type='checkbox' data-toggle='checkbox' value='" + stu.P.Email + "'/></label></td>";
@@ -344,7 +311,7 @@ function displayMyStudents() {
             buf += "<td>" + formatMajor(stu) + "</td>";
             buf += "<td><span class=\'fui-new\'></span> <span class=\'fui-chat\'></span></td>";
             buf += "</tr>";
-        }
+        }                  */
     });
     if (buf.length == 0) {
         $("#table-myStudents-body").find("tr td").html("No tutored students");
@@ -464,20 +431,12 @@ function updateMajor(email) {
 }
 
 function showPrivileges() {
-    var buf = "";
-    var admins;
     getUsers(function(data) {
-        admins = data;
         var buf = "";
-        var tpl = $('#row-admin').html();
-        Mustache.parse(tpl);   // optional, speeds up future uses
+        var tpl = Handlebars.compile($('#row-admin').html());
         data.forEach(function (a) {
-            var data = {
-                email: a.Email,
-                fullname : a.Firstname + " " + a.Lastname
-            };
-            data[a.Role] = "selected";
-            buf += Mustache.render(tpl,data);
+            a[a.Role] = "selected";
+            buf += tpl(a);
         });
         $("#table-privileges-body").html(buf);
         $(".tagsinput").tagsInput();

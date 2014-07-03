@@ -18,39 +18,41 @@
     <script src="js/rest.js"></script>
     <script src="js/logout.js"></script>
     <script src="js/profile.js"></script>
+    <script src="js/handlebars-v1.3.0.js"></script>
+    <script src="js/templates.js"></script>
     <script src="js/conventions.js"></script>
     <script src="js/jquery.tablesorter.min.js"></script>
     <script src="js/mustache.js"></script>
-    <script type="x-tmpl-mustache" id="row-my-conventions">
+
+    <script type="text/x-handlebars-template" id="row-my-conventions">
         <tr>
             <td>
                 <label class='checkbox'>
-                    <input type='checkbox' class='checkbox-mail-conventions' data-toggle='checkbox' value='{{email}}'/>
+                    <input type='checkbox' class='checkbox-mail-conventions' data-toggle='checkbox' value='{{stu.P.Email}}'/>
                 </label>
             </td>
-
-            <td><a href='#' onclick="showDetails('{{email}}')">{{student}}</a></td>
-            <td>{{promotion}}</td>
-            <td>{{major}}</td>
-            <td><a href='mailto:{{sup.Email}}' title='{{sup.Firstname}} {{sup.Lastname}}'>{{supFullname}}</a></td>
-            <td><a href='mailto:{{tutor.Email}}' title='{{tutor.Firstname}} {{tutor.Lastname}}'>{{tutorFullname}}</a></td>
-            <td>{{midtermReport}}</td>
-            <td>{{grade}}</td>
+            <td><a href='#' onclick="showDetails('{{Stu.P.Email}}')">{{shortFullname Stu.P}}</a></td>
+            <td>{{Stu.Promotion}}</td>
+            <td>{{Stu.Major}}</td>
+            <td><a href='mailto:{{Sup.Email}}' title='{{fullname Sup}}'>{{shortFullname Sup}}</a></td>
+            <td><a href='mailto:{{Tutor.Email}}' title='{{fullname Tutor}}'>{{shortFullname Tutor}}</a></td>
+            <td>{{deadline MidtermReport}}</td>
+            <td>?</td>
             <td>
                 <span class='fui-new'></span> <span class='fui-chat'></span>
             </td>
         </tr>
     </script>
-    <script type="x-tmpl-mustache" id="row-admin">
+    <script type="text/x-handlebars-template" id="row-admin">
         <div class='col-md-6'>
             <div class='form-group'>
-                <label for='lbl-{{email}}' class='col-md-7 control-label'>
-                    <a class="btn btn-xs btn-danger fui-cross" href="#" onclick="rmUser(this,'{{email}}')"></a>
-                    <a href="mailto:{{email}}">{{fullname}}</a>
+                <label for='lbl-{{Email}}' class='col-md-7 control-label'>
+                    <a class="btn btn-xs btn-danger fui-cross" href="#" onclick="rmUser(this,'{{Email}}')"></a>
+                    <a href="mailto:{{Email}}">{{fullname this}}</a>
                 </label>
                 <span class='col-md-3'>
-                    <select onchange="updatePrivilege(this, '{{email}}')">
-                        <option value="" {{no}}>None</option>
+                    <select onchange="updatePrivilege(this, '{{Email}}')">
+                        <option value="">None</option>
                         <option value="major" {{major}}>Major</option>
                         <option value="admin" {{admin}}>Admin</option>
                         <option value="root" {{root}}>Root</option>
@@ -58,6 +60,23 @@
                 </span>
             </div>
         </div>
+    </script>
+    <script type="text/x-handlebars-template" id="row-my-students">
+        <tr>
+            <td>
+                <label class='checkbox'>
+                    <input class='checkbox-mail-myStudents' type='checkbox' data-toggle='checkbox' value='{{Stu.P.Email}}'/>
+                </label>
+            </td>
+            <td>{{student Stu.P}}</td>
+            <td>{{Stu.Promotion}}</td>
+            <td>{{Stu.Major}}</td>
+            <td>{{shortCompany this}}</td>
+            <td>{{shortFullname Sup}}</td>
+            <td>{{deadline midtermReport}}</td>
+            <td>?</td>
+            <td><span class='fui-new'></span> <span class='fui-chat'></span></td>
+        </tr>
     </script>
 </head>
 <body>
