@@ -59,7 +59,6 @@ function showPendingCounter() {
 
 function pickOne() {
     randomPending(function(data) {
-        console.log(data);
         if (data.length == 0) {
             success();
         } else {
@@ -158,21 +157,12 @@ function pickBestMatching(tutor, kn) {
     return res;
 }
 
-function df(d, active) {
-    var date = new Date(Date.parse(d));
-    var str = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
-    if (active && date < new Date()) {
-        return "<span class='late'> " + str + "</span>";
-    }
-    return str;
-}
-
 function pickTheory() {
     pendingConvention.Tutor.Firstname = $("#th-tutor-fn").val();
     pendingConvention.Tutor.Lastname = $("#th-tutor-ln").val();
     pendingConvention.Tutor.Email = $("#th-tutor-email").val();
     pendingConvention.Tutor.Tel = $("#th-tutor-tel").val();
-    commitPendingConvention(pendingConvention, ackPick());
+    commitPendingConvention(pendingConvention, ackPick);
 }
 
 function ackPick(){
@@ -182,7 +172,7 @@ function ackPick(){
 
 function pickKnown() {
     pendingConvention.Tutor.Email = $("#known-tutor-selector").val();
-    commitPendingConvention(pendingConvention, ackPick());
+    commitPendingConvention(pendingConvention, ackPick);
 }
 
 function showPage(li, id) {
@@ -213,17 +203,6 @@ function refresh() {
     }
 }
 
-
-function formatMajor(s) {
-    return s.Major==undefined ? s.Major : "?";
-}
-
-function truncate(str, size) {
-    if (str.length > size) {
-        return str.substring(0, 27) + "...";
-    }
-    return str;
-}
 
 function formatStudent(p, truncate) {
     var name = p.Lastname + " " + p.Firstname;
@@ -294,24 +273,9 @@ function displayMyStudents() {
     var tpl = Handlebars.compile($('#row-my-students').html());
     var buf = "";
     conventions.forEach(function (c) {
-        var tut = c.Tutor;
-        if (tut.Email == user.Email) {
+        if (c.Tutor.Email == user.Email) {
             buf += tpl(c);
         }
-/*
-            var stu = c.Stu;
-            buf += "<tr>";
-            buf += "<td><label class='checkbox'><input class='checkbox-mail-myStudents' type='checkbox' data-toggle='checkbox' value='" + stu.P.Email + "'/></label></td>";
-            buf += "<td>" + formatStudent(stu.P, true) + "</td>";
-            buf += "<td>" + stu.Promotion + "</td>";
-            buf += "<td>" + stu.Major + "</td>";
-            buf += "<td>" + formatCompany(c.Company, c.CompanyWWW, true) + "</td>";
-            buf += "<td>" + formatPerson(c.Sup, true) + "</td>";
-            buf += "<td>" + df(c.MidtermReport) + "</td>";
-            buf += "<td>" + formatMajor(stu) + "</td>";
-            buf += "<td><span class=\'fui-new\'></span> <span class=\'fui-chat\'></span></td>";
-            buf += "</tr>";
-        }                  */
     });
     if (buf.length == 0) {
         $("#table-myStudents-body").find("tr td").html("No tutored students");
@@ -450,14 +414,9 @@ function updatePrivilege(select, email) {
 }
 
 function newUser(m) {
-    var d = {
-        Firstname: $("#lbl-nu-fn").val(),
-        Lastname: $("#lbl-nu-ln").val(),
-        Tel: $("#lbl-nu-tel").val(),
-        Email: $("#lbl-nu-email").val(),
-        Priv: $("#lbl-nu-priv").val()
-    };
-    createUser(function() {$("#new-user").hide()});
+    createUser($("#lbl-nu-fn").val(), $("#lbl-nu-ln").val(),
+                $("#lbl-nu-tel").val(), $("#lbl-nu-email").val(),
+                $("#lbl-nu-priv").val(), function() {$("#new-user").hide()});
 }
 
 function rmUser(btn, m) {

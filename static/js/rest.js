@@ -57,8 +57,8 @@ function getConventions(ok, no) {
 }
 
 //User management
-function createUser(ok, no) {
-    postWithToken("/users/", d, defaultCb(ok), defaultCb(no));
+function createUser(fn, ln, tel, email, priv, ok, no) {
+    postWithToken("/users/", {Firstname: fn, Lastname: ln, Tel: tel, Email: email, Priv: priv}, defaultCb(ok), defaultCb(no));
 }
 
 function deleteUser(email, ok, no) {
