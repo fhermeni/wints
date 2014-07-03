@@ -5,13 +5,13 @@ function logout() {
     $.ajax({
         method: "POST",
         url: "/logout",
-        headers: {"X-auth-token" : sessionStorage.getItem("token")},
+        headers: {"X-auth-token" : localStorage.getItem("token")},
 
     }).done(function () {
-        sessionStorage.clear();
+        localStorage.clear();
         window.location.href = "/"
     }).fail(function (){
-        sessionStorage.clear();
+        localStorage.clear();
         window.location.href = "/"
         console.log(arguments);
         console.log("Unable to log out: " + data.responseText)

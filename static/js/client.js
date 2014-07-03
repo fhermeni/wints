@@ -3,8 +3,8 @@
 */
 
 $( document ).ready(function () {
-    if (sessionStorage.getItem("homepage") && sessionStorage.getItem("token")) {
-        window.location.href = sessionStorage.getItem("homepage");
+    if (localStorage.getItem("homepage") && localStorage.getItem("token")) {
+        window.location.href = localStorage.getItem("homepage");
     }
 });
 
@@ -13,13 +13,13 @@ function login() {
         .done(function(data) {
             //debugger;
             $("#err").html("");
-            sessionStorage.setItem("User", JSON.stringify(data));
-            sessionStorage.setItem("token", jqr.getResponseHeader("X-auth-token"));
+            localStorage.setItem("User", JSON.stringify(data));
+            localStorage.setItem("token", jqr.getResponseHeader("X-auth-token"));
             if (data.Role == "") {
-                sessionStorage.setItem("homepage", "student.html");
+                localStorage.setItem("homepage", "student.html");
                 window.location.href = "/static/student.html";
             } else {
-                sessionStorage.setItem("homepage", "admin.html");
+                localStorage.setItem("homepage", "admin.html");
                 window.location.href = "/static/admin.html";
             }
 

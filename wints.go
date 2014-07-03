@@ -14,6 +14,9 @@ import (
 	"strconv"
 )
 
+const (
+	ROOT_API = "/api/v1"
+)
 var DB *sql.DB
 var store = sessions.NewCookieStore([]byte("wints"))
 
@@ -303,26 +306,32 @@ func main() {
 		return
 	}
 
-	//go backend.PullConventions(DB)
-	//backend.DaemonConventionsPuller(DB);
-
+	/*delay, err := time.ParseDuration(cfg.RefreshPeriod)
+	if err != nil {
+		log.Fatalln(err.Error())
+	}
+	backend.DaemonConventionsPuller(DB, cfg.WWWConventionsURL,
+										cfg.WWWConventionsLogin,
+										cfg.WWWConventionsPassword,
+										delay);
+	*/
 	//Rest stuff
 	r := mux.NewRouter()
 
 	r.HandleFunc("/", rootHandler)
 
-	r.HandleFunc("/pending/_random", RequireRole(RandomPendingConvention, "admin")).Methods("GET")
-	r.HandleFunc("/conventions/", RequireRole(GetAllConventions,"major")).Methods("GET")
-	r.HandleFunc("/conventions/", RequireRole(CommitPendingConvention,"admin")).Methods("POST")
-	r.HandleFunc("/conventions/{email}/major", RequireRole(UpdateMajor, "major")).Methods("POST")
-	r.HandleFunc("/users/", RequireRole(GetAdmins, "admin")).Methods("GET")
-	r.HandleFunc("/users/", RequireRole(NewAdmin, "root")).Methods("POST")
-	r.HandleFunc("/users/{email}/roles/", RequireRole(GrantRole, "root")).Methods("POST")
-	r.HandleFunc("/users/{email}", RequireRole(RmUser, "root")).Methods("DELETE")
-	r.HandleFunc("/users/{email}/password", RequireToken(ChangePassword)).Methods("POST")
-	r.HandleFunc("/users/{email}/", RequireToken(ChangeProfile)).Methods("POST")
-	r.HandleFunc("/login", Login).Methods("POST")
-	r.HandleFunc("/logout", RequireToken(Logout)).Methods("POST")
+	r.HandleFunc(ROOT_API + "/pending/_random", RequireRole(RandomPendingConvention, "admin")).Methods("GET")
+	r.HandleFunc(ROOT_API + "/conventions/", RequireRole(GetAllConventions,"major")).Methods("GET")
+	r.HandleFunc(ROOT_API + "/conventions/", RequireRole(CommitPendingConvention,"admin")).Methods("POST")
+	r.HandleFunc(ROOT_API + "/conventions/{email}/major", RequireRole(UpdateMajor, "major")).Methods("POST")
+	r.HandleFunc(ROOT_API + "/users/", RequireRole(GetAdmins, "admin")).Methods("GET")
+	r.HandleFunc(ROOT_API + "/users/", RequireRole(NewAdmin, "root")).Methods("POST")
+	r.HandleFunc(ROOT_API + "/users/{email}/roles/", RequireRole(GrantRole, "root")).Methods("POST")
+	r.HandleFunc(ROOT_API + "/users/{email}", RequireRole(RmUser, "root")).Methods("DELETE")
+	r.HandleFunc(ROOT_API + "/users/{email}/password", RequireToken(ChangePassword)).Methods("POST")
+	r.HandleFunc(ROOT_API + "/users/{email}/", RequireToken(ChangeProfile)).Methods("POST")
+	r.HandleFunc(ROOT_API + "/login", Login).Methods("POST")
+	r.HandleFunc(ROOT_API + "/logout", RequireToken(Logout)).Methods("POST")
 	fs := http.Dir("static/")
 	fileHandler := http.FileServer(fs)
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", fileHandler))

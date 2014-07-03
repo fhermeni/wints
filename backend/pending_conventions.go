@@ -63,7 +63,8 @@ func PullConventions(db *sql.DB, url, login, password string) {
 	}
 }
 
-func DaemonConventionsPuller(db *sql.DB, url, login, password string) {
+func DaemonConventionsPuller(db *sql.DB, url, login, password string, delay time.Duration) {
+	go PullConventions(db, url, login, password)
 	ticker := time.NewTicker(time.Hour)
 	quit := make(chan struct{})
 	go func() {

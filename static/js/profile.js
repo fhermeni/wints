@@ -16,7 +16,7 @@ function updateProfile() {
         method: "POST",
         url: "/users/" + user.Email + "/",
         data: JSON.stringify(body),
-        headers: {"X-auth-token" : sessionStorage.getItem("token")},
+        headers: {"X-auth-token" : localStorage.getItem("token")},
     }).done(updateCb).fail(errorCb());
 }
 
@@ -63,7 +63,7 @@ function updateCb(data, resp, xhr ) {
         var fn = $("#fullname").val();
         $("#profileEditor-err").html("");
         user = data;
-        sessionStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("user", JSON.stringify(user));
         $("#fullname").html(user.Firstname + " " + user.Lastname);
         $("#profileEditor").modal('hide');
         $("#profileEditor-err").html("");

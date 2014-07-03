@@ -36,7 +36,7 @@ function options(current, opts) {
 
 $( document ).ready(function () {
     //Check access
-    user = JSON.parse(sessionStorage.getItem("User"));
+    user = JSON.parse(localStorage.getItem("User"));
 
     fillSelect("infos-student-major", ['?', 'al','ihm','vim','ubinet','kis','cssr','imafa']);
 
