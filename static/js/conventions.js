@@ -1,7 +1,3 @@
-/**
- * Created by fhermeni on 05/05/2014.
- */
-
 var total = 0;
 var pending = 0;
 var committed = 0;
