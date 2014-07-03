@@ -56,17 +56,17 @@ $( document ).ready(function () {
 });
 
 function showPendingCounter() {
-    getWithToken("/pending/_random", function(data) {
+    randomPending(function(data) {
         if (data.Pending > 0) {
-                $("#pending-counter").html(" <span class='navbar-new'>" + data.Pending + "</span>");
+            $("#pending-counter").html(" <span class='navbar-new'>" + data.Pending + "</span>");
         } else {
-                $("#pending-counter").html("");
+            $("#pending-counter").html("");
         }
     });
 }
 
 function pickOne() {
-    getWithToken("/pending/_random", function(data) {
+    randomPending(function(data) {
         if (data.length == 0) {
             success();
         } else {
@@ -181,10 +181,7 @@ function pickTheory() {
     pendingConvention.Tutor.Lastname = $("#th-tutor-ln").val();
     pendingConvention.Tutor.Email = $("#th-tutor-email").val();
     pendingConvention.Tutor.Tel = $("#th-tutor-tel").val();
-    postWithToken("/conventions/", pendingConvention, ackPick, nackPick);
-}
-
-function nackPick(){
+    commitPendingConvention(pendingConvention, ackPick());
 }
 
 function ackPick(){
@@ -197,10 +194,10 @@ function pickKnown() {
     known.forEach(function (t) {
         if (t.Email == tEmail)  {
             pendingConvention.Tutor = t;
-            return false
+            return false;
         }
     });
-    postWithToken("/conventions/", pendingConvention, ackPick, nackPick);
+    commitPendingConvention(pendingConvention, ackPick());
 }
 
 function showPage(li, id) {
@@ -276,7 +273,7 @@ function formatCompany(n, www, truncate) {
 }
 
 function getAllConventions() {
-    getWithToken("/conventions/", function(data) {
+    getConventions(function(data) {
         if (!conventions) {
             conventions = data;
             if (conventions.length == 0) {
@@ -458,7 +455,7 @@ function showDetails(s) {
 
 function updateMajor(email) {
     var val = $("#infos-student-major").val();
-    postRawWithToken("/conventions/" + email + "/major",val,
+    setMajor(email,val,
         function() {
             conventions.forEach(function (c) {
                 if (c.Stu.P.Email == email) {
@@ -467,17 +464,13 @@ function updateMajor(email) {
                 }
             });
             refresh();
-        },
-        function () {
-            console.log(arguments)
-        }
-    );
+        });
 }
 
 function showPrivileges() {
     var buf = "";
     var admins;
-    getWithToken("/users/", function(data) {
+    getUsers(function(data) {
         admins = data;
         var buf = "";
         var tpl = $('#row-admin').html();
@@ -497,10 +490,8 @@ function showPrivileges() {
 
 }
 
-function setPrivilege(select, email) {
-    var val = $(select).val();
-    console.log("Set permission of " + email + " to " + val);
-    postRawWithToken("/users/" + email + "/roles/", val, function() {}, function () { console.log(arguments)});
+function updatePrivilege(select, email) {
+    setPrivilege(email, $(select).val());
 }
 
 function newUser(m) {
@@ -511,17 +502,9 @@ function newUser(m) {
         Email: $("#lbl-nu-email").val(),
         Priv: $("#lbl-nu-priv").val()
     };
-    postWithToken("/users/", d, function() {
-        $("#new-user").hide()
-    },
-    function() {console.log(args)});
+    createUser(function() {$("#new-user").hide()});
 }
 
-
 function rmUser(btn, m) {
-    deleteWithToken("/users/" + m, function() {
-        $(btn).parent().parent().parent().remove();
-    }, function() {
-        console.log(arguments)
-    });
+    deleteUser(m, function() {$(btn).parent().parent().parent().remove();});
 }

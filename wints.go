@@ -326,7 +326,7 @@ func main() {
 	r.HandleFunc(ROOT_API + "/conventions/{email}/major", RequireRole(UpdateMajor, "major")).Methods("POST")
 	r.HandleFunc(ROOT_API + "/users/", RequireRole(GetAdmins, "admin")).Methods("GET")
 	r.HandleFunc(ROOT_API + "/users/", RequireRole(NewAdmin, "root")).Methods("POST")
-	r.HandleFunc(ROOT_API + "/users/{email}/roles/", RequireRole(GrantRole, "root")).Methods("POST")
+	r.HandleFunc(ROOT_API + "/users/{email}/role", RequireRole(GrantRole, "root")).Methods("POST")
 	r.HandleFunc(ROOT_API + "/users/{email}", RequireRole(RmUser, "root")).Methods("DELETE")
 	r.HandleFunc(ROOT_API + "/users/{email}/password", RequireToken(ChangePassword)).Methods("POST")
 	r.HandleFunc(ROOT_API + "/users/{email}/", RequireToken(ChangeProfile)).Methods("POST")
