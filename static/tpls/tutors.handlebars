@@ -1,0 +1,38 @@
+{{#if this}}
+<h3>{{len this}}</span> Tutors</h3>
+<a id='btn-mail-tutors' class="btn-sm btn-primary"><span class="fui-mail"></span> mail selection</a>
+<table class="table table-condensed table-hover tablesorter" id="table-assignments">
+    <thead>
+    <tr>
+        <th><label class='checkbox'><input id="general-checkbox-tutors" type='checkbox' data-toggle='checkbox'/></label></th>
+        <th>Tutor</th>
+        <th>Count</th>
+        <th>Students</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#each this}}
+        <tr>
+            <td>
+                <label class='checkbox'>
+                    <input type='checkbox' class='checkbox-mail-tutors' data-toggle='checkbox' value='{{tutor.Email}}'/>
+                </label>
+            </td>
+            <td>
+                <a href="mailto:{{tutor.Email}}">
+                    {{fullname tutor}}
+                </a>
+            </td>
+            <td>{{len students}}</td>
+            <td>
+                {{#each students}}
+                    <a href="mailto:{{P.Email}}">{{shortFullname P}}</a>,
+                {{/each}}
+            </td>
+        </tr>
+    {{/each}}
+    </tbody>
+</table>
+{{else}}
+    <h5 class="text-center">No tutors</h5>
+{{/if}}

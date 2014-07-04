@@ -257,44 +257,44 @@ function generateMailto(cl, btn) {
     }
 }
 
+function orderByTutors(cc) {
+    var res = [];
+    /*
+    [ {
+        tutor:
+        students:
+        },
+        ...
+        ]
+     */
+    var tutors = {};
+    var students = {};
+    cc.forEach(function (c) {
+        var t = c.Tutor;
+        if (!tutors[t.Email]) {
+            tutors[t.Email] = t;
+            students[t.Email] = [];
+        }
+        students[t.Email].push(c.Stu);
+    });
+    Object.keys(tutors).forEach(function(em) {
+       var r = {tutor: tutors[em], students: students[em]};
+       res.push(r);
+    });
+    return res;
+}
 
 function displayTutors() {
-    var tutors = {};
-    var persons = {};
-    if (conventions.length == 0) {
-        $("#table-assignments-body").find("tr td").html("No tutors to display");
-    } else {
-        conventions.forEach(function (c) {
-            var t = c.Tutor;
-            ft = formatPerson(t);
-            if (!tutors[t.Email]) {
-                tutors[t.Email] = [];
-                persons[t.Email] = t;
-            }
-            tutors[t.Email].push(formatStudent(c.Stu.P, true));
-        });
-        var buf = "";
-        Object.keys(tutors).forEach(function (k) {
-            buf += "<tr>";
-            buf += "<td><label class='checkbox'><input type='checkbox' class='checkbox-mail-tutors' data-toggle='checkbox' value='" + k + "'/></label></td>";
-            buf += "<td>" + formatPerson(persons[k]) + "</td>";
-            buf += "<td>" + tutors[k].length + "</td>";
-            buf += "<td>" + tutors[k].join(", ") + "</td>";
-            buf += "</tr>";
-        });
-        if (buf.length == 0) {
-            $("#table-assignments-body").find("tr td").html("No tutors to display");
-            return;
-        }
-        $("#table-assignments-body").html(buf);
+        var res = orderByTutors(conventions);
+        var html = Handlebars.getTemplate("tutors")(res);
+        $("#assignments").html(html);
         $("#table-assignments").tablesorter({headers: {0: {"sorter": false}}});
         $("#nb-tutors").html(Object.keys(tutors).length);
-        $(':checkbox').checkbox();
+        $('#assignments').find(':checkbox').checkbox();
         $("#general-checkbox-tutors").checkbox().on('toggle', toggleTutorCheckboxes);
         $('.checkbox-mail-tutors').checkbox().on('toggle', function() {
             return generateMailto("checkbox-mail-tutors", 'btn-mail-tutors');
         });
-    }
 }
 
 
