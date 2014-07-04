@@ -3,10 +3,8 @@
  */
 
 function showProfileEditor() {
-    $("#lbl-firstname").val(user.Firstname);
-    $("#lbl-lastname").val(user.Lastname);
-    $("#lbl-tel").val(user.Tel);
-    $("#profileEditor").modal('show');
+    var buf = Handlebars.getTemplate("profileEditor")(user);
+    $("#modal").html(buf).modal('show')
 }
 
 function updateProfile() {

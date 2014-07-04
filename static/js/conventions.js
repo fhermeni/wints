@@ -213,16 +213,6 @@ function formatStudent(p, truncate) {
     return "<a href='#' onclick=\"showDetails('" + p.Email + "')\">" + name + "</a>";
 }
 
-function formatCompany(n, www, truncate) {
-    if (truncate && n.length > 20) {
-        n = n.substring(0, 17) + "...";
-    }
-    if (www != "") {
-        return "<a target='_blank' href='" + www + "'>" + n + "</a>";
-    }
-    return n;
-}
-
 function getAllConventions() {
     getConventions(function(data) {
         if (!conventions) {
@@ -356,25 +346,10 @@ function toggleTutorCheckboxes() {
 }
 
 function showDetails(s) {
-    $("#student-details").modal('show');
     conventions.forEach(function (c) {
         if (c.Stu.P.Email == s) {
-            $("#infos-student-name").html(formatPerson(c.Stu.P));
-            $("#infos-student-tel").html(c.Stu.P.Tel);
-            $("#infos-student-major").val(c.Stu.Major)
-                .on("change", function() {
-                    updateMajor(c.Stu.P.Email)
-                });
-            $("#infos-student-promotion").html(c.Stu.Promotion);
-            $("#infos-sup-name").html(formatPerson(c.Sup));
-            $("#infos-sup-tel").html(c.Sup.Tel);
-            $("#infos-company-name").html(formatCompany(c.Company, c.CompanyWWW));
-            $("#infos-company-period").html(df(c.Begin) + " to " + df(c.End));
-            $("#infos-company-midterm").html(df(c.MidtermReport));
-
-            $("#infos-tutor-name").html(formatPerson(c.Tutor));
-            $("#infos-tutor-tel").html(c.Tutor.Tel);
-
+            var buf = Handlebars.getTemplate("student-detail")(c);
+            $("#modal").html(buf).modal('show');
             return false;
         }
     });
