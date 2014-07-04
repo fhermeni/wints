@@ -13,6 +13,7 @@ import (
 	"errors"
 	"strconv"
 	"math/rand"
+	"io/ioutil"
 )
 
 const (
@@ -227,7 +228,7 @@ func UpdateMajor(w http.ResponseWriter, r *http.Request, email string) {
 }
 
 func requiredContent(w http.ResponseWriter, r *http.Request) ([]byte, error) {
-	cnt, err := requiredContent(w, r)
+	cnt, err := ioutil.ReadAll(r.Body)
 	if reportIfError(w, "", err) {
 		return []byte{}, err
 	}

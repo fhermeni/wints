@@ -8,9 +8,9 @@ $( document ).ready(function () {
     }
 });
 
-function login() {
-    var jqr =$.post("/login", JSON.stringify({Email: $("#login").val(), Password :$("#password").val()}))
-        .done(function(data) {
+function doLogin() {
+    jqr = login($("#login").val(), $("#password").val(),
+        function(data) {
             //debugger;
             $("#err").html("");
             localStorage.setItem("User", JSON.stringify(data));
@@ -23,8 +23,8 @@ function login() {
                 window.location.href = "/static/admin.html";
             }
 
-        })
-        .fail(function (data) {
+        },
+        function (data) {
             $("#err").html("<div class='alert alert-danger'>" + data.responseText + "</div>");
         });
 }

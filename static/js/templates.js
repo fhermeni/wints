@@ -73,6 +73,19 @@ Handlebars.registerHelper('deadline', function(d) {
     return date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
 });
 
+Handlebars.registerHelper('majorOptions', function(m) {
+    var opts = ['?', 'al','ihm','vim','ubinet','kis','cssr','imafa'];
+    var b = "";
+    if (!m) {
+        m = "?";
+    }
+    opts.forEach(function (o) {
+        var unquoted = o.replace(/\"/g, "");
+        var selected = m == unquoted ? " selected " : "";
+        b += "<option value='" + unquoted + "' " + selected + " >" + unquoted + "</option>";
+    });
+    return new Handlebars.SafeString(b);
+});
 
 Handlebars.registerHelper('date', function(d) {
     var date = new Date(Date.parse(d));

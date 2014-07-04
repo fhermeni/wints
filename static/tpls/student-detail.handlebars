@@ -9,7 +9,9 @@
                 <dd id="infos-student-promotion">{{Stu.Promotion}}</dd>
                 <dt>Major</dt>
                 <dd>
-                    <select id="infos-student-major"></select>
+                    <select id="infos-student-major" onchange="updateMajor('{{Stu.P.Email}}')">
+                        {{majorOptions Major}}
+                    </select>
                 </dd>
 
                 <dt class="glyphicon glyphicon-earphone"></dt>

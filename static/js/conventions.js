@@ -4,33 +4,9 @@ var user;
 
 var currentPage;
 
-function fillSelect(id, opts) {
-    var b = "";
-    opts.forEach(function (o) {
-        var unquoted = o.replace(/\"/g, "");
-       b += "<option value='" + unquoted + "'>" + unquoted + "</option>";
-    });
-    $("#" + id).html(b);
-}
-
-function options(current, opts) {
-    var b = "";
-    opts.forEach(function (o) {
-        var unquoted = o.replace(/\"/g, "");
-        if (unquoted == current) {
-            b += "<option value='" + unquoted + "' selected>" + unquoted + "</option>";
-        } else {
-            b += "<option value='" + unquoted + "'>" + unquoted + "</option>";
-        }
-    });
-    return b;
-}
-
 $( document ).ready(function () {
     //Check access
     user = JSON.parse(localStorage.getItem("User"));
-
-    fillSelect("infos-student-major", ['?', 'al','ihm','vim','ubinet','kis','cssr','imafa']);
 
     if (!user) {
         window.location.href = "/";

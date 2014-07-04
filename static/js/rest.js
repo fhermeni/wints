@@ -74,7 +74,7 @@ function setPrivilege(email, p, ok, no) {
 }
 
 function setMajor(email, p, ok, no) {
-    postRawWithToken("/users/" + email + "/role", p, defaultCb(ok), defaultCb(no));
+    postRawWithToken("/conventions/" + email + "/major", p, defaultCb(ok), defaultCb(no));
 }
 
 //Profile management
@@ -84,4 +84,9 @@ function setProfile(fn, ln, tel, ok, no) {
 
 function setPassword(oldP, newP, ok, no) {
     postWithToken("/users/" + user.Email + "/password", {OldPassword:oldP, NewPassword:newP}, defaultCb(ok), defaultCb(no));
+}
+
+//authentication
+function login(email, password, ok, no) {
+    return postWithToken("/login", {Email: email, Password: password}, defaultCb(ok), defaultCb(no));
 }
