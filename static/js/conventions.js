@@ -275,12 +275,9 @@ function orderByTutors(cc) {
 }
 
 function displayTutors() {
-        var res = orderByTutors(conventions);
-        var html = Handlebars.getTemplate("tutors")(res);
+        var html = Handlebars.getTemplate("tutors")(orderByTutors(conventions));
         $("#assignments").html(html);
         $("#table-assignments").tablesorter({headers: {0: {"sorter": false}}});
-        $("#nb-tutors").html(Object.keys(tutors).length);
-        $('#assignments').find(':checkbox').checkbox();
         $("#general-checkbox-tutors").checkbox().on('toggle', toggleTutorCheckboxes);
         $('.checkbox-mail-tutors').checkbox().on('toggle', function() {
             return generateMailto("checkbox-mail-tutors", 'btn-mail-tutors');
