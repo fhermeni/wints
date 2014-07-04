@@ -55,7 +55,12 @@ Handlebars.registerHelper('shortCompany', function(c) {
 
 Handlebars.registerHelper('deadline', function(d) {
     var date = new Date(Date.parse(d));
-    return date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
+    var now = new Date();
+    var str = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
+    if (now.getMilliseconds() > date.getMilliseconds()) {
+        return new Handlebars.SafeString("<span class='late'>" + str + "</span>");
+    }
+    return str;
 });
 
 Handlebars.registerHelper('majorOptions', function(m) {
