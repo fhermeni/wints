@@ -65,6 +65,10 @@ type PendingConventionMsg struct {
 func RandomPendingConvention(w http.ResponseWriter, r *http.Request, email string) {
 	cc, err := backend.GetRawConventions(DB)
 	nb := len(cc)
+	if nb == 0 {
+		jsonReply(w, PendingConventionMsg{backend.Convention{}, nil, 0})
+		return
+	}
 	c := cc[rand.Intn(nb)];
 	known, err := backend.Admins(DB)
 	if !reportIfError(w, "Unable to get the possible tutors", err) {
