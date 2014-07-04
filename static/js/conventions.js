@@ -236,22 +236,16 @@ function toggleConventionCheckboxes() {
 }
 
 function displayMyStudents() {
-    var tpl = Handlebars.compile($('#row-my-students').html());
-    var buf = "";
-    conventions.forEach(function (c) {
-        if (c.Tutor.Email == user.Email) {
-            buf += tpl(c);
-        }
+    var myStudents = conventions.filter(function (c) {
+        return c.Tutor.Email == user.Email;
     });
-    if (buf.length == 0) {
-        $("#table-myStudents-body").find("tr td").html("No tutored students");
-        return;
-    }
+    var html = Handlebars.getTemplate("myStudents")(myStudents);
+    $("#myStudents").html(html);
     $("#table-myStudents").tablesorter({headers: {0: {"sorter": false}}});
     $(':checkbox').checkbox();
     $('#general-checkbox-myStudents').on('toggle', toggleMyStudentCheckboxes);
     $('.checkbox-mail-myStudents').checkbox().on('toggle', function() {
-       return generateMailto("checkbox-mail-myStudents", 'btn-mail-myStudents');
+        return generateMailto("checkbox-mail-myStudents", 'btn-mail-myStudents');
     });
 }
 

@@ -61,23 +61,6 @@
             </div>
         </div>
     </script>
-    <script type="text/x-handlebars-template" id="row-my-students">
-        <tr>
-            <td>
-                <label class='checkbox'>
-                    <input class='checkbox-mail-myStudents' type='checkbox' data-toggle='checkbox' value='{{Stu.P.Email}}'/>
-                </label>
-            </td>
-            <td>{{student Stu.P}}</td>
-            <td>{{Stu.Promotion}}</td>
-            <td>{{Stu.Major}}</td>
-            <td>{{shortCompany this}}</td>
-            <td>{{shortFullname Sup}}</td>
-            <td>{{deadline midtermReport}}</td>
-            <td>?</td>
-            <td><span class='fui-new'></span> <span class='fui-chat'></span></td>
-        </tr>
-    </script>
 </head>
 <body>
 <div class="container">
@@ -117,7 +100,7 @@
 
     <!-- the students I am supervising -->
     <div class="page" id="myStudents" data-url="myStudents" style="display: none">
-    <h3>Tutored students</h3>
+    <!--<h3>Tutored students</h3>
 
         <a id='btn-mail-myStudents' class="btn-sm btn-primary"><span class="fui-mail"></span> mail selection</a>
         <table class="table table-condensed table-hover tablesorter" id="table-myStudents">
@@ -142,7 +125,7 @@
                     <td colspan="8" class="text-center">Loading ...</td>
                 </tr>
             </tbody>
-        </table>
+        </table> -->
     </div>
 
     <!-- list conventions -->

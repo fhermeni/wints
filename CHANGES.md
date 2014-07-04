@@ -14,7 +14,8 @@
 - delete user OK
 - logging
 - init mode OK
-- hide static pages, stay inside "/", rest API in "rest/v1/"
+- hide static pages, stay inside "/",
+- rest API in "rest/v1/"  OK
 - confirmation for sensible data
 - change password OK
 
