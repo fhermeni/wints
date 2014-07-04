@@ -24,25 +24,6 @@
     <script src="js/jquery.tablesorter.min.js"></script>
     <script src="js/mustache.js"></script>
 
-    <script type="text/x-handlebars-template" id="row-my-conventions">
-        <tr>
-            <td>
-                <label class='checkbox'>
-                    <input type='checkbox' class='checkbox-mail-conventions' data-toggle='checkbox' value='{{stu.P.Email}}'/>
-                </label>
-            </td>
-            <td><a href='#' onclick="showDetails('{{Stu.P.Email}}')">{{shortFullname Stu.P}}</a></td>
-            <td>{{Stu.Promotion}}</td>
-            <td>{{Stu.Major}}</td>
-            <td><a href='mailto:{{Sup.Email}}' title='{{fullname Sup}}'>{{shortFullname Sup}}</a></td>
-            <td><a href='mailto:{{Tutor.Email}}' title='{{fullname Tutor}}'>{{shortFullname Tutor}}</a></td>
-            <td>{{deadline MidtermReport}}</td>
-            <td>?</td>
-            <td>
-                <span class='fui-new'></span> <span class='fui-chat'></span>
-            </td>
-        </tr>
-    </script>
     <script type="text/x-handlebars-template" id="row-admin">
         <div class='col-md-6'>
             <div class='form-group'>
@@ -99,64 +80,10 @@
     </div>
 
     <!-- the students I am supervising -->
-    <div class="page" id="myStudents" data-url="myStudents" style="display: none">
-    <!--<h3>Tutored students</h3>
-
-        <a id='btn-mail-myStudents' class="btn-sm btn-primary"><span class="fui-mail"></span> mail selection</a>
-        <table class="table table-condensed table-hover tablesorter" id="table-myStudents">
-            <thead>
-                <tr>
-                    <th rowspan="2"><label class='checkbox'><input id="general-checkbox-myStudents" type='checkbox' data-toggle='checkbox'/></label></th>
-                    <th rowspan="2">Student</th>
-                    <th rowspan="2">Promotion</th>
-                    <th rowspan="2">Major</th>
-                    <th rowspan="2">Company</th>
-                    <th rowspan="2">Supervisor</th>
-                    <th colspan="3">Midterm evaluation</th>
-                </tr>
-                <tr>
-                    <th><small>due date</small></th>
-                    <th><small>grade</small></th>
-                    <th><small>resources</small></th>
-                </tr>
-            </thead>
-            <tbody id="table-myStudents-body">
-                <tr>
-                    <td colspan="8" class="text-center">Loading ...</td>
-                </tr>
-            </tbody>
-        </table> -->
-    </div>
+    <div class="page" id="myStudents" data-url="myStudents" style="display: none"></div>
 
     <!-- list conventions -->
-    <div class="page" id="conventions" data-url="conventions" style="display: none">
-        <h3><span id="nb-conventions"></span> Internships</h3>
-        <a id='btn-mail-conventions' class="btn-sm btn-primary"><span class="fui-mail"></span> mail selection</a>
-        <table class="table table-condensed table-hover tablesorter" id="table-conventions">
-            <thead>
-                <tr>
-                    <th rowspan="2"><label class='checkbox' id="general-checkbox-conventions"><input id="foo" type='checkbox' data-toggle='checkbox'/></label></th>
-                    <th rowspan="2">Student</th>
-                    <th rowspan="2">Promotion</th>
-                    <th rowspan="2">Major</th>
-                    <th rowspan="2">Supervisor</th>
-                    <th rowspan="2">Tutor</th>
-                    <th colspan="3">Midterm evaluation</th>
-                </tr>
-                <tr>
-                    <th><small>due date</small></th>
-                    <th><small>grade</small></th>
-                    <th><small>resources</small></th>
-                </tr>
-
-            </thead>
-            <tbody id="table-conventions-body">
-                <tr>
-                    <td colspan="7" class="text-center">Loading ...</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+    <div class="page" id="conventions" data-url="conventions" style="display: none"></div>
 
     <!-- pending page -->
     <div id="pending" data-url="pending" class="page" style="display: none">

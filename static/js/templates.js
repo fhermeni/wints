@@ -31,6 +31,10 @@ Handlebars.registerHelper('shortFullname', function(p) {
 
 });
 
+Handlebars.registerHelper('len', function(a) {
+    return a.length
+});
+
 Handlebars.registerHelper('company', function(c) {
     if (c.CompanyWWW != "") {
         return new Handlebars.SafeString("<a target='_blank' href='" + c.CompanyWWW + "'>" + c.Company + "</a>");

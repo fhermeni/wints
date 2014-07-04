@@ -207,25 +207,14 @@ function getAllConventions() {
 }
 
 function displayMyConventions() {
-        if (conventions.length == 0) {
-            $("#table-conventions-body").find("tr td").html("No conventions to display");
-            $("#table-assignments-body").find("tr td").html("No tutors to display");
-        } else {
-            var tpl = Handlebars.compile($('#row-my-conventions').html());
-            var buf = "";
-            conventions.forEach(function (c) {
-                buf  += tpl(c);
-            });
-            $('#table-conventions-body').html(buf);
-            $("#nb-conventions").html(conventions.length);
-            $("#table-conventions").tablesorter({headers: {0: {"sorter": false}}});
-            $(':checkbox').checkbox();
-            $("#general-checkbox-conventions").on('toggle', toggleConventionCheckboxes);
-            $('.checkbox-mail-conventions').checkbox().on('toggle', function() {
-                return generateMailto("checkbox-mail-conventions", 'btn-mail-conventions');
-            });
-
-        }
+    var html = Handlebars.getTemplate("watchlist")(conventions);
+    $("#conventions").html(html);
+    $("#table-conventions").tablesorter({headers: {0: {"sorter": false}}});
+    $('#conventions').find(':checkbox').checkbox();
+    $("#general-checkbox-conventions").on('toggle', toggleConventionCheckboxes);
+    $('.checkbox-mail-conventions').checkbox().on('toggle', function() {
+        return generateMailto("checkbox-mail-conventions", 'btn-mail-conventions');
+    });
 }
 
 function toggleConventionCheckboxes() {
@@ -242,7 +231,7 @@ function displayMyStudents() {
     var html = Handlebars.getTemplate("myStudents")(myStudents);
     $("#myStudents").html(html);
     $("#table-myStudents").tablesorter({headers: {0: {"sorter": false}}});
-    $(':checkbox').checkbox();
+    $('#myStudents').find(':checkbox').checkbox();
     $('#general-checkbox-myStudents').on('toggle', toggleMyStudentCheckboxes);
     $('.checkbox-mail-myStudents').checkbox().on('toggle', function() {
         return generateMailto("checkbox-mail-myStudents", 'btn-mail-myStudents');
