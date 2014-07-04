@@ -63,6 +63,14 @@ Handlebars.registerHelper('deadline', function(d) {
     return str;
 });
 
+Handlebars.registerHelper('rawFullname', function(p) {
+    var fn = p.Firstname + " " + p.Lastname;
+    for (i = fn.length; i < 60; i++) {
+        fn = fn + " ";
+    }
+    return fn;
+});
+
 Handlebars.registerHelper('majorOptions', function(m) {
     var opts = ['?', 'al','ihm','vim','ubinet','kis','cssr','imafa'];
     var b = "";

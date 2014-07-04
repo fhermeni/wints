@@ -336,3 +336,9 @@ function newUser(m) {
 function rmUser(btn, m) {
     deleteUser(m, function() {$(btn).parent().parent().parent().remove();});
 }
+
+function rawTutors() {
+    var tutors = orderByTutors(conventions);
+    var txt = Handlebars.getTemplate("rawTutors")(tutors);
+    $("#modal").html(txt).modal('show');
+}
