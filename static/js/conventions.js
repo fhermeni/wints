@@ -179,16 +179,6 @@ function refresh() {
     }
 }
 
-
-function formatStudent(p, truncate) {
-    var name = p.Lastname + " " + p.Firstname;
-    var fn = name;
-    if (truncate && name.length > 30) {
-        name = name.substring(0, 27) + "...";
-    }
-    return "<a href='#' onclick=\"showDetails('" + p.Email + "')\">" + name + "</a>";
-}
-
 function getAllConventions() {
     getConventions(function(data) {
         if (!conventions) {

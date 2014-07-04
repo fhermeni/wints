@@ -53,25 +53,6 @@ Handlebars.registerHelper('shortCompany', function(c) {
     return n;
 });
 
-function formatCompany(n, www, truncate) {
-    if (truncate && n.length > 20) {
-        n = n.substring(0, 17) + "...";
-    }
-    if (www != "") {
-        return "<a target='_blank' href='" + www + "'>" + n + "</a>";
-    }
-    return n;
-}
-
-function formatPerson(p, truncate) {
-    var name = p.Lastname + " "  + p.Firstname;
-    var fn = name;
-    if (truncate && name.length > 30) {
-        name = name.substring(0, 27) + "...";
-    }
-    return "<a href='mailto:" + p.Email + "' title='" + fn + "'>" +  name + "</a>";
-}
-
 Handlebars.registerHelper('deadline', function(d) {
     var date = new Date(Date.parse(d));
     return date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
