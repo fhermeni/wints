@@ -10,7 +10,8 @@
 <div class='col-md-6'>
     <div class='form-group'>
         <label for='lbl-{{Email}}' class='col-md-7 control-label'>
-            <a class="btn btn-xs btn-danger fui-cross" href="#" onclick="rmUser(this,'{{Email}}')"></a>
+            <!-- onclick="rmUser(this,'{{Email}}') -->
+            <a class="btn btn-xs btn-danger fui-cross" data-toggle="deluser-confirmation" href="#"> </a>
             <a href="mailto:{{Email}}">{{fullname this}}</a>
         </label>
         <span class='col-md-3'>

@@ -17,6 +17,8 @@
 - hide static pages, stay inside "/",
 - rest API in "rest/v1/"  OK
 - confirmation for sensible data
+   -> user deletion
+   -> alignment with exact matching
 - change password OK
 
 ## Version 2.0 ##

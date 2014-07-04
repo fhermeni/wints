@@ -245,7 +245,9 @@ func GrantRole(w http.ResponseWriter, r *http.Request, email string) {
 		return
 	}
 	err = backend.GrantPrivilege(DB, target, string(role))
-	reportIfError(w, "", err)
+	if !reportIfError(w, "", err) {
+		backend.Log(email, "User '" + target + "' granted to role '" + string(role) + "'");
+	}
 }
 
 func RequireToken(cb func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {

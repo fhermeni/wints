@@ -62,7 +62,7 @@ function createUser(fn, ln, tel, email, priv, ok, no) {
 }
 
 function deleteUser(email, ok, no) {
-    callWithToken("GET", "/users/" + email, defaultCb(ok),  defaultCb(no));
+    callWithToken("DELETE", "/users/" + email, defaultCb(ok),  defaultCb(no));
 }
 
 function getUsers(ok, no) {

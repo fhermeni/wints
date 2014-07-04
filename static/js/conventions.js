@@ -317,10 +317,13 @@ function updateMajor(email) {
 
 function showPrivileges() {
     getUsers(function(data) {
-        var html = Handlebars.getTemplate("privileges")(data);
+        var others = data.filter(function (u) {
+            return u.Email != user.Email;
+        });
+        var html = Handlebars.getTemplate("privileges")(others);
         $("#privileges").html(html);
     });
-
+    $('[data-toggle="deluser-confirmation"]').confirmation({onConfirm: rmUser});
 }
 
 function updatePrivilege(select, email) {
