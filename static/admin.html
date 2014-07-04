@@ -23,25 +23,6 @@
     <script src="js/conventions.js"></script>
     <script src="js/jquery.tablesorter.min.js"></script>
     <script src="js/mustache.js"></script>
-
-    <script type="text/x-handlebars-template" id="row-admin">
-        <div class='col-md-6'>
-            <div class='form-group'>
-                <label for='lbl-{{Email}}' class='col-md-7 control-label'>
-                    <a class="btn btn-xs btn-danger fui-cross" href="#" onclick="rmUser(this,'{{Email}}')"></a>
-                    <a href="mailto:{{Email}}">{{fullname this}}</a>
-                </label>
-                <span class='col-md-3'>
-                    <select onchange="updatePrivilege(this, '{{Email}}')">
-                        <option value="">None</option>
-                        <option value="major" {{major}}>Major</option>
-                        <option value="admin" {{admin}}>Admin</option>
-                        <option value="root" {{root}}>Root</option>
-                    </select>
-                </span>
-            </div>
-        </div>
-    </script>
 </head>
 <body>
 <div class="container">
@@ -184,13 +165,7 @@
     </div>
 
     <!-- Privileges -->
-    <div id="privileges" data-url="privileges" class="page" style="display: none">
-    <h3>Permissions
-    <small><button href="#new-user" data-toggle='modal' class="btn btn-success"><span class="glyphicon glyphicon-plus"></span> add user</button></small>
-    </h3>
-
-        <div id="table-privileges-body"></div>
-    </div>
+    <div id="privileges" data-url="privileges" class="page" style="display: none"></div>
 
     <div id="modal" class="modal fade"></div>
 

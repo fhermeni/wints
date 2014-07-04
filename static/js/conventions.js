@@ -330,15 +330,8 @@ function updateMajor(email) {
 
 function showPrivileges() {
     getUsers(function(data) {
-        var buf = "";
-        var tpl = Handlebars.compile($('#row-admin').html());
-        data.forEach(function (a) {
-            a[a.Role] = "selected";
-            buf += tpl(a);
-        });
-        $("#table-privileges-body").html(buf);
-        $(".tagsinput").tagsInput();
-        $("select").selectpicker({style: 'btn-sm btn-primary', menuStyle: 'dropdown-inverse'});
+        var html = Handlebars.getTemplate("privileges")(data);
+        $("#privileges").html(html);
     });
 
 }

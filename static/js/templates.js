@@ -91,6 +91,22 @@ Handlebars.registerHelper('majorOptions', function(m) {
     return new Handlebars.SafeString(b);
 });
 
+Handlebars.registerHelper('roleOptions', function(m) {
+    var opts = {
+        '':"None",
+        "major" : "Major",
+        "admin" : "Admin",
+        "root"  : "Root"
+    };
+    var b = '';
+    Object.keys(opts).forEach(function (k) {
+        var selected = m == k ? " selected " : "";
+        b += "<option value='" + k + "' " + selected + " >" + opts[k] + "</option>";
+    });
+    return new Handlebars.SafeString(b);
+});
+
+
 Handlebars.registerHelper('date', function(d) {
     var date = new Date(Date.parse(d));
     return date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
