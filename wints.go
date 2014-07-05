@@ -108,13 +108,17 @@ func NewAdmin(w http.ResponseWriter, r *http.Request, email string) {
 	}
 	p := backend.User{nu.Firstname, nu.Lastname, nu.Email, nu.Tel, nu.Priv}
 	err = backend.NewUser(DB, p)
-	reportIfError(w, "", err)
+	if !reportIfError(w, "", err) {
+		backend.LogActionInfo(email, " User '" + nu.Email + "'(" + nu.Priv + ") created");
+	}
 }
 
 func RmUser(w http.ResponseWriter, r *http.Request, email string) {
 	target,_ := mux.Vars(r)["email"]
 	err := backend.RmUser(DB, target)
-	reportIfError(w, "", err)
+	if !reportIfError(w, "", err) {
+		backend.LogActionInfo(email, " User '" + target + "' deleted");
+	}
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -140,6 +144,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	s.Save(r, w)
 	w.Header().Add("X-auth-token", string(tok))
 	jsonReply(w, u)
+	backend.LogActionInfo(cred.Email, " log in");
 }
 
 func Logout(w http.ResponseWriter, r *http.Request, email string) {
@@ -149,7 +154,9 @@ func Logout(w http.ResponseWriter, r *http.Request, email string) {
 		return
 	}
 	err := backend.CloseSession(DB, token)
-	reportIfError(w, "Unable to logout", err)
+	if !reportIfError(w, "Unable to logout", err) {
+		backend.LogActionInfo(email, " log out");
+	}
 }
 
 func CommitPendingConvention(w http.ResponseWriter, r *http.Request, email string) {
@@ -170,6 +177,7 @@ func CommitPendingConvention(w http.ResponseWriter, r *http.Request, email strin
 	if reportIfError(w, "Unable to register the internship", err) {
 		return
 	}
+	backend.LogActionInfo(email, "validate the convention of '" + c.Stu.P.Email + "'");
 	backend.RescanPending(DB, c)
 }
 
@@ -224,7 +232,10 @@ func UpdateMajor(w http.ResponseWriter, r *http.Request, email string) {
 		return
 	}
 	err = backend.SetMajor(DB, target, string(m))
-	reportIfError(w, "", err)
+	if !reportIfError(w, "", err) {
+		backend.LogActionInfo(email, "Major of '" + target + "' set to '" + string(m) + "'");
+	}
+
 }
 
 func requiredContent(w http.ResponseWriter, r *http.Request) ([]byte, error) {
@@ -246,7 +257,7 @@ func GrantRole(w http.ResponseWriter, r *http.Request, email string) {
 	}
 	err = backend.GrantPrivilege(DB, target, string(role))
 	if !reportIfError(w, "", err) {
-		backend.Log(email, "User '" + target + "' granted to role '" + string(role) + "'");
+		backend.LogActionInfo(email, "'" + target + "' granted to role '" + string(role) + "'");
 	}
 }
 
@@ -291,13 +302,20 @@ func main() {
 		log.Fatalln(err.Error())
 	}
 
+	backend.InitLogger(cfg.Logfile)
+	defer backend.CloseLogger();
 	DB, err = sql.Open("postgres", cfg.DBurl)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
 
 	if len(os.Args) > 1 && os.Args[1] == "-i" {
-		backend.NewUser(DB, backend.User{"R", "oot", "root@localhost", "0662496455", "root"})
+		err := backend.NewUser(DB, backend.User{"R", "oot", "root@localhost", "0662496455", "root"})
+		if err != nil {
+			backend.LogError("Unable to create the root account: " + err.Error());
+		} else {
+			backend.LogInfo("Root account created");
+		}
 		return
 	}
 

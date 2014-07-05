@@ -13,6 +13,7 @@ type Config struct {
 	MidtermReportDeadline string
 	DBurl string
 	Port int
+	Logfile string
 }
 
 func ReadConfig(path string) (Config, error) {

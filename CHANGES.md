@@ -20,6 +20,8 @@
    -> user deletion
    -> alignment with exact matching
 - change password OK
+- verify email format when aligning and changing
+- sort by date correctly
 
 ## Version 2.0 ##
 

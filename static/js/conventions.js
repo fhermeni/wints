@@ -301,8 +301,8 @@ function showDetails(s) {
     });
 }
 
-function updateMajor(email) {
-    var val = $("#infos-student-major").val();
+function updateMajor(s, email) {
+    var val = $(s).val();
     setMajor(email,val,
         function() {
             conventions.forEach(function (c) {
@@ -333,7 +333,7 @@ function updatePrivilege(select, email) {
 function newUser(m) {
     createUser($("#lbl-nu-fn").val(), $("#lbl-nu-ln").val(),
                 $("#lbl-nu-tel").val(), $("#lbl-nu-email").val(),
-                $("#lbl-nu-priv").val(), function() {$("#new-user").hide()});
+                $("#lbl-nu-priv").val(), function() {$("#modal").hide()});
 }
 
 function rmUser(btn, m) {

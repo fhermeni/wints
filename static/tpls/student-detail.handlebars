@@ -1,46 +1,46 @@
 <div class="modal-dialog">
     <div class="modal-content">
         <div class="modal-body form-horizontal">
-            <h3 id="infos-student-name">
+            <h3>
                 <a href="mailto:{{Stu.P.Email}}">{{fullname Stu.P}}</a>
             </h3>
             <dl class="dl-horizontal">
                 <dt>Promotion</dt>
-                <dd id="infos-student-promotion">{{Stu.Promotion}}</dd>
+                <dd>{{Stu.Promotion}}</dd>
                 <dt>Major</dt>
                 <dd>
-                    <select id="infos-student-major" onchange="updateMajor('{{Stu.P.Email}}')">
+                    <select onchange="updateMajor(this,'{{Stu.P.Email}}')">
                         {{majorOptions Major}}
                     </select>
                 </dd>
 
                 <dt class="glyphicon glyphicon-earphone"></dt>
-                <dd id="infos-student-tel">{{Stu.P.Tel}}</dd>
+                <dd>{{Stu.P.Tel}}</dd>
             </dl>
 
-            <h5>Company: <small id="infos-company-name">{{company this}}</small></h5>
+            <h5>Company: <small>{{company this}}</small></h5>
             <dl class="dl-horizontal">
                 <dt>Period</dt>
-                <dd id="infos-company-period">{{date Begin}} to {{date End}}</dd>
+                <dd>{{date Begin}} to {{date End}}</dd>
 
                 <dt>Midterm report</dt>
-                <dd id="infos-company-midterm">{{deadline MidtermReport}}</dd>
+                <dd>{{deadline MidtermReport}}</dd>
             </dl>
 
-            <h5>Supervisor: <small id="infos-sup-name">
+            <h5>Supervisor: <small>
                 <a href="mailto:{{Sup.Email}}">{{fullname Sup}}</a>
             </small></h5>
             <dl class="dl-horizontal">
                 <dt class="glyphicon glyphicon-earphone"></dt>
-                <dd id="infos-sup-tel">{{Sup.Tel}}</dd>
+                <dd>{{Sup.Tel}}</dd>
             </dl>
 
-            <h5>Tutor: <small id="infos-tutor-name">
+            <h5>Tutor: <small>
                 <a href="mailto:{{Tutor.Email}}">{{fullname Tutor}}</a>
             </small></h5>
             <dl class="dl-horizontal">
                 <dt class="glyphicon glyphicon-earphone"></dt>
-                <dd id="infos-tutor-tel">{{Tutor.Tel}}</dd>
+                <dd>{{Tutor.Tel}}</dd>
             </dl>
         </div>
     </div>
