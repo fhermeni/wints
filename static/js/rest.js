@@ -77,6 +77,12 @@ function setMajor(email, p, ok, no) {
     postRawWithToken("/conventions/" + email + "/major", p, defaultCb(ok), defaultCb(no));
 }
 
+function setMidtermDeadline(email, d, ok, no) {
+    var fmt = d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
+    postRawWithToken("/conventions/" + email + "/midterm/deadline", fmt, defaultCb(ok), defaultCb(no));
+}
+
+
 //Profile management
 function setProfile(fn, ln, tel, ok, no) {
     postWithToken("/users/" + user.Email + "/", {Firstname: fn, Lastname:ln, Tel: tel}, defaultCb(ok), defaultCb(no))

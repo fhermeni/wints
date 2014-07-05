@@ -19,18 +19,18 @@ $( document ).ready(function () {
     getAllConventions();
     currentPage = "myStudents";
     if (user.Role == "admin" || user.Role == "root") {
-        showPendingCounter();
+        randomPending(function(data) {
+            showPendingCounter(data.Pending);
+        });
     }
 });
 
-function showPendingCounter() {
-    randomPending(function(data) {
-        if (data.Pending > 0) {
-            $("#pending-counter").html(" <span class='navbar-new'>" + data.Pending + "</span>");
-        } else {
-            $("#pending-counter").html("");
-        }
-    });
+function showPendingCounter(nb) {
+    if (nb > 0) {
+        $("#pending-counter").html(" <span class='navbar-new'>" + nb + "</span>");
+    } else {
+        $("#pending-counter").html("");
+    }
 }
 
 function pickOne() {
@@ -40,10 +40,10 @@ function pickOne() {
         } else {
             var pending = data.Pending;
             pendingConvention = data.C;
+            showPendingCounter(data.Pending);
             if (pending == 0) {
                 success();
             } else {
-                $("#pending-counter").html(" <span class='navbar-new'>" + pending + "</span>");
                 var kn = data.Known;
                 kn.sort(function (a, b) {
                     return a.Lastname.localeCompare(b.Lastname);
@@ -57,14 +57,12 @@ function pickOne() {
 function success() {
     $("#completed").html(100);
     $("#progress").css("width", "100%");
-    $("#alignment-box").hide();
-    $("#nothing").show();
     $("#pending-counter").html("");
+    $("#alignment-box").html("<h5 class='text-center'>Nothing to align</h5>");
 }
 
 function drawProfile(c, kn) {
     $("#alignment-box").show();
-    $("#nothing").hide();
     var student = c.C.Stu;
     var tutor = c.C.Tutor;
     var company = c.C.Company;
@@ -173,6 +171,7 @@ function refresh() {
     } else if (currentPage == "privileges") {
         showPrivileges();
     } else if (currentPage == "pending") {
+        //showPending();
         pickOne();
     } else {
         console.log("Unsupported operation on '" + currentPage + "'");
@@ -296,6 +295,13 @@ function showDetails(s) {
         if (c.Stu.P.Email == s) {
             var buf = Handlebars.getTemplate("student-detail")(c);
             $("#modal").html(buf).modal('show');
+            $('#modal .date').datepicker({format:"dd/mm/yyyy"})
+                .on("changeDate", function(e){
+                    setMidtermDeadline(c.Stu.P.Email, e.date, function(){
+                        c.MidtermReport = e.date;
+                        refresh();
+                    });
+                });
             return false;
         }
     });
@@ -322,8 +328,8 @@ function showPrivileges() {
         });
         var html = Handlebars.getTemplate("privileges")(others);
         $("#privileges").html(html);
+        $('[data-toggle="deluser-confirmation"]').confirmation({onConfirm: rmUser});
     });
-    $('[data-toggle="deluser-confirmation"]').confirmation({onConfirm: rmUser});
 }
 
 function updatePrivilege(select, email) {
@@ -336,8 +342,9 @@ function newUser(m) {
                 $("#lbl-nu-priv").val(), function() {$("#modal").hide()});
 }
 
-function rmUser(btn, m) {
-    deleteUser(m, function() {$(btn).parent().parent().parent().remove();});
+function rmUser() {
+    debugger;
+    deleteUser($(this).attr("user"), function() {$(this).parent().parent().parent().remove();});
 }
 
 function rawTutors() {

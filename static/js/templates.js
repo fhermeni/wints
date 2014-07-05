@@ -12,6 +12,7 @@ Handlebars.getTemplate = function(name) {
                 }
                 Handlebars.templates[name] = Handlebars.compile(data);
             },
+            cache: false,
             async : false
         });
     }

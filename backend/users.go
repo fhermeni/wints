@@ -76,8 +76,7 @@ func NewUser(db *sql.DB, p User) error {
 }
 
 func RmUser(db *sql.DB, email string) error {
-	_,err := db.Exec("DELETE FROM users where email=$1", email)
- 	return err
+	return SingleUpdate(db, "DELETE FROM users where email=$1", email)
 }
 
 func rand_str(str_size int) string {

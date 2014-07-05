@@ -24,7 +24,14 @@
                 <dd>{{date Begin}} to {{date End}}</dd>
 
                 <dt>Midterm report</dt>
-                <dd>{{deadline MidtermReport}}</dd>
+                <dd>
+                    <input type="text" data-provide="datepicker" class="form-control date input-sm" value="{{date MidtermReport}}">
+                    <!--
+                <div class="input-group date">
+                    <input type="text" class="form-control" value="{{date MidtermReport}}">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+                </div>  -->
+                </dd>
             </dl>
 
             <h5>Supervisor: <small>

@@ -67,7 +67,7 @@ func scanConvention(rows *sql.Rows) (Convention, error) {
 }
 
 func GetConvention(db *sql.DB, email string) (Convention, error) {
-	sql := "select stu.firstname, stu.lastname, stu.tel, students.promotion, students.major, startTime, endTime, tut.firstname, tut.lastname, tut.email, tut.tel,"+
+	sql := "select stu.firstname, stu.lastname, stu.email, stu.tel, students.promotion, students.major, startTime, endTime, tut.firstname, tut.lastname, tut.email, tut.tel,"+
 	"midTermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel "+
 	" from internships, users as stu, users as tut, students where students.email = $1 and stu.email = $1 and internships.student = $1 and tut.email = internships.tutor";
 
@@ -103,5 +103,5 @@ func GetConventions(db *sql.DB) ([]Convention, error) {
 }
 
 func SetMidtermDeadline(db *sql.DB, email string, d time.Time) error {
-	return SingleUpdate(db, "update conventions set midtermDeadline=$2 where email=$1", email, d)
+	return SingleUpdate(db, "update internships set midtermDeadline=$2 where student=$1", email, d)
 }

@@ -5,23 +5,24 @@
 - update profile OK
 - tutor alignment OK
 - major alignment OK
-- error reporting
 - permissions: -(students, tutor), major, admin, root   OK
-  major: see all conventions + manipulate major
-  admin: pending conventions
-  root: users permission
+  major: see all conventions + manipulate major OK
+  admin: pending conventions OK
+  root: users permission OK
 - new user OK
 - delete user OK
-- logging
 - init mode OK
-- hide static pages, stay inside "/",
 - rest API in "rest/v1/"  OK
 - confirmation for sensible data
-   -> user deletion
+   -> user deletion OK
    -> alignment with exact matching
 - change password OK
+- tutor can adapt the report deadline OK
 - verify email format when aligning and changing
 - sort by date correctly
+- logging
+- error reporting
+- hide static pages, stay inside "/",
 
 ## Version 2.0 ##
 

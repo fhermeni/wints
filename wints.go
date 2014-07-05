@@ -14,6 +14,7 @@ import (
 	"strconv"
 	"math/rand"
 	"io/ioutil"
+	"time"
 )
 
 const (
@@ -235,8 +236,34 @@ func UpdateMajor(w http.ResponseWriter, r *http.Request, email string) {
 	if !reportIfError(w, "", err) {
 		backend.LogActionInfo(email, "Major of '" + target + "' set to '" + string(m) + "'");
 	}
-
 }
+
+func UpdateMidtermDeadline(w http.ResponseWriter, r *http.Request, email string) {
+	d, err := requiredContent(w, r)
+	if err != nil {
+		return
+	}
+	t, err := time.Parse("2/1/2006", string(d))
+	if reportIfError(w, "Invalid format", err) {
+		return
+	}
+	target,_ := mux.Vars(r)["email"]
+	u, err := backend.GetUser(DB, target);
+	if u.Role == "" {
+		c, err := backend.GetConvention(DB, target)
+		if reportIfError(w, "", err) {
+			return
+		}
+		if c.Tutor.Email != email {
+			http.Error(w, "You cannot update the deadline on a student not under your responsibility", http.StatusForbidden)
+			return
+		}
+	}
+	//Other levels are ok
+	err = backend.SetMidtermDeadline(DB, target, t)
+	reportIfError(w, "", err);
+}
+
 
 func requiredContent(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	cnt, err := ioutil.ReadAll(r.Body)
@@ -337,6 +364,7 @@ func main() {
 	r.HandleFunc(ROOT_API + "/conventions/", RequireRole(GetAllConventions,"major")).Methods("GET")
 	r.HandleFunc(ROOT_API + "/conventions/", RequireRole(CommitPendingConvention,"admin")).Methods("POST")
 	r.HandleFunc(ROOT_API + "/conventions/{email}/major", RequireRole(UpdateMajor, "major")).Methods("POST")
+	r.HandleFunc(ROOT_API + "/conventions/{email}/midterm/deadline", RequireToken(UpdateMidtermDeadline)).Methods("POST")
 	r.HandleFunc(ROOT_API + "/users/", RequireRole(GetAdmins, "admin")).Methods("GET")
 	r.HandleFunc(ROOT_API + "/users/", RequireRole(NewAdmin, "root")).Methods("POST")
 	r.HandleFunc(ROOT_API + "/users/{email}/role", RequireRole(GrantRole, "root")).Methods("POST")
