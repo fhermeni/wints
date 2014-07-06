@@ -1,11 +1,11 @@
 {{#if this}}
     <h3>{{len this}} tutored students</h3>
 
-    <a id='btn-mail-myStudents' class="btn-sm btn-primary"><span class="fui-mail"></span> mail selection</a>
+    <a class="btn-sm btn-primary mail-selection"><span class="fui-mail"></span> mail selection</a>
     <table class="table table-condensed table-hover tablesorter" id="table-myStudents">
         <thead>
         <tr>
-            <th rowspan="2"><label class='checkbox'><input id="general-checkbox-myStudents" type='checkbox' data-toggle='checkbox'/></label></th>
+            <th rowspan="2"><label class='checkbox mailto'><input type='checkbox' data-toggle='checkbox'/></label></th>
             <th rowspan="2">Student</th>
             <th rowspan="2">Promotion</th>
             <th rowspan="2">Major</th>
@@ -23,8 +23,8 @@
             {{#each this}}
                 <tr>
                     <td>
-                        <label class='checkbox'>
-                            <input class='checkbox-mail-myStudents' type='checkbox' data-toggle='checkbox' value='{{Stu.P.Email}}'/>
+                        <label class='checkbox mail-checkbox' data-email="{{Stu.P.Email}}">
+                            <input type='checkbox' data-toggle='checkbox' value='{{Stu.P.Email}}'/>
                         </label>
                     </td>
                     <td><a href='#' onclick="showDetails('{{Stu.P.Email}}')">{{shortFullname Stu.P}}</a></td>

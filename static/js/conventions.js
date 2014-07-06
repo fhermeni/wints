@@ -195,22 +195,39 @@ function getAllConventions() {
     );
 }
 
-function displayMyConventions() {
-    var html = Handlebars.getTemplate("watchlist")(conventions);
-    $("#conventions").html(html);
-    $("#table-conventions").tablesorter({headers: {0: {"sorter": false}}});
-    $('#conventions').find(':checkbox').checkbox();
-    $("#general-checkbox-conventions").on('toggle', toggleConventionCheckboxes);
-    $('.checkbox-mail-conventions').checkbox().on('toggle', function() {
-        return generateMailto("checkbox-mail-conventions", 'btn-mail-conventions');
-    });
+function shiftSelect(e, me, root) {
+    if (e.shiftKey || e.metaKey) {
+        var tr = $(me).closest("tr");
+        var p = tr.prev();
+        while (p.length > 0) {
+            var lbl = p.find(".checkbox");
+            if (lbl.hasClass("checked")) {
+                break;
+            } else {
+                lbl.addClass("checked");
+
+            }
+            p = p.prev();
+        }
+        generateMailto(root);
+    }
 }
 
-function toggleConventionCheckboxes() {
-    var nextState = $("#general-checkbox-conventions").find(":checked").length > 0 ? "check" : "uncheck";
-    $(".checkbox-mail-conventions").checkbox(nextState);
-    generateMailto("checkbox-mail-conventions", 'btn-mail-conventions');
+function toggleMailCheckboxes(root) {
+    var nextState = root.find(".mailto").find(":checked").length > 0 ? "check" : "uncheck";
+    root.find(":checkbox").checkbox(nextState);
+    generateMailto(root);
+}
 
+function displayMyConventions() {
+    var html = Handlebars.getTemplate("watchlist")(conventions);
+    root = $("#conventions");
+    root.html(html);
+    $("#table-conventions").tablesorter({headers: {0: {"sorter": false}}});
+    root.find(':checkbox').checkbox();
+    root.find('tbody').find(':checkbox').checkbox().on('toggle', function(e) {generateMailto(root);});
+    root.find('.checkbox').click(function (e) {shiftSelect(e, this, root);});
+    root.find(".mailto").on('toggle', function() {toggleMailCheckboxes(root);});
 }
 
 function displayMyStudents() {
@@ -218,44 +235,30 @@ function displayMyStudents() {
         return c.Tutor.Email == user.Email;
     });
     var html = Handlebars.getTemplate("myStudents")(myStudents);
-    $("#myStudents").html(html);
+    var root = $("#myStudents").html(html);
     $("#table-myStudents").tablesorter({headers: {0: {"sorter": false}}});
-    $('#myStudents').find(':checkbox').checkbox();
-    $('#general-checkbox-myStudents').on('toggle', toggleMyStudentCheckboxes);
-    $('.checkbox-mail-myStudents').checkbox().on('toggle', function() {
-        return generateMailto("checkbox-mail-myStudents", 'btn-mail-myStudents');
-    });
+    root.find(':checkbox').checkbox();
+    root.find('tbody').find(':checkbox').checkbox().on('toggle', function(e) {generateMailto(root);});
+    root.find('.checkbox').click(function (e) {shiftSelect(e, this, root);});
+    root.find(".mailto").on('toggle', function() {toggleMailCheckboxes(root);});
 }
 
-function toggleMyStudentCheckboxes() {
-    var nextState = $("#general-checkbox-myStudents:checked").length > 0 ? "check" : "uncheck";
-    $(".checkbox-mail-myStudents").checkbox(nextState);
-    generateMailto("checkbox-mail-myStudents", 'btn-mail-myStudents');
-}
+function generateMailto(root) {
+    var checked = root.find(".mail-checkbox.checked");
 
-function generateMailto(cl, btn) {
-    var checked = $("." + cl + ":checked");
     if (checked.length > 0) {
         var emails = [];
         checked.each(function (i, e) {
-            emails.push($(e).val());
+            emails.push($(e).attr("data-email"));
         });
-        $("#" + btn).attr("href","mailto:" + emails.join(","));
+        root.find(".mail-selection").attr("href","mailto:" + emails.join(","));
     } else {
-        $("#" + btn).attr("href","#");
+        root.find(".mail-selection").attr("href","#");
     }
 }
 
 function orderByTutors(cc) {
     var res = [];
-    /*
-    [ {
-        tutor:
-        students:
-        },
-        ...
-        ]
-     */
     var tutors = {};
     var students = {};
     cc.forEach(function (c) {
@@ -275,19 +278,12 @@ function orderByTutors(cc) {
 
 function displayTutors() {
         var html = Handlebars.getTemplate("tutors")(orderByTutors(conventions));
-        $("#assignments").html(html);
+        var root = $("#assignments").html(html);
         $("#table-assignments").tablesorter({headers: {0: {"sorter": false}}});
-        $("#general-checkbox-tutors").checkbox().on('toggle', toggleTutorCheckboxes);
-        $('.checkbox-mail-tutors').checkbox().on('toggle', function() {
-            return generateMailto("checkbox-mail-tutors", 'btn-mail-tutors');
-        });
-}
-
-
-function toggleTutorCheckboxes() {
-    var nextState = $("#general-checkbox-tutors:checked").length > 0 ? "check" : "uncheck";
-    $(".checkbox-mail-tutors").checkbox(nextState);
-    generateMailto("checkbox-mail-tutors", 'btn-mail-tutors');
+    root.find(':checkbox').checkbox();
+    root.find('tbody').find(':checkbox').checkbox().on('toggle', function(e) {generateMailto(root);});
+    root.find('.checkbox').click(function (e) {shiftSelect(e, this, root);});
+    root.find(".mailto").on('toggle', function() {toggleMailCheckboxes(root);});
 }
 
 function showDetails(s) {
@@ -295,7 +291,7 @@ function showDetails(s) {
         if (c.Stu.P.Email == s) {
             var buf = Handlebars.getTemplate("student-detail")(c);
             $("#modal").html(buf).modal('show');
-            $('#modal .date').datepicker({format:"dd/mm/yyyy"})
+            $('#modal').find('.date').datepicker({format:"dd/mm/yyyy"})
                 .on("changeDate", function(e){
                     setMidtermDeadline(c.Stu.P.Email, e.date, function(){
                         c.MidtermReport = e.date;
@@ -336,19 +332,17 @@ function updatePrivilege(select, email) {
     setPrivilege(email, $(select).val());
 }
 
-function newUser(m) {
+function newUser() {
     createUser($("#lbl-nu-fn").val(), $("#lbl-nu-ln").val(),
                 $("#lbl-nu-tel").val(), $("#lbl-nu-email").val(),
                 $("#lbl-nu-priv").val(), function() {$("#modal").hide()});
 }
 
 function rmUser() {
-    debugger;
     deleteUser($(this).attr("user"), function() {$(this).parent().parent().parent().remove();});
 }
 
 function rawTutors() {
-    var tutors = orderByTutors(conventions);
-    var txt = Handlebars.getTemplate("rawTutors")(tutors);
+    var txt = Handlebars.getTemplate("rawTutors")(orderByTutors(conventions));
     $("#modal").html(txt).modal('show');
 }

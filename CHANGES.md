@@ -17,6 +17,7 @@
    -> user deletion OK
    -> alignment with exact matching
 - change password OK
+- shift click support for mailing
 - tutor can adapt the report deadline OK
 - verify email format when aligning and changing
 - sort by date correctly
