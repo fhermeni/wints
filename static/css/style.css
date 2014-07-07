@@ -87,3 +87,12 @@ footer {
     background-color: #E74C3C;
     color: white;
 }
+
+.error-msg {
+    display: none;
+    color: #E74C3C;
+}
+
+.error-msg:target {
+    display: block;
+}

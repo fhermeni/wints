@@ -161,7 +161,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	password := r.PostFormValue("password")
 	_, err := backend.Register(DB, login, password)
 	if err != nil {
-		http.Redirect(w, r, "/?err=badLogin", 302);
+		http.Redirect(w, r, "/#badLogin", 302);
 		return
 	}
 	backend.SetSession(login, w)

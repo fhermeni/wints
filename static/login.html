@@ -30,8 +30,12 @@
                         <input name="password" class="form-control login-field" placeholder="Password" type="password"/>
                         <label class="login-field-icon fui-lock" for="login"></label>
                     </div>
-                    <div id="err"></div>
-                    <input type="submit" class="btn btn-primary btn-lg btn-block" value="Log in">
+                        <div class="error-msg" id="badLogin">
+                            <span class="glyphicon glyphicon-warning-sign"></span>
+                            Invalid email or password
+                        </div>
+
+                        <input type="submit" class="btn btn-primary btn-lg btn-block" value="Log in">
                     <a class="login-link" href="#">Lost your password</a>
                     </form>
                 </div>
