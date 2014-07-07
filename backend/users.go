@@ -10,10 +10,6 @@ import (
 	"net/http"
 )
 
-const (
-	changePassword = "update users set password=$2 where uid=$1"
-)
-
 type User struct {
 	Firstname string
 	Lastname  string
@@ -76,7 +72,12 @@ func NewUser(db *sql.DB, p User) error {
 }
 
 func RmUser(db *sql.DB, email string) error {
-	return SingleUpdate(db, "DELETE FROM users where email=$1", email)
+	err := SingleUpdate(db, "DELETE FROM users where email=$1", email)
+	if err != nil {
+		//The user exists, so it is just it is it is tutoring so.
+		return &BackendError{http.StatusPreconditionFailed, "The user is tutoring students"}
+	}
+	return nil
 }
 
 func rand_str(str_size int) string {

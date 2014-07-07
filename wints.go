@@ -35,12 +35,8 @@ func reportIfError(w http.ResponseWriter, header string, err error) bool {
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
-	n, err := backend.ExtractEmail(r)
-	if reportIfError(w, "", err) {
-		return
-	}
-	if len(n) == 0 {
-		log.Printf("No cookie");
+	_, err := backend.ExtractEmail(r)
+	if err != nil {
 		http.ServeFile(w, r, "static/login.html")
 	} else {
 		http.Redirect(w, r, "/home", 302)
@@ -386,7 +382,7 @@ func main() {
 	r.HandleFunc(ROOT_API + "/users/{email}/password", RequireToken(ChangePassword)).Methods("POST")
 	r.HandleFunc(ROOT_API + "/users/{email}/", RequireToken(ChangeProfile)).Methods("POST")
 	r.HandleFunc(ROOT_API + "/login", Login).Methods("POST")
-	r.HandleFunc(ROOT_API + "/logout", RequireToken(Logout)).Methods("POST")
+	r.HandleFunc(ROOT_API + "/logout", RequireToken(Logout)).Methods("GET")
 	fs := http.Dir("static/")
 	fileHandler := http.FileServer(fs)
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", fileHandler))

@@ -17,7 +17,6 @@
     <script src="static/js/bootstrap.min.js"></script>
     <script src="static/js/bootstrap-select.js"></script>
     <script src="static/js/rest.js"></script>
-    <script src="static/js/logout.js"></script>
     <script src="static/js/profile.js"></script>
     <script src="static/js/handlebars-v1.3.0.js"></script>
     <script src="static/js/templates.js"></script>
@@ -35,7 +34,7 @@
                     <li><a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="fullname">Fullname</span><b class="caret"></b></a><span class="dropdown-arrow"></span>
                         <ul class="dropdown-menu" role="menu">
                             <li><a href="#" onclick="showProfileEditor()"><span class="fui-new"></span> Edit profile</a></li>
-                            <li><a onclick="logout()"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                            <li><a href="api/v1/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
                         </ul>
                     </li>
                     <li class="tutorItem" style="display: none;"><a onclick="showPage(this, 'myStudents');">My students</a></li>
