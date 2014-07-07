@@ -195,6 +195,8 @@ function refresh() {
         displayTutors();
     } else if (currentPage == "privileges") {
         showPrivileges();
+    } else if (currentPage == "defenses") {
+        defenseSchedule();
     } else if (currentPage == "pending") {
         //showPending();
         pickOne();
@@ -314,22 +316,72 @@ function groupByMajor(cc) {
 }
 
 function defenseSchedule() {
-    var byMajor = groupByMajor(conventions);
-    console.log(byMajor);
+    var dates = [
+        new Date(2014, 8, 8),
+        new Date(2014, 8, 10),
+        new Date(2014, 8, 12)
+    ];
+
+    var slots = [];
+    dates.forEach(function (d) {
+        var am = new Date(d);
+        am.setHours(9);
+        var pm = new Date(d);
+        pm.setHours(14);
+        slots.push(am);
+        slots.push(pm);
+    });
+
+    var byMajor = groupByMajor(conventions.filter(function (c) {
+        return c.Stu.Major != "ubinet";
+    }));
     var committees = [];
     var cur = [];
+    committees.push(cur);
     Object.keys(byMajor).forEach(function (m) {
         var cc = byMajor[m];
         cc.forEach(function (c) {
             cur.push(c);
             if (cur.length == 5) {
+                cur = [];
                 committees.push(cur);
             }
-            cur = [];
         });
     });
-    console.log(committees);
+    console.log(committees.length + " half day(s)");
+    //max. nb of committees in parallel
+    var nbInParallel = Math.ceil(committees.length / ( slots.length));
+    console.log("Max number of committees in parallel: " + nbInParallel);
+
+    var schedule = [];
+    for (i = 0; i < slots.length; i++) {
+        schedule[i] = [];
+    }
+
+    for (var i = 0; i < committees.length; ) {
+        for (var t = 0; t < slots.length; t++) {
+            //for each slot;
+            if (!schedule[t]) {
+                schedule[t] = [];
+            }
+            if (schedule[t].length < nbInParallel) {
+                schedule[t].push(committees[i++]);
+                if (i == committees.length) {
+                    break;
+                }
+
+            }
+        }
+    }
+    var groups = [];
+    for (var i = 0; i < slots.length; i++) {
+        groups.push({"slot" : slots[i], "schedule" : schedule[i]});
+    }
+    var html = Handlebars.getTemplate("temporarySchedule")(groups);
+    $("#defenses").html(html);
 }
+
+
 function displayTutors() {
         var html = Handlebars.getTemplate("tutors")(orderByTutors(conventions));
         var root = $("#assignments").html(html);

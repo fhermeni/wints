@@ -73,7 +73,7 @@ Handlebars.registerHelper('rawFullname', function(p) {
 });
 
 Handlebars.registerHelper('majorOptions', function(m) {
-    var opts = ['?', 'iam', 'al','ihm','vim','ubinet','kis','cssr','imafa'];
+    var opts = ['?', 'iam', 'al','ihm','vim','ubinet','kis','cssr','imafa','inum'];
     var b = "";
     if (!m) {
         m = "?";
@@ -106,6 +106,22 @@ Handlebars.registerHelper('date', function(d) {
     var date = new Date(Date.parse(d));
     return date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
 });
+
+Handlebars.registerHelper('slot', function(d) {
+    var date = new Date(Date.parse(d));
+    //console.log(date);
+    return date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear() + " " + date.getHours() + ":00";
+});
+
+Handlebars.registerHelper('majors', function(cc) {
+    majors = {};
+    //console.log(cc);
+    cc.forEach(function (c) {
+        majors[c.Stu.Major] = true;
+    });
+    return Object.keys(majors).join(",");
+});
+
 
 function df(d, active) {
     var date = new Date(Date.parse(d));
