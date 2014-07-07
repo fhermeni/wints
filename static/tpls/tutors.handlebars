@@ -27,7 +27,7 @@
             <td>{{len students}}</td>
             <td>
                 {{#each students}}
-                    <a href='#' onclick="showDetails('{{P.Email}}')">{{shortFullname P}}</a>,
+                    <a class='clickable' onclick="showDetails('{{P.Email}}')">{{shortFullname P}}</a>,
                 {{/each}}
             </td>
         </tr>

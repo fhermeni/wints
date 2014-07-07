@@ -100,3 +100,7 @@ footer {
 .error-msg:target {
     display: block;
 }
+
+.clickable:hover {
+    cursor: pointer;
+}

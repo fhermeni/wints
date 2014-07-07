@@ -73,7 +73,7 @@ Handlebars.registerHelper('rawFullname', function(p) {
 });
 
 Handlebars.registerHelper('majorOptions', function(m) {
-    var opts = ['?', 'al','ihm','vim','ubinet','kis','cssr','imafa'];
+    var opts = ['?', 'iam', 'al','ihm','vim','ubinet','kis','cssr','imafa'];
     var b = "";
     if (!m) {
         m = "?";

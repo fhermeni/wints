@@ -1,0 +1,20 @@
+{{#if this}}
+    <h3>Defenses</h3>
+
+    <p>Simple tools to generate a template for the defense commitees</p>
+
+
+    <div class="form-horizontal">
+        <div id="profileEditor-password-err"></div>
+        <div class="form-group">
+            <label for="lbl-nbDays" class="col-sm-3 control-label">Nb. of days</label>
+            <div class="col-sm-9">
+                <input type="number" class="form-control" id="lbl-nbDays"/>
+            </div>
+        </div>
+    </div>
+
+    <a class="btn btn-info" onclick="defenseSchedule()"> Skeleton</a>
+{{else}}
+    <h5 class="text-center">No defenses to prepare</h5>
+{{/if}}
