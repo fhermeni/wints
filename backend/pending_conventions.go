@@ -23,6 +23,7 @@ const (
 	companyWWW      = 23
 	begin           = 38
 	end             = 39
+	titleIdx		= 50
 	supervisorFn    = 61
 	supervisorLn    = 62
 	supervisorEmail = 63
@@ -83,25 +84,25 @@ func DaemonConventionsPuller(db *sql.DB, url, login, password string, delay time
 func ScanPendingConvention(rows *sql.Rows) (Convention, error) {
 	var stuFn, stuLn, stuTel, stuEmail, promo string
 	var tutorFn, tutorLn, tutorTel, tutorEmail string
-	var supFn, supLn, supTel, supEmail, company, companyWWW string
+	var supFn, supLn, supTel, supEmail, company, companyWWW, title string
 	var start, end, midDeadline time.Time
 
 	err := rows.Scan(&stuFn, &stuLn, &stuEmail, &stuTel, &promo, &start, &end,
 		&tutorFn, &tutorLn, &tutorEmail, &tutorTel, &midDeadline,
-		&company, &companyWWW, &supFn, &supLn, &supEmail, &supTel)
+		&company, &companyWWW, &supFn, &supLn, &supEmail, &supTel, &title)
 	if err != nil {
 		return Convention{}, err
 	}
 	stu := Student{User{stuFn, stuLn, stuEmail, stuTel,""}, promo, ""}
 	tutor := User{tutorFn, tutorLn, tutorEmail, tutorTel, ""}
 	sup := User{supFn, supLn, supEmail, supTel, ""}
-	return Convention{stu, sup, tutor, company, companyWWW, start, end, midDeadline}, nil
+	return Convention{stu, sup, tutor, company, companyWWW, start, end, midDeadline, title}, nil
 }
 
 func GetRawConventions(db *sql.DB) ([]Convention, error) {
 	sql := "select users.firstname, users.lastname, users.email, users.tel, students.promotion, startTime, endTime, tutorFn, " +
 			"tutorLn, tutorEmail, tutorTel, midTermDeadline," +
-			"company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel" +
+			"company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title" +
 			" from pending_internships, users, students where students.email = pending_internships.student and users.email = pending_internships.student"
 
 	rows, err := db.Query(sql)
@@ -143,7 +144,7 @@ func RescanPending(db *sql.DB, c Convention) error {
 	sql := "select student, midTermDeadline," +
 			"company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, starttime, endtime, midtermdeadline" +
 			" from pending_internships where tutorEmail=$1"
-	var student, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel string
+	var student, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title string
 	var md, begin, end time.Time
 
 	//Catch pending interviews with a known tutor
@@ -155,7 +156,7 @@ func RescanPending(db *sql.DB, c Convention) error {
 	defer rows.Close();
 	for rows.Next() {
 		//All
-		rows.Scan(&student, &md, &company, &companyWWW, &supervisorFn, &supervisorLn, &supervisorEmail, &supervisorTel, &begin, &end, &md)
+		rows.Scan(&student, &md, &company, &companyWWW, &supervisorFn, &supervisorLn, &supervisorEmail, &supervisorTel, &begin, &end, &md, &title)
 		//Update the informations and register
 		c.Company = company
 		c.CompanyWWW = companyWWW
@@ -174,8 +175,8 @@ func RescanPending(db *sql.DB, c Convention) error {
 func RegisterPendingInternship(db *sql.DB, c Convention) error {
 	supervisor := c.Sup
 	tutor := c.Tutor
-	_, err := db.Exec("insert into pending_internships (student, startTime, endTime, tutorFn, tutorLn, tutorTel, tutorEmail, midtermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)",
-		c.Stu.P.Email, c.Begin, c.End, tutor.Firstname, tutor.Lastname, tutor.Tel, tutor.Email, c.Begin.Add(TWO_MONTHS), c.Company, c.CompanyWWW, supervisor.Firstname, supervisor.Lastname, supervisor.Email, supervisor.Tel)
+	_, err := db.Exec("insert into pending_internships (student, startTime, endTime, tutorFn, tutorLn, tutorTel, tutorEmail, midtermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14, $15)",
+		c.Stu.P.Email, c.Begin, c.End, tutor.Firstname, tutor.Lastname, tutor.Tel, tutor.Email, c.Begin.Add(TWO_MONTHS), c.Company, c.CompanyWWW, supervisor.Firstname, supervisor.Lastname, supervisor.Email, supervisor.Tel, c.Title)
 	return err
 }
 
@@ -231,10 +232,11 @@ func getRawConventions2(db *sql.DB, url, login, password string, year int, promo
 			return err
 		}
 		companyWWW := clean(record[companyWWW])
+		title := clean(record[titleIdx])
 		if len(companyWWW) != 0 && !strings.HasPrefix(companyWWW, "http") {
 			companyWWW = "http://" + companyWWW
 		}
-		c := Convention{stu, supervisor, tutor, clean(record[company]), companyWWW, startTime, endTime, startTime.Add(TWO_MONTHS)}
+		c := Convention{stu, supervisor, tutor, clean(record[company]), companyWWW, startTime, endTime, startTime.Add(TWO_MONTHS), title}
 		InspectRawConvention(db, c)
 		nb++;
 	}

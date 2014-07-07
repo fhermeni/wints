@@ -4,22 +4,23 @@
     <title>Authentification</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="static/css/bootstrap.min.css">
-    <link rel="stylesheet" href="static/css/style.css">
     <link href="static/css/flat-ui.css" rel="stylesheet">
     <script src="static/js/jquery-2.1.0.min.js"></script>
     <script src="static/js/bootstrap.min.js"></script>
     <script src="static/js/rest.js"></script>
     <script src="static/js/jquery.placeholder.js"></script>
+    <link rel="stylesheet" href="static/css/style.css">
 </head>
 <body class="login-background">
 <div class="container">
+    <div class="text-center bs-danger error-msg" id="badLogin">Invalid email or password</div>
     <div class="login">
         <div class="login-screen">
                 <div class="login-icon">
                     <img src="static/img/LOGO_UNS_couleurs_web.png" style="background: #edeff1; padding: 5px; width: 128px"/>
                     <h4>Welcome to <small>Wints</small></h4>
                 </div>
-                <div class="login-form">
+            <div class="login-form">
                     <form method="post" action="/api/v1/login">
                     <div class="form-group">
                         <input name="login" class="form-control login-field" placeholder="Email" type="text"/>
@@ -30,11 +31,6 @@
                         <input name="password" class="form-control login-field" placeholder="Password" type="password"/>
                         <label class="login-field-icon fui-lock" for="login"></label>
                     </div>
-                        <div class="error-msg" id="badLogin">
-                            <span class="glyphicon glyphicon-warning-sign"></span>
-                            Invalid email or password
-                        </div>
-
                         <input type="submit" class="btn btn-primary btn-lg btn-block" value="Log in">
                     <a class="login-link" href="#">Lost your password</a>
                     </form>

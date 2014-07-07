@@ -354,7 +354,7 @@ func main() {
 		return
 	}
 
-	/*delay, err := time.ParseDuration(cfg.RefreshPeriod)
+	delay, err := time.ParseDuration(cfg.RefreshPeriod)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
@@ -362,7 +362,7 @@ func main() {
 										cfg.WWWConventionsLogin,
 										cfg.WWWConventionsPassword,
 										delay);
-	*/
+
 	//Rest stuff
 	r := mux.NewRouter()
 

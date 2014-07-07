@@ -15,7 +15,7 @@
 - rest API in "rest/v1/"  OK
 - confirmation for sensible data
    -> user deletion OK
-   -> alignment with exact matching
+   -> alignment with exact matching OK
 - change password OK
 - shift click support for mailing OK
 - tutor can adapt the report deadline OK

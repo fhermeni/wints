@@ -88,11 +88,15 @@ footer {
     color: white;
 }
 
+/*.error-msg {
+    background-color: #E74C3C;
+    color: white;
+} */
+
 .error-msg {
     display: none;
-    color: #E74C3C;
+    background-color: #f2dede;
 }
-
 .error-msg:target {
     display: block;
 }

@@ -58,7 +58,6 @@ function randomPending(ok, no) {
 }
 
 function commitPendingConvention(c, ok, no) {
-    console.log(c);
     postWithToken("/conventions/", c, noCb(ok), restError(no));
 }
 

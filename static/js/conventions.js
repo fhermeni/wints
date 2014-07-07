@@ -95,7 +95,6 @@ function drawProfile(c, kn) {
             options += ("<option value='" + t.Email + "'>" + t.Firstname + " " + t.Lastname + "</option>");
         });
 
-
         var best = pickBestMatching(tutor.Lastname, kn);
 
         $("#known-tutor-selector").html(options);
@@ -103,12 +102,36 @@ function drawProfile(c, kn) {
             $("#known-tutor-selector option[value='" + best.Email + "']").attr("selected", "selected");
             $("#btn-choose-known").show();
         }
+        if (best.Lastname == tutor.Lastname) {
+            //Perfect match, favor the theory
+            d=$('#pick-theory');
+            d.confirmation({onConfirm: pickTheory, placement: "top", title: "Are you sure ? 'cause it is a perfect match !"});
+            d.removeAttr("onclick");
+
+            k=$("#btn-choose-known");
+            k.attr("onclick", "pickKnown()");
+            k.confirmation('destroy');
+        } else {
+            d=$('#pick-theory');
+            d.attr("onclick","pickTheory()");
+            d.confirmation('destroy');
+
+            k=$("#btn-choose-known");
+            k.confirmation({onConfirm: pickKnown, placement: "bottom", title: "Are you sure ? 'cause they differ !"});
+            k.removeAttr("onclick");
+
+        }
     }
 
+    drawCompletionBar(c);
+}
+
+function drawCompletionBar(c) {
     var completion = Math.ceil(100 * conventions.length / (c.Pending + conventions.length));
     $("#completed").html(completion);
     $("#progress").css("width", completion + "%");
     $("select").selectpicker({style: 'btn-sm btn-success', menuStyle: 'dropdown-inverse'});
+
 }
 
 function pickBestMatching(tutor, kn) {
@@ -278,6 +301,35 @@ function orderByTutors(cc) {
     return res;
 }
 
+function groupByMajor(cc) {
+    var majors = {};
+    cc.forEach(function (c) {
+        var m = c.Stu.Major;
+        if (!majors[m]) {
+            majors[m] = [];
+        }
+        majors[m].push(c);
+    });
+    return majors;
+}
+
+function defenseSchedule() {
+    var byMajor = groupByMajor(conventions);
+    console.log(byMajor);
+    var committees = [];
+    var cur = [];
+    Object.keys(byMajor).forEach(function (m) {
+        var cc = byMajor[m];
+        cc.forEach(function (c) {
+            cur.push(c);
+            if (cur.length == 5) {
+                committees.push(cur);
+            }
+            cur = [];
+        });
+    });
+    console.log(committees);
+}
 function displayTutors() {
         var html = Handlebars.getTemplate("tutors")(orderByTutors(conventions));
         var root = $("#assignments").html(html);

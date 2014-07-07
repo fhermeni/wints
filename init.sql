@@ -7,16 +7,14 @@ drop table if exists sessions;
 drop table if exists logs;
 drop type if exists app_status;
 drop table if exists users;
-drop type if exists e_roles;
 
 -- user
-create type e_roles as enum('', 'major', 'admin', 'root');
 create table users(email text PRIMARY KEY,
 				  firstname text,
 				  lastname text,
 				  tel text,
 				  password text,
-				  role e_roles
+				  role text
 				  );
 
 -- students
@@ -63,7 +61,8 @@ create table internships(student text PRIMARY KEY REFERENCES students(email),
                         supervisorFn text,
                         supervisorLn text,
                         supervisorEmail text,
-                        supervisorTel text
+                        supervisorTel text,
+                        title text
 );
 
 create table pending_internships(student text PRIMARY KEY REFERENCES students(email),
@@ -79,5 +78,6 @@ create table pending_internships(student text PRIMARY KEY REFERENCES students(em
                         supervisorFn text,
                         supervisorLn text,
                         supervisorEmail text,
-                        supervisorTel text
+                        supervisorTel text,
+                        title text
 )
