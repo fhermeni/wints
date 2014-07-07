@@ -17,13 +17,14 @@
    -> user deletion OK
    -> alignment with exact matching
 - change password OK
-- shift click support for mailing
+- shift click support for mailing OK
 - tutor can adapt the report deadline OK
+- hide static pages, stay inside "/" OK
 - verify email format when aligning and changing
 - sort by date correctly
 - logging
 - error reporting
-- hide static pages, stay inside "/",
+- encoding when pulling conventions
 
 ## Version 2.0 ##
 

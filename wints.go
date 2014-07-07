@@ -6,7 +6,6 @@ import (
 	"github.com/fhermeni/wints/backend"
 	"net/http"
 	"github.com/gorilla/mux"
-	"github.com/gorilla/sessions"
 	"encoding/json"
 	"log"
 	"os"
@@ -21,7 +20,6 @@ const (
 	ROOT_API = "/api/v1"
 )
 var DB *sql.DB
-var store = sessions.NewCookieStore([]byte("wints"))
 
 func reportIfError(w http.ResponseWriter, header string, err error) bool {
 	if err == nil {
@@ -37,7 +35,35 @@ func reportIfError(w http.ResponseWriter, header string, err error) bool {
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
-	http.Redirect(w, r, "static/login.html", 301)
+	n, err := backend.ExtractEmail(r)
+	if reportIfError(w, "", err) {
+		return
+	}
+	if len(n) == 0 {
+		log.Printf("No cookie");
+		http.ServeFile(w, r, "static/login.html")
+	} else {
+		http.Redirect(w, r, "/home", 302)
+	}
+}
+
+func homeHandler(w http.ResponseWriter, r *http.Request) {
+	n, err := backend.ExtractEmail(r)
+	if reportIfError(w, "", err) {
+		return
+	}
+	if len(n) == 0 {
+		log.Printf("No cookie");
+		http.Redirect(w, r, "/", 302)
+	}
+	u, err := backend.GetUser(DB, n)
+ 	if !reportIfError(w, "", err) {
+		if u.Role != "" {
+			http.ServeFile(w, r, "static/admin.html")
+			return
+		}
+		log.Printf("No dashboard available")
+	}
 }
 
 func jsonReply(w http.ResponseWriter, j interface{}) {
@@ -114,6 +140,18 @@ func NewAdmin(w http.ResponseWriter, r *http.Request, email string) {
 	}
 }
 
+func GetUser(w http.ResponseWriter, r *http.Request, email string) {
+	target,_ := mux.Vars(r)["email"]
+	if target != email {
+		http.Error(w, "You cannot get the profile of another person", http.StatusForbidden)
+		return
+	}
+	u, err := backend.GetUser(DB, email)
+	if !reportIfError(w, "", err) {
+		jsonReply(w, u)
+	}
+
+}
 func RmUser(w http.ResponseWriter, r *http.Request, email string) {
 	target,_ := mux.Vars(r)["email"]
 	err := backend.RmUser(DB, target)
@@ -123,41 +161,21 @@ func RmUser(w http.ResponseWriter, r *http.Request, email string) {
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
-	var cred backend.Credential
-	if jsonRequest(w, r, &cred) != nil {
-		return
-	}
-	u, err := backend.Register(DB, cred)
+	login := r.PostFormValue("login")
+	password := r.PostFormValue("password")
+	_, err := backend.Register(DB, login, password)
 	if err != nil {
-		http.Error(w, "Unknown username or incorrect password", http.StatusUnauthorized)
+		http.Redirect(w, r, "/?err=badLogin", 302);
 		return
 	}
-	tok, err := backend.OpenSession(DB, cred.Email)
-	if reportIfError(w, "Unable to open the session", err) {
-		return
-	}
-	s, err := store.Get(r, "wints")
-	if reportIfError(w, "Unable to get the session identifier", err) {
-		return
-	}
-	s.Values["token"] = tok
-	s.Values["email"] = cred.Email
-	s.Save(r, w)
-	w.Header().Add("X-auth-token", string(tok))
-	jsonReply(w, u)
-	backend.LogActionInfo(cred.Email, " log in");
+	backend.SetSession(login, w)
+	backend.LogActionInfo(login, " log in");
+	http.Redirect(w, r, "/", 302);
 }
 
 func Logout(w http.ResponseWriter, r *http.Request, email string) {
-	token := r.Header.Get("X-auth-token")
-	if (len(token) == 0) {
-		http.Error(w, "X-auth-token is missing", http.StatusUnauthorized)
-		return
-	}
-	err := backend.CloseSession(DB, token)
-	if !reportIfError(w, "Unable to logout", err) {
-		backend.LogActionInfo(email, " log out");
-	}
+	backend.ClearSession(w);
+	http.Redirect(w, r, "/", 302);
 }
 
 func CommitPendingConvention(w http.ResponseWriter, r *http.Request, email string) {
@@ -290,34 +308,28 @@ func GrantRole(w http.ResponseWriter, r *http.Request, email string) {
 
 func RequireToken(cb func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		token := r.Header.Get("X-auth-token")
-		if (token == "") {
-			http.Error(w, "Header 'X-auth-token' is missing", http.StatusForbidden)
+		n, _ := backend.ExtractEmail(r)
+		if (len(n) == 0) {
+			http.Redirect(w, r, "/", 302)
+			return
 		}
-		email, err := backend.CheckSession(DB, token)
-		if err != nil {
-			http.Error(w, "Invalid session token", http.StatusUnauthorized)
-		}
-		cb(w, r, email)
+		cb(w, r, n)
 	}
 }
 
 func RequireRole(cb func(http.ResponseWriter, *http.Request, string), role string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		token := r.Header.Get("X-auth-token")
-		if (token == "") {
-			http.Error(w, "Header 'X-auth-token' is missing", http.StatusForbidden)
-		}
-		email, err := backend.CheckSession(DB, token)
-		if err != nil {
-			http.Error(w, "Invalid session token", http.StatusUnauthorized)
+		email, _ := backend.ExtractEmail(r)
+		if (len(email) == 0) {
+			http.Redirect(w, r, "/", 302)
+			return
 		}
 
 		u, _ := backend.GetUser(DB, email)
 		if u.CompatibleRole(role) {
 			cb(w, r, email)
 		} else {
-			http.Error(w, "This operation requires '" + role + "' right but got only '" + u.Role + "'", http.StatusUnauthorized)
+			http.Error(w, "Unsufficient permission", http.StatusUnauthorized)
 		}
 	}
 }
@@ -337,7 +349,7 @@ func main() {
 	}
 
 	if len(os.Args) > 1 && os.Args[1] == "-i" {
-		err := backend.NewUser(DB, backend.User{"R", "oot", "root@localhost", "0662496455", "root"})
+		err := backend.NewUser(DB, backend.User{"R", "oot", "root@localhost", "", "root"})
 		if err != nil {
 			backend.LogError("Unable to create the root account: " + err.Error());
 		} else {
@@ -359,6 +371,7 @@ func main() {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/", rootHandler)
+	r.HandleFunc("/home", homeHandler)
 
 	r.HandleFunc(ROOT_API + "/pending/_random", RequireRole(RandomPendingConvention, "admin")).Methods("GET")
 	r.HandleFunc(ROOT_API + "/conventions/", RequireRole(GetAllConventions,"major")).Methods("GET")
@@ -369,6 +382,7 @@ func main() {
 	r.HandleFunc(ROOT_API + "/users/", RequireRole(NewAdmin, "root")).Methods("POST")
 	r.HandleFunc(ROOT_API + "/users/{email}/role", RequireRole(GrantRole, "root")).Methods("POST")
 	r.HandleFunc(ROOT_API + "/users/{email}", RequireRole(RmUser, "root")).Methods("DELETE")
+	r.HandleFunc(ROOT_API + "/users/{email}", RequireToken(GetUser)).Methods("GET")
 	r.HandleFunc(ROOT_API + "/users/{email}/password", RequireToken(ChangePassword)).Methods("POST")
 	r.HandleFunc(ROOT_API + "/users/{email}/", RequireToken(ChangeProfile)).Methods("POST")
 	r.HandleFunc(ROOT_API + "/login", Login).Methods("POST")

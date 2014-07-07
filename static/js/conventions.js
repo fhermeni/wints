@@ -6,7 +6,9 @@ var currentPage;
 
 $( document ).ready(function () {
     //Check access
-    user = JSON.parse(localStorage.getItem("User"));
+    getProfile(function(d) {
+        user = d;
+    });
 
     if (!user) {
         window.location.href = "/";

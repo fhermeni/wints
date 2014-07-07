@@ -6,34 +6,34 @@
 
 var ROOT_API = "/api/v1";
 
-function callWithToken(method, url, successCb, errorCb) {
+function callWithToken(method, url, successCb, restError) {
     return $.ajax({
         method: method,
         url: ROOT_API + url,
         headers: {"X-auth-token" : localStorage.getItem("token")}
-    }).done(successCb).fail(errorCb);
+    }).done(successCb).fail(restError);
 }
 
-function postWithToken(url, data, successCb, errorCb) {
+function postWithToken(url, data, successCb, restError) {
     return $.ajax({
         method: "POST",
         url: ROOT_API + url,
         data: JSON.stringify(data),
         headers: {"X-auth-token" : localStorage.getItem("token")}
-    }).done(successCb).fail(errorCb);
+    }).done(successCb).fail(restError);
 }
 
-function postRawWithToken(url, data, successCb, errorCb) {
+function postRawWithToken(url, data, successCb, restError) {
     return $.ajax({
         method: "POST",
         url: ROOT_API + url,
         data: data,
         contentType: "text/plain",
         headers: {"X-auth-token" : localStorage.getItem("token")}
-    }).done(successCb).fail(errorCb);
+    }).done(successCb).fail(restError);
 }
 
-function defaultCb(no) {
+function noCb(no) {
     if (no != undefined) {
         return no;
     }
@@ -42,57 +42,75 @@ function defaultCb(no) {
     };
 }
 
+function restError(no) {
+    if (no) {
+        return no;
+    }
+    return function(jqr, type, status) {
+        var html = Handlebars.getTemplate("error")(jqr);
+        $("#modal").html(html).modal('show');
+    }
+}
+
 //Convention management
 function randomPending(ok, no) {
-    callWithToken("GET", "/pending/_random", defaultCb(ok), defaultCb(no));
+    callWithToken("GET", "/pending/_random", noCb(ok), restError(no));
 }
 
 function commitPendingConvention(c, ok, no) {
     console.log(c);
-    postWithToken("/conventions/", c, defaultCb(ok), defaultCb(no));
+    postWithToken("/conventions/", c, noCb(ok), restError(no));
 }
 
 function getConventions(ok, no) {
-    callWithToken("GET", "/conventions/",defaultCb(ok), defaultCb(no));
+    callWithToken("GET", "/conventions/",noCb(ok), restError(no));
 }
 
 //User management
 function createUser(fn, ln, tel, email, priv, ok, no) {
-    postWithToken("/users/", {Firstname: fn, Lastname: ln, Tel: tel, Email: email, Priv: priv}, defaultCb(ok), defaultCb(no));
+    postWithToken("/users/", {Firstname: fn, Lastname: ln, Tel: tel, Email: email, Priv: priv}, noCb(ok), restError(no));
 }
 
 function deleteUser(email, ok, no) {
-    callWithToken("DELETE", "/users/" + email, defaultCb(ok),  defaultCb(no));
+    callWithToken("DELETE", "/users/" + email, noCb(ok),  restError(no));
 }
 
 function getUsers(ok, no) {
-    callWithToken("GET", "/users/", defaultCb(ok), defaultCb(no));
+    callWithToken("GET", "/users/", noCb(ok), restError(no));
 }
 
+function getProfile(ok, no) {
+    return $.ajax({
+        method: "GET",
+        url: ROOT_API + "/users/" + $.cookie("session"),
+        async: false
+    }).done(noCb(ok)).fail(restError(no));
+
+}
 function setPrivilege(email, p, ok, no) {
-    postRawWithToken("/users/" + email + "/role", p, defaultCb(ok), defaultCb(no));
+    postRawWithToken("/users/" + email + "/role", p, noCb(ok), restError(no));
 }
 
 function setMajor(email, p, ok, no) {
-    postRawWithToken("/conventions/" + email + "/major", p, defaultCb(ok), defaultCb(no));
+    postRawWithToken("/conventions/" + email + "/major", p, noCb(ok), restError(no));
 }
 
 function setMidtermDeadline(email, d, ok, no) {
     var fmt = d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
-    postRawWithToken("/conventions/" + email + "/midterm/deadline", fmt, defaultCb(ok), defaultCb(no));
+    postRawWithToken("/conventions/" + email + "/midterm/deadline", fmt, noCb(ok), restError(no));
 }
 
 
 //Profile management
 function setProfile(fn, ln, tel, ok, no) {
-    postWithToken("/users/" + user.Email + "/", {Firstname: fn, Lastname:ln, Tel: tel}, defaultCb(ok), defaultCb(no))
+    postWithToken("/users/" + user.Email + "/", {Firstname: fn, Lastname:ln, Tel: tel}, noCb(ok), restError(no))
 }
 
 function setPassword(oldP, newP, ok, no) {
-    postWithToken("/users/" + user.Email + "/password", {OldPassword:oldP, NewPassword:newP}, defaultCb(ok), defaultCb(no));
+    postWithToken("/users/" + user.Email + "/password", {OldPassword:oldP, NewPassword:newP}, noCb(ok), restError(no));
 }
 
 //authentication
 function login(email, password, ok, no) {
-    return postWithToken("/login", {Email: email, Password: password}, defaultCb(ok), defaultCb(no));
+    return postWithToken("/login", {Email: email, Password: password}, noCb(ok), restError(no));
 }

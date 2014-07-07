@@ -39,19 +39,19 @@ func (p User) CompatibleRole(r string) bool {
 	return false;
 }
 
-func Register(db *sql.DB, c Credential) (User, error) {
+func Register(db *sql.DB, email, password string) (User, error) {
 	var fn, ln, tel, p, r string
-	err := db.QueryRow("select firstname, lastname, tel, password, role from users where email=$1", c.Email).Scan(&fn, &ln, &tel, &p, &r)
+	err := db.QueryRow("select firstname, lastname, tel, password, role from users where email=$1", email).Scan(&fn, &ln, &tel, &p, &r)
 	if err != nil {
-		log.Printf("Unknown user %s: ‰s\n", c.Email, err)
+		log.Printf("Unknown user %s: ‰s\n", email, err)
 		return User{}, errors.New("Unknown user or incorrect password")
 	}
-	if (bcrypt.CompareHashAndPassword([]byte(p), []byte(c.Password)) != nil) {
-		log.Printf("Bad password for %s\n", c.Email)
+	if (bcrypt.CompareHashAndPassword([]byte(p), []byte(password)) != nil) {
+		log.Printf("Bad password for %s\n", email)
 		return User{}, errors.New("Unknown user or incorrect password")
 	}
 
-	return User{fn, ln, c.Email, tel, r}, nil
+	return User{fn, ln, email, tel, r}, nil
 }
 
 func NewUser(db *sql.DB, p User) error {

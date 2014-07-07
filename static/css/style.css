@@ -82,3 +82,8 @@ footer {
     font-size: 12pt;
     font-family: courier;
 }
+
+.error-modal {
+    background-color: #E74C3C;
+    color: white;
+}

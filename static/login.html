@@ -3,42 +3,37 @@
 <head>
     <title>Authentification</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/style.css">
-    <link href="css/flat-ui.css" rel="stylesheet">
-    <script src="js/jquery-2.1.0.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/rest.js"></script>
-    <script src="js/client.js"></script>
-    <script src="js/bootstrap-select.js"></script>
-    <script src="js/bootstrap-switch.js"></script>
-    <script src="js/flatui-checkbox.js"></script>
-    <script src="js/flatui-radio.js"></script>
-    <script src="js/jquery.tagsinput.js"></script>
-    <script src="js/jquery.placeholder.js"></script>
-
+    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/css/style.css">
+    <link href="static/css/flat-ui.css" rel="stylesheet">
+    <script src="static/js/jquery-2.1.0.min.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
+    <script src="static/js/rest.js"></script>
+    <script src="static/js/jquery.placeholder.js"></script>
 </head>
 <body class="login-background">
 <div class="container">
     <div class="login">
         <div class="login-screen">
                 <div class="login-icon">
-                    <img src="img/LOGO_UNS_couleurs_web.png" style="background: #edeff1; padding: 5px; width: 128px"/>
+                    <img src="static/img/LOGO_UNS_couleurs_web.png" style="background: #edeff1; padding: 5px; width: 128px"/>
                     <h4>Welcome to <small>Wints</small></h4>
                 </div>
                 <div class="login-form">
+                    <form method="post" action="/api/v1/login">
                     <div class="form-group">
-                        <input id="login" class="form-control login-field" placeholder="Email" type="text"/>
+                        <input name="login" class="form-control login-field" placeholder="Email" type="text"/>
                         <label class="login-field-icon fui-user" for="login"></label>
                     </div>
 
                     <div class="form-group" id="group-password">
-                        <input id="password" class="form-control login-field" placeholder="Password" type="password"/>
+                        <input name="password" class="form-control login-field" placeholder="Password" type="password"/>
                         <label class="login-field-icon fui-lock" for="login"></label>
                     </div>
                     <div id="err"></div>
-                    <a class="btn btn-primary btn-lg btn-block" onclick="doLogin()">Log in</a>
+                    <input type="submit" class="btn btn-primary btn-lg btn-block" value="Log in">
                     <a class="login-link" href="#">Lost your password</a>
+                    </form>
                 </div>
         </div>
     </div>
