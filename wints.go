@@ -156,6 +156,19 @@ func RmUser(w http.ResponseWriter, r *http.Request, email string) {
 	}
 }
 
+func GetDefense(w http.ResponseWriter, r *http.Request, email string) {
+	http.ServeFile(w, r, "defenses.json");
+}
+
+func PostDefense(w http.ResponseWriter, r *http.Request, email string) {
+	cnt, err := ioutil.ReadAll(r.Body)
+	if reportIfError(w, "", err) {
+		return
+	}
+	err = ioutil.WriteFile("defenses.json", cnt, 0644)
+	reportIfError(w, "", err)
+}
+
 func Login(w http.ResponseWriter, r *http.Request) {
 	login := r.PostFormValue("login")
 	password := r.PostFormValue("password")
@@ -383,6 +396,8 @@ func main() {
 	r.HandleFunc(ROOT_API + "/users/{email}/", RequireToken(ChangeProfile)).Methods("POST")
 	r.HandleFunc(ROOT_API + "/login", Login).Methods("POST")
 	r.HandleFunc(ROOT_API + "/logout", RequireToken(Logout)).Methods("GET")
+	r.HandleFunc(ROOT_API + "/defenses", RequireRole(GetDefense, "admin")).Methods("GET")
+	r.HandleFunc(ROOT_API + "/defenses", RequireRole(PostDefense, "admin")).Methods("POST")
 	fs := http.Dir("static/")
 	fileHandler := http.FileServer(fs)
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", fileHandler))

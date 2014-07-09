@@ -1,0 +1,54 @@
+<html>
+<head>
+    <title>Planing des soutenances</title>
+    <style type="text/css">
+        .jury {
+            float: left;
+        }
+        .session {
+            clear: both;
+        }
+    </style>
+    <style media="screen" type="text/css">
+        .jury {
+            width: 25%;
+        }
+    </style>
+    <style media="print" type="text/css">
+        .jury {
+            width: 50%
+        }
+        .jury {
+            page-break-after: always;
+        }
+    </style>
+</head>
+<body>
+{{#each sessions}}
+
+    <div class="session">
+    <h1>{{slotDate date}}</h1>
+    {{#each jury}}
+        <div class="jury">
+            <h2>Session {{inc @index}} ({{majors students}})</h2>
+
+            <!--<p>
+                <b>Room</b>: {{room}}<br/>
+                <b>Jury</b>:
+            </p>
+            <ul>
+                {{#each commission}}
+                    <li>{{this}}</li>
+                {{/each}}
+            </ul>
+            <p>
+            {{#each students}}
+                <b>{{offset @index ../../date}}</b>: {{slotEntry this}}<br/>
+            {{/each}}
+            </p>  -->
+        </div>
+    {{/each}}
+    </div>
+{{/each}}
+</body>
+</html>

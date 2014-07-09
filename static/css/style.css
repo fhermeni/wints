@@ -44,10 +44,6 @@ tbody {
 .login {
     margin-top: 100px;
 }
-
-.clickable {
-    cursor : pointer;
-}
 .stat-type {
     padding-right: 20px;
     padding-left: 3px;
@@ -103,4 +99,49 @@ footer {
 
 .clickable:hover {
     cursor: pointer;
+}
+
+/* sortable */
+
+ol.students {
+    border: 1px solid #999999;
+    list-style-type: none;
+    margin: 0 0 9px 0;
+    padding: 0;
+    font-size: 10pt;
+    min-height: 100pt;
+}
+
+ol.students li {
+    display: block;
+    margin: 3px;
+    padding: 2px 5px 2px 5px;
+    border: 1px solid #cccccc;
+    color: #0088cc;
+    background: #eeeeee;
+}
+body.dragging, body.dragging * {
+    cursor: move !important;
+}
+
+.dragged {
+    position: absolute;
+    opacity: 0.5;
+    z-index: 2000;
+}
+
+ol.all-students {
+    min-height: 500pt;
+}
+ol.students li.placeholder {
+    position: relative;
+    /** More li styles **/
+}
+ol.students li.placeholder:before {
+    position: absolute;
+    /** Define arrowhead **/
+}
+
+.page-header {
+    margin-top: 20px;
 }

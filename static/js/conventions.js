@@ -1,8 +1,9 @@
 var pendingConvention;
 var conventions;
 var user;
-
+var defenses;
 var currentPage;
+
 
 $( document ).ready(function () {
     //Check access
@@ -196,7 +197,8 @@ function refresh() {
     } else if (currentPage == "privileges") {
         showPrivileges();
     } else if (currentPage == "defenses") {
-        defenseSchedule();
+        //defenseSchedule();
+        showDefenses();
     } else if (currentPage == "pending") {
         //showPending();
         pickOne();
@@ -315,70 +317,254 @@ function groupByMajor(cc) {
     return majors;
 }
 
-function defenseSchedule() {
-    var dates = [
-        new Date(2014, 8, 8),
-        new Date(2014, 8, 10),
-        new Date(2014, 8, 12)
-    ];
-
-    var slots = [];
-    dates.forEach(function (d) {
-        var am = new Date(d);
-        am.setHours(9);
-        var pm = new Date(d);
-        pm.setHours(14);
-        slots.push(am);
-        slots.push(pm);
+function showDefenses() {
+    getDefenses(function(data) {
+        defenses = data;
+        var html = Handlebars.getTemplate("defense-init")(defenses);
+        $("#defenses").html(html);
+        displayDefensesForm();
+    }, function() {
+        console.log("unknown");
+        defenses = {
+            filter: "",
+            sessions: []
+        };
+        var html = Handlebars.getTemplate("defense-init")(defenses);
+        $("#defenses").html(html);
     });
+}
 
-    var byMajor = groupByMajor(conventions.filter(function (c) {
-        return c.Stu.Major != "ubinet";
-    }));
-    var committees = [];
-    var cur = [];
-    committees.push(cur);
-    Object.keys(byMajor).forEach(function (m) {
-        var cc = byMajor[m];
-        cc.forEach(function (c) {
-            cur.push(c);
-            if (cur.length == 5) {
-                cur = [];
-                committees.push(cur);
+function filterConventions() {
+    var filter = $("#lbl-filter").val();
+    if (filter.length == 0) {
+        filter = "";
+    }
+    var filtered = [];
+    try {
+        filtered = conventions.filter(function (c) {
+            return eval(filter);
+        });
+        $("#lbl-filter-infos").html("<i class='glyphicon glyphicon-ok'>(" + filtered.length + " student(s))</i>");
+    } catch (e) {
+        $("#lbl-filter-infos").html("<i class='glyphicon glyphicon-remove'></i>");
+    }
+    return filtered;
+}
+
+function nextSession(d) {
+    var n;
+    if (d.getHours() == 9) {
+        n = new Date(d);
+        n.setHours(14);
+    }
+    if (d.getHours() == 14) {
+        n = new Date(d.getTime() + 86400000);
+        n.setHours(9);
+    }
+    return n;
+}
+
+function saveSessionDate(i) {
+    var id = $(i).attr("data-session");
+    defenses.sessions[id].date = $(i).val();
+    saveDefenses(defenses);
+}
+
+function saveRoom(i) {
+    var idx = $(i).attr("data-jury");
+    var r = $(i).val();
+    defenses.sessions.forEach(function (s) {
+        s.jury.forEach(function (x) {
+            if (x.id == idx) {
+                x.room = r;
+                return false;
+            }
+        })
+    });
+    saveDefenses(defenses);
+}
+
+function saveJury(i) {
+    var idx = $(i).attr("data-jury");
+    var jidx = $(i).attr("data-jury-idx");
+    var m = $(i).val();
+    defenses.sessions.forEach(function (s) {
+        s.jury.forEach(function (x) {
+            if (x.id == idx) {
+                x.commission[jidx] = m;
+                return false;
+            }
+        })
+    });
+    saveDefenses(defenses);
+}
+
+function saveLists() {
+    var raw = [];
+    var pool = [];
+    $(".students").each(function (idx, l) {
+        var id = $(l).attr("data-jury");
+        $(l).find("li").each(function (i, s) {
+            var e = $(s).attr("data-email");
+            if (id == -1) {
+                console.log(e);
+                pool.push(e);
+            } else {
+                if (!raw[id]) {
+                    raw[id] = [];
+                }
+                raw[id].push(e);
             }
         });
     });
-    console.log(committees.length + " half day(s)");
-    //max. nb of committees in parallel
-    var nbInParallel = Math.ceil(committees.length / ( slots.length));
-    console.log("Max number of committees in parallel: " + nbInParallel);
+    defenses.sessions.forEach(function (s){
+        s.jury.forEach(function (j) {
+            j.students=raw[j.id];
+        });
+    });
+    defenses.pool = pool;
+    saveDefenses(defenses);
+}
+
+function prepareSchedule() {
+
+    var nbSlots = $("#lbl-nbSlots").val();
+    if (nbSlots == 0) {
+        return;
+    }
+    defenses = {
+        filter : $("#lbl-filter").val(),
+        pool: [],
+        tutors : extractTutors(conventions)
+    };
+
+    var byMajor = groupByMajor(filterConventions());
+    var groups = [];
+    var group = [];
+    groups.push(group);
+    Object.keys(byMajor).forEach(function (m) {
+        var cc = byMajor[m];
+        cc.forEach(function (c) {
+            group.push(c.Stu.P.Email);
+            if (group.length == 5) {
+                group = [];
+                groups.push(group);
+            }
+        });
+    });
+
+    var nbInParallel = Math.ceil(groups.length / nbSlots);
 
     var schedule = [];
-    for (i = 0; i < slots.length; i++) {
-        schedule[i] = [];
-    }
 
-    for (var i = 0; i < committees.length; ) {
-        for (var t = 0; t < slots.length; t++) {
+    for (var i = 0; i < groups.length; ) {
+        for (var t = 0; t < nbSlots; t++) {
             //for each slot;
             if (!schedule[t]) {
                 schedule[t] = [];
             }
             if (schedule[t].length < nbInParallel) {
-                schedule[t].push(committees[i++]);
-                if (i == committees.length) {
+                schedule[t].push(groups[i++]);
+                if (i == groups.length) {
                     break;
                 }
 
             }
         }
     }
-    var groups = [];
-    for (var i = 0; i < slots.length; i++) {
-        groups.push({"slot" : slots[i], "schedule" : schedule[i]});
+
+
+    defenses["sessions"] = [];
+    var d = new Date();
+    d = new Date(d.getTime() + 86400000);
+    d.setMinutes(0);
+    d.setSeconds(0);
+    d.setHours(9);                                         //tomorrow 9am
+    var idx = 0;
+    for (var i = 0; i < nbSlots; i++) {
+        var session = {
+            date : d,
+            jury : []
+        };
+        schedule[i].forEach(function (s) {
+            //Middle of each students, we add a break
+            s.splice((s.length + 1)/2, 0, undefined);
+           var j = {
+               room: "?",
+               commission: ["","",""],
+               students : s,
+               id: idx
+           };
+           session.jury.push(j);
+           idx++;
+        });
+        d = nextSession(d);
+        defenses["sessions"].push(session);
     }
-    var html = Handlebars.getTemplate("temporarySchedule")(groups);
-    $("#defenses").html(html);
+    show_session(0);
+    saveDefenses(defenses);
+    displayDefensesForm();
+}
+
+function getConvention(m) {
+    var res = undefined;
+    conventions.forEach(function(c) {
+        if (c.Stu.P.Email == m) {
+            res = c;
+            return false;
+        }
+    });
+    return res;
+}
+
+function resetDefense() {
+    defenses = undefined;
+    displayDefensesForm();
+}
+
+function displayDefensesForm() {
+    var html = Handlebars.getTemplate("defenses-form")(defenses);
+    $("#defenses-form").html(html);
+    $(".students").sortable({
+        group:'students',
+        pullPlaceholder: false,
+        onDrop: function ($item, container, _super, event) {
+            $item.removeClass("dragged").removeAttr("style");
+            $("body").removeClass("dragging");
+            saveLists();
+        },
+        // set item relative to cursor position
+        onDragStart: function ($item, container, _super) {
+            var offset = $item.offset(),
+                pointer = container.rootGroup.pointer;
+
+            adjustment = {
+                left: pointer.left - offset.left,
+                top: pointer.top - offset.top
+            };
+
+            _super($item, container)
+        },
+        onDrag: function ($item, position) {
+            $item.css({
+                left: position.left - adjustment.left,
+                top: position.top - adjustment.top
+            })
+        }
+    });
+    show_session(0);
+}
+
+function displayProgram() {
+    var html = Handlebars.getTemplate("defenses-program")(defenses);
+    var w = window.open();
+    $(w.document.body).html(html);
+}
+
+function displayPlanning() {
+    var html = Handlebars.getTemplate("defenses-planning")(defenses);
+    var w = window.open();
+    $(w.document.body).html(html);
 }
 
 
@@ -451,4 +637,37 @@ function rmUser() {
 function rawTutors() {
     var txt = Handlebars.getTemplate("rawTutors")(orderByTutors(conventions));
     $("#modal").html(txt).modal('show');
+}
+
+//defenses stuff
+function show_session(nb) {
+    $(".defense-session").each(function (idx, d) {
+        if (nb == idx) {
+            $(d).show();
+        }
+        else {
+            $(d).hide();
+        }
+    });
+
+    $(".defenses-pages li").each(function (idx, d) {
+        if (nb + 1 == idx) {
+            $(d).addClass("active");
+        }
+        else {
+            $(d).removeClass("active");
+        }
+    });
+}
+
+function extractTutors(cc) {
+    var tutors = {};
+    var cnt = [];
+    cc.forEach(function (c) {
+        if (!tutors[c.Tutor.Email]) {
+            tutors[c.Tutor.Email] = true;
+            cnt.push(c.Tutor);
+        }
+    });
+    return cnt;
 }

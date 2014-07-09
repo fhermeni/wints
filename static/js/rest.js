@@ -9,8 +9,7 @@ var ROOT_API = "/api/v1";
 function callWithToken(method, url, successCb, restError) {
     return $.ajax({
         method: method,
-        url: ROOT_API + url,
-        headers: {"X-auth-token" : localStorage.getItem("token")}
+        url: ROOT_API + url
     }).done(successCb).fail(restError);
 }
 
@@ -18,8 +17,7 @@ function postWithToken(url, data, successCb, restError) {
     return $.ajax({
         method: "POST",
         url: ROOT_API + url,
-        data: JSON.stringify(data),
-        headers: {"X-auth-token" : localStorage.getItem("token")}
+        data: JSON.stringify(data)
     }).done(successCb).fail(restError);
 }
 
@@ -28,8 +26,7 @@ function postRawWithToken(url, data, successCb, restError) {
         method: "POST",
         url: ROOT_API + url,
         data: data,
-        contentType: "text/plain",
-        headers: {"X-auth-token" : localStorage.getItem("token")}
+        contentType: "text/plain"
     }).done(successCb).fail(restError);
 }
 
@@ -112,4 +109,12 @@ function setPassword(oldP, newP, ok, no) {
 //authentication
 function login(email, password, ok, no) {
     return postWithToken("/login", {Email: email, Password: password}, noCb(ok), restError(no));
+}
+
+function saveDefenses(d, ok, no) {
+    return postWithToken("/defenses", d, noCb(ok), restError(no));
+}
+
+function getDefenses(ok, no) {
+    callWithToken("GET", "/defenses",noCb(ok), restError(no));
 }

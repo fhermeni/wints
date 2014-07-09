@@ -7,11 +7,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="static/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link rel="stylesheet" href="static/css/flat-ui.css">
-    <link rel="stylesheet" href="static/css/datepicker3.css">
+    <!--<link rel="stylesheet" href="static/css/my-flat-ui.css">-->
+    <!--<link rel="stylesheet" href="static/css/datepicker3.css">-->
     <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="static/css/bootstrap-datetimepicker.min.css">
     <script src="static/js/jquery-2.1.0.min.js"></script>
     <script src="static/js/jquery.cookie.js"></script>
-    <script src="static/js/bootstrap-datepicker-fixed.js"></script>
+    <script src="static/js/moment-with-langs.min.js"></script>
+    <!--<script src="static/js/langs.min.js"></script>-->
+    <script src="static/js/bootstrap-datetimepicker.min.js"></script>
+    <!--<script src="static/js/bootstrap-datepicker-fixed.js"></script>-->
     <script src="static/js/flatui-radio.js"></script>
     <script src="static/js/flatui-checkbox.js"></script>
     <script src="static/js/bootstrap.min.js"></script>
@@ -24,6 +29,7 @@
     <script src="static/js/jquery.tablesorter.min.js"></script>
     <script src="static/js/mustache.js"></script>
     <script src="static/js/bootstrap-confirmation.js"></script>
+    <script src="static/js/jquery-sortable-min.js"></script>
 </head>
 <body>
 <div class="container">
@@ -40,12 +46,12 @@
                     <li class="tutorItem" style="display: none;"><a onclick="showPage(this, 'myStudents');">My students</a></li>
                     <li class="majorItem adminItem rootItem" style="display: none;"><a onclick="showPage(this, 'conventions');">Watchlist</a></li>
                     <li class="adminItem rootItem" style="display: none;"><a onclick="showPage(this, 'pending')">Pending conventions <span id="pending-counter"></span></a></li>
-                    <li class="adminItem rootItem" style="display: none;"><a onclick="showPage(this, 'defenses')">Defenses</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li class="adminItem rootItem" style="display: none">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="fui-gear"></span><b class="caret"></b></a><span class="dropdown-arrow"></span>
                         <ul class="dropdown-menu" role="menu">
+                            <li class="adminItem rootItem" style="display: none;"><a onclick="showPage(this, 'defenses')">Defenses</a></li>
                             <li class="adminItem rootItem" style="display: none;"><a onclick="showPage(undefined, 'assignments')">Tutors</a></li>
                             <li class="rootItem" style="display: none;"><a onclick="showPage(undefined, 'privileges')">Permissions</a></li>
                         </ul>

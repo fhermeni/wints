@@ -57,7 +57,7 @@ Handlebars.registerHelper('shortCompany', function(c) {
 Handlebars.registerHelper('deadline', function(d) {
     var date = new Date(Date.parse(d));
     var now = new Date();
-    var str = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
+    var str = twoD(date.getDate()) + "/" + twoD(date.getMonth() + 1) + "/" + twoD(date.getFullYear());
     if (now.getMilliseconds() > date.getMilliseconds()) {
         return new Handlebars.SafeString("<span class='late'>" + str + "</span>");
     }
@@ -104,24 +104,78 @@ Handlebars.registerHelper('roleOptions', function(m) {
 
 Handlebars.registerHelper('date', function(d) {
     var date = new Date(Date.parse(d));
-    return date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
+    return twoD(date.getDate()) + "/" + twoD(date.getMonth() + 1) + "/" + twoD(date.getFullYear());
 });
 
 Handlebars.registerHelper('slot', function(d) {
     var date = new Date(Date.parse(d));
-    //console.log(date);
-    return date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear() + " " + date.getHours() + ":00";
+    return twoD(date.getDate()) + "/" + twoD(date.getMonth() + 1) + "/" + date.getFullYear() + " " + twoD(date.getHours()) + ":00";
 });
 
-Handlebars.registerHelper('majors', function(cc) {
-    majors = {};
-    //console.log(cc);
-    cc.forEach(function (c) {
-        majors[c.Stu.Major] = true;
+Handlebars.registerHelper('majors', function(emails) {
+    var majors = {};
+    emails.forEach(function (e) {
+        if (e) {
+            c = getConvention(e);
+            majors[c.Stu.Major] = true;
+        }
     });
-    return Object.keys(majors).join(",");
+    return Object.keys(majors).join(", ");
 });
 
+
+Handlebars.registerHelper('offset', function(i, date) {
+    var offset = i * 30 * 60 * 1000;
+    var from = new Date(new Date(date).getTime() + offset);
+    var to = new Date(from.getTime() + 30 * 60 * 1000);
+    var str = twoD(from.getHours()) + ":" + twoD(from.getMinutes()) + " - " + twoD(to.getHours()) + ":" + twoD(to.getMinutes());
+    return str;
+});
+
+function twoD(d) {
+    return d <= 9 ? "0" + d : d;
+}
+
+Handlebars.registerHelper('committeeOptions', function(a, opts) {
+    b = "<option >?</option>";
+    opts.forEach(function (o) {
+        var fn = o.Firstname + " " + o.Lastname;
+        var selected = a == fn ? " selected " : "";
+        b += "<option " + selected +">" + fn + "</option>";
+    });
+    return new Handlebars.SafeString(b);
+});
+
+Handlebars.registerHelper('inc', function(d) {
+    return d + 1;
+});
+
+Handlebars.registerHelper('slotEntry', function(e) {
+    if (e) {
+        var c = getConvention(e);
+        return c.Stu.P.Firstname + " " + c.Stu.P.Lastname + " (" + c.Stu.Major + ")";
+    }
+    return "Break";
+});
+
+Handlebars.registerHelper('slotDate', function(s) {
+    var m = moment(s, "DD/MM/YYYY HH:mm");
+    m.lang("fr");
+    return m.format("dddd D MMMM YYYY, HH:mm");
+});
+
+
+Handlebars.registerHelper('shortSlotEntry', function(s) {
+    if (e) {
+        var c = getConvention(e);
+        var fn = c.Stu.P.Firstname + " " + c.Stu.P.Lastname;
+        if (fn.length > 30) {
+            fn =  fn.substring(0, 27) + "...";
+        }
+        return fn + " (" + s.Major + ")";
+    }
+    return "Break";
+});
 
 function df(d, active) {
     var date = new Date(Date.parse(d));

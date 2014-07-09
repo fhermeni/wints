@@ -1,0 +1,28 @@
+<html>
+<head></head>
+<body>
+{{#each sessions}}
+    {{#each slots}}
+        <h1>Session {{date ../date}}</h1>
+        <ul>
+            <li>Room: {{room}}</li>
+            <li>Jury:
+                <ul>
+                    {{#each committee}}
+                        <li>{{this}}</li>
+                    {{/each}}
+                </ul>
+            </li>
+        </ul>
+
+        {{#each students}}
+            <h2>{{offset @index ../../date}} {{fullname Stu.P}} - {{Stu.Promotion}}/{{Stu.Major}}</h2>
+            <ul>
+                <li>Company: {{Company}}</li>
+                <li>Title: "{{Title}}"</li>
+            </ul>
+        {{/each}}
+    {{/each}}
+{{/each}}
+</body>
+</html>
