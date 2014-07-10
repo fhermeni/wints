@@ -5,22 +5,22 @@
     <thead>
     <tr>
         <th rowspan="2">
-            <label class='checkbox mailto'>
-                <input id="foo" type='checkbox' data-toggle='checkbox'/>
+            <label class='checkbox mailto-students'>
+                <input type='checkbox' data-toggle='checkbox'/>
             </label>
         </th>
         <th rowspan="2">Student</th>
         <th rowspan="2">Promotion</th>
         <th rowspan="2">Major</th>
         <th rowspan="2">
-            <label class='checkbox mailto'>
-                <input id="foo" type='checkbox' data-toggle='checkbox'/>
+            <label class='checkbox mailto-sups'>
+                <input type='checkbox' data-toggle='checkbox'/>
             </label>
             Supervisor
         </th>
         <th rowspan="2">
-            <label class='checkbox mailto'>
-                <input id="foo" type='checkbox' data-toggle='checkbox'/>
+            <label class='checkbox mailto-tutors'>
+                <input type='checkbox' data-toggle='checkbox'/>
             </label>
             Tutor
         </th>
@@ -37,22 +37,22 @@
     {{#each this}}
         <tr>
             <td>
-                <label class='checkbox mail-checkbox' data-email="{{Stu.P.Email}}">
-                    <input type='checkbox' data-toggle='checkbox' value='{{Stu.P.Email}}'/>
+                <label class='checkbox mail-checkbox mail-checkbox-stu' data-email="{{Stu.P.Email}}">
+                    <input type='checkbox' class="mail-checkbox-students" data-toggle='checkbox' value='{{Stu.P.Email}}'/>
                 </label>
             </td>
             <td><a class='clickable' onclick="showDetails('{{Stu.P.Email}}')">{{shortFullname Stu.P}}</a></td>
             <td>{{Stu.Promotion}}</td>
             <td>{{Stu.Major}}</td>
             <td>
-                <label class='checkbox mail-checkbox' data-email="{{Stu.P.Email}}">
-                    <input type='checkbox' data-toggle='checkbox' value='{{Stu.P.Email}}'/>
+                <label class='checkbox mail-checkbox mail-checkbox-s' data-email="{{Sup.Email}}">
+                    <input type='checkbox' class="mail-checkbox-sup" data-toggle='checkbox' value='{{Sup.Email}}'/>
                 </label>
                 <a href='mailto:{{Sup.Email}}' title='{{fullname Sup}}'>{{shortFullname Sup}}</a>
             </td>
             <td>
-                <label class='checkbox mail-checkbox' data-email="{{Stu.P.Email}}">
-                    <input type='checkbox' data-toggle='checkbox' value='{{Stu.P.Email}}'/>
+                <label class='checkbox mail-checkbox mail-checkbox-t' data-email="{{Tutor.Email}}">
+                    <input type='checkbox' class="mail-checkbox-tutors" data-toggle='checkbox' value='{{Tutor.Email}}'/>
                 </label>
                 <a href='mailto:{{Tutor.Email}}' title='{{fullname Tutor}}'>{{shortFullname Tutor}}</a>
             </td>

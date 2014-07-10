@@ -20,7 +20,9 @@
 - shift click support for mailing OK
 - tutor can adapt the report deadline OK
 - hide static pages, stay inside "/" OK
+- defenses preparation support OK
 - checkbox to mail supervisor/tutor in the first two tabs
+   - watchlist OK
 - verify email format when aligning and changing
 - sort by date correctly
 - logging

@@ -197,10 +197,8 @@ function refresh() {
     } else if (currentPage == "privileges") {
         showPrivileges();
     } else if (currentPage == "defenses") {
-        //defenseSchedule();
         showDefenses();
     } else if (currentPage == "pending") {
-        //showPending();
         pickOne();
     } else {
         console.log("Unsupported operation on '" + currentPage + "'");
@@ -224,17 +222,17 @@ function getAllConventions() {
     );
 }
 
-function shiftSelect(e, me, root) {
+function shiftSelect(e, me, root, cl) {
     if (e.shiftKey || e.metaKey) {
         var tr = $(me).closest("tr");
         var p = tr.prev();
         while (p.length > 0) {
-            var lbl = p.find(".checkbox");
+            var lbl = p.find(cl);
+            console.log(lbl);
             if (lbl.hasClass("checked")) {
                 break;
             } else {
                 lbl.addClass("checked");
-
             }
             p = p.prev();
         }
@@ -242,21 +240,47 @@ function shiftSelect(e, me, root) {
     }
 }
 
-function toggleMailCheckboxes(root) {
-    var nextState = root.find(".mailto").find(":checked").length > 0 ? "check" : "uncheck";
-    root.find(":checkbox").checkbox(nextState);
+function toggleMailCheckboxes(chk, cl, root) {
+    var nextState = $(chk).hasClass("checked");
+    root.find(cl).checkbox(nextState ? "check" : "uncheck");
     generateMailto(root);
 }
 
+function sortableHeaders(idxs) {
+    vals = {headers : {}};
+    idxs.forEach(function (v) {
+        vals.headers[v] = 1
+    });
+    return vals;
+}
 function displayMyConventions() {
     var html = Handlebars.getTemplate("watchlist")(conventions);
     root = $("#conventions");
     root.html(html);
-    $("#table-conventions").tablesorter({headers: {0: {"sorter": false}}});
+    $("#table-conventions").tablesorter(sortableHeaders([1,2,3,6,7]));
     root.find(':checkbox').checkbox();
-    root.find('tbody').find(':checkbox').checkbox().on('toggle', function(e) {generateMailto(root);});
-    root.find('.checkbox').click(function (e) {shiftSelect(e, this, root);});
-    root.find(".mailto").on('toggle', function() {toggleMailCheckboxes(root);});
+    root.find('tbody').find(':checkbox').checkbox().on('toggle', function (e) {
+        generateMailto(root);
+    });
+    root.find('.mail-checkbox-stu').click(function (e) {
+        shiftSelect(e, this, root,'.mail-checkbox-stu');
+    });
+    root.find('.mail-checkbox-s').click(function (e) {
+        shiftSelect(e, this, root,'.mail-checkbox-s');
+    });
+    root.find('.mail-checkbox-t').click(function (e) {
+        shiftSelect(e, this, root,'.mail-checkbox-t');
+    });
+
+    root.find(".mailto-students").on('toggle', function (e) {
+        toggleMailCheckboxes(e.currentTarget, ".mail-checkbox-students", root);
+    });
+    root.find(".mailto-tutors").on('toggle', function (e) {
+        toggleMailCheckboxes(e.currentTarget, ".mail-checkbox-tutors", root);
+    });
+    root.find(".mailto-sups").on('toggle', function (e) {
+        toggleMailCheckboxes(e.currentTarget, ".mail-checkbox-sup", root);
+    });
 }
 
 function displayMyStudents() {
