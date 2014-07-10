@@ -246,18 +246,10 @@ function toggleMailCheckboxes(chk, cl, root) {
     generateMailto(root);
 }
 
-function sortableHeaders(idxs) {
-    vals = {headers : {}};
-    idxs.forEach(function (v) {
-        vals.headers[v] = 1
-    });
-    return vals;
-}
 function displayMyConventions() {
     var html = Handlebars.getTemplate("watchlist")(conventions);
     root = $("#conventions");
     root.html(html);
-    $("#table-conventions").tablesorter(sortableHeaders([1,2,3,6,7]));
     root.find(':checkbox').checkbox();
     root.find('tbody').find(':checkbox').checkbox().on('toggle', function (e) {
         generateMailto(root);
@@ -280,6 +272,13 @@ function displayMyConventions() {
     });
     root.find(".mailto-sups").on('toggle', function (e) {
         toggleMailCheckboxes(e.currentTarget, ".mail-checkbox-sup", root);
+    });
+    $("#table-conventions").tablesorter({
+        headers: {
+            0: {sorter: false},
+            4: {sorter: false},
+            5: {sorter: false}
+        }
     });
 }
 

@@ -1,10 +1,10 @@
 {{#if this}}
 <h3>{{len this}} internships</h3>
 <a class="btn-sm btn-primary mail-selection"><span class="fui-mail"></span> mail selection</a>
-<table class="table table-condensed table-hover tablesorter" id="table-conventions">
+<table class="table table-condensed table-hover" id="table-conventions">
     <thead>
     <tr>
-        <th rowspan="2">
+        <th rowspan="2" class="sorter-false">
             <label class='checkbox mailto-students'>
                 <input type='checkbox' data-toggle='checkbox'/>
             </label>
@@ -12,13 +12,13 @@
         <th rowspan="2">Student</th>
         <th rowspan="2">Promotion</th>
         <th rowspan="2">Major</th>
-        <th rowspan="2">
+        <th rowspan="2" class="sorter-false">
             <label class='checkbox mailto-sups'>
                 <input type='checkbox' data-toggle='checkbox'/>
             </label>
             Supervisor
         </th>
-        <th rowspan="2">
+        <th rowspan="2" class="sorter-false">
             <label class='checkbox mailto-tutors'>
                 <input type='checkbox' data-toggle='checkbox'/>
             </label>
