@@ -4,12 +4,26 @@
 <table class="table table-condensed table-hover tablesorter" id="table-conventions">
     <thead>
     <tr>
-        <th rowspan="2"><label class='checkbox mailto'><input id="foo" type='checkbox' data-toggle='checkbox'/></label></th>
+        <th rowspan="2">
+            <label class='checkbox mailto'>
+                <input id="foo" type='checkbox' data-toggle='checkbox'/>
+            </label>
+        </th>
         <th rowspan="2">Student</th>
         <th rowspan="2">Promotion</th>
         <th rowspan="2">Major</th>
-        <th rowspan="2">Supervisor</th>
-        <th rowspan="2">Tutor</th>
+        <th rowspan="2">
+            <label class='checkbox mailto'>
+                <input id="foo" type='checkbox' data-toggle='checkbox'/>
+            </label>
+            Supervisor
+        </th>
+        <th rowspan="2">
+            <label class='checkbox mailto'>
+                <input id="foo" type='checkbox' data-toggle='checkbox'/>
+            </label>
+            Tutor
+        </th>
         <th colspan="3">Midterm evaluation</th>
     </tr>
     <tr>
@@ -30,8 +44,18 @@
             <td><a class='clickable' onclick="showDetails('{{Stu.P.Email}}')">{{shortFullname Stu.P}}</a></td>
             <td>{{Stu.Promotion}}</td>
             <td>{{Stu.Major}}</td>
-            <td><a href='mailto:{{Sup.Email}}' title='{{fullname Sup}}'>{{shortFullname Sup}}</a></td>
-            <td><a href='mailto:{{Tutor.Email}}' title='{{fullname Tutor}}'>{{shortFullname Tutor}}</a></td>
+            <td>
+                <label class='checkbox mail-checkbox' data-email="{{Stu.P.Email}}">
+                    <input type='checkbox' data-toggle='checkbox' value='{{Stu.P.Email}}'/>
+                </label>
+                <a href='mailto:{{Sup.Email}}' title='{{fullname Sup}}'>{{shortFullname Sup}}</a>
+            </td>
+            <td>
+                <label class='checkbox mail-checkbox' data-email="{{Stu.P.Email}}">
+                    <input type='checkbox' data-toggle='checkbox' value='{{Stu.P.Email}}'/>
+                </label>
+                <a href='mailto:{{Tutor.Email}}' title='{{fullname Tutor}}'>{{shortFullname Tutor}}</a>
+            </td>
             <td>{{deadline MidtermReport}}</td>
             <td>?</td>
             <td>
