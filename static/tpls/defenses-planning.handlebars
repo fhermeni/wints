@@ -15,16 +15,18 @@
             </ul>
         </div>
     </div>
-    <div id="pool" class="col-sm-3 pool">
-        <h5>Student pool</h5>
-        <ol class="students all-students" data-jury="-1" id="student-pool">
-            {{#each pool}}
-                <li data-email="{{this}}">{{slotEntry this}}</li>
-            {{/each}}
-        </ol>
-    </div>
-    <div class="row">
-        <div class="col-sm-8 col-sm-offset-4">
+    <div class="row" id="top-planning">
+        <div class="col-sm-4 pool">
+            <div id="pool">
+            <h5>Student pool</h5>
+            <ol class="students all-students" data-jury="-1" id="student-pool">
+                {{#each pool}}
+                    <li data-email="{{this}}">{{slotEntry this}}</li>
+                {{/each}}
+            </ol>
+            </div>
+        </div>
+        <div class="col-sm-8">
             {{#each sessions}}
                 <div class="defense-session" id="defense-session-{{@index}}">
                     <div class="form-horizontal">

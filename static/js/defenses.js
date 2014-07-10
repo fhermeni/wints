@@ -7,6 +7,7 @@ function showDefenses() {
         defenses = data;
         var html = Handlebars.getTemplate("defense-init")(defenses);
         $("#defenses").html(html);
+        $('[data-toggle="reset-defense-confirmation"]').confirmation({onConfirm: prepareSchedule});
         showCoarseDefenseForm();
     }, function() {
         console.log("unknown");
@@ -15,6 +16,7 @@ function showDefenses() {
             sessions: []
         };
         var html = Handlebars.getTemplate("defense-init")(defenses);
+        $('[data-toggle="reset-defense-confirmation"]').confirmation({onConfirm: prepareSchedule});
         $("#defenses").html(html);
     });
 }
@@ -96,7 +98,7 @@ function saveLists() {
 }
 
 function prepareSchedule() {
-
+    debugger;
     var nbSlots = $("#lbl-nbSlots").val();
     if (nbSlots == 0) {
         return;
@@ -227,7 +229,9 @@ function showDefensePlanningForm() {
     $("#defenses-form").html(html);
     $(".students").sortable(sortableOptions());
     $('#pool').affix({
-        offset:  330
+        offset: {
+            top: ($("#top-planning").position().top)
+        }
     });
     show_session(0);
 }

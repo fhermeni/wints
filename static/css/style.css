@@ -146,19 +146,16 @@ ol.all-students {
 }
 ol.students li.placeholder {
     position: relative;
-    /** More li styles **/
 }
 ol.students li.placeholder:before {
     position: absolute;
-    /** Define arrowhead **/
 }
 
-.affix,.affix-top {
+.affix-top {
     position:static;
 }
 
 #pool.affix-top {
-    position: static;
     margin-top:25px;
     width:250px;
 }
