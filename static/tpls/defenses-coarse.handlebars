@@ -1,0 +1,18 @@
+{{#if this.sessions}}
+    <div class="row">
+        {{#each sessions}}
+            <div class="col-sm-2">
+                <h6 class="text-center">S {{inc @index}}</h6>
+                {{#each jury}}
+                    <ol class="students" data-jury="{{id}}">
+                        {{#each students}}
+                            <li class="coarse-entry" data-email="{{this}}">{{slotMajor this}}</li>
+                        {{/each}}
+                    </ol>
+                {{/each}}
+            </div>
+        {{/each}}
+    </div>
+{{else}}
+    <h5 class="text-center">You must generate a template first</h5>
+{{/if}}

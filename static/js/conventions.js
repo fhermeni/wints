@@ -322,7 +322,7 @@ function showDefenses() {
         defenses = data;
         var html = Handlebars.getTemplate("defense-init")(defenses);
         $("#defenses").html(html);
-        displayDefensesForm();
+        showCoarseDefenseForm();
     }, function() {
         console.log("unknown");
         defenses = {
@@ -364,10 +364,14 @@ function nextSession(d) {
     return n;
 }
 
+function storeDefenses() {
+    console.log("saving the defenses");
+    saveDefenses(defenses);
+}
+
 function saveSessionDate(i) {
     var id = $(i).attr("data-session");
     defenses.sessions[id].date = $(i).val();
-    saveDefenses(defenses);
 }
 
 function saveRoom(i) {
@@ -381,7 +385,6 @@ function saveRoom(i) {
             }
         })
     });
-    saveDefenses(defenses);
 }
 
 function saveJury(i) {
@@ -396,7 +399,6 @@ function saveJury(i) {
             }
         })
     });
-    saveDefenses(defenses);
 }
 
 function saveLists() {
@@ -423,7 +425,6 @@ function saveLists() {
         });
     });
     defenses.pool = pool;
-    saveDefenses(defenses);
 }
 
 function prepareSchedule() {
@@ -456,13 +457,17 @@ function prepareSchedule() {
     var nbInParallel = Math.ceil(groups.length / nbSlots);
 
     var schedule = [];
-
+    for (var t = 0; t < nbSlots; t++) {
+        if (!schedule[t]) {
+            schedule[t] = [];
+        }
+        for (var x = 0; x < nbInParallel; x++) {
+            schedule[t][i] = [];
+        }
+    }
     for (var i = 0; i < groups.length; ) {
         for (var t = 0; t < nbSlots; t++) {
             //for each slot;
-            if (!schedule[t]) {
-                schedule[t] = [];
-            }
             if (schedule[t].length < nbInParallel) {
                 schedule[t].push(groups[i++]);
                 if (i == groups.length) {
@@ -483,7 +488,7 @@ function prepareSchedule() {
     var idx = 0;
     for (var i = 0; i < nbSlots; i++) {
         var session = {
-            date : d,
+            date : moment(d).format("DD/MM/YYYY HH:mm"),
             jury : []
         };
         schedule[i].forEach(function (s) {
@@ -498,12 +503,19 @@ function prepareSchedule() {
            session.jury.push(j);
            idx++;
         });
+        while (session.jury.length < nbInParallel) {
+            session.jury.push({
+                room : "?",
+                commission: ["","",""],
+                students: [undefined],
+                id: idx++
+            })
+        }
         d = nextSession(d);
         defenses["sessions"].push(session);
     }
-    show_session(0);
-    saveDefenses(defenses);
-    displayDefensesForm();
+    //Padding of the jurys
+    showCoarseDefenseForm();
 }
 
 function getConvention(m) {
@@ -517,15 +529,9 @@ function getConvention(m) {
     return res;
 }
 
-function resetDefense() {
-    defenses = undefined;
-    displayDefensesForm();
-}
 
-function displayDefensesForm() {
-    var html = Handlebars.getTemplate("defenses-form")(defenses);
-    $("#defenses-form").html(html);
-    $(".students").sortable({
+function sortableOptions() {
+    return {
         group:'students',
         pullPlaceholder: false,
         onDrop: function ($item, container, _super, event) {
@@ -551,23 +557,54 @@ function displayDefensesForm() {
                 top: position.top - adjustment.top
             })
         }
+    }
+}
+function showCoarseDefenseForm() {
+    var html = Handlebars.getTemplate("defenses-coarse")(defenses);
+    $("#defenses-form").html(html);
+    $(".students").sortable(sortableOptions());
+}
+
+function showDefensePlanningForm() {
+    var html = Handlebars.getTemplate("defenses-planning")(defenses);
+    $("#defenses-form").html(html);
+    $(".students").sortable(sortableOptions());
+    $('#pool').affix({
+        offset:  300
     });
     show_session(0);
 }
 
-function displayProgram() {
-    var html = Handlebars.getTemplate("defenses-program")(defenses);
-    var w = window.open();
-    $(w.document.body).html(html);
+function displayDefenses(i) {
+    var html = Handlebars.getTemplate("defenses-show-" + i)(rmEmptyJuries(defenses));
+    window.open( "data:x-application/external;charset=utf-8," + escape(html));
 }
 
-function displayPlanning() {
-    var html = Handlebars.getTemplate("defenses-planning")(defenses);
-    var w = window.open();
-    $(w.document.body).html(html);
+function rmEmptyJuries(defenses) {
+    var d = {
+        sessions: []
+    };
+    var i = 0;
+    defenses.sessions.forEach(function (s) {
+        cs = {
+            date : s.date,
+            jury : []
+        };
+        d.sessions.push(cs);
+        s.jury.forEach(function (j) {
+            var empty = true;
+            j.students.forEach(function (s) {
+                if (s != undefined && s != null) {
+                    empty = false;
+                }
+            });
+            if (!empty) {
+                cs.jury.push(j);
+            }
+        });
+    });
+    return d;
 }
-
-
 function displayTutors() {
         var html = Handlebars.getTemplate("tutors")(orderByTutors(conventions));
         var root = $("#assignments").html(html);

@@ -109,7 +109,7 @@ ol.students {
     margin: 0 0 9px 0;
     padding: 0;
     font-size: 10pt;
-    min-height: 100pt;
+    min-height: 50pt;
 }
 
 ol.students li {
@@ -120,6 +120,17 @@ ol.students li {
     color: #0088cc;
     background: #eeeeee;
 }
+
+ol.students li.coarse-entry {
+    display: block;
+    margin: 1px;
+    padding: 2px 2px 2px 2px;
+    border: 1px solid #cccccc;
+    color: #0088cc;
+    background: #eeeeee;
+    line-height: 1;
+}
+
 body.dragging, body.dragging * {
     cursor: move !important;
 }
@@ -131,7 +142,7 @@ body.dragging, body.dragging * {
 }
 
 ol.all-students {
-    min-height: 500pt;
+    min-height: 100pt;
 }
 ol.students li.placeholder {
     position: relative;
@@ -142,6 +153,18 @@ ol.students li.placeholder:before {
     /** Define arrowhead **/
 }
 
-.page-header {
-    margin-top: 20px;
+.affix,.affix-top {
+    position:static;
+}
+
+#pool.affix-top {
+    position: static;
+    margin-top:25px;
+    width:250px;
+}
+
+#pool.affix {
+    position: fixed;
+    top:20px;
+    width:250px;
 }

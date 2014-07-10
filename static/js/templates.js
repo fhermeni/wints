@@ -108,8 +108,9 @@ Handlebars.registerHelper('date', function(d) {
 });
 
 Handlebars.registerHelper('slot', function(d) {
-    var date = new Date(Date.parse(d));
-    return twoD(date.getDate()) + "/" + twoD(date.getMonth() + 1) + "/" + date.getFullYear() + " " + twoD(date.getHours()) + ":00";
+    return d;
+    /*var date = new Date(Date.parse(d));
+    return twoD(date.getDate()) + "/" + twoD(date.getMonth() + 1) + "/" + date.getFullYear() + " " + twoD(date.getHours()) + ":00";*/
 });
 
 Handlebars.registerHelper('majors', function(emails) {
@@ -154,6 +155,26 @@ Handlebars.registerHelper('slotEntry', function(e) {
     if (e) {
         var c = getConvention(e);
         return c.Stu.P.Firstname + " " + c.Stu.P.Lastname + " (" + c.Stu.Major + ")";
+    }
+    return "Break";
+});
+
+Handlebars.registerHelper('notEmptyJury', function(f) {
+    console.log(f);
+    var empty = true;
+    f.students.forEach(function (s) {
+        if (s != undefined) {
+            empty = false;
+            return false;
+        }
+    });
+    return empty;
+});
+
+Handlebars.registerHelper('slotMajor', function(e) {
+    if (e) {
+        var c = getConvention(e);
+        return c.Stu.Major;
     }
     return "Break";
 });
