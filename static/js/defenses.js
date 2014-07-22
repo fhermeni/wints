@@ -5,6 +5,9 @@
 function showDefenses() {
     getDefenses(function(data) {
         defenses = JSON.parse(data);
+        if (!defenses.visio) {
+            defenses.visio = {};
+        }
         var html = Handlebars.getTemplate("defense-init")(defenses);
         $("#defenses").html(html);
         $('[data-toggle="reset-defense-confirmation"]').confirmation({onConfirm: prepareSchedule});
@@ -295,10 +298,22 @@ function switchVisibility(i) {
     var j = $(i);
     var mail = j.parent().attr("data-email");
     if (j.hasClass("glyphicon-eye-open")) {
-        j.removeClass("glyphicon-eye-open").addClass("glyphicon-eye-close");
+        j.removeClass("glyphicon-eye-open").addClass("glyphicon-eye-close late");
         defenses.private[mail] = true;
     } else {
-        j.removeClass("glyphicon-eye-close").addClass("glyphicon-eye-open");
+        j.removeClass("glyphicon-eye-close").removeClass("late").addClass("glyphicon-eye-open");
         defenses.private[mail] = false;
+    }
+}
+
+function switchVisio(i) {
+    var j = $(i);
+    var mail = j.parent().attr("data-email");
+    if (j.hasClass("glyphicon-facetime-video")) {
+        j.removeClass("glyphicon-facetime-video").addClass("glyphicon-user");
+        defenses.visio[mail] = false;
+    } else {
+        j.removeClass("glyphicon-user").addClass("glyphicon-facetime-video");
+        defenses.visio[mail] = true;
     }
 }

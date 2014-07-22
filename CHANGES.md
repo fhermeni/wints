@@ -26,6 +26,7 @@
 - upload/download reports OK
 - grade reports
 - watchlist: mode general, mode grades OK, no need in practice
+- visio/live public/private defenses: OK
 
 - verify email format when aligning and changing
 - sort by date correctly

@@ -154,8 +154,8 @@ Handlebars.registerHelper('slotEntry', function(e) {
     if (e) {
         var c = getConvention(e);
         var buf = c.Stu.P.Firstname + " " + c.Stu.P.Lastname + " (" + c.Stu.Major + ")";
-        buf += " <span onclick='switchVisibility(this)' class='glyphicon glyphicon-eye-" + (defenses.private[c.Stu.P.Email] ? "close" : "open") + "'></span>";
-        console.log(buf);
+        buf += " <span onclick='switchVisibility(this)' class='glyphicon glyphicon-eye-" + (defenses.private[c.Stu.P.Email] ? "close late" : "open") + "'></span>";
+        buf += " <span onclick='switchVisio(this)' class='glyphicon " + (defenses.visio[c.Stu.P.Email] ? "glyphicon-facetime-video" : "glyphicon-user") + "'></span>";
         return new Handlebars.SafeString(buf);
     }
     return "Break";
