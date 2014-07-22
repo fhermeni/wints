@@ -74,7 +74,9 @@
                                     <label>Agenda</label>
                                     <ol class="students" data-jury="{{id}}">
                                         {{#each students}}
-                                            <li data-email="{{this}}">{{slotEntry this}}</li>
+                                            <li data-email="{{this}}">
+                                                {{slotEntry this}}
+                                            </li>
                                         {{/each}}
                                     </ol>
                                 </div>

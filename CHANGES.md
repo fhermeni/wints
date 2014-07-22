@@ -23,11 +23,40 @@
 - defenses preparation support OK
 - checkbox to mail supervisor/tutor in the first two tabs
    - watchlist OK
+- upload/download reports OK
+- grade reports
+- watchlist: mode general, mode grades OK, no need in practice
+
 - verify email format when aligning and changing
 - sort by date correctly
 - logging
 - error reporting
 - encoding when pulling conventions
+- les fiches d'évaluations finales devraient être accessibles au jury naturellement
+- UI reports, encoding
+-
+
+defenses:
+ - coarse grain view for the student schedule
+ - detailed view for
+   - jury, room, date
+   - confidential defenses
+   - mail checkbox + button
+   - download all fiche d'évaluation
+ - upload fiches d'évaluation final depuis watchlist
+
+defenses(_id_, cnt)
+  - new,
+  - save,
+  - delete,
+  - save as
+
+
+midtermReport(_id_, cnt)
+
+finalReport(_id, cnt)
+
+
 
 ## Version 2.0 ##
 

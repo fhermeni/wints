@@ -4,34 +4,31 @@
 <table class="table table-condensed table-hover" id="table-conventions">
     <thead>
     <tr>
-        <th rowspan="2" class="sorter-false">
+        <th class="sorter-false">
             <label class='checkbox mailto-students'>
                 <input type='checkbox' data-toggle='checkbox'/>
             </label>
         </th>
-        <th rowspan="2">Student</th>
-        <th rowspan="2">Promotion</th>
-        <th rowspan="2">Major</th>
-        <th rowspan="2" class="sorter-false">
+        <th>Student</th>
+        <th>Promotion</th>
+        <th>Major</th>
+        <th class="sorter-false">
             <label class='checkbox mailto-sups'>
                 <input type='checkbox' data-toggle='checkbox'/>
             </label>
             Supervisor
         </th>
-        <th rowspan="2" class="sorter-false">
+        <th class="sorter-false">
             <label class='checkbox mailto-tutors'>
                 <input type='checkbox' data-toggle='checkbox'/>
             </label>
             Tutor
         </th>
-        <th colspan="3">Midterm evaluation</th>
+        <th class="sorter-false rotate"><div><span>Midterm evaluation</span></div></th>
+        <th class="sorter-false rotate"><div><span>Final evaluation</span></div></th>
+        <th class="sorter-false rotate"><div><span>Supervisor evaluation</span></div></th>
+        <th class="sorter-false rotate"><div><span>Defense</span></div></th>
     </tr>
-    <tr>
-        <th><small>due date</small></th>
-        <th><small>grade</small></th>
-        <th><small>resources</small></th>
-    </tr>
-
     </thead>
     <tbody>
     {{#each this}}
@@ -56,11 +53,10 @@
                 </label>
                 <a href='mailto:{{Tutor.Email}}' title='{{fullname Tutor}}'>{{shortFullname Tutor}}</a>
             </td>
-            <td>{{deadline MidtermReport}}</td>
-            <td>?</td>
-            <td>
-                <span class='fui-new'></span> <span class='fui-chat'></span>
-            </td>
+            <td>{{reportGrade MidtermReport}}</td>
+            <td>{{reportGrade FinalReport}}</td>
+            <td>{{reportGrade SupReport}}</td>
+            <td>{{grade Defense.Grade}}</td>
         </tr>
     {{/each}}
     </tbody>

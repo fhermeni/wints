@@ -15,7 +15,9 @@ type Convention struct {
 	CompanyWWW string
 	Begin      time.Time
 	End        time.Time
-	MidtermReport time.Time
+	MidtermReport ReportMetaData
+	FinalReport ReportMetaData
+	SupReport ReportMetaData
 	Title	string
 }
 
@@ -48,7 +50,7 @@ func RegisterInternship(db *sql.DB, c Convention, move bool) error {
 	return err
 }
 
-func scanConvention(rows *sql.Rows) (Convention, error) {
+func scanConvention(db *sql.DB, rows *sql.Rows) (Convention, error) {
 	var stuFn, stuLn, stuMail, stuTel, promo, major, title string
 	var tutorFn, tutorLn, tutorTel, tutorEmail string
 	var supFn, supLn, supTel, supEmail, company, companyWWW string
@@ -63,7 +65,20 @@ func scanConvention(rows *sql.Rows) (Convention, error) {
 	stu := Student{User{stuFn, stuLn, stuMail, stuTel,""}, promo, major}
 	tutor := User{tutorFn, tutorLn, tutorEmail, tutorTel, ""}
 	sup := User{supFn, supLn, supEmail, supTel, ""}
-	return Convention{stu, sup, tutor, company, companyWWW, start, end, midDeadline, title}, nil
+	mid, err := GetReportMetaData(db, stuMail, "midterm")
+	if err != nil {
+		return Convention{}, err
+	}
+	final, err := GetReportMetaData(db, stuMail, "final")
+	if err != nil {
+		return Convention{}, err
+	}
+	supReport, err := GetReportMetaData(db, stuMail, "supReport")
+	if err != nil {
+		return Convention{}, err
+	}
+
+	return Convention{stu, sup, tutor, company, companyWWW, start, end, mid, final, supReport, title}, nil
 }
 
 func GetConvention(db *sql.DB, email string) (Convention, error) {
@@ -79,7 +94,7 @@ func GetConvention(db *sql.DB, email string) (Convention, error) {
 	if (!rows.Next()) {
 		return Convention{}, errors.New("No pending convention for " + email)
 	}
-	return scanConvention(rows)
+	return scanConvention(db, rows)
 }
 
 func GetConventions(db *sql.DB) ([]Convention, error) {
@@ -93,7 +108,7 @@ func GetConventions(db *sql.DB) ([]Convention, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
- 		c, err := scanConvention(rows)
+ 		c, err := scanConvention(db, rows)
 		if err != nil {
 			return conventions, err
 		}
@@ -102,6 +117,6 @@ func GetConventions(db *sql.DB) ([]Convention, error) {
 	return conventions, nil
 }
 
-func SetMidtermDeadline(db *sql.DB, email string, d time.Time) error {
+/*func SetMidtermDeadline(db *sql.DB, email string, d time.Time) error {
 	return SingleUpdate(db, "update internships set midtermDeadline=$2 where student=$1", email, d)
-}
+} */

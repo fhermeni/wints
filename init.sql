@@ -80,4 +80,15 @@ create table pending_internships(student text PRIMARY KEY REFERENCES students(em
                         supervisorEmail text,
                         supervisorTel text,
                         title text
-)
+);
+
+create table reports(student text REFERENCES students(email),
+                        kind text,
+                        deadline timestamp,
+                        grade integer,
+                         cnt bytea,
+                         constraint pk_reports PRIMARY KEY(student, kind)
+                        );
+
+create table defenses(id text,
+                      content text);

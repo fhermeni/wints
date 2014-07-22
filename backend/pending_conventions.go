@@ -96,7 +96,7 @@ func ScanPendingConvention(rows *sql.Rows) (Convention, error) {
 	stu := Student{User{stuFn, stuLn, stuEmail, stuTel,""}, promo, ""}
 	tutor := User{tutorFn, tutorLn, tutorEmail, tutorTel, ""}
 	sup := User{supFn, supLn, supEmail, supTel, ""}
-	return Convention{stu, sup, tutor, company, companyWWW, start, end, midDeadline, title}, nil
+	return Convention{stu, sup, tutor, company, companyWWW, start, end, ReportMetaData{},ReportMetaData{},ReportMetaData{}, title}, nil
 }
 
 func GetRawConventions(db *sql.DB) ([]Convention, error) {
@@ -236,7 +236,7 @@ func getRawConventions2(db *sql.DB, url, login, password string, year int, promo
 		if len(companyWWW) != 0 && !strings.HasPrefix(companyWWW, "http") {
 			companyWWW = "http://" + companyWWW
 		}
-		c := Convention{stu, supervisor, tutor, clean(record[company]), companyWWW, startTime, endTime, startTime.Add(TWO_MONTHS), title}
+		c := Convention{stu, supervisor, tutor, clean(record[company]), companyWWW, startTime, endTime, ReportMetaData{},ReportMetaData{}, ReportMetaData{}, title}
 		InspectRawConvention(db, c)
 		nb++;
 	}

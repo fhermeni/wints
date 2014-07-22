@@ -74,6 +74,9 @@ footer {
     color: #e74c3c;
 }
 
+.warning {
+    color: #f0ad4e;
+}
 .raw {
     font-size: 12pt;
     font-family: courier;
@@ -164,4 +167,15 @@ ol.students li.placeholder:before {
     position: fixed;
     top:20px;
     width:250px;
+}
+
+th.rotate {
+    height: 140px;
+    white-space: nowrap;
+}
+
+th.rotate > div {
+    transform: rotate(315deg);
+    transform-origin: right, top;
+    width: 25px;
 }

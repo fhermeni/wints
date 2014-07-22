@@ -19,6 +19,7 @@ import (
 const (
 	ROOT_API = "/api/v1"
 )
+
 var DB *sql.DB
 
 func reportIfError(w http.ResponseWriter, header string, err error) bool {
@@ -53,7 +54,7 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", 302)
 	}
 	u, err := backend.GetUser(DB, n)
- 	if !reportIfError(w, "", err) {
+	if !reportIfError(w, "", err) {
 		if u.Role != "" {
 			http.ServeFile(w, r, "static/admin.html")
 			return
@@ -63,10 +64,17 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func jsonReply(w http.ResponseWriter, j interface{}) {
-	w.Header().Set("Content-type","application/json; charset=utf-8")
+	w.Header().Set("Content-type", "application/json; charset=utf-8")
 	enc := json.NewEncoder(w)
 	err := enc.Encode(j)
 	reportIfError(w, "Error while serialising response", err)
+}
+
+func fileReply(w http.ResponseWriter, mime, filename string, cnt []byte) {
+	w.Header().Set("Content-type", mime)
+	w.Header().Set("Content-disposition", "attachment; filename=" + filename)
+	_, err := w.Write(cnt)
+	reportIfError(w, "", err)
 }
 
 func jsonRequest(w http.ResponseWriter, r *http.Request, j interface{}) error {
@@ -75,14 +83,14 @@ func jsonRequest(w http.ResponseWriter, r *http.Request, j interface{}) error {
 	if err != nil {
 		log.Printf("Bad JSON message format: %s", err)
 		http.Error(w, "Bad JSON message format", http.StatusBadRequest)
-		return  err
+		return err
 	}
 	return nil
 }
 
 type PendingConventionMsg struct {
-	C backend.Convention
-	Known []backend.User
+	C       backend.Convention
+	Known   []backend.User
 	Pending int
 }
 
@@ -117,10 +125,10 @@ func GetAdmins(w http.ResponseWriter, r *http.Request, email string) {
 
 type NewUser struct {
 	Firstname string
-	Lastname string
-	Tel string
-	Email string
-	Priv string
+	Lastname  string
+	Tel       string
+	Email     string
+	Priv      string
 }
 
 func NewAdmin(w http.ResponseWriter, r *http.Request, email string) {
@@ -132,12 +140,12 @@ func NewAdmin(w http.ResponseWriter, r *http.Request, email string) {
 	p := backend.User{nu.Firstname, nu.Lastname, nu.Email, nu.Tel, nu.Priv}
 	err = backend.NewUser(DB, p)
 	if !reportIfError(w, "", err) {
-		backend.LogActionInfo(email, " User '" + nu.Email + "'(" + nu.Priv + ") created");
+		backend.LogActionInfo(email, " User '"+nu.Email+"'("+nu.Priv+") created");
 	}
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request, email string) {
-	target,_ := mux.Vars(r)["email"]
+	target, _ := mux.Vars(r)["email"]
 	if target != email {
 		http.Error(w, "You cannot get the profile of another person", http.StatusForbidden)
 		return
@@ -149,15 +157,18 @@ func GetUser(w http.ResponseWriter, r *http.Request, email string) {
 
 }
 func RmUser(w http.ResponseWriter, r *http.Request, email string) {
-	target,_ := mux.Vars(r)["email"]
+	target, _ := mux.Vars(r)["email"]
 	err := backend.RmUser(DB, target)
 	if !reportIfError(w, "", err) {
-		backend.LogActionInfo(email, " User '" + target + "' deleted");
+		backend.LogActionInfo(email, " User '"+target+"' deleted");
 	}
 }
 
 func GetDefense(w http.ResponseWriter, r *http.Request, email string) {
-	http.ServeFile(w, r, "defenses.json");
+	cnt, err := backend.Defense(DB, "si/ifi")
+	if !reportIfError(w, "", err) {
+		w.Write([]byte(cnt))
+	}
 }
 
 func PostDefense(w http.ResponseWriter, r *http.Request, email string) {
@@ -165,7 +176,7 @@ func PostDefense(w http.ResponseWriter, r *http.Request, email string) {
 	if reportIfError(w, "", err) {
 		return
 	}
-	err = ioutil.WriteFile("defenses.json", cnt, 0644)
+	err = backend.SaveDefense(DB, "si/ifi", string(cnt))
 	reportIfError(w, "", err)
 }
 
@@ -197,7 +208,7 @@ func CommitPendingConvention(w http.ResponseWriter, r *http.Request, email strin
 	_, err = backend.GetUser(DB, tEmail)
 	if err != nil {
 		err = backend.NewUser(DB, c.Tutor)
-		if reportIfError(w, "Unable to register the tutor " + c.Tutor.String(), err) {
+		if reportIfError(w, "Unable to register the tutor "+c.Tutor.String(), err) {
 			return
 		}
 	}
@@ -205,18 +216,18 @@ func CommitPendingConvention(w http.ResponseWriter, r *http.Request, email strin
 	if reportIfError(w, "Unable to register the internship", err) {
 		return
 	}
-	backend.LogActionInfo(email, "validate the convention of '" + c.Stu.P.Email + "'");
+	backend.LogActionInfo(email, "validate the convention of '"+c.Stu.P.Email+"'");
 	backend.RescanPending(DB, c)
 }
 
 type PersonUpdate struct {
 	Firstname string
-	Lastname string
-	Tel string
+	Lastname  string
+	Tel       string
 }
 
 func ChangeProfile(w http.ResponseWriter, r *http.Request, email string) {
-	target,_ := mux.Vars(r)["email"]
+	target, _ := mux.Vars(r)["email"]
 	if target != email {
 		http.Error(w, "You cannot update the profile of another person", http.StatusForbidden)
 		return
@@ -238,7 +249,7 @@ type PasswordRenewal struct {
 }
 
 func ChangePassword(w http.ResponseWriter, r *http.Request, email string) {
-	target,_ := mux.Vars(r)["email"]
+	target, _ := mux.Vars(r)["email"]
 	if target != email {
 		http.Error(w, "You cannot update the profile of another person", http.StatusForbidden)
 		return
@@ -254,14 +265,14 @@ func ChangePassword(w http.ResponseWriter, r *http.Request, email string) {
 }
 
 func UpdateMajor(w http.ResponseWriter, r *http.Request, email string) {
-	target,_ := mux.Vars(r)["email"]
+	target, _ := mux.Vars(r)["email"]
 	m, err := requiredContent(w, r)
 	if err != nil {
 		return
 	}
 	err = backend.SetMajor(DB, target, string(m))
 	if !reportIfError(w, "", err) {
-		backend.LogActionInfo(email, "Major of '" + target + "' set to '" + string(m) + "'");
+		backend.LogActionInfo(email, "Major of '"+target+"' set to '"+string(m)+"'");
 	}
 }
 
@@ -274,23 +285,130 @@ func UpdateMidtermDeadline(w http.ResponseWriter, r *http.Request, email string)
 	if reportIfError(w, "Invalid format", err) {
 		return
 	}
-	target,_ := mux.Vars(r)["email"]
-	u, err := backend.GetUser(DB, target);
-	if u.Role == "" {
-		c, err := backend.GetConvention(DB, target)
-		if reportIfError(w, "", err) {
-			return
-		}
-		if c.Tutor.Email != email {
-			http.Error(w, "You cannot update the deadline on a student not under your responsibility", http.StatusForbidden)
-			return
-		}
-	}
+	target, _ := mux.Vars(r)["email"]
 	//Other levels are ok
-	err = backend.SetMidtermDeadline(DB, target, t)
+	err = backend.UpdateDeadline(DB, target, "midterm", t)
 	reportIfError(w, "", err);
 }
 
+func UpdateFinalDeadline(w http.ResponseWriter, r *http.Request, email string) {
+	d, err := requiredContent(w, r)
+	if err != nil {
+		return
+	}
+	t, err := time.Parse("2/1/2006", string(d))
+	if reportIfError(w, "Invalid format", err) {
+		return
+	}
+	target, _ := mux.Vars(r)["email"]
+
+	//Other levels are ok
+	err = backend.UpdateDeadline(DB, target, "final", t)
+	reportIfError(w, "", err);
+}
+
+func UpdateSupReportDeadline(w http.ResponseWriter, r *http.Request, email string) {
+	d, err := requiredContent(w, r)
+	if err != nil {
+		return
+	}
+	t, err := time.Parse("2/1/2006", string(d))
+	if reportIfError(w, "Invalid format", err) {
+		return
+	}
+	target, _ := mux.Vars(r)["email"]
+
+	//Other levels are ok
+	err = backend.UpdateDeadline(DB, target, "supReport", t)
+	reportIfError(w, "", err);
+}
+
+func myStudent(w http.ResponseWriter, mine, target string) bool {
+	u, err := backend.GetUser(DB, target);
+	if err != nil {
+		reportIfError(w, "", err)
+		return false
+	}
+	if u.Role == "" {
+		c, err := backend.GetConvention(DB, target)
+		if reportIfError(w, "", err) {
+			return false
+		}
+		if c.Tutor.Email != mine {
+			http.Error(w, "The student is not under your responsibility", http.StatusForbidden)
+			return false
+		}
+	}
+	return true
+}
+
+func UploadMidtermReport(w http.ResponseWriter, r *http.Request, email string) {
+	d, err := requiredContent(w, r)
+	if err != nil {
+		return
+	}
+	target, _ := mux.Vars(r)["email"]
+	err = backend.SetReport(DB, target, "midterm", d)
+	reportIfError(w, "", err);
+}
+
+func GetMidtermReport(w http.ResponseWriter, r *http.Request, email string) {
+	target, _ := mux.Vars(r)["email"]
+	cnt, err := backend.Report(DB, target, "midterm")
+	if reportIfError(w, "", err) {
+		return
+	}
+
+	u, _ := backend.GetUser(DB, target)
+
+	fileReply(w, "application/pdf", u.Lastname + "-midterm.pdf", cnt)
+}
+
+func GetFinalReport(w http.ResponseWriter, r *http.Request, email string) {
+	target, _ := mux.Vars(r)["email"]
+	if (!myStudent(w, email, target)) {
+		return
+	}
+	cnt, err := backend.Report(DB, target, "final")
+	if reportIfError(w, "", err) {
+		return
+	}
+	u, _ := backend.GetUser(DB, target)
+	fileReply(w, "application/pdf", u.Lastname + "-final.pdf", cnt)
+}
+
+func UploadFinalReport(w http.ResponseWriter, r *http.Request, email string) {
+	d, err := requiredContent(w, r)
+	if err != nil {
+		return
+	}
+
+	target, _ := mux.Vars(r)["email"]
+	err = backend.SetReport(DB, target, "final", d)
+	reportIfError(w, "", err);
+}
+
+func UploadSupReport(w http.ResponseWriter, r *http.Request, email string) {
+	d, err := requiredContent(w, r)
+	if err != nil {
+		return
+	}
+	target, _ := mux.Vars(r)["email"]
+	err = backend.SetReport(DB, target, "supReport", d)
+	reportIfError(w, "", err);
+}
+
+func GetSupReport(w http.ResponseWriter, r *http.Request, email string) {
+	target, _ := mux.Vars(r)["email"]
+	cnt, err := backend.Report(DB, target, "supReport")
+	if reportIfError(w, "", err) {
+		return
+	}
+
+	u, _ := backend.GetUser(DB, target)
+
+	fileReply(w, "application/pdf", u.Lastname + "-sup.pdf", cnt)
+}
 
 func requiredContent(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	cnt, err := ioutil.ReadAll(r.Body)
@@ -304,14 +422,14 @@ func requiredContent(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 }
 
 func GrantRole(w http.ResponseWriter, r *http.Request, email string) {
-	target,_ := mux.Vars(r)["email"]
+	target, _ := mux.Vars(r)["email"]
 	role, err := requiredContent(w, r)
 	if err != nil {
 		return
 	}
 	err = backend.GrantPrivilege(DB, target, string(role))
 	if !reportIfError(w, "", err) {
-		backend.LogActionInfo(email, "'" + target + "' granted to role '" + string(role) + "'");
+		backend.LogActionInfo(email, "'"+target+"' granted to role '"+string(role)+"'");
 	}
 }
 
@@ -343,6 +461,34 @@ func RequireRole(cb func(http.ResponseWriter, *http.Request, string), role strin
 	}
 }
 
+func migrateReports() {
+	rows, err := DB.Query("select student,midtermDeadline from internships")
+	if err != nil {
+		log.Printf("%s\n", err)
+		return
+	}
+	defer rows.Close();
+	for rows.Next() {
+		var m string
+		var d time.Time
+		rows.Scan(&m, &d)
+		_, err = backend.NewReport(DB, m, "midterm", d)
+		if err != nil {
+			log.Printf("midterm: %s\n", err)
+		}
+		t, _ := time.Parse("02/01/2006", "01/09/2014")
+		_, err = backend.NewReport(DB, m, "final", t)
+		if err != nil {
+			log.Printf("final: %s\n", err)
+		}
+
+		_, err = backend.NewReport(DB, m, "supReport", t)
+		if err != nil {
+			log.Printf("final: %s\n", err)
+		}
+
+	}
+}
 func main() {
 
 	cfg, err := backend.ReadConfig("./wints.conf")
@@ -357,24 +503,27 @@ func main() {
 		log.Fatalln(err.Error())
 	}
 
-	if len(os.Args) > 1 && os.Args[1] == "-i" {
-		err := backend.NewUser(DB, backend.User{"R", "oot", "root@localhost", "", "root"})
-		if err != nil {
-			backend.LogError("Unable to create the root account: " + err.Error());
-		} else {
-			backend.LogInfo("Root account created");
+	//migrateReports()
+	for _, v := range os.Args {
+		if v == "-i" {
+			err := backend.NewUser(DB, backend.User{"R", "oot", "root@localhost", "", "root"})
+			if err != nil {
+				backend.LogError("Unable to create the root account: " + err.Error());
+			} else {
+				backend.LogInfo("Root account created");
+			}
+			return
+		} else if v == "-s" {
+			delay, err := time.ParseDuration(cfg.RefreshPeriod)
+			if err != nil {
+				log.Fatalln(err.Error())
+			}
+			backend.DaemonConventionsPuller(DB, cfg.WWWConventionsURL,
+				cfg.WWWConventionsLogin,
+				cfg.WWWConventionsPassword,
+				delay);
 		}
-		return
 	}
-
-	delay, err := time.ParseDuration(cfg.RefreshPeriod)
-	if err != nil {
-		log.Fatalln(err.Error())
-	}
-	backend.DaemonConventionsPuller(DB, cfg.WWWConventionsURL,
-										cfg.WWWConventionsLogin,
-										cfg.WWWConventionsPassword,
-										delay);
 
 	//Rest stuff
 	r := mux.NewRouter()
@@ -382,28 +531,39 @@ func main() {
 	r.HandleFunc("/", rootHandler)
 	r.HandleFunc("/home", homeHandler)
 
-	r.HandleFunc(ROOT_API + "/pending/_random", RequireRole(RandomPendingConvention, "admin")).Methods("GET")
-	r.HandleFunc(ROOT_API + "/conventions/", RequireRole(GetAllConventions,"major")).Methods("GET")
-	r.HandleFunc(ROOT_API + "/conventions/", RequireRole(CommitPendingConvention,"admin")).Methods("POST")
-	r.HandleFunc(ROOT_API + "/conventions/{email}/major", RequireRole(UpdateMajor, "major")).Methods("POST")
-	r.HandleFunc(ROOT_API + "/conventions/{email}/midterm/deadline", RequireToken(UpdateMidtermDeadline)).Methods("POST")
-	r.HandleFunc(ROOT_API + "/users/", RequireRole(GetAdmins, "admin")).Methods("GET")
-	r.HandleFunc(ROOT_API + "/users/", RequireRole(NewAdmin, "root")).Methods("POST")
-	r.HandleFunc(ROOT_API + "/users/{email}/role", RequireRole(GrantRole, "root")).Methods("POST")
-	r.HandleFunc(ROOT_API + "/users/{email}", RequireRole(RmUser, "root")).Methods("DELETE")
-	r.HandleFunc(ROOT_API + "/users/{email}", RequireToken(GetUser)).Methods("GET")
-	r.HandleFunc(ROOT_API + "/users/{email}/password", RequireToken(ChangePassword)).Methods("POST")
-	r.HandleFunc(ROOT_API + "/users/{email}/", RequireToken(ChangeProfile)).Methods("POST")
-	r.HandleFunc(ROOT_API + "/login", Login).Methods("POST")
-	r.HandleFunc(ROOT_API + "/logout", RequireToken(Logout)).Methods("GET")
-	r.HandleFunc(ROOT_API + "/defenses", RequireRole(GetDefense, "admin")).Methods("GET")
-	r.HandleFunc(ROOT_API + "/defenses", RequireRole(PostDefense, "admin")).Methods("POST")
+	//migrateReports()
+	r.HandleFunc(ROOT_API+"/pending/_random", RequireRole(RandomPendingConvention, "admin")).Methods("GET")
+	r.HandleFunc(ROOT_API+"/conventions/", RequireRole(GetAllConventions, "major")).Methods("GET")
+	r.HandleFunc(ROOT_API+"/conventions/", RequireRole(CommitPendingConvention, "admin")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/major", RequireRole(UpdateMajor, "major")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/midterm/deadline", RequireRole(UpdateMidtermDeadline, "major")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/midterm/report", RequireRole(UploadMidtermReport, "major")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/midterm/report", RequireRole(GetMidtermReport, "major")).Methods("GET")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/final/deadline", RequireRole(UpdateFinalDeadline, "major")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/final/report", RequireRole(UploadFinalReport, "major")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/final/report", RequireRole(GetFinalReport, "major")).Methods("GET")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/deadline", RequireRole(UpdateSupReportDeadline, "major")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/report", RequireRole(UploadSupReport, "major")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/report", RequireRole(GetSupReport, "major")).Methods("GET")
+
+
+	r.HandleFunc(ROOT_API+"/users/", RequireRole(GetAdmins, "admin")).Methods("GET")
+	r.HandleFunc(ROOT_API+"/users/", RequireRole(NewAdmin, "root")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/users/{email}/role", RequireRole(GrantRole, "root")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/users/{email}", RequireRole(RmUser, "root")).Methods("DELETE")
+	r.HandleFunc(ROOT_API+"/users/{email}", RequireToken(GetUser)).Methods("GET")
+	r.HandleFunc(ROOT_API+"/users/{email}/password", RequireToken(ChangePassword)).Methods("POST")
+	r.HandleFunc(ROOT_API+"/users/{email}/", RequireToken(ChangeProfile)).Methods("POST")
+	r.HandleFunc(ROOT_API+"/login", Login).Methods("POST")
+	r.HandleFunc(ROOT_API+"/logout", RequireToken(Logout)).Methods("GET")
+	r.HandleFunc(ROOT_API+"/defenses", RequireRole(GetDefense, "admin")).Methods("GET")
+	r.HandleFunc(ROOT_API+"/defenses", RequireRole(PostDefense, "admin")).Methods("POST")
 	fs := http.Dir("static/")
 	fileHandler := http.FileServer(fs)
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", fileHandler))
 	http.Handle("/", r)
 	log.Println("Daemon started")
-	err = http.ListenAndServe(":" + strconv.Itoa(cfg.Port), nil)
+	err = http.ListenAndServe(":"+strconv.Itoa(cfg.Port), nil)
 	if err != nil {
 		log.Fatalf("%s\n", err)
 	}

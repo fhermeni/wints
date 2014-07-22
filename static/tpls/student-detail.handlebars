@@ -1,54 +1,51 @@
 <div class="modal-dialog">
     <div class="modal-content">
         <div class="modal-body form-horizontal">
-            <h3>
+            <h4>
                 <a href="mailto:{{Stu.P.Email}}">{{fullname Stu.P}}</a>
-            </h3>
+            </h4>
             <dl class="dl-horizontal">
-                <dt>Promotion</dt>
+                <dt>promotion</dt>
                 <dd>{{Stu.Promotion}}</dd>
-                <dt>Major</dt>
+                <dt>major</dt>
                 <dd>
                     <select onchange="updateMajor(this,'{{Stu.P.Email}}')">
-                        {{majorOptions Major}}
+                        {{majorOptions Stu.Major}}
                     </select>
                 </dd>
+                <dt>academic tutor</dt>
+                <dd>
+                    <a href="mailto:{{Tutor.Email}}">{{fullname Tutor}}</a>
+                    ({{Tutor.Tel}})
+                </dd>
 
-                <dt class="glyphicon glyphicon-earphone"></dt>
-                <dd>{{Stu.P.Tel}}</dd>
+
             </dl>
 
-            <h5>Company: <small>{{company this}}</small></h5>
+            <h6 class="text-center">{{company this}}</h6>
             <dl class="dl-horizontal">
-                <dt>Period</dt>
+                <dt>period</dt>
                 <dd>{{date Begin}} to {{date End}}</dd>
-
-                <dt>Midterm report</dt>
+                <dt>supervisor</dt>
                 <dd>
-                    <input type="text" data-provide="datepicker" class="form-control date input-sm" value="{{date MidtermReport}}">
-                    <!--
-                <div class="input-group date">
-                    <input type="text" class="form-control" value="{{date MidtermReport}}">
-                    <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
-                </div>  -->
+                    <a href="mailto:{{Sup.Email}}">{{fullname Sup}}</a>
+                    ({{Sup.Tel}})
                 </dd>
             </dl>
 
-            <h5>Supervisor: <small>
-                <a href="mailto:{{Sup.Email}}">{{fullname Sup}}</a>
-            </small></h5>
-            <dl class="dl-horizontal">
-                <dt class="glyphicon glyphicon-earphone"></dt>
-                <dd>{{Sup.Tel}}</dd>
-            </dl>
+                    <h6>Supervisor evaluation</h6>
 
-            <h5>Tutor: <small>
-                <a href="mailto:{{Tutor.Email}}">{{fullname Tutor}}</a>
-            </small></h5>
-            <dl class="dl-horizontal">
-                <dt class="glyphicon glyphicon-earphone"></dt>
-                <dd>{{Tutor.Tel}}</dd>
-            </dl>
+                    <dl class="dl-horizontal">
+                        <dt>due date</dt>
+                        <dd><input type="text" data-provide="datepicker" class="form-control date input-sm" value="{{date SupReport.Deadline}}"></dd>
+                        <dt>grade</dt>
+                        <dd><input type="number" class="form-control input-sm" value="{{SupReport.Grade}}"></dd>
+                    </dl>
+
+                    <a href="/api/v1/conventions/{{Stu.P.Email}}/supervisor/report" id='dl-supervisor' class='btn btn-wide btn-success'>
+                        <i class='glyphicon glyphicon-cloud-download'></i> Get the report
+                    </a>
+                    <input type="file" id="up-supervisor" name="up-supervisor" style="display: none;">
         </div>
     </div>
 </div>
