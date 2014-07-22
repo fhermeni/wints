@@ -4,7 +4,7 @@
 
 function showDefenses() {
     getDefenses(function(data) {
-        defenses = data;
+        defenses = JSON.parse(data);
         var html = Handlebars.getTemplate("defense-init")(defenses);
         $("#defenses").html(html);
         $('[data-toggle="reset-defense-confirmation"]').confirmation({onConfirm: prepareSchedule});
@@ -13,7 +13,8 @@ function showDefenses() {
         console.log("unknown");
         defenses = {
             filter: "",
-            sessions: []
+            sessions: [],
+            private:{}
         };
         var html = Handlebars.getTemplate("defense-init")(defenses);
         $('[data-toggle="reset-defense-confirmation"]').confirmation({onConfirm: prepareSchedule});
@@ -79,7 +80,7 @@ function saveLists() {
         $(l).find("li").each(function (i, s) {
             var e = $(s).attr("data-email");
             if (id == -1) {
-                console.log(e);
+              //  console.log(e);
                 pool.push(e);
             } else {
                 if (!raw[id]) {
@@ -227,7 +228,7 @@ function showCoarseDefenseForm() {
 function showDefensePlanningForm() {
     var html = Handlebars.getTemplate("defenses-planning")(defenses);
     $("#defenses-form").html(html);
-    $(".students").sortable(sortableOptions());
+    //$(".students").sortable(sortableOptions());
     $('#pool').affix({
         offset: {
             top: ($("#top-planning").position().top)
@@ -256,7 +257,7 @@ function rmEmptyJuries(defenses) {
         s.jury.forEach(function (j) {
             var empty = true;
             j.students.forEach(function (s) {
-                if (s != undefined && s != null) {
+                if (s != undefined && s != null && s != "") {
                     empty = false;
                 }
             });
@@ -265,6 +266,7 @@ function rmEmptyJuries(defenses) {
             }
         });
     });
+    console.log(d);
     return d;
 }
 
@@ -287,4 +289,16 @@ function show_session(nb) {
             $(d).removeClass("active");
         }
     });
+}
+
+function switchVisibility(i) {
+    var j = $(i);
+    var mail = j.parent().attr("data-email");
+    if (j.hasClass("glyphicon-eye-open")) {
+        j.removeClass("glyphicon-eye-open").addClass("glyphicon-eye-close");
+        defenses.private[mail] = true;
+    } else {
+        j.removeClass("glyphicon-eye-close").addClass("glyphicon-eye-open");
+        defenses.private[mail] = false;
+    }
 }

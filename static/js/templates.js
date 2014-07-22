@@ -25,8 +25,8 @@ Handlebars.registerHelper('fullname', function(p) {
 
 Handlebars.registerHelper('shortFullname', function(p) {
     name = p.Lastname + " " + p.Firstname;
-    if (name.length > 30) {
-        name = name.substring(0, 27) + "...";
+    if (name.length > 20) {
+        name = name.substring(0, 17) + "...";
     }
     return name;
 
@@ -79,9 +79,8 @@ Handlebars.registerHelper('majorOptions', function(m) {
         m = "?";
     }
     opts.forEach(function (o) {
-        var unquoted = o.replace(/\"/g, "");
-        var selected = m == unquoted ? " selected " : "";
-        b += "<option value='" + unquoted + "' " + selected + " >" + unquoted + "</option>";
+        var selected = m == o ? " selected " : "";
+        b += "<option value='" + o + "' " + selected + " >" + o + "</option>";
     });
     return new Handlebars.SafeString(b);
 });
@@ -154,7 +153,10 @@ Handlebars.registerHelper('inc', function(d) {
 Handlebars.registerHelper('slotEntry', function(e) {
     if (e) {
         var c = getConvention(e);
-        return c.Stu.P.Firstname + " " + c.Stu.P.Lastname + " (" + c.Stu.Major + ")";
+        var buf = c.Stu.P.Firstname + " " + c.Stu.P.Lastname + " (" + c.Stu.Major + ")";
+        buf += " <span onclick='switchVisibility(this)' class='glyphicon glyphicon-eye-" + (defenses.private[c.Stu.P.Email] ? "close" : "open") + "'></span>";
+        console.log(buf);
+        return new Handlebars.SafeString(buf);
     }
     return "Break";
 });
@@ -198,11 +200,29 @@ Handlebars.registerHelper('shortSlotEntry', function(s) {
     return "Break";
 });
 
+Handlebars.registerHelper('reportGrade', function(r) {
+    if (!r.IsIn) {
+        var date = new Date(Date.parse(r.Deadline));
+        if (date > new Date()) {
+            return new Handlebars.SafeString("<span title='Deadline passed !' class='late glyphicon glyphicon-warning-sign'></span>");
+        } else {
+            return "-";
+        }
+    }
+    var url = "/api/v1/conventions/" + r.Email + "/" + r.Kind + "/report";
+    var g = r.Grade >= 0 ? r.Grade : "<span title='Grade expected' class='warning glyphicon glyphicon-question-sign'></span>";
+    return new Handlebars.SafeString("<a href='" + url + "'>" + g + " </a>");
+});
+
+Handlebars.registerHelper('grade', function(g) {
+    return g < 0 ? "?" : g;
+});
+
 function df(d, active) {
     var date = new Date(Date.parse(d));
     var str = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
     if (active && date < new Date()) {
-        return "<span class='late'> " + str + "</span>";
+
     }
     return str;
 }

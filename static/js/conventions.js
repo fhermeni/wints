@@ -379,18 +379,52 @@ function displayTutors() {
     root.find(".mailto").on('toggle', function() {toggleMailCheckboxes(root);});
 }
 
+function getUploadData(kind, email) {
+    return {theme:'bootstrap',
+        allowedExtensions:"pdf",
+        btnText:'<span class="glyphicon glyphicon-cloud-upload"></span> Put the report',
+        url: 'api/v1/conventions/' + email + '/' + kind + '/report',
+        showFilename:false,
+        invalidExtError:'PDF file expected',
+        maxSize: 10,
+        sizeError:"The file cannot exceed 10MB",
+        onFileError: function(file, error) {
+            console.log("Erreur: " + error);
+    },
+        onFileSuccess: function(file, data) {
+            $("#dl-" + kind).removeAttr("disabled");
+        },
+        multi: false}
+}
 function showDetails(s) {
     conventions.forEach(function (c) {
         if (c.Stu.P.Email == s) {
             var buf = Handlebars.getTemplate("student-detail")(c);
             $("#modal").html(buf).modal('show');
-            $('#modal').find('.date').datepicker({format:"dd/mm/yyyy"})
+            $('#modal').find('.date')/*.datepicker({format:"dd/mm/yyyy"})*/
                 .on("changeDate", function(e){
                     setMidtermDeadline(c.Stu.P.Email, e.date, function(){
                         c.MidtermReport = e.date;
                         refresh();
                     });
                 });
+
+            if (c.SupReport.IsIn) {
+                $("#dl-supervisor").show();
+                $("#up-supervisor").hide();
+            } else {
+                $("#dl-supervisor").hide();
+                $("#up-supervisor").pekeUpload(getUploadData("supervisor", c.Stu.P.Email));
+            }
+
+            /*if (c.FinalReport.IsIn) {
+                $("#dl-final").show();
+                $("#up-final").hide();
+            } else {
+                $("#dl-final").hide();
+                $("#up-final").pekeUpload(getUploadData("final", c.Stu.P.Email));
+            }  */
+
             return false;
         }
     });
