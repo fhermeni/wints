@@ -118,3 +118,8 @@ function saveDefenses(d, ok, no) {
 function getDefenses(ok, no) {
     callWithToken("GET", "/defenses",noCb(ok), restError(no));
 }
+
+//Reports
+function updateMark(student, kind, m, ok, no) {
+    postRawWithToken("/conventions/" + student + "/" + kind + "/mark", m, noCb(ok), restError(no));
+}

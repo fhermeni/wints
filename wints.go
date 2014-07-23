@@ -276,50 +276,73 @@ func UpdateMajor(w http.ResponseWriter, r *http.Request, email string) {
 	}
 }
 
-func UpdateMidtermDeadline(w http.ResponseWriter, r *http.Request, email string) {
-	d, err := requiredContent(w, r)
-	if err != nil {
-		return
+func MarkKind(cb func(http.ResponseWriter, *http.Request, string), kind string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		cb(w, r, kind)
 	}
-	t, err := time.Parse("2/1/2006", string(d))
-	if reportIfError(w, "Invalid format", err) {
-		return
-	}
-	target, _ := mux.Vars(r)["email"]
-	//Other levels are ok
-	err = backend.UpdateDeadline(DB, target, "midterm", t)
-	reportIfError(w, "", err);
 }
 
-func UpdateFinalDeadline(w http.ResponseWriter, r *http.Request, email string) {
-	d, err := requiredContent(w, r)
-	if err != nil {
-		return
-	}
-	t, err := time.Parse("2/1/2006", string(d))
-	if reportIfError(w, "Invalid format", err) {
-		return
-	}
-	target, _ := mux.Vars(r)["email"]
+func GetReport(kind string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		target, _ := mux.Vars(r)["email"]
+		cnt, err := backend.Report(DB, target, kind)
+		if reportIfError(w, "", err) {
+			return
+		}
 
-	//Other levels are ok
-	err = backend.UpdateDeadline(DB, target, "final", t)
-	reportIfError(w, "", err);
+		u, _ := backend.GetUser(DB, target)
+
+		fileReply(w, "application/pdf", u.Lastname + "-" + kind + ".pdf", cnt)
+	}
 }
 
-func UpdateSupReportDeadline(w http.ResponseWriter, r *http.Request, email string) {
+func UpdateDeadline(kind string) http.HandlerFunc{
+	return func(w http.ResponseWriter, r *http.Request) {
+		d, err := requiredContent(w, r)
+		if err != nil {
+			return
+		}
+		t, err := time.Parse("2/1/2006", string(d))
+		if reportIfError(w, "Invalid format", err) {
+			return
+		}
+		target, _ := mux.Vars(r)["email"]
+
+		//Other levels are ok
+		err = backend.UpdateDeadline(DB, target, kind, t)
+		reportIfError(w, "", err);
+	}
+}
+
+func UploadReport(kind string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		d, err := requiredContent(w, r)
+		if err != nil {
+			return
+		}
+
+		target, _ := mux.Vars(r)["email"]
+		err = backend.SetReport(DB, target, kind, d)
+		reportIfError(w, "", err);
+	}
+}
+
+func UpdateMark(w http.ResponseWriter, r *http.Request, kind string) {
 	d, err := requiredContent(w, r)
 	if err != nil {
 		return
 	}
-	t, err := time.Parse("2/1/2006", string(d))
+	i, err := strconv.Atoi(string(d))
 	if reportIfError(w, "Invalid format", err) {
 		return
 	}
+	if i < 0 || i > 20 {
+		reportIfError(w, "Mark must be between 0 and 20", errors.New("Mark must be between 0 and 20"))
+		return
+	}
 	target, _ := mux.Vars(r)["email"]
-
 	//Other levels are ok
-	err = backend.UpdateDeadline(DB, target, "supReport", t)
+	err = backend.UpdateGrade(DB, target, kind, i)
 	reportIfError(w, "", err);
 }
 
@@ -340,74 +363,6 @@ func myStudent(w http.ResponseWriter, mine, target string) bool {
 		}
 	}
 	return true
-}
-
-func UploadMidtermReport(w http.ResponseWriter, r *http.Request, email string) {
-	d, err := requiredContent(w, r)
-	if err != nil {
-		return
-	}
-	target, _ := mux.Vars(r)["email"]
-	err = backend.SetReport(DB, target, "midterm", d)
-	reportIfError(w, "", err);
-}
-
-func GetMidtermReport(w http.ResponseWriter, r *http.Request, email string) {
-	target, _ := mux.Vars(r)["email"]
-	cnt, err := backend.Report(DB, target, "midterm")
-	if reportIfError(w, "", err) {
-		return
-	}
-
-	u, _ := backend.GetUser(DB, target)
-
-	fileReply(w, "application/pdf", u.Lastname + "-midterm.pdf", cnt)
-}
-
-func GetFinalReport(w http.ResponseWriter, r *http.Request, email string) {
-	target, _ := mux.Vars(r)["email"]
-	if (!myStudent(w, email, target)) {
-		return
-	}
-	cnt, err := backend.Report(DB, target, "final")
-	if reportIfError(w, "", err) {
-		return
-	}
-	u, _ := backend.GetUser(DB, target)
-	fileReply(w, "application/pdf", u.Lastname + "-final.pdf", cnt)
-}
-
-func UploadFinalReport(w http.ResponseWriter, r *http.Request, email string) {
-	d, err := requiredContent(w, r)
-	if err != nil {
-		return
-	}
-
-	target, _ := mux.Vars(r)["email"]
-	err = backend.SetReport(DB, target, "final", d)
-	reportIfError(w, "", err);
-}
-
-func UploadSupReport(w http.ResponseWriter, r *http.Request, email string) {
-	d, err := requiredContent(w, r)
-	if err != nil {
-		return
-	}
-	target, _ := mux.Vars(r)["email"]
-	err = backend.SetReport(DB, target, "supReport", d)
-	reportIfError(w, "", err);
-}
-
-func GetSupReport(w http.ResponseWriter, r *http.Request, email string) {
-	target, _ := mux.Vars(r)["email"]
-	cnt, err := backend.Report(DB, target, "supReport")
-	if reportIfError(w, "", err) {
-		return
-	}
-
-	u, _ := backend.GetUser(DB, target)
-
-	fileReply(w, "application/pdf", u.Lastname + "-sup.pdf", cnt)
 }
 
 func requiredContent(w http.ResponseWriter, r *http.Request) ([]byte, error) {
@@ -536,15 +491,18 @@ func main() {
 	r.HandleFunc(ROOT_API+"/conventions/", RequireRole(GetAllConventions, "major")).Methods("GET")
 	r.HandleFunc(ROOT_API+"/conventions/", RequireRole(CommitPendingConvention, "admin")).Methods("POST")
 	r.HandleFunc(ROOT_API+"/conventions/{email}/major", RequireRole(UpdateMajor, "major")).Methods("POST")
-	r.HandleFunc(ROOT_API+"/conventions/{email}/midterm/deadline", RequireRole(UpdateMidtermDeadline, "major")).Methods("POST")
-	r.HandleFunc(ROOT_API+"/conventions/{email}/midterm/report", RequireRole(UploadMidtermReport, "major")).Methods("POST")
-	r.HandleFunc(ROOT_API+"/conventions/{email}/midterm/report", RequireRole(GetMidtermReport, "major")).Methods("GET")
-	r.HandleFunc(ROOT_API+"/conventions/{email}/final/deadline", RequireRole(UpdateFinalDeadline, "major")).Methods("POST")
-	r.HandleFunc(ROOT_API+"/conventions/{email}/final/report", RequireRole(UploadFinalReport, "major")).Methods("POST")
-	r.HandleFunc(ROOT_API+"/conventions/{email}/final/report", RequireRole(GetFinalReport, "major")).Methods("GET")
-	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/deadline", RequireRole(UpdateSupReportDeadline, "major")).Methods("POST")
-	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/report", RequireRole(UploadSupReport, "major")).Methods("POST")
-	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/report", RequireRole(GetSupReport, "major")).Methods("GET")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/midterm/deadline", UpdateDeadline("midterm")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/midterm/report", UploadReport("midterm")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/midterm/report", GetReport("midterm")).Methods("GET")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/midterm/mark", MarkKind(UpdateMark, "midterm")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/final/deadline", UpdateDeadline("final")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/final/report", UploadReport("final")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/final/report", GetReport("final")).Methods("GET")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/final/mark", MarkKind(UpdateMark, "final")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/deadline", UpdateDeadline("supReport")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/report", UploadReport("major")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/mark", MarkKind(UpdateMark, "supReport")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/report", GetReport("supReport")).Methods("GET")
 
 
 	r.HandleFunc(ROOT_API+"/users/", RequireRole(GetAdmins, "admin")).Methods("GET")

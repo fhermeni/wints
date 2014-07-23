@@ -39,7 +39,7 @@
                         <dt>due date</dt>
                         <dd><input type="text" data-provide="datepicker" class="form-control date input-sm" value="{{date SupReport.Deadline}}"></dd>
                         <dt>grade</dt>
-                        <dd><input type="number" class="form-control input-sm" value="{{SupReport.Grade}}"></dd>
+                        <dd><input type="number" class="form-control input-sm" value="{{SupReport.Grade}}" onchange="setMark('{{Stu.P.Email}}', 'supervisor','SupReport', this)"></dd>
                     </dl>
 
                     <a href="/api/v1/conventions/{{Stu.P.Email}}/supervisor/report" id='dl-supervisor' class='btn btn-wide btn-success'>

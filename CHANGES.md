@@ -24,7 +24,7 @@
 - checkbox to mail supervisor/tutor in the first two tabs
    - watchlist OK
 - upload/download reports OK
-- grade reports
+- grade reports OK
 - watchlist: mode general, mode grades OK, no need in practice
 - visio/live public/private defenses: OK
 

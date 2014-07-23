@@ -60,7 +60,7 @@ func SetReport(db *sql.DB, s string, kind string, cnt []byte) error {
 }
 
 func UpdateGrade(db *sql.DB, s, kind string, g int) error {
-	sql := "update reports set g=$3 where student=$1 and kind=$2"
+	sql := "update reports set grade=$3 where student=$1 and kind=$2"
 	err := SingleUpdate(db, sql, s, kind, g)
 	return err
 }
