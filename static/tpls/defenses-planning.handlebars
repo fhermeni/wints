@@ -57,6 +57,17 @@
                                         </div>
 
                                         <div class="form-group">
+                                            <label class="col-sm-3 control-label">Time</label>
+
+                                            <div class="col-sm-5">
+                                                <!-- {{time}} -->
+                                                <input data-jury="{{id}}" onchange="saveTime(this)" type="text"
+                                                       data-slot="{{@index}}" class="form-control input-sm"
+                                                       value="{{time}}"/>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
                                             <label class="col-sm-3 control-label">Commission</label>
 
                                             <div class="col-sm-3">

@@ -8,6 +8,13 @@ function showDefenses() {
         if (!defenses.visio) {
             defenses.visio = {};
         }
+        defenses.sessions.forEach(function (s) {
+            s.jury.forEach(function (j) {
+                if (!j.time) {
+                    j.time = s.date;
+                }
+            })
+        });
         var html = Handlebars.getTemplate("defense-init")(defenses);
         $("#defenses").html(html);
         $('[data-toggle="reset-defense-confirmation"]').confirmation({onConfirm: prepareSchedule});
@@ -55,6 +62,19 @@ function saveRoom(i) {
         s.jury.forEach(function (x) {
             if (x.id == idx) {
                 x.room = r;
+                return false;
+            }
+        })
+    });
+}
+
+function saveTime(i) {
+    var idx = $(i).attr("data-jury");
+    var r = $(i).val();
+    defenses.sessions.forEach(function (s) {
+        s.jury.forEach(function (x) {
+            if (x.id == idx) {
+                x.date = r;
                 return false;
             }
         })
