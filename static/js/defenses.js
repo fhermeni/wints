@@ -74,7 +74,7 @@ function saveTime(i) {
     defenses.sessions.forEach(function (s) {
         s.jury.forEach(function (x) {
             if (x.id == idx) {
-                x.date = r;
+                x.time = r;
                 return false;
             }
         })

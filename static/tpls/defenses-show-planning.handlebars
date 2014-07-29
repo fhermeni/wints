@@ -38,7 +38,7 @@
     <h1>{{slotDate date}}</h1>
     {{#each jury}}
         <div class="jury">
-            <h2>Session {{inc @index}} ({{majors students}})</h2>
+            <h2>Session {{inc @index}} ({{majors students}}) - {{date}}</h2>
 
             <p>
                 <b>Room</b>: {{room}}<br/>
@@ -51,7 +51,7 @@
             </ul>
             <p>
             {{#each students}}
-                <b>{{offset @index ../../date}}</b>: {{slotEntry this}}<br/>
+                <b>{{offset @index ../date}}</b>: {{slotEntry this}}<br/>
             {{/each}}
             </p>
         </div>

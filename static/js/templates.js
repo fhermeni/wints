@@ -101,11 +101,11 @@ Handlebars.registerHelper('roleOptions', function(m) {
 });
 
 
-Handlebars.registerHelper('date', function(d) {
+/*Handlebars.registerHelper('date', function(d) {
     var date = new Date(Date.parse(d));
     return twoD(date.getDate()) + "/" + twoD(date.getMonth() + 1) + "/" + twoD(date.getFullYear());
 });
-
+  */
 Handlebars.registerHelper('slot', function(d) {
     return d;
     /*var date = new Date(Date.parse(d));
@@ -126,7 +126,9 @@ Handlebars.registerHelper('majors', function(emails) {
 
 Handlebars.registerHelper('offset', function(i, date) {
     var offset = i * 30 * 60 * 1000;
-    var from = new Date(new Date(date).getTime() + offset);
+    var m = moment(date, "HH:mm");
+    console.log(m.toDate() + " " + offset + " " + i);
+    var from = new Date(m.toDate().getTime() + offset);
     var to = new Date(from.getTime() + 30 * 60 * 1000);
     var str = twoD(from.getHours()) + ":" + twoD(from.getMinutes()) + " - " + twoD(to.getHours()) + ":" + twoD(to.getMinutes());
     return str;
@@ -184,7 +186,7 @@ Handlebars.registerHelper('slotMajor', function(e) {
 Handlebars.registerHelper('slotDate', function(s) {
     var m = moment(s, "DD/MM/YYYY HH:mm");
     m.lang("fr");
-    return m.format("dddd D MMMM YYYY, HH:mm");
+    return m.format("dddd D MMMM");
 });
 
 

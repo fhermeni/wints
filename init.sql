@@ -1,3 +1,7 @@
+drop table if exists finalreport;
+drop table if exists midtermreport;
+drop table if exists defenses;
+drop table if exists reports;
 drop table if exists internships;
 drop table if exists pending_internships;
 drop table if exists interviews;
