@@ -101,11 +101,11 @@ Handlebars.registerHelper('roleOptions', function(m) {
 });
 
 
-/*Handlebars.registerHelper('date', function(d) {
+Handlebars.registerHelper('shortDate', function(d) {
     var date = new Date(Date.parse(d));
     return twoD(date.getDate()) + "/" + twoD(date.getMonth() + 1) + "/" + twoD(date.getFullYear());
 });
-  */
+
 Handlebars.registerHelper('slot', function(d) {
     return d;
     /*var date = new Date(Date.parse(d));
