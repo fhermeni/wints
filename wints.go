@@ -453,7 +453,12 @@ func main() {
 
 	backend.InitLogger(cfg.Logfile)
 	defer backend.CloseLogger();
-	DB, err = sql.Open("postgres", cfg.DBurl)
+	dbUrl := os.Getenv("DATABASE_URL")
+
+	if len(dbUrl) == 0 {
+		dbUrl = cfg.DBurl
+	}
+	DB, err = sql.Open("postgres", dbUrl)
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
