@@ -58,7 +58,7 @@ func CountPending(db *sql.DB) (int, error) {
 
 func PullConventions(db *sql.DB, url, login, password string) {
 	err := InspectRawConventions2(db,url, login,password,
-						[]string{"Master%20IFI", "Master%20IMAFA", "MAM%205", "SI%205"}, time.Now().Year())
+						[]string{"Master%20IFI", "Master%20IMAFA", "MAM%205", "SI%205","Master%202%20SSTIM-images"}, time.Now().Year())
 	if err != nil {
 		log.Printf("Unable to pull the conventions: %s\n", err)
 	}

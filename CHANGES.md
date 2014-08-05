@@ -38,6 +38,8 @@
 - UI reports, encoding
 -
 
+- Automatic blank reports
+
 defenses:
  - coarse grain view for the student schedule
  - detailed view for

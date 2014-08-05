@@ -518,7 +518,6 @@ func main() {
 		log.Fatalln(err.Error())
 	}
 
-	//migrateReports()
 	for _, v := range os.Args {
 		if v == "-i" {
 			err := backend.NewUser(DB, backend.User{"R", "oot", "root@localhost", "", "root"})
@@ -546,7 +545,7 @@ func main() {
 	r.HandleFunc("/", rootHandler)
 	r.HandleFunc("/home", homeHandler)
 
-	//migrateReports()
+	migrateReports()
 	r.HandleFunc(ROOT_API+"/pending/_random", RequireRole(RandomPendingConvention, "admin")).Methods("GET")
 	r.HandleFunc(ROOT_API+"/conventions/", RequireRole(GetAllConventions, "major")).Methods("GET")
 	r.HandleFunc(ROOT_API+"/conventions/", RequireRole(CommitPendingConvention, "admin")).Methods("POST")

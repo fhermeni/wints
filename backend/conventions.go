@@ -60,6 +60,7 @@ func scanConvention(db *sql.DB, rows *sql.Rows) (Convention, error) {
 		&tutorFn, &tutorLn, &tutorEmail, &tutorTel, &midDeadline,
 		&company, &companyWWW, &supFn, &supLn, &supEmail, &supTel, &title)
 	if err != nil {
+		log.Printf("Here")
 		return Convention{}, err
 	}
 	stu := Student{User{stuFn, stuLn, stuMail, stuTel,""}, promo, major}
@@ -67,14 +68,17 @@ func scanConvention(db *sql.DB, rows *sql.Rows) (Convention, error) {
 	sup := User{supFn, supLn, supEmail, supTel, ""}
 	mid, err := GetReportMetaData(db, stuMail, "midterm")
 	if err != nil {
+		log.Printf("Hop")
 		return Convention{}, err
 	}
 	final, err := GetReportMetaData(db, stuMail, "final")
 	if err != nil {
+		log.Printf("Hip")
 		return Convention{}, err
 	}
 	supReport, err := GetReportMetaData(db, stuMail, "supReport")
 	if err != nil {
+		log.Printf("Poo")
 		return Convention{}, err
 	}
 
