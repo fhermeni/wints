@@ -39,20 +39,21 @@
         <div class="container-fluid">
             <div>
                 <ul id="menu-pages" class="nav navbar-nav navbar-left">
-                    <li><a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="fullname">Fullname</span><b class="caret"></b></a><span class="dropdown-arrow"></span>
+                    <li><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i><span id="fullname">Fullname</span><b class="caret"></b></a><span class="dropdown-arrow"></span>
                         <ul class="dropdown-menu" role="menu">
                             <li><a href="#" onclick="showProfileEditor()"><span class="fui-new"></span> Edit profile</a></li>
                             <li><a href="api/v1/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
                         </ul>
                     </li>
-                    <li class="tutorItem" style="display: none;"><a onclick="showPage(this, 'myStudents');">My students</a></li>
-                    <li class="majorItem adminItem rootItem" style="display: none;"><a onclick="showPage(this, 'conventions');">Watchlist</a></li>
-                    <li class="adminItem rootItem" style="display: none;"><a onclick="showPage(this, 'pending')">Pending conventions <span id="pending-counter"></span></a></li>
+                    <li class="tutorItem" style="display: none;"><a onclick="showPage(this, 'myStudents');"><i class="glyphicon glyphicon-briefcase"></i> My students</a></li>
+                    <li class="majorItem adminItem rootItem" style="display: none;"><a onclick="showPage(this, 'conventions');"><i class="glyphicon glyphicon-eye-open"></i> Watchlist</a></li>
+                    <li class="adminItem rootItem" style="display: none;"><a onclick="showPage(this, 'pending')"><i class="glyphicon glyphicon-filter"></i> Pending conventions <span id="pending-counter"></span></a></li>
                     <li class="adminItem rootItem" style="display: none;">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Defenses<b class="caret"></b></a><span class="dropdown-arrow"></span>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-picture"></i> Defenses<b class="caret"></b></a><span class="dropdown-arrow"></span>
                         <ul class="dropdown-menu" role="menu">
-                            <li><a onclick="showPage(this, 'defenses')">Prepare defenses</a></li>
-                            <li><a onclick="showPage(this, 'defenses_assignments')">Assignments</a></li>
+                            <li><a onclick="showPage(this, 'defenses')"><i class="glyphicon glyphicon-wrench"></i> prepare</a></li>
+                            <li><a href="/static/defenses-planning.html" target="_blank"><i class="glyphicon glyphicon-link"></i> planning</a></li>
+                            <li><a href="/static/defenses-program.html" target="_blank"><i class="glyphicon glyphicon-link"></i> program</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -60,8 +61,10 @@
                     <li class="adminItem rootItem" style="display: none">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="fui-gear"></span><b class="caret"></b></a><span class="dropdown-arrow"></span>
                         <ul class="dropdown-menu" role="menu">
-                            <li class="adminItem rootItem" style="display: none;"><a onclick="showPage(undefined, 'assignments')">Tutors</a></li>
-                            <li class="rootItem" style="display: none;"><a onclick="showPage(undefined, 'privileges')">Permissions</a></li>
+                            <li class="adminItem rootItem" style="display: none;"><a onclick="showPage(undefined, 'assignments')"><i class="glyphicon glyphicon-euro"></i> tutor service</a></li>
+                            <li class="adminItem rootItem" style="display: none;"><a onclick="showPage(undefined, 'assignments')"><i class="glyphicon glyphicon-euro"></i> jury service</a></li>
+                            <li class="adminItem rootItem divider" style="display: none;"></li>
+                            <li class="rootItem" style="display: none;"><a onclick="showPage(undefined, 'privileges')"><i class="glyphicon glyphicon-lock"></i> permissions</a></li>
                         </ul>
                     </li>
                 </ul>
