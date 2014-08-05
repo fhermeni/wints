@@ -20,15 +20,22 @@ function prevDay() {
 function showDay(d) {
     //console.log("show day " + d);
     var m = moment(defenses[d].date, "DD/MM/YYYY");
-    m.lang("en");
+    m.lang("fr");
     $("#defense-day").html(m.format("dddd D MMMM"));
+
+    if (d != 0) {
+        $("#prev-day").find("a").html("&larr; " + defenses[d - 1].date);
+    }
+    if (d != defenses.length - 1) {
+        $("#next-day").find("a").html(defenses[d + 1].date + " &rarr;");
+    }
     if (d == 0) {
-        $("#prev-day").addClass("disabled");
+        $("#prev-day").hide();
     } else if (d == defenses.length - 1) {
-        $("#next-day").addClass("disabled");
+        $("#next-day").hide();
     } else {
-        $("#next-day").removeClass("disabled");
-        $("#prev-day").removeClass("disabled");
+        $("#next-day").show();
+        $("#prev-day").show();
     }
     $("#day-" + d).toggle();
 }

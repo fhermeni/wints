@@ -1,17 +1,11 @@
-<ul class="pager">
-    <li class="previous disabled" id="prev-day"><a href="#" onclick="prevDay()">&larr; Previous</a></li>
-    <li><h2 id="defense-day" style="display: inline">Today</h2></li>
-    <li class="next" id="next-day"><a href="#" onclick="nextDay()">Next &rarr;</a></li>
-</ul>
-
 {{#each this}}
         <div id="day-{{@index}}" style="display:none;">
     {{#each period}}
         <h3>
             {{#if @index}}
-                Afternoon
+                Après-midi
             {{else}}
-                Morning
+                Matin
             {{/if}}
         </h3>
         <div class="row">
@@ -20,7 +14,7 @@
                 <h3>Session {{inc @index}} ({{majors students}})</h3>
 
                 <p>
-                    <b>Room</b>: {{room}}<br/>
+                    <b>Salle</b>: {{room}}<br/>
                     <b>Jury</b>: {{commission commission}}
                 </p>
                 <p>
@@ -29,10 +23,10 @@
                         {{#if P}}
                             {{P.Firstname}} {{P.Lastname}} ({{Major}})
                             {{#if private}}
-                                &nbsp;<span class="glyphicon glyphicon-eye-close" title="confidential"></span>
+                                &nbsp;<span class="glyphicon glyphicon-eye-close" title="soutenance confidentielle"></span>
                             {{/if}}
                             {{#if visio}}
-                                &nbsp;<span class="glyphicon glyphicon-facetime-video" title="visio-conference"></span>
+                                &nbsp;<span class="glyphicon glyphicon-facetime-video" title="soutenance en visio-conference"></span>
                             {{/if}}
                         {{else}}
                             Break
