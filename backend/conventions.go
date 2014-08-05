@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"log"
 	"errors"
+	"strconv"
 )
 
 type Convention struct {
@@ -46,6 +47,22 @@ func RegisterInternship(db *sql.DB, c Convention, move bool) error {
 			return errors.New("No pending internship deleted with email '" + c.Stu.P.Email + "'")
 		}
 	}
+	//Create the reports
+	_, err = NewReport(db, c.Stu.P.Email, "midterm", c.Begin.Add(TWO_MONTHS))
+	if err != nil {
+		log.Printf("midterm: %s\n", err)
+	}
+	t, _ := time.Parse("02/01/2006", "01/09/" + strconv.Itoa(time.Now().Year()))
+	_, err = NewReport(db, c.Stu.P.Email, "final", t)
+	if err != nil {
+		log.Printf("final: %s\n", err)
+	}
+
+	_, err = NewReport(db, c.Stu.P.Email, "supReport", t)
+	if err != nil {
+		log.Printf("supervisor report: %s\n", err)
+	}
+
 	log.Printf("Convention of %s validated\n", c.Stu)
 	return err
 }
