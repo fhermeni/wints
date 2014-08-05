@@ -3,7 +3,7 @@
  */
 
 function showDefenses() {
-    getDefenses(function(data) {
+    getEmbeddedDefenses(function(data) {
         defenses = JSON.parse(data);
         if (!defenses.visio) {
             defenses.visio = {};
@@ -47,7 +47,7 @@ function nextSession(d) {
 
 function storeDefenses() {
     console.log("saving the defenses");
-    saveDefenses(defenses);
+    saveDefenses(defenses, publicDefenses(rmEmptyJuries(defenses)));
 }
 
 function saveSessionDate(i) {
@@ -249,15 +249,22 @@ function showCoarseDefenseForm() {
 }
 
 function showDefensePlanningForm() {
-    var html = Handlebars.getTemplate("defenses-planning")(defenses);
-    $("#defenses-form").html(html);
-    //$(".students").sortable(sortableOptions());
-    $('#pool').affix({
-        offset: {
-            top: ($("#top-planning").position().top)
-        }
+    getUsers(function (users) {
+        defenses.tutors = [];
+        users.forEach(function (u) {
+            defenses.tutors.push(u);
+        });
+        console.log(defenses.tutors);
+        var html = Handlebars.getTemplate("defenses-planning")(defenses);
+        $("#defenses-form").html(html);
+        //$(".students").sortable(sortableOptions());
+        $('#pool').affix({
+            offset: {
+                top: ($("#top-planning").position().top)
+            }
+        });
+        show_session(0);
     });
-    show_session(0);
 }
 
 function displayDefenses(i) {
@@ -268,7 +275,9 @@ function displayDefenses(i) {
 
 function rmEmptyJuries(defenses) {
     var d = {
-        sessions: []
+        sessions: [],
+        private: defenses.private,
+        visio : defenses.visio
     };
     var i = 0;
     defenses.sessions.forEach(function (s) {
@@ -336,4 +345,56 @@ function switchVisio(i) {
         j.removeClass("glyphicon-user").addClass("glyphicon-facetime-video");
         defenses.visio[mail] = true;
     }
+}
+
+function publicDefenses(d) {
+    var long = {};
+    long.sessions = [];
+    d.sessions.forEach(function (session) {
+        var newSession = {date: session.date, jury:[]};
+        long.sessions.push(newSession);
+        session.jury.forEach(function (j) {
+            var myJury = {
+                students : [],
+                commission : j.commission,
+                room : j.room,
+                id : j.id,
+                time : j.date
+            };
+
+            newSession.jury.push(myJury);
+            j.students.forEach(function (stu) {
+                var c = getConvention(stu);
+                if (c) {
+                    //get its fn,ln
+                    var myStudent = {
+                        P: {
+                            Firstname: c.Stu.P.Firstname,
+                            Lastname: c.Stu.P.Lastname
+                        },
+                        Major: c.Stu.Major,
+                        Promotion: c.Stu.Promotion,
+                        Subject: c.Title,
+                        CompanyWWW: c.CompanyWWW,
+                        Company: c.Company,
+                        private : d.private[stu],
+                        visio: d.visio[stu]
+
+                    };
+                    myJury.students.push(myStudent);
+                } else {
+                    myJury.students.push({});
+                }
+            });
+        });
+    });
+
+    var byDay = [];
+    for (i = 0; i < long.sessions.length; i+=2) {
+        byDay.push({
+            date: long.sessions[i].date,
+            period : [long.sessions[i], long.sessions[i+1]]
+        });
+    }
+    return byDay;
 }

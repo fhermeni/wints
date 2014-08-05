@@ -111,12 +111,12 @@ function login(email, password, ok, no) {
     return postWithToken("/login", {Email: email, Password: password}, noCb(ok), restError(no));
 }
 
-function saveDefenses(d, ok, no) {
-    return postWithToken("/defenses", d, noCb(ok), restError(no));
+function saveDefenses(d, pub_version, ok, no) {
+    return postWithToken("/defenses", {Short: JSON.stringify(d), Long: JSON.stringify(pub_version)}, noCb(ok), restError(no));
 }
 
-function getDefenses(ok, no) {
-    callWithToken("GET", "/defenses",noCb(ok), restError(no));
+function getEmbeddedDefenses(ok, no) {
+    callWithToken("GET", "/defenses?fmt=embedded",noCb(ok), restError(no));
 }
 
 //Reports

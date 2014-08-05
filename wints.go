@@ -44,6 +44,13 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func getLongDefenses(w http.ResponseWriter, r *http.Request) {
+	cnt, err := backend.LongDefense(DB, "si/ifi")
+	if !reportIfError(w, "", err) {
+		w.Write([]byte(cnt))
+	}
+}
+
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	n, err := backend.ExtractEmail(r)
 	if reportIfError(w, "", err) {
@@ -164,20 +171,68 @@ func RmUser(w http.ResponseWriter, r *http.Request, email string) {
 	}
 }
 
-func GetDefense(w http.ResponseWriter, r *http.Request, email string) {
-	cnt, err := backend.Defense(DB, "si/ifi")
-	if !reportIfError(w, "", err) {
-		w.Write([]byte(cnt))
+func GetDefense(w http.ResponseWriter, r *http.Request) {
+	fmt := r.FormValue("fmt")
+	if (len(fmt) == 0) {
+		fmt = "embedded"
 	}
+	var cnt string
+	var err error
+	switch (fmt) {
+	case "public":
+		cnt, err = backend.LongDefense(DB, "si/ifi")
+	case "embedded":
+		email, _ := backend.ExtractEmail(r)
+		if (len(email) == 0) {
+			http.Redirect(w, r, "/", 302)
+	    	return
+		}
+		u, _ := backend.GetUser(DB, email)
+		if u.CompatibleRole("admin") {
+			cnt, err = backend.Defense(DB, "si/ifi")
+		} else {
+			http.Error(w, "Unsufficient permission", http.StatusUnauthorized)
+			return
+		}
+	}
+	w.Write([]byte(cnt))
+	reportIfError(w, "", err)
+}
+
+type DefensesPost struct {
+	Short string
+	Long  string
 }
 
 func PostDefense(w http.ResponseWriter, r *http.Request, email string) {
-	cnt, err := ioutil.ReadAll(r.Body)
+	var dp DefensesPost
+	err := jsonRequest(w, r, &dp)
+	if err != nil {
+		return
+	}
+	log.Printf("%s\n", dp.Short)
+	log.Printf("%s\n", dp.Long)
+
+	err = backend.SaveDefense(DB, "si/ifi", string(dp.Short), string(dp.Long))
+	reportIfError(w, "", err)
+
+	/*cnt, err := ioutil.ReadAll(r.Body)
+
+	//Separator short from long
+	var f interface{}
+	err = json.Unmarshal(cnt, &f)
 	if reportIfError(w, "", err) {
 		return
 	}
-	err = backend.SaveDefense(DB, "si/ifi", string(cnt))
-	reportIfError(w, "", err)
+    m := f.(map[string]interface{})
+
+	if reportIfError(w, "", err) {
+		return
+	}
+	log.Printf("%s\n",m["Short"]);
+	log.Printf("%s\n",m["Long"]);
+	//err = backend.SaveDefense(DB, "si/ifi", string(m["Short"].([]byte)), string(m["Long"].([]byte)))
+	//reportIfError(w, "", err)*/
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -519,8 +574,10 @@ func main() {
 	r.HandleFunc(ROOT_API+"/users/{email}/", RequireToken(ChangeProfile)).Methods("POST")
 	r.HandleFunc(ROOT_API+"/login", Login).Methods("POST")
 	r.HandleFunc(ROOT_API+"/logout", RequireToken(Logout)).Methods("GET")
-	r.HandleFunc(ROOT_API+"/defenses", RequireRole(GetDefense, "admin")).Methods("GET")
+	//r.HandleFunc(ROOT_API+"/defenses", RequireRole(GetDefense, "admin")).Methods("GET")
+	r.HandleFunc(ROOT_API+"/defenses", GetDefense).Methods("GET")
 	r.HandleFunc(ROOT_API+"/defenses", RequireRole(PostDefense, "admin")).Methods("POST")
+	//r.HandleFunc("/defenses/program", getDefensesProgram).Methods("GET")
 	fs := http.Dir("static/")
 	fileHandler := http.FileServer(fs)
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", fileHandler))

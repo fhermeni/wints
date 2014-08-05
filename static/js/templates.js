@@ -5,7 +5,7 @@
 Handlebars.getTemplate = function(name) {
     if (Handlebars.templates === undefined || Handlebars.templates[name] === undefined) {
         $.ajax({
-            url : 'static/tpls/' + name + '.handlebars',
+            url : '/static/tpls/' + name + '.handlebars',
             success : function(data) {
                 if (Handlebars.templates === undefined) {
                     Handlebars.templates = {};
@@ -115,19 +115,29 @@ Handlebars.registerHelper('slot', function(d) {
 Handlebars.registerHelper('majors', function(emails) {
     var majors = {};
     emails.forEach(function (e) {
-        if (e) {
-            c = getConvention(e);
-            majors[c.Stu.Major] = true;
+        if (e.Major) {
+            majors[e.Major] = true;
         }
     });
     return Object.keys(majors).join(", ");
+});
+
+Handlebars.registerHelper('commission', function(emails) {
+    var cnt = [];
+    emails.forEach(function (e) {
+        if (e) {
+            cnt.push(e);
+        } else {
+            cnt.push("?")
+        }
+    });
+    return cnt.join(", ");
 });
 
 
 Handlebars.registerHelper('offset', function(i, date) {
     var offset = i * 30 * 60 * 1000;
     var m = moment(date, "HH:mm");
-    console.log(m.toDate() + " " + offset + " " + i);
     var from = new Date(m.toDate().getTime() + offset);
     var to = new Date(from.getTime() + 30 * 60 * 1000);
     var str = twoD(from.getHours()) + ":" + twoD(from.getMinutes()) + " - " + twoD(to.getHours()) + ":" + twoD(to.getMinutes());
@@ -164,7 +174,6 @@ Handlebars.registerHelper('slotEntry', function(e) {
 });
 
 Handlebars.registerHelper('notEmptyJury', function(f) {
-    console.log(f);
     var empty = true;
     f.students.forEach(function (s) {
         if (s != undefined) {
