@@ -7,16 +7,28 @@ import (
 	"crypto/tls"
 	"net"
 	"log"
+	"io/ioutil"
 )
 
 func Mail(cfg Config, to string, input string, data interface{}) error {
 
-	tpl, err := template.ParseFiles(input)
-	var out bytes.Buffer
+	var out []byte
 
-	if tpl.Execute(&out, data); err != nil {
-		return err
+	if data == nil {
+		var err error
+		out, err = ioutil.ReadFile(input)
+		if err != nil {
+			return err
+		}
+	} else {
+		tpl, err := template.ParseFiles(input)
+		var b bytes.Buffer
+		if tpl.Execute(&b, data); err != nil {
+			return err
+		}
+		out = b.Bytes()
 	}
+
 	hostname,_,err := net.SplitHostPort(cfg.SmtpServer)
 	if err != nil {
 		return err
@@ -28,7 +40,7 @@ func Mail(cfg Config, to string, input string, data interface{}) error {
 			auth,
 			tls,
 			cfg.SmtpSender, []string{to},
-			out.Bytes())
+			out)
 		if err != nil {
 			log.Printf("Unable to send a mail: %s\n", err.Error())
 		}

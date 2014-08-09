@@ -470,7 +470,7 @@ func GrantRole(w http.ResponseWriter, r *http.Request, email string) {
 	err = backend.GrantPrivilege(DB, target, string(role))
 	if !reportIfError(w, "", err) {
 		backend.LogActionInfo(email, "'"+target+"' granted to role '"+string(role)+"'");
-		backend.Mail(cfg, email, "mails/priv_" + string(role) + ".txt", struct{}{})
+		backend.Mail(cfg, target, "mails/priv_" + string(role) + ".txt", nil)
 	}
 }
 
