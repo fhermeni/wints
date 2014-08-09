@@ -114,7 +114,7 @@ func RandomPendingConvention(w http.ResponseWriter, r *http.Request, email strin
 }
 
 func GetAllConventions(w http.ResponseWriter, r *http.Request, email string) {
-	conventions, err := backend.GetConventions(DB)
+	conventions, err := backend.GetConventions2(DB, email)
 	if !reportIfError(w, "Unable to get the conventions ", err) {
 		jsonReply(w, conventions)
 	}
@@ -577,7 +577,7 @@ func main() {
 
 	//migrateReports()
 	r.HandleFunc(ROOT_API+"/pending/_random", RequireRole(RandomPendingConvention, "admin")).Methods("GET")
-	r.HandleFunc(ROOT_API+"/conventions/", RequireRole(GetAllConventions, "major")).Methods("GET")
+	r.HandleFunc(ROOT_API+"/conventions/", /*RequireRole(GetAllConventions, "major"))*/ RequireToken(GetAllConventions)).Methods("GET")
 	r.HandleFunc(ROOT_API+"/conventions/", RequireRole(CommitPendingConvention, "admin")).Methods("POST")
 	r.HandleFunc(ROOT_API+"/conventions/{email}/major", RequireRole(UpdateMajor, "major")).Methods("POST")
 	r.HandleFunc(ROOT_API+"/conventions/{email}/midterm/deadline", UpdateDeadline("midterm")).Methods("POST")

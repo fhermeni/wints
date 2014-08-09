@@ -145,3 +145,40 @@ func GetConventions(db *sql.DB) ([]Convention, error) {
 	}
 	return conventions, nil
 }
+
+
+func GetConventions2(db *sql.DB, emitter string) ([]Convention, error) {
+	conventions := make([]Convention, 0, 0)
+	u, err := GetUser(db, emitter)
+	if err != nil {
+		return conventions, err
+	}
+	var q string
+	var rows *sql.Rows
+	if len(u.Role) == 0 {
+		q = "select stu.firstname, stu.lastname, stu.email, stu.tel, students.promotion, students.major, startTime, endTime, tut.firstname, tut.lastname, tut.email, tut.tel," +
+				"midTermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title " +
+				" from internships, users as stu, users as tut, students where students.email = stu.email and internships.student = stu.email and tut.email = internships.tutor" +
+				" and tutor=$1";
+		rows, err = db.Query(q, emitter)
+	} else {
+		q = "select stu.firstname, stu.lastname, stu.email, stu.tel, students.promotion, students.major, startTime, endTime, tut.firstname, tut.lastname, tut.email, tut.tel," +
+				"midTermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title " +
+				" from internships, users as stu, users as tut, students where students.email = stu.email and internships.student = stu.email and tut.email = internships.tutor";
+		rows, err = db.Query(q)
+	}
+
+
+	if err != nil {
+		return conventions, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		c, err := scanConvention(db, rows)
+		if err != nil {
+			return conventions, err
+		}
+		conventions = append(conventions, c)
+	}
+	return conventions, nil
+}
