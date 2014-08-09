@@ -27,6 +27,14 @@ const (
 	TWO_MONTHS = 2*time.Hour*24*30
 )
 
+func IsTutoring(db *sql.DB, email string) (bool, error) {
+	rows, err := db.Query("select internships.student,pending_internships.student from internships,pending_internships where tutor=$1", email)
+	if err != nil {
+		return false, err;
+	}
+	return rows.Next(), nil
+}
+
 func RegisterInternship(db *sql.DB, c Convention, move bool) error {
 	supervisor := c.Sup
 	_, err := db.Exec("insert into internships (student, startTime, endTime, tutor, midtermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11, $12)",

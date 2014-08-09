@@ -4,6 +4,17 @@ var user;
 var defenses;
 var currentPage;
 
+function missing(id) {
+    var d = $("#" + id);
+    if (d.val() == "") {
+        d.notify("Required", {autoHide: false});
+        return true;
+    }
+    return false;
+}
+function reportSuccess(msg) {
+    $.notify(msg, {autoHideDelay: 1000, className: "success", globalPosition: "top center"})
+}
 
 $( document ).ready(function () {
     //Check access
@@ -416,15 +427,6 @@ function showDetails(s) {
                 $("#dl-supervisor").hide();
                 $("#up-supervisor").pekeUpload(getUploadData("supervisor", c.Stu.P.Email));
             }
-
-            /*if (c.FinalReport.IsIn) {
-                $("#dl-final").show();
-                $("#up-final").hide();
-            } else {
-                $("#dl-final").hide();
-                $("#up-final").pekeUpload(getUploadData("final", c.Stu.P.Email));
-            }  */
-
             return false;
         }
     });
@@ -449,9 +451,13 @@ function showPrivileges() {
         var others = data.filter(function (u) {
             return u.Email != user.Email;
         });
+        //The base
         var html = Handlebars.getTemplate("privileges")(others);
         $("#privileges").html(html);
-        $('[data-toggle="deluser-confirmation"]').confirmation({onConfirm: rmUser});
+        $('[data-toggle="deluser-confirmation"]').each(function (i, a) {
+            var j = $(a);
+            j.confirmation({onConfirm: function() {rmUser(j.attr("data-user"), j.parent().parent().parent())}});
+        });
     });
 }
 
@@ -460,13 +466,28 @@ function updatePrivilege(select, email) {
 }
 
 function newUser() {
+    if (missing("lbl-nu-fn") || missing("lbl-nu-ln") || missing("lbl-nu-email")) {
+        return false;
+    }
     createUser($("#lbl-nu-fn").val(), $("#lbl-nu-ln").val(),
                 $("#lbl-nu-tel").val(), $("#lbl-nu-email").val(),
-                $("#lbl-nu-priv").val(), function() {$("#modal").hide()});
+                $("#lbl-nu-priv").val(),
+                function() {
+                    $("#new-user").modal('hide');
+                    reportSuccess("Account created");
+                    showPrivileges();
+                }, function(o) {
+                    if (o.status == 409) {
+                        $("#lbl-nu-email").notify("This email is already registered");
+                    }
+                });
 }
 
-function rmUser() {
-    deleteUser($(this).attr("user"), function() {$(this).parent().parent().parent().remove();});
+function rmUser(email, div) {
+    deleteUser(email, function() {
+        div.remove();
+        reportSuccess("Account deleted")
+    });
 }
 
 function rawTutors() {

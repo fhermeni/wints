@@ -32,6 +32,7 @@ function updatePassword() {
         $("#profileEditor-password-err").html();
         setPassword($("#lbl-old-password").val(), $("#lbl-password1").val(), function() {
             $("#modal").modal('hide');
+            $.notify("Password changed successfully");
         });
     }
 }

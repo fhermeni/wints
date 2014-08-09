@@ -8,6 +8,7 @@ import (
 	"crypto/rand"
 	"log"
 	"net/http"
+	"time"
 )
 
 type User struct {
@@ -39,11 +40,9 @@ func Register(db *sql.DB, email, password string) (User, error) {
 	var fn, ln, tel, p, r string
 	err := db.QueryRow("select firstname, lastname, tel, password, role from users where email=$1", email).Scan(&fn, &ln, &tel, &p, &r)
 	if err != nil {
-		log.Printf("Unknown user %s: ‰s\n", email, err)
 		return User{}, errors.New("Unknown user or incorrect password")
 	}
 	if (bcrypt.CompareHashAndPassword([]byte(p), []byte(password)) != nil) {
-		log.Printf("Bad password for %s\n", email)
 		return User{}, errors.New("Unknown user or incorrect password")
 	}
 
@@ -51,8 +50,7 @@ func Register(db *sql.DB, email, password string) (User, error) {
 }
 
 func NewUser(db *sql.DB, p User) error {
-	newPassword := rand_str(8)
-	log.Printf("New password for user '%s %s': %s\n", p.Firstname, p.Lastname, newPassword)
+	newPassword := rand_str(64) //Hard to guess
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.MinCost)
 	if err != nil {
 		return err
@@ -66,22 +64,28 @@ func NewUser(db *sql.DB, p User) error {
 		return err
 	}
 	if nb == 1 {
+		token, _ := PasswordRenewalRequest(db, p.Email)
+		log.Printf("Token for %s: %s\n",p.Email, token)
 		return nil
 	}
 	return &BackendError{http.StatusConflict, "User already exists"}
 }
 
 func RmUser(db *sql.DB, email string) error {
-	err := SingleUpdate(db, "DELETE FROM users where email=$1", email)
+	ok, err := IsTutoring(db, email)
 	if err != nil {
+		return err
+	}
+	if (ok) {
 		//The user exists, so it is just it is it is tutoring so.
 		return &BackendError{http.StatusPreconditionFailed, "The user is tutoring students"}
 	}
-	return nil
+
+	return SingleUpdate(db, "DELETE FROM users where email=$1", email)
 }
 
 func rand_str(str_size int) string {
-	alphanum := "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz$_-!@&,;:/"
+	alphanum := "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 	var bytes = make([]byte, str_size)
 	rand.Read(bytes)
 	for i, b := range bytes {
@@ -113,7 +117,7 @@ func Admins(db *sql.DB) ([]User, error) {
 	return admins, nil
 }
 
-func NewPassword(db *sql.DB, email string, oldPassword, newPassword []byte) error {
+func ChangePassword(db *sql.DB, email string, oldPassword, newPassword []byte) error {
 	//Get the password
 	var p []byte
 	err := db.QueryRow("select password from users where email=$1", email).Scan(&p)
@@ -124,6 +128,10 @@ func NewPassword(db *sql.DB, email string, oldPassword, newPassword []byte) erro
 		return &BackendError{http.StatusConflict, "incorrect old password"}
 	}
 
+	//Delete possible renew requests
+	db.QueryRow("delete from password_renewal where user=$1", email)
+
+	//Make the new one
 	hash, err := bcrypt.GenerateFromPassword(newPassword, bcrypt.MinCost)
 	if err != nil {
 		return err
@@ -137,4 +145,30 @@ func SetProfile(db *sql.DB, email, fn, ln, tel string) error {
 
 func GrantPrivilege(db *sql.DB, email, priv string) error {
 	return SingleUpdate(db, "update users set role=$2 where email=$1", email, priv)
+}
+
+func PasswordRenewalRequest(db *sql.DB, email string) (string, error) {
+	//In case a request already exists
+	db.QueryRow("delete from password_renewal where email=$1", email)
+	token := rand_str(32)
+	d, _ := time.ParseDuration("48h")
+	_, err := db.Exec("insert into password_renewal(email,token,deadline) values($1,$2,$3)", email, token, time.Now().Add(d))
+ 	return token, err
+}
+
+func NewPassword(db *sql.DB, token string, newPassword []byte) (string, error) {
+	//Delete possible renew requests
+	var email string
+	db.QueryRow("select email from password_renewal where token=$1", token).Scan(&email)
+	//Make the new one
+	hash, err := bcrypt.GenerateFromPassword(newPassword, bcrypt.MinCost)
+	if err != nil {
+		return "", err
+	}
+	err = SingleUpdate(db, "update users set password=$2 where email=$1", email, hash)
+	if (err != nil) {
+		return "", err
+	}
+	db.QueryRow("delete from password_renewal where token=$1", token)
+	return email, nil
 }

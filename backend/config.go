@@ -13,7 +13,13 @@ type Config struct {
 	MidtermReportDeadline string
 	DBurl string
 	Port int
+	RecaptchaPk string
 	Logfile string
+	SmtpServer string
+	SmtpUsername string
+	SmtpPassword string
+	SmtpSender string
+	WWW string
 }
 
 func ReadConfig(path string) (Config, error) {

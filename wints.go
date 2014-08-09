@@ -21,6 +21,7 @@ const (
 )
 
 var DB *sql.DB
+var cfg backend.Config
 
 func reportIfError(w http.ResponseWriter, header string, err error) bool {
 	if err == nil {
@@ -60,14 +61,11 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 		log.Printf("No cookie");
 		http.Redirect(w, r, "/", 302)
 	}
-	u, err := backend.GetUser(DB, n)
-	if !reportIfError(w, "", err) {
-		if u.Role != "" {
-			http.ServeFile(w, r, "static/admin.html")
-			return
-		}
-		log.Printf("No dashboard available")
+	_, err = backend.GetUser(DB, n)
+	if reportIfError(w, "", err) {
+		return
 	}
+	http.ServeFile(w, r, "static/admin.html")
 }
 
 func jsonReply(w http.ResponseWriter, j interface{}) {
@@ -144,6 +142,11 @@ func NewAdmin(w http.ResponseWriter, r *http.Request, email string) {
 	if err != nil {
 		return
 	}
+	_, err = backend.GetUser(DB, nu.Email)
+	if err == nil {
+		http.Error(w, "Unsufficient permission", http.StatusConflict)
+		return
+	}
 	p := backend.User{nu.Firstname, nu.Lastname, nu.Email, nu.Tel, nu.Priv}
 	err = backend.NewUser(DB, p)
 	if !reportIfError(w, "", err) {
@@ -215,24 +218,6 @@ func PostDefense(w http.ResponseWriter, r *http.Request, email string) {
 
 	err = backend.SaveDefense(DB, "si/ifi", string(dp.Short), string(dp.Long))
 	reportIfError(w, "", err)
-
-	/*cnt, err := ioutil.ReadAll(r.Body)
-
-	//Separator short from long
-	var f interface{}
-	err = json.Unmarshal(cnt, &f)
-	if reportIfError(w, "", err) {
-		return
-	}
-    m := f.(map[string]interface{})
-
-	if reportIfError(w, "", err) {
-		return
-	}
-	log.Printf("%s\n",m["Short"]);
-	log.Printf("%s\n",m["Long"]);
-	//err = backend.SaveDefense(DB, "si/ifi", string(m["Short"].([]byte)), string(m["Long"].([]byte)))
-	//reportIfError(w, "", err)*/
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -246,6 +231,33 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	backend.SetSession(login, w)
 	backend.LogActionInfo(login, " log in");
 	http.Redirect(w, r, "/", 302);
+}
+
+func PasswordReset(w http.ResponseWriter, r *http.Request) {
+	email, err := ioutil.ReadAll(r.Body)
+	if reportIfError(w, "", err) {
+		return
+	}
+	if len(email) == 0 {
+		http.Error(w, "Email is missing", http.StatusBadRequest)
+		return
+	}
+	u, err := backend.GetUser(DB, string(email))
+	if err != nil {
+		log.Printf("%s\n", email)
+		return
+	}
+	token, err := backend.PasswordRenewalRequest(DB, string(email))
+	if reportIfError(w, "Unable to generate a token", err) {
+		return
+	}
+	err = backend.Mail(cfg, u, "mails/account_reset.txt", struct {
+				WWW   string
+				Token string
+			}{cfg.WWW, token})
+	if err != nil {
+		log.Fatalf("%s\n", err)
+	}
 }
 
 func Logout(w http.ResponseWriter, r *http.Request, email string) {
@@ -315,9 +327,27 @@ func ChangePassword(w http.ResponseWriter, r *http.Request, email string) {
 		return
 	}
 
-	err := backend.NewPassword(DB, email, []byte(p.OldPassword), []byte(p.NewPassword))
+	err := backend.ChangePassword(DB, email, []byte(p.OldPassword), []byte(p.NewPassword))
 	reportIfError(w, "", err)
 }
+
+func NewPassword(w http.ResponseWriter, r *http.Request) {
+	token := r.FormValue("token")
+	password := r.FormValue("password")
+	email, err := backend.NewPassword(DB, token, []byte(password))
+	if reportIfError(w, "", err) {
+		return
+	}
+	_, err = backend.Register(DB, email, password)
+	if err != nil {
+		http.Redirect(w, r, "/#badLogin", 302);
+		return
+	}
+	backend.SetSession(email, w)
+	backend.LogActionInfo(email, " log in");
+	http.Redirect(w, r, "/", 302);
+}
+
 
 func UpdateMajor(w http.ResponseWriter, r *http.Request, email string) {
 	target, _ := mux.Vars(r)["email"]
@@ -500,12 +530,11 @@ func migrateReports() {
 	}
 }
 func main() {
-
-	cfg, err := backend.ReadConfig("./wints.conf")
+	var err error
+	cfg, err = backend.ReadConfig("./wints.conf")
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-
 	backend.InitLogger(cfg.Logfile)
 	defer backend.CloseLogger();
 	dbUrl := os.Getenv("DATABASE_URL")
@@ -570,13 +599,13 @@ func main() {
 	r.HandleFunc(ROOT_API+"/users/{email}", RequireRole(RmUser, "root")).Methods("DELETE")
 	r.HandleFunc(ROOT_API+"/users/{email}", RequireToken(GetUser)).Methods("GET")
 	r.HandleFunc(ROOT_API+"/users/{email}/password", RequireToken(ChangePassword)).Methods("POST")
+	r.HandleFunc(ROOT_API+"/new_password", NewPassword).Methods("POST")
 	r.HandleFunc(ROOT_API+"/users/{email}/", RequireToken(ChangeProfile)).Methods("POST")
 	r.HandleFunc(ROOT_API+"/login", Login).Methods("POST")
+	r.HandleFunc(ROOT_API+"/password_reset", PasswordReset).Methods("POST")
 	r.HandleFunc(ROOT_API+"/logout", RequireToken(Logout)).Methods("GET")
-	//r.HandleFunc(ROOT_API+"/defenses", RequireRole(GetDefense, "admin")).Methods("GET")
 	r.HandleFunc(ROOT_API+"/defenses", GetDefense).Methods("GET")
 	r.HandleFunc(ROOT_API+"/defenses", RequireRole(PostDefense, "admin")).Methods("POST")
-	//r.HandleFunc("/defenses/program", getDefensesProgram).Methods("GET")
 	fs := http.Dir("static/")
 	fileHandler := http.FileServer(fs)
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", fileHandler))
