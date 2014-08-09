@@ -145,7 +145,3 @@ func GetConventions(db *sql.DB) ([]Convention, error) {
 	}
 	return conventions, nil
 }
-
-/*func SetMidtermDeadline(db *sql.DB, email string, d time.Time) error {
-	return SingleUpdate(db, "update internships set midtermDeadline=$2 where student=$1", email, d)
-} */

@@ -462,7 +462,14 @@ function showPrivileges() {
 }
 
 function updatePrivilege(select, email) {
-    setPrivilege(email, $(select).val());
+    setPrivilege(email, $(select).val(),
+    function() {
+        $.notify("Privilege updated", {
+             position:"top center",
+             autoHideDelay: 1000,
+             className : "success"})
+    }
+    );
 }
 
 function newUser() {

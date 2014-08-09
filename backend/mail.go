@@ -9,7 +9,7 @@ import (
 	"log"
 )
 
-func Mail(cfg Config, u User, input string, data interface{}) error {
+func Mail(cfg Config, to string, input string, data interface{}) error {
 
 	tpl, err := template.ParseFiles(input)
 	var out bytes.Buffer
@@ -27,7 +27,7 @@ func Mail(cfg Config, u User, input string, data interface{}) error {
 		err := SendMail(cfg.SmtpServer,
 			auth,
 			tls,
-			cfg.SmtpSender, []string{u.Email},
+			cfg.SmtpSender, []string{to},
 			out.Bytes())
 		if err != nil {
 			log.Printf("Unable to send a mail: %s\n", err.Error())

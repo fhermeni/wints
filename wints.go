@@ -251,7 +251,7 @@ func PasswordReset(w http.ResponseWriter, r *http.Request) {
 	if reportIfError(w, "Unable to generate a token", err) {
 		return
 	}
-	err = backend.Mail(cfg, u, "mails/account_reset.txt", struct {
+	err = backend.Mail(cfg, u.Email, "mails/account_reset.txt", struct {
 				WWW   string
 				Token string
 			}{cfg.WWW, token})
@@ -470,6 +470,7 @@ func GrantRole(w http.ResponseWriter, r *http.Request, email string) {
 	err = backend.GrantPrivilege(DB, target, string(role))
 	if !reportIfError(w, "", err) {
 		backend.LogActionInfo(email, "'"+target+"' granted to role '"+string(role)+"'");
+		backend.Mail(cfg, email, "mails/priv_" + string(role) + ".txt", struct{}{})
 	}
 }
 
