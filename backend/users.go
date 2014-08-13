@@ -6,9 +6,15 @@ import (
 	"errors"
 	"code.google.com/p/go.crypto/bcrypt"
 	"crypto/rand"
-	"log"
-	"net/http"
 	"time"
+)
+
+var (
+	errUserExists = errors.New("User already exists")
+	errUserNotFound = errors.New("User not found")
+	errUserTutoring = errors.New("The user is tutoring students")
+	errCredentials = errors.New("Incorrect credentials")
+	errNoPendingRequests = errors.New("No password renewable request pending")
 )
 
 type User struct {
@@ -38,37 +44,27 @@ func (p User) CompatibleRole(r string) bool {
 
 func Register(db *sql.DB, email, password string) (User, error) {
 	var fn, ln, tel, p, r string
-	err := db.QueryRow("select firstname, lastname, tel, password, role from users where email=$1", email).Scan(&fn, &ln, &tel, &p, &r)
-	if err != nil {
-		return User{}, errors.New("Unknown user or incorrect password")
+	if err := db.QueryRow("select firstname, lastname, tel, password, role from users where email=$1", email).Scan(&fn, &ln, &tel, &p, &r); err != nil {
+		return User{}, errCredentials
 	}
-	if (bcrypt.CompareHashAndPassword([]byte(p), []byte(password)) != nil) {
-		return User{}, errors.New("Unknown user or incorrect password")
+	if err := bcrypt.CompareHashAndPassword([]byte(p), []byte(password)); err != nil {
+		return User{}, errCredentials
 	}
-
 	return User{fn, ln, email, tel, r}, nil
 }
 
-func NewUser(db *sql.DB, p User) error {
+func NewUser(db *sql.DB, p User) (string,error) {
 	newPassword := rand_str(64) //Hard to guess
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.MinCost)
 	if err != nil {
-		return err
+		return "", err
 	}
-	res, err := db.Exec("insert into users(email, firstname, lastname, tel, password, role) values ($1,$2,$3,$4,$5,$6)", p.Email, p.Firstname, p.Lastname, p.Tel, hashedPassword, p.Role)
+	_, err = db.Exec("insert into users(email, firstname, lastname, tel, password, role) values ($1,$2,$3,$4,$5,$6)", p.Email, p.Firstname, p.Lastname, p.Tel, hashedPassword, p.Role)
 	if err != nil {
-		return err;
+		return "", errUserExists;
 	}
-	nb, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if nb == 1 {
-		token, _ := PasswordRenewalRequest(db, p.Email)
-		log.Printf("Token for %s: %s\n",p.Email, token)
-		return nil
-	}
-	return &BackendError{http.StatusConflict, "User already exists"}
+	token, err := PasswordRenewalRequest(db, p.Email)
+	return token, err
 }
 
 func RmUser(db *sql.DB, email string) error {
@@ -77,11 +73,9 @@ func RmUser(db *sql.DB, email string) error {
 		return err
 	}
 	if (ok) {
-		//The user exists, so it is just it is it is tutoring so.
-		return &BackendError{http.StatusPreconditionFailed, "The user is tutoring students"}
+		return errUserTutoring
 	}
-
-	return SingleUpdate(db, "DELETE FROM users where email=$1", email)
+	return SingleUpdate(db, errUserNotFound, "DELETE FROM users where email=$1", email)
 }
 
 func rand_str(str_size int) string {
@@ -97,14 +91,16 @@ func rand_str(str_size int) string {
 func GetUser(db *sql.DB, email string) (User, error) {
 	var fn, ln, tel, role string
 	err := db.QueryRow("select firstname, lastname, tel, role from users where email=$1", email).Scan(&fn, &ln, &tel, &role)
-	return User{fn, ln, email, tel, role}, err
+	if err != nil {
+		return User{}, errUserNotFound
+	}
+	return User{fn, ln, email, tel, role}, nil
 }
 
 func Admins(db *sql.DB) ([]User, error) {
 	rows, err := db.Query("select firstname, lastname, users.email, tel, role from users where users.email not in (select email from students)")
 	admins := make([]User, 0, 0)
 	if err != nil {
-		log.Printf("Error: %s\n", err)
 		return admins, err
 	}
 	defer rows.Close()
@@ -120,12 +116,11 @@ func Admins(db *sql.DB) ([]User, error) {
 func ChangePassword(db *sql.DB, email string, oldPassword, newPassword []byte) error {
 	//Get the password
 	var p []byte
-	err := db.QueryRow("select password from users where email=$1", email).Scan(&p)
-	if err != nil {
-		return err
+	if err := db.QueryRow("select password from users where email=$1", email).Scan(&p); err != nil {
+		return errCredentials
 	}
 	if (bcrypt.CompareHashAndPassword(p, oldPassword) != nil) {
-		return &BackendError{http.StatusConflict, "incorrect old password"}
+		return errCredentials
 	}
 
 	//Delete possible renew requests
@@ -136,15 +131,15 @@ func ChangePassword(db *sql.DB, email string, oldPassword, newPassword []byte) e
 	if err != nil {
 		return err
 	}
-	return SingleUpdate(db, "update users set password=$2 where email=$1", email, hash)
+	return SingleUpdate(db, errUserNotFound, "update users set password=$2 where email=$1", email, hash)
 }
 
 func SetProfile(db *sql.DB, email, fn, ln, tel string) error {
-	return SingleUpdate(db, "update users set firstname=$1, lastname=$2, tel=$3 where email=$4", fn, ln, tel, email)
+	return SingleUpdate(db, errUserNotFound, "update users set firstname=$1, lastname=$2, tel=$3 where email=$4", fn, ln, tel, email)
 }
 
 func GrantPrivilege(db *sql.DB, email, priv string) error {
-	return SingleUpdate(db, "update users set role=$2 where email=$1", email, priv)
+	return SingleUpdate(db, errUserNotFound, "update users set role=$2 where email=$1", email, priv)
 }
 
 func PasswordRenewalRequest(db *sql.DB, email string) (string, error) {
@@ -153,22 +148,28 @@ func PasswordRenewalRequest(db *sql.DB, email string) (string, error) {
 	token := rand_str(32)
 	d, _ := time.ParseDuration("48h")
 	_, err := db.Exec("insert into password_renewal(email,token,deadline) values($1,$2,$3)", email, token, time.Now().Add(d))
+	if err != nil {
+		//Not very sure, might be a SQL error or a connexion error as well.
+		return "", errUserNotFound
+	}
  	return token, err
 }
 
 func NewPassword(db *sql.DB, token string, newPassword []byte) (string, error) {
 	//Delete possible renew requests
 	var email string
-	db.QueryRow("select email from password_renewal where token=$1", token).Scan(&email)
+	err := db.QueryRow("select email from password_renewal where token=$1", token).Scan(&email)
+	if err != nil {
+		return "", errNoPendingRequests
+	}
 	//Make the new one
 	hash, err := bcrypt.GenerateFromPassword(newPassword, bcrypt.MinCost)
 	if err != nil {
 		return "", err
 	}
-	err = SingleUpdate(db, "update users set password=$2 where email=$1", email, hash)
-	if (err != nil) {
+	if err := SingleUpdate(db, errUserNotFound, "update users set password=$2 where email=$1", email, hash); err != nil {
 		return "", err
 	}
-	db.QueryRow("delete from password_renewal where token=$1", token)
-	return email, nil
+	_, err = db.Exec("delete from password_renewal where token=$1", token)
+	return email, err
 }

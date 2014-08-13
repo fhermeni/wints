@@ -32,6 +32,8 @@
 - notification for ok actions
 - password reset OK
 - verify email format when aligning and changing
+- re-assign tutors OK
+- student details depending on the privileges
 
 - logging
 - error reporting

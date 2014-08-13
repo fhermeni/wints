@@ -4,6 +4,22 @@
 //Collect rest queries
 
 
+function missing(id) {
+    var d = $("#" + id);
+    if (d.val() == "") {
+        d.notify("Required", {autoHide: false});
+        return true;
+    }
+    return false;
+}
+function reportSuccess(msg) {
+    $.notify(msg, {autoHideDelay: 1000, className: "success", globalPosition: "top center"})
+}
+
+function reportError(msg) {
+    $.notify(msg, {autoHideDelay: 2000, className: "error", globalPosition: "top center"})
+}
+
 var ROOT_API = "/api/v1";
 
 function callWithToken(method, url, successCb, restError) {
@@ -16,6 +32,14 @@ function callWithToken(method, url, successCb, restError) {
 function postWithToken(url, data, successCb, restError) {
     return $.ajax({
         method: "POST",
+        url: ROOT_API + url,
+        data: JSON.stringify(data)
+    }).done(successCb).fail(restError);
+}
+
+function putWithToken(url, data, successCb, restError) {
+    return $.ajax({
+        method: "PUT",
         url: ROOT_API + url,
         data: JSON.stringify(data)
     }).done(successCb).fail(restError);
@@ -35,7 +59,7 @@ function noCb(no) {
         return no;
     }
     return function() {
-        console.log(arguments);
+        reportSuccess("Operation successful");
     };
 }
 
@@ -44,8 +68,7 @@ function restError(no) {
         return no;
     }
     return function(jqr, type, status) {
-        var html = Handlebars.getTemplate("error")(jqr);
-        $("#modal").html(html).modal('show');
+        reportError(jqr.responseText);
     }
 }
 
@@ -64,7 +87,7 @@ function getConventions(ok, no) {
 
 //User management
 function createUser(fn, ln, tel, email, priv, ok, no) {
-    postWithToken("/users/", {Firstname: fn, Lastname: ln, Tel: tel, Email: email, Priv: priv}, noCb(ok), restError(no));
+    postWithToken("/users/", {Firstname: fn, Lastname: ln, Tel: tel, Email: email, Role: priv}, noCb(ok), restError(no));
 }
 
 function deleteUser(email, ok, no) {
@@ -75,14 +98,14 @@ function getUsers(ok, no) {
     callWithToken("GET", "/users/", noCb(ok), restError(no));
 }
 
-function getProfile(ok, no) {
+function syncGetUsers(ok, no) {
     return $.ajax({
         method: "GET",
-        url: ROOT_API + "/users/" + $.cookie("session"),
+        url: ROOT_API + "/users/",
         async: false
     }).done(noCb(ok)).fail(restError(no));
-
 }
+
 function setPrivilege(email, p, ok, no) {
     postRawWithToken("/users/" + email + "/role", p, noCb(ok), restError(no));
 }
@@ -91,6 +114,11 @@ function setMajor(email, p, ok, no) {
     postRawWithToken("/conventions/" + email + "/major", p, noCb(ok), restError(no));
 }
 
+function setTutor(email, p, ok, no) {
+    postRawWithToken("/conventions/" + email + "/tutor", p, noCb(ok), restError(no));
+}
+
+
 function setMidtermDeadline(email, d, ok, no) {
     var fmt = d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
     postRawWithToken("/conventions/" + email + "/midterm/deadline", fmt, noCb(ok), restError(no));
@@ -98,12 +126,21 @@ function setMidtermDeadline(email, d, ok, no) {
 
 
 //Profile management
+function getProfile(ok, no) {
+    return $.ajax({
+        method: "GET",
+        url: ROOT_API + "/profile",
+        async: false
+    }).done(noCb(ok)).fail(restError(no));
+
+}
+
 function setProfile(fn, ln, tel, ok, no) {
-    postWithToken("/users/" + user.Email + "/", {Firstname: fn, Lastname:ln, Tel: tel}, noCb(ok), restError(no))
+    putWithToken("/profile", {Firstname: fn, Lastname:ln, Tel: tel, Email: "", Role: ""}, noCb(ok), restError(no))
 }
 
 function setPassword(oldP, newP, ok, no) {
-    postWithToken("/users/" + user.Email + "/password", {OldPassword:oldP, NewPassword:newP}, noCb(ok), restError(no));
+    putWithToken("/profile/password", {OldPassword:oldP, NewPassword:newP}, noCb(ok), restError(no));
 }
 
 //authentication

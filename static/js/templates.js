@@ -85,6 +85,17 @@ Handlebars.registerHelper('majorOptions', function(m) {
     return new Handlebars.SafeString(b);
 });
 
+Handlebars.registerHelper('tutorOptions', function(m) {
+    var users;
+    syncGetUsers(function(data) {users = data});
+    var b = "";
+    users.forEach(function (o) {
+        var selected = m == o.Email ? " selected " : "";
+        b += "<option value='" + o.Email + "' " + selected + " >" + o.Firstname + " " + o.Lastname + "</option>";
+    });
+    return new Handlebars.SafeString(b);
+});
+
 Handlebars.registerHelper('roleOptions', function(m) {
     var opts = {
         '':"None",

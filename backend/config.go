@@ -15,10 +15,10 @@ type Config struct {
 	Port int
 	RecaptchaPk string
 	Logfile string
-	SmtpServer string
-	SmtpUsername string
-	SmtpPassword string
-	SmtpSender string
+	SMTPServer string
+	SMTPUsername string
+	SMTPPassword string
+	SMTPSender string
 	WWW string
 }
 

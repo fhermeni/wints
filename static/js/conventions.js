@@ -4,18 +4,6 @@ var user;
 var defenses;
 var currentPage;
 
-function missing(id) {
-    var d = $("#" + id);
-    if (d.val() == "") {
-        d.notify("Required", {autoHide: false});
-        return true;
-    }
-    return false;
-}
-function reportSuccess(msg) {
-    $.notify(msg, {autoHideDelay: 1000, className: "success", globalPosition: "top center"})
-}
-
 $( document ).ready(function () {
     //Check access
     getProfile(function(d) {
@@ -412,7 +400,7 @@ function showDetails(s) {
         if (c.Stu.P.Email == s) {
             var buf = Handlebars.getTemplate("student-detail")(c);
             $("#modal").html(buf).modal('show');
-            $('#modal').find('.date')/*.datepicker({format:"dd/mm/yyyy"})*/
+            $('#modal').find('.date')
                 .on("changeDate", function(e){
                     setMidtermDeadline(c.Stu.P.Email, e.date, function(){
                         c.MidtermReport = e.date;
@@ -443,6 +431,21 @@ function updateMajor(s, email) {
                 }
             });
             refresh();
+        });
+}
+
+function updateTutor(s, email) {
+    var val = $(s).val();
+    setTutor(email,val,
+        function(data) {
+            conventions.forEach(function (c) {
+                if (c.Stu.P.Email == email) {
+                    c.Tutor = data.Tutor;
+                    return false;
+                }
+            });
+            refresh();
+            reportSuccess("Tutor changed")
         });
 }
 

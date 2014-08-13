@@ -8,47 +8,40 @@ function showProfileEditor() {
 }
 
 function updateProfile() {
+    if (missing("lbl-firstname") || missing("lbl-lastname")) {
+        return false
+    }
     setProfile( $("#lbl-firstname").val(),  $("#lbl-lastname").val(),  $("#lbl-tel").val(), updateCb, errorCb);
 }
 
 function updatePassword() {
     var ok = true;
-    if ($("#lbl-old-password").val().length == 0) {
-        $("#lbl-old-password").parent().parent().addClass("has-error");
-        ok = false;
-    } else {
-        $("#lbl-old-password").parent().parent().removeClass("has-error");
+    if (missing("lbl-old-password") || missing("lbl-password1") || missing("lbl-password2")) {
+        return;
     }
 
-    if ($("#lbl-password1").val() != $("#lbl-password2").val() || $("#lbl-password1").val() == 0) {
-        $("#lbl-password1").parent().parent().addClass("has-error");
-        $("#lbl-password2").parent().parent().addClass("has-error");
-        ok = false;
-    } else {
-        $("#lbl-password1").parent().parent().removeClass("has-error");
-        $("#lbl-password2").parent().parent().removeClass("has-error");
+    var p1 = $("#lbl-password1").val();
+    var p2 = $("#lbl-password2").val();
+    if (p1 != p2) {
+        $("#lbl-password2").notify("The passwords do not match", {className : "danger"});
+        return
     }
-    if (ok) {
-        $("#profileEditor-password-err").html();
-        setPassword($("#lbl-old-password").val(), $("#lbl-password1").val(), function() {
+    if (p2.length < 8) {
+        $("#lbl-password1").notify("Password must be 8 characters length minimum", {className : "error"})
+        return
+    }
+    setPassword($("#lbl-old-password").val(), $("#lbl-password1").val(), function() {
             $("#modal").modal('hide');
             $.notify("Password changed successfully");
-        });
-    }
+    });
 }
 
-function updateCb(data, resp, xhr ) {
-    if (xhr.status == 200 && xhr.readyState == 4) {
-        var fn = $("#fullname").val();
-        $("#profileEditor-err").html("");
+function updateCb(data, resp, xhr) {
         user = data;
         localStorage.setItem("user", JSON.stringify(user));
         $("#fullname").html(user.Firstname + " " + user.Lastname);
         $("#profileEditor").modal('hide');
-        $("#profileEditor-err").html("");
-    } else {
-        $("#profileEditor-err").html("<div class='alert alert-danger'>" + res.responseText + "</div>")
-    }
+        reportSuccess("Profile updated successfully");
 }
 
 function errorCb(data, resp, xhr ) {

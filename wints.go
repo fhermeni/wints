@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"log"
 	"os"
-	"errors"
 	"strconv"
 	"math/rand"
 	"io/ioutil"
@@ -23,17 +22,13 @@ const (
 var DB *sql.DB
 var cfg backend.Config
 
-func reportIfError(w http.ResponseWriter, header string, err error) bool {
-	if err == nil {
-		return false
+func report500OnError(w http.ResponseWriter, header string, err error) bool {
+	if err != nil {
+		http.Error(w, "The operation did not complete. A possible bug", http.StatusInternalServerError)
+		log.Printf("%s: %s\n", header, err.Error());
+		return true
 	}
-	if be, ok := err.(*backend.BackendError); ok {
-		http.Error(w, be.Error(), be.Status)
-	} else {
-		http.Error(w, "", http.StatusInternalServerError)
-		log.Printf("%s: %s\n", header, err.Error())
-	}
-	return true
+	return false
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
@@ -45,24 +40,17 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getLongDefenses(w http.ResponseWriter, r *http.Request) {
-	cnt, err := backend.LongDefense(DB, "si/ifi")
-	if !reportIfError(w, "", err) {
-		w.Write([]byte(cnt))
-	}
-}
-
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 	n, err := backend.ExtractEmail(r)
-	if reportIfError(w, "", err) {
+	if report500OnError(w, "Unable to get the email from the token", err) {
 		return
 	}
 	if len(n) == 0 {
-		log.Printf("No cookie");
 		http.Redirect(w, r, "/", 302)
+		return
 	}
 	_, err = backend.GetUser(DB, n)
-	if reportIfError(w, "", err) {
+	if report500OnError(w, "No user having email '" + n + "'", err) {
 		return
 	}
 	http.ServeFile(w, r, "static/admin.html")
@@ -72,25 +60,19 @@ func jsonReply(w http.ResponseWriter, j interface{}) {
 	w.Header().Set("Content-type", "application/json; charset=utf-8")
 	enc := json.NewEncoder(w)
 	err := enc.Encode(j)
-	reportIfError(w, "Error while serialising response", err)
+	report500OnError(w, "Unable to serialize the response", err)
 }
 
 func fileReply(w http.ResponseWriter, mime, filename string, cnt []byte) {
 	w.Header().Set("Content-type", mime)
 	w.Header().Set("Content-disposition", "attachment; filename=" + filename)
 	_, err := w.Write(cnt)
-	reportIfError(w, "", err)
+	report500OnError(w, "Unable to serve file '" + filename + "'", err)
 }
 
 func jsonRequest(w http.ResponseWriter, r *http.Request, j interface{}) error {
 	dec := json.NewDecoder(r.Body)
-	err := dec.Decode(&j)
-	if err != nil {
-		log.Printf("Bad JSON message format: %s", err)
-		http.Error(w, "Bad JSON message format", http.StatusBadRequest)
-		return err
-	}
-	return nil
+	return dec.Decode(&j)
 }
 
 type PendingConventionMsg struct {
@@ -108,69 +90,54 @@ func RandomPendingConvention(w http.ResponseWriter, r *http.Request, email strin
 	}
 	c := cc[rand.Intn(nb)];
 	known, err := backend.Admins(DB)
-	if !reportIfError(w, "Unable to get the possible tutors", err) {
-		jsonReply(w, PendingConventionMsg{c, known, nb})
+	if report500OnError(w, "Unable to get the possible tutors", err) {
+		return
 	}
+	jsonReply(w, PendingConventionMsg{c, known, nb})
 }
 
 func GetAllConventions(w http.ResponseWriter, r *http.Request, email string) {
 	conventions, err := backend.GetConventions2(DB, email)
-	if !reportIfError(w, "Unable to get the conventions ", err) {
-		jsonReply(w, conventions)
+	if report500OnError(w, "Unable to get the conventions ", err) {
+		return
 	}
+	jsonReply(w, conventions)
 }
 
 
 func GetAdmins(w http.ResponseWriter, r *http.Request, email string) {
 	admins, err := backend.Admins(DB)
-	if !reportIfError(w, "Unable to get the possible admins", err) {
-		jsonReply(w, admins)
+	if report500OnError(w, "Unable to get the possible admins", err) {
+		return
 	}
-}
-
-type NewUser struct {
-	Firstname string
-	Lastname  string
-	Tel       string
-	Email     string
-	Priv      string
+	jsonReply(w, admins)
 }
 
 func NewAdmin(w http.ResponseWriter, r *http.Request, email string) {
-	var nu NewUser
+	var nu backend.User
 	err := jsonRequest(w, r, &nu)
-	if err != nil {
+	if report500OnError(w, "Unable to extract the user profile", err) {
 		return
 	}
-	_, err = backend.GetUser(DB, nu.Email)
-	if err == nil {
-		http.Error(w, "Unsufficient permission", http.StatusConflict)
+	_, err = backend.NewUser(DB, nu)
+	if report500OnError(w, "Unable to create the user " + nu.String(), err) {
 		return
-	}
-	p := backend.User{nu.Firstname, nu.Lastname, nu.Email, nu.Tel, nu.Priv}
-	err = backend.NewUser(DB, p)
-	if !reportIfError(w, "", err) {
-		backend.LogActionInfo(email, " User '"+nu.Email+"'("+nu.Priv+") created");
 	}
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request, email string) {
-	target, _ := mux.Vars(r)["email"]
-	if target != email {
-		http.Error(w, "You cannot get the profile of another person", http.StatusForbidden)
+	u, err := backend.GetUser(DB, email)
+	if report500OnError(w, "Unable to get user '" + email + "'", err) {
 		return
 	}
-	u, err := backend.GetUser(DB, email)
-	if !reportIfError(w, "", err) {
-		jsonReply(w, u)
-	}
-
+	jsonReply(w, u)
 }
+
 func RmUser(w http.ResponseWriter, r *http.Request, email string) {
 	target, _ := mux.Vars(r)["email"]
 	err := backend.RmUser(DB, target)
-	if !reportIfError(w, "", err) {
-		backend.LogActionInfo(email, " User '"+target+"' deleted");
+	if report500OnError(w, "Unable to remove user '" + email + "'", err) {
+		return
 	}
 }
 
@@ -190,16 +157,19 @@ func GetDefense(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/", 302)
 	    	return
 		}
-		u, _ := backend.GetUser(DB, email)
+		u, err := backend.GetUser(DB, email)
+		if report500OnError(w, "Unknown user '" + email + "'", err) {
+			return
+		}
 		if u.CompatibleRole("admin") {
 			cnt, err = backend.Defense(DB, "si/ifi")
 		} else {
-			http.Error(w, "Unsufficient permission", http.StatusUnauthorized)
+			http.Error(w, "Unsufficient permission", http.StatusForbidden)
 			return
 		}
 	}
-	w.Write([]byte(cnt))
-	reportIfError(w, "", err)
+	_, err  = w.Write([]byte(cnt))
+	report500OnError(w, "Unable to send the defense content", err)
 }
 
 type DefensesPost struct {
@@ -210,14 +180,11 @@ type DefensesPost struct {
 func PostDefense(w http.ResponseWriter, r *http.Request, email string) {
 	var dp DefensesPost
 	err := jsonRequest(w, r, &dp)
-	if err != nil {
+	if report500OnError(w, "Unable to parse the defense content", err) {
 		return
 	}
-	log.Printf("%s\n", dp.Short)
-	log.Printf("%s\n", dp.Long)
-
 	err = backend.SaveDefense(DB, "si/ifi", string(dp.Short), string(dp.Long))
-	reportIfError(w, "", err)
+	report500OnError(w, "Unable to save the defense", err)
 }
 
 func Login(w http.ResponseWriter, r *http.Request) {
@@ -229,35 +196,23 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	backend.SetSession(login, w)
-	backend.LogActionInfo(login, " log in");
 	http.Redirect(w, r, "/", 302);
 }
 
 func PasswordReset(w http.ResponseWriter, r *http.Request) {
-	email, err := ioutil.ReadAll(r.Body)
-	if reportIfError(w, "", err) {
-		return
-	}
-	if len(email) == 0 {
-		http.Error(w, "Email is missing", http.StatusBadRequest)
-		return
-	}
-	u, err := backend.GetUser(DB, string(email))
-	if err != nil {
-		log.Printf("%s\n", email)
+	email, err := requiredContent(w, r)
+	if report500OnError(w, "", err) {
 		return
 	}
 	token, err := backend.PasswordRenewalRequest(DB, string(email))
-	if reportIfError(w, "Unable to generate a token", err) {
+	if report500OnError(w, "Unable to generate a token for a password reset", err) {
 		return
 	}
-	err = backend.Mail(cfg, u.Email, "mails/account_reset.txt", struct {
+	err = backend.Mail(cfg, []string{string(email)}, "mails/account_reset.txt", struct {
 				WWW   string
 				Token string
 			}{cfg.WWW, token})
-	if err != nil {
-		log.Fatalf("%s\n", err)
-	}
+	report500OnError(w, "Unable to send the token for a password reset by mail", err)
 }
 
 func Logout(w http.ResponseWriter, r *http.Request, email string) {
@@ -274,40 +229,33 @@ func CommitPendingConvention(w http.ResponseWriter, r *http.Request, email strin
 	tEmail := c.Tutor.Email
 	_, err = backend.GetUser(DB, tEmail)
 	if err != nil {
-		err = backend.NewUser(DB, c.Tutor)
-		if reportIfError(w, "Unable to register the tutor "+c.Tutor.String(), err) {
+		_, err = backend.NewUser(DB, c.Tutor)
+		if report500OnError(w, "Unable to register the tutor "+c.Tutor.String(), err) {
 			return
 		}
 	}
 	err = backend.RegisterInternship(DB, c, true);
-	if reportIfError(w, "Unable to register the internship", err) {
+	if report500OnError(w, "Unable to register the internship", err) {
 		return
 	}
-	backend.LogActionInfo(email, "validate the convention of '"+c.Stu.P.Email+"'");
 	backend.RescanPending(DB, c)
 }
 
-type PersonUpdate struct {
-	Firstname string
-	Lastname  string
-	Tel       string
-}
 
 func ChangeProfile(w http.ResponseWriter, r *http.Request, email string) {
-	target, _ := mux.Vars(r)["email"]
-	if target != email {
-		http.Error(w, "You cannot update the profile of another person", http.StatusForbidden)
-		return
-	}
-	var p PersonUpdate
+	var p backend.User
 	if jsonRequest(w, r, &p) != nil {
 		return
 	}
 	err := backend.SetProfile(DB, email, p.Firstname, p.Lastname, p.Tel)
-	u, err := backend.GetUser(DB, email)
-	if !reportIfError(w, "", err) {
-		jsonReply(w, u)
+	if report500OnError(w, "Unable to update the profile", err) {
+		return
 	}
+	u, err := backend.GetUser(DB, email)
+	if report500OnError(w, "Unable to get user '" + email +"'", err) {
+		return
+	}
+	jsonReply(w, u)
 }
 
 type PasswordRenewal struct {
@@ -316,26 +264,20 @@ type PasswordRenewal struct {
 }
 
 func ChangePassword(w http.ResponseWriter, r *http.Request, email string) {
-	target, _ := mux.Vars(r)["email"]
-	if target != email {
-		http.Error(w, "You cannot update the profile of another person", http.StatusForbidden)
-		return
-	}
-
 	var p PasswordRenewal
-	if jsonRequest(w, r, &p) != nil {
+	err := jsonRequest(w, r, &p)
+	if report500OnError(w, "Unable to extract the passwords", err) {
 		return
 	}
-
-	err := backend.ChangePassword(DB, email, []byte(p.OldPassword), []byte(p.NewPassword))
-	reportIfError(w, "", err)
+	err = backend.ChangePassword(DB, email, []byte(p.OldPassword), []byte(p.NewPassword))
+	report500OnError(w, "Unable to change the password", err)
 }
 
 func NewPassword(w http.ResponseWriter, r *http.Request) {
 	token := r.FormValue("token")
 	password := r.FormValue("password")
 	email, err := backend.NewPassword(DB, token, []byte(password))
-	if reportIfError(w, "", err) {
+	if report500OnError(w, "Unable to create a new password from the token", err) {
 		return
 	}
 	_, err = backend.Register(DB, email, password)
@@ -344,7 +286,6 @@ func NewPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	backend.SetSession(email, w)
-	backend.LogActionInfo(email, " log in");
 	http.Redirect(w, r, "/", 302);
 }
 
@@ -356,10 +297,37 @@ func UpdateMajor(w http.ResponseWriter, r *http.Request, email string) {
 		return
 	}
 	err = backend.SetMajor(DB, target, string(m))
-	if !reportIfError(w, "", err) {
-		backend.LogActionInfo(email, "Major of '"+target+"' set to '"+string(m)+"'");
+	if report500OnError(w, "Unable to update the major of '" + target + "' to " + string(m), err) {
+		return
 	}
 }
+
+func UpdateTutor(w http.ResponseWriter, r *http.Request, email string) {
+	student, _ := mux.Vars(r)["email"]
+	newTutor, err := requiredContent(w, r)
+	if err != nil {
+		return
+	}
+	log.Println(newTutor)
+
+	c, err := backend.GetConvention(DB, student)
+	//oldTutor := c.Tutor.Email
+	if report500OnError(w, "", err) {
+		return
+	}
+	err = backend.UpdateTutor(DB, string(student), string(newTutor))
+	if report500OnError(w, "", err) {
+		return
+	}
+	c, err = backend.GetConvention(DB, string(student))
+	if report500OnError(w, "", err) {
+		return
+	}
+	//TODO: mail both tutors and the student
+	//backend.Mail(cfg, string[]{string(oldTutor), string(newTutor), string(c.Student.P.Email)}, "tutor_update.txt", c.Tutor);
+	jsonReply(w, c)
+}
+
 
 func MarkKind(cb func(http.ResponseWriter, *http.Request, string), kind string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -371,7 +339,7 @@ func GetReport(kind string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		target, _ := mux.Vars(r)["email"]
 		cnt, err := backend.Report(DB, target, kind)
-		if reportIfError(w, "", err) {
+		if report500OnError(w, "", err) {
 			return
 		}
 
@@ -388,27 +356,27 @@ func UpdateDeadline(kind string) http.HandlerFunc{
 			return
 		}
 		t, err := time.Parse("2/1/2006", string(d))
-		if reportIfError(w, "Invalid format", err) {
+		if report500OnError(w, "Invalid format", err) {
 			return
 		}
 		target, _ := mux.Vars(r)["email"]
 
 		//Other levels are ok
 		err = backend.UpdateDeadline(DB, target, kind, t)
-		reportIfError(w, "", err);
+		report500OnError(w, "", err);
 	}
 }
 
 func UploadReport(kind string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		d, err := requiredContent(w, r)
-		if err != nil {
+		if report500OnError(w, "", err) {
 			return
 		}
 
 		target, _ := mux.Vars(r)["email"]
 		err = backend.SetReport(DB, target, kind, d)
-		reportIfError(w, "", err);
+		report500OnError(w, "", err);
 	}
 }
 
@@ -418,28 +386,23 @@ func UpdateMark(w http.ResponseWriter, r *http.Request, kind string) {
 		return
 	}
 	i, err := strconv.Atoi(string(d))
-	if reportIfError(w, "Invalid format", err) {
-		return
-	}
-	if i < 0 || i > 20 {
-		reportIfError(w, "Mark must be between 0 and 20", errors.New("Mark must be between 0 and 20"))
+	if err != nil {
+		http.Error(w, "", http.StatusBadRequest)
 		return
 	}
 	target, _ := mux.Vars(r)["email"]
-	//Other levels are ok
 	err = backend.UpdateGrade(DB, target, kind, i)
-	reportIfError(w, "", err);
+	report500OnError(w, "", err);
 }
 
 func myStudent(w http.ResponseWriter, mine, target string) bool {
 	u, err := backend.GetUser(DB, target);
 	if err != nil {
-		reportIfError(w, "", err)
 		return false
 	}
 	if u.Role == "" {
 		c, err := backend.GetConvention(DB, target)
-		if reportIfError(w, "", err) {
+		if err != nil {
 			return false
 		}
 		if c.Tutor.Email != mine {
@@ -452,11 +415,12 @@ func myStudent(w http.ResponseWriter, mine, target string) bool {
 
 func requiredContent(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 	cnt, err := ioutil.ReadAll(r.Body)
-	if reportIfError(w, "", err) {
+	if err != nil {
 		return []byte{}, err
 	}
 	if len(cnt) == 0 {
-		reportIfError(w, "", errors.New("Missing request body"))
+		http.Error(w, "", http.StatusBadRequest)
+		return []byte{}, err
 	}
 	return cnt, nil
 }
@@ -464,14 +428,14 @@ func requiredContent(w http.ResponseWriter, r *http.Request) ([]byte, error) {
 func GrantRole(w http.ResponseWriter, r *http.Request, email string) {
 	target, _ := mux.Vars(r)["email"]
 	role, err := requiredContent(w, r)
-	if err != nil {
+	if report500OnError(w, "", err) {
 		return
 	}
 	err = backend.GrantPrivilege(DB, target, string(role))
-	if !reportIfError(w, "", err) {
-		backend.LogActionInfo(email, "'"+target+"' granted to role '"+string(role)+"'");
-		backend.Mail(cfg, target, "mails/priv_" + string(role) + ".txt", nil)
+	if report500OnError(w, "", err) {
+		return
 	}
+	backend.Mail(cfg, []string{target}, "mails/priv_" + string(role) + ".txt", nil)
 }
 
 func RequireToken(cb func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
@@ -502,42 +466,12 @@ func RequireRole(cb func(http.ResponseWriter, *http.Request, string), role strin
 	}
 }
 
-func migrateReports() {
-	rows, err := DB.Query("select student,midtermDeadline from internships")
-	if err != nil {
-		log.Printf("%s\n", err)
-		return
-	}
-	defer rows.Close();
-	for rows.Next() {
-		var m string
-		var d time.Time
-		rows.Scan(&m, &d)
-		_, err = backend.NewReport(DB, m, "midterm", d)
-		if err != nil {
-			log.Printf("midterm: %s\n", err)
-		}
-		t, _ := time.Parse("02/01/2006", "01/09/2014")
-		_, err = backend.NewReport(DB, m, "final", t)
-		if err != nil {
-			log.Printf("final: %s\n", err)
-		}
-
-		_, err = backend.NewReport(DB, m, "supReport", t)
-		if err != nil {
-			log.Printf("final: %s\n", err)
-		}
-
-	}
-}
 func main() {
 	var err error
 	cfg, err = backend.ReadConfig("./wints.conf")
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-	backend.InitLogger(cfg.Logfile)
-	defer backend.CloseLogger();
 	dbUrl := os.Getenv("DATABASE_URL")
 
 	if len(dbUrl) == 0 {
@@ -547,17 +481,9 @@ func main() {
 	if err != nil {
 		log.Fatalln(err.Error())
 	}
-
+	defer DB.Close()
 	for _, v := range os.Args {
-		if v == "-i" {
-			err := backend.NewUser(DB, backend.User{"R", "oot", "root@localhost", "", "root"})
-			if err != nil {
-				backend.LogError("Unable to create the root account: " + err.Error());
-			} else {
-				backend.LogInfo("Root account created");
-			}
-			return
-		} else if v == "-s" {
+		if v == "-s" {
 			delay, err := time.ParseDuration(cfg.RefreshPeriod)
 			if err != nil {
 				log.Fatalln(err.Error())
@@ -575,11 +501,12 @@ func main() {
 	r.HandleFunc("/", rootHandler)
 	r.HandleFunc("/home", homeHandler)
 
-	//migrateReports()
+	//Convention management
 	r.HandleFunc(ROOT_API+"/pending/_random", RequireRole(RandomPendingConvention, "admin")).Methods("GET")
 	r.HandleFunc(ROOT_API+"/conventions/", /*RequireRole(GetAllConventions, "major"))*/ RequireToken(GetAllConventions)).Methods("GET")
 	r.HandleFunc(ROOT_API+"/conventions/", RequireRole(CommitPendingConvention, "admin")).Methods("POST")
 	r.HandleFunc(ROOT_API+"/conventions/{email}/major", RequireRole(UpdateMajor, "major")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/tutor", RequireRole(UpdateTutor, "admin")).Methods("POST")
 	r.HandleFunc(ROOT_API+"/conventions/{email}/midterm/deadline", UpdateDeadline("midterm")).Methods("POST")
 	r.HandleFunc(ROOT_API+"/conventions/{email}/midterm/report", UploadReport("midterm")).Methods("POST")
 	r.HandleFunc(ROOT_API+"/conventions/{email}/midterm/report", GetReport("midterm")).Methods("GET")
@@ -593,17 +520,19 @@ func main() {
 	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/mark", MarkKind(UpdateMark, "supReport")).Methods("POST")
 	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/report", GetReport("supReport")).Methods("GET")
 
+	//Profile management
+	r.HandleFunc(ROOT_API+"/profile", RequireToken(GetUser)).Methods("GET")
+	r.HandleFunc(ROOT_API+"/profile", RequireToken(ChangeProfile)).Methods("PUT")
+	r.HandleFunc(ROOT_API+"/profile/password", RequireToken(ChangePassword)).Methods("PUT")
+	r.HandleFunc(ROOT_API+"/profile/password", NewPassword).Methods("POST")
+	r.HandleFunc(ROOT_API+"/profile/password", PasswordReset).Methods("DELETE")
 
 	r.HandleFunc(ROOT_API+"/users/", RequireRole(GetAdmins, "admin")).Methods("GET")
 	r.HandleFunc(ROOT_API+"/users/", RequireRole(NewAdmin, "root")).Methods("POST")
 	r.HandleFunc(ROOT_API+"/users/{email}/role", RequireRole(GrantRole, "root")).Methods("POST")
 	r.HandleFunc(ROOT_API+"/users/{email}", RequireRole(RmUser, "root")).Methods("DELETE")
-	r.HandleFunc(ROOT_API+"/users/{email}", RequireToken(GetUser)).Methods("GET")
-	r.HandleFunc(ROOT_API+"/users/{email}/password", RequireToken(ChangePassword)).Methods("POST")
-	r.HandleFunc(ROOT_API+"/new_password", NewPassword).Methods("POST")
-	r.HandleFunc(ROOT_API+"/users/{email}/", RequireToken(ChangeProfile)).Methods("POST")
 	r.HandleFunc(ROOT_API+"/login", Login).Methods("POST")
-	r.HandleFunc(ROOT_API+"/password_reset", PasswordReset).Methods("POST")
+
 	r.HandleFunc(ROOT_API+"/logout", RequireToken(Logout)).Methods("GET")
 	r.HandleFunc(ROOT_API+"/defenses", GetDefense).Methods("GET")
 	r.HandleFunc(ROOT_API+"/defenses", RequireRole(PostDefense, "admin")).Methods("POST")
@@ -616,5 +545,4 @@ func main() {
 	if err != nil {
 		log.Fatalf("%s\n", err)
 	}
-	defer DB.Close()
 }

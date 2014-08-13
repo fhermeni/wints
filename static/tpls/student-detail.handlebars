@@ -14,9 +14,14 @@
                     </select>
                 </dd>
                 <dt>academic tutor</dt>
-                <dd>
+                <!--<dd>
                     <a href="mailto:{{Tutor.Email}}">{{fullname Tutor}}</a>
                     ({{Tutor.Tel}})
+                </dd>-->
+                <dd>
+                    <select onchange="updateTutor(this,'{{Stu.P.Email}}')">
+                        {{tutorOptions Tutor.Email}}
+                    </select>
                 </dd>
 
 
