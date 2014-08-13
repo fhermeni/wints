@@ -33,7 +33,7 @@
 - password reset OK
 - verify email format when aligning and changing
 - re-assign tutors OK
-- student details depending on the privileges
+- student details depending on the privileges OK
 
 - logging
 - error reporting

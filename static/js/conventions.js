@@ -398,7 +398,14 @@ function getUploadData(kind, email) {
 function showDetails(s) {
     conventions.forEach(function (c) {
         if (c.Stu.P.Email == s) {
-            var buf = Handlebars.getTemplate("student-detail")(c);
+            var buf = "";
+            if (user.Role == "") {
+                buf = Handlebars.getTemplate("student-detail")(c);
+            } else if (user.Role == "major") {
+                buf = Handlebars.getTemplate("student-detail-major")(c);
+            } else {
+                buf = Handlebars.getTemplate("student-detail-admin")(c);
+            }
             $("#modal").html(buf).modal('show');
             $('#modal').find('.date')
                 .on("changeDate", function(e){

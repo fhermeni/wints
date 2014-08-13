@@ -37,7 +37,7 @@ Handlebars.registerHelper('len', function(a) {
 });
 
 Handlebars.registerHelper('company', function(c) {
-    if (c.CompanyWWW != "") {
+    if (c.CompanyWWW && c.CompanyWWW != "") {
         return new Handlebars.SafeString("<a target='_blank' href='" + c.CompanyWWW + "'>" + c.Company + "</a>");
     }
     return c.Company;
