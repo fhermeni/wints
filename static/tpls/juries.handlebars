@@ -1,0 +1,22 @@
+{{#if this}}
+<h3>Jury accounting</h3>
+<a class="btn-sm btn-success" href="#" onclick="rawJuries()"><span class="fui-list"></span> copy to clipboard</a>
+<table class="table table-condensed table-hover" id="table-juries">
+    <thead>
+    <tr>
+        <th>Jury</th>
+        <th>Count</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#each this}}
+        <tr>
+            <td>{{user}}</td>
+            <td>{{count}}</td>
+        </tr>
+    {{/each}}
+    </tbody>
+</table>
+{{else}}
+    <h5 class="text-center">No tutors</h5>
+{{/if}}

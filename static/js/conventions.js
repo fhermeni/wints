@@ -199,7 +199,10 @@ function refresh() {
         showDefenses();
     } else if (currentPage == "pending") {
         pickOne();
-    } else {
+    } else if (currentPage == "juries") {
+        showJuryService();
+    }
+    else {
         console.log("Unsupported operation on '" + currentPage + "'");
     }
 }

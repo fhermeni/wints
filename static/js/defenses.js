@@ -298,7 +298,6 @@ function rmEmptyJuries(defenses) {
             }
         });
     });
-    console.log(d);
     return d;
 }
 
@@ -397,4 +396,47 @@ function publicDefenses(d) {
         });
     }
     return byDay;
+}
+
+function showJuryService() {
+    getEmbeddedDefenses(function (data) {
+        var d = JSON.parse(data);
+        var html = Handlebars.getTemplate("juries")(jury_service(rmEmptyJuries(d)));
+        $("#juries").html(html);
+    });
+
+}
+
+function rawJuries() {
+    getEmbeddedDefenses(function (data) {
+        var d = JSON.parse(data);
+        var txt = Handlebars.getTemplate("rawJuries")(jury_service(rmEmptyJuries(d)));
+        $("#modal").html(txt).modal('show');
+    });
+}
+
+
+function jury_service(defenses) {
+    var count = {};
+    var users;
+    syncGetUsers(function(d) {users = d});
+    defenses.sessions.forEach(function (s) {
+        s.jury.forEach(function (j) {
+            j.commission.forEach(function (e) {
+                if (e.length > 1) {
+                    if (!count[e]) {
+                        count[e] = 1;
+                    } else {
+                        count[e]++;
+                    }
+                }
+            })
+        });
+    });
+    arr = [];
+    Object.keys(count).forEach(function (e) {
+        arr.push({user: e, count: count[e]});
+            }
+    );
+    return arr;
 }
