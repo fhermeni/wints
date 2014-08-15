@@ -57,10 +57,13 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func jsonReply(w http.ResponseWriter, j interface{}) {
+	t1 := time.Now()
 	w.Header().Set("Content-type", "application/json; charset=utf-8")
 	enc := json.NewEncoder(w)
 	err := enc.Encode(j)
 	report500OnError(w, "Unable to serialize the response", err)
+	t2 := time.Now()
+	log.Printf("Delay to encode: %s\n", (t2.Sub(t1)))
 }
 
 func fileReply(w http.ResponseWriter, mime, filename string, cnt []byte) {
@@ -97,7 +100,10 @@ func RandomPendingConvention(w http.ResponseWriter, r *http.Request, email strin
 }
 
 func GetAllConventions(w http.ResponseWriter, r *http.Request, email string) {
+	t1 := time.Now();
 	conventions, err := backend.GetConventions2(DB, email)
+	t2 := time.Now();
+	log.Printf("%s ms to get the values\n", t2.Sub(t1))
 	if report500OnError(w, "Unable to get the conventions ", err) {
 		return
 	}
