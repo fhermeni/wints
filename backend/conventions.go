@@ -31,6 +31,8 @@ var (
 	errUnknownConvention = errors.New("Unknown convention")
 	errConventionExists = errors.New("Convention already exists")
 	errInvalidTutor = errors.New("The new tutor is a student")
+	allMyConventions *sql.Stmt = nil
+	allConventions *sql.Stmt = nil
 )
 
 func IsTutoring(db *sql.DB, email string) (bool, error) {
@@ -133,7 +135,19 @@ func GetConventions2(db *sql.DB, emitter string) ([]Convention, error) {
 		" join users as tut on tut.email = internships.tutor" +
 		" join students on students.email = stu.email" +
 		" and tutor=$1"
-		rows, err = db.Query(q, emitter)
+		if allConventions == nil {
+			allConventions, err = db.Prepare(q)
+		}
+		if err != nil {
+			return conventions, err
+		}
+
+		/*stmt, err := db.Prepare(q)
+		if err != nil {
+			return conventions, err
+		}                              */
+		rows, err = allConventions.Query(emitter)
+		//rows, err = db.Query(q, emitter)
 	} else {
 /*		q = "select stu.firstname, stu.lastname, stu.email, stu.tel, students.promotion, students.major, startTime, endTime, tut.firstname, tut.lastname, tut.email, tut.tel," +
 				"midTermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title " +
@@ -143,6 +157,11 @@ func GetConventions2(db *sql.DB, emitter string) ([]Convention, error) {
 		" join users as stu on stu.email = internships.student" +
 		" join users as tut on tut.email = internships.tutor" +
 		" join students on students.email = stu.email"
+		/*stmt, err := db.Prepare(q)
+		if err != nil {
+			return conventions, err
+		}
+		rows, err = stmt.Query()*/
 		rows, err = db.Query(q)
 	}
 
