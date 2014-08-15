@@ -4,7 +4,10 @@ var user;
 var defenses;
 var currentPage;
 
+var waitingBlock;
+
 $( document ).ready(function () {
+    waitingBlock = $("#cnt").clone().html();
     //Check access
     getProfile(function(d) {
         user = d;
@@ -36,6 +39,9 @@ function showPendingCounter(nb) {
 }
 
 function pickOne() {
+    var html = Handlebars.getTemplate("pending")({});
+    $("#cnt").html(html);
+
     randomPending(function(data) {
         if (data.length == 0) {
             success();
@@ -175,9 +181,7 @@ function pickKnown() {
 }
 
 function showPage(li, id) {
-    $(".page").each(function (idx, d){
-        d.style.display = d.id == id ? "block" : "none";
-    });
+    $("#cnt").html(waitingBlock);
     $("#menu-pages").find("li").removeClass("active");
     if (li) {
         $(li.parentNode).addClass("active");
@@ -187,6 +191,7 @@ function showPage(li, id) {
 }
 
 function refresh() {
+    //reset the div
     if (currentPage == "myStudents") {
         displayMyStudents();
     } else if (currentPage == "conventions") {
@@ -250,7 +255,7 @@ function toggleMailCheckboxes(chk, cl, root) {
 
 function displayMyConventions() {
     var html = Handlebars.getTemplate("watchlist")(conventions);
-    root = $("#conventions");
+    root = $("#cnt");
     root.html(html);
     root.find(':checkbox').checkbox();
     root.find('tbody').find(':checkbox').checkbox().on('toggle', function (e) {
@@ -288,8 +293,9 @@ function displayMyStudents() {
     var myStudents = conventions.filter(function (c) {
         return c.Tutor.Email == user.Email;
     });
+    console.log(myStudents);
     var html = Handlebars.getTemplate("myStudents")(myStudents);
-    var root = $("#myStudents").html(html);
+    var root = $("#cnt").html(html);
     $("#table-myStudents").tablesorter({headers: {0: {"sorter": false}}});
     root.find(':checkbox').checkbox();
     root.find('tbody').find(':checkbox').checkbox().on('toggle', function(e) {generateMailto(root);});
@@ -373,7 +379,7 @@ function getConvention(m) {
 
 function displayTutors() {
         var html = Handlebars.getTemplate("tutors")(orderByTutors(conventions));
-        var root = $("#assignments").html(html);
+        var root = $("#cnt").html(html);
         $("#table-assignments").tablesorter({headers: {0: {"sorter": false}}});
     root.find(':checkbox').checkbox();
     root.find('tbody').find(':checkbox').checkbox().on('toggle', function(e) {generateMailto(root);});
@@ -398,6 +404,12 @@ function getUploadData(kind, email) {
         },
         multi: false}
 }
+
+function showNewUser() {
+    var buf = Handlebars.getTemplate("new-user")({});
+    $("#modal").html(buf).modal('show');
+}
+
 function showDetails(s) {
     conventions.forEach(function (c) {
         if (c.Stu.P.Email == s) {
@@ -466,7 +478,7 @@ function showPrivileges() {
         });
         //The base
         var html = Handlebars.getTemplate("privileges")(others);
-        $("#privileges").html(html);
+        $("#cnt").html(html);
         $('[data-toggle="deluser-confirmation"]').each(function (i, a) {
             var j = $(a);
             j.confirmation({onConfirm: function() {rmUser(j.attr("data-user"), j.parent().parent().parent())}});
@@ -493,7 +505,7 @@ function newUser() {
                 $("#lbl-nu-tel").val(), $("#lbl-nu-email").val(),
                 $("#lbl-nu-priv").val(),
                 function() {
-                    $("#new-user").modal('hide');
+                    $("#modal").modal('hide');
                     reportSuccess("Account created");
                     showPrivileges();
                 }, function(o) {

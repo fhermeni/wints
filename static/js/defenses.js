@@ -16,7 +16,7 @@ function showDefenses() {
             })
         });
         var html = Handlebars.getTemplate("defense-init")(defenses);
-        $("#defenses").html(html);
+        $("#cnt").html(html);
         $('[data-toggle="reset-defense-confirmation"]').confirmation({onConfirm: prepareSchedule});
         showCoarseDefenseForm();
     }, function() {
@@ -28,7 +28,7 @@ function showDefenses() {
         };
         var html = Handlebars.getTemplate("defense-init")(defenses);
         $('[data-toggle="reset-defense-confirmation"]').confirmation({onConfirm: prepareSchedule});
-        $("#defenses").html(html);
+        $("#cnt").html(html);
     });
 }
 
@@ -402,7 +402,7 @@ function showJuryService() {
     getEmbeddedDefenses(function (data) {
         var d = JSON.parse(data);
         var html = Handlebars.getTemplate("juries")(jury_service(rmEmptyJuries(d)));
-        $("#juries").html(html);
+        $("#cnt").html(html);
     });
 
 }

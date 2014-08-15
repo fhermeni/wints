@@ -1,0 +1,53 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">New user</div>
+        <div class="modal-body form-horizontal">
+            <div class="form-horizontal">
+                <div id="newUser-err"></div>
+                <div class="form-group">
+                    <label for="lbl-nu-fn" class="col-sm-3 control-label">Firstname</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="lbl-nu-fn" placeholder="firstname"/>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="lbl-nu-ln" class="col-sm-3 control-label">Lastname</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="lbl-nu-ln" placeholder="lastname"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="lbl-nu-email" class="col-sm-3 control-label">Email</label>
+                    <div class="col-sm-9">
+                        <input type="email" class="form-control" id="lbl-nu-email" placeholder="email"/>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="lbl-nu-tel" class="col-sm-3 control-label">Telephon</label>
+                    <div class="col-sm-9">
+                        <input type="text" class="form-control" id="lbl-nu-tel" placeholder="telephon"/>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="lbl-nu-priv" class="col-sm-3 control-label">Permissions</label>
+                    <div class="col-sm-9">
+                        <select id="lbl-nu-priv">
+                            <option value=""></option>
+                            <option value="admin">admin</option>
+                            <option value="root">root</option>
+                            <option value="major">major</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="text-right">
+                    <button type="button" class="btn btn-success" onclick="newUser()">Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
