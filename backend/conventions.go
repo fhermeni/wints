@@ -144,13 +144,13 @@ func GetConventions2(db *sql.DB, emitter string) ([]Convention, error) {
 		" join users as stu on stu.email = internships.student" +
 		" join users as tut on tut.email = internships.tutor" +
 		" join students on students.email = stu.email"
-		if allConventions != nil {
+		if allConventions == nil {
 			allConventions, err = db.Prepare(q)
 		}
 		if err != nil {
 			return conventions, err
 		}
-		rows, err = allConventions.Query(q)
+		rows, err = allConventions.Query()
 	}
 
 	if err != nil {
