@@ -29,7 +29,7 @@
 - visio/live public/private defenses: OK
 - public pages for the defense planning OK
 - sort by date correctly OK
-- notification for ok actions
+- notification for ok actions OK
 - password reset OK
 - verify email format when aligning and changing
 - re-assign tutors OK

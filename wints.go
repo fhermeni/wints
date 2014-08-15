@@ -13,6 +13,7 @@ import (
 	"math/rand"
 	"io/ioutil"
 	"time"
+	"runtime/pprof"
 )
 
 const (
@@ -467,7 +468,12 @@ func RequireRole(cb func(http.ResponseWriter, *http.Request, string), role strin
 }
 
 func main() {
-	var err error
+	f, err := os.Create("cpuProfile.prof")
+	if err != nil {
+		log.Fatal(err)
+	}
+	pprof.StartCPUProfile(f)
+	defer pprof.StopCPUProfile()
 	cfg, err = backend.ReadConfig("./wints.conf")
 	if err != nil {
 		log.Fatalln(err.Error())
