@@ -13,6 +13,7 @@ import (
 	"math/rand"
 	"io/ioutil"
 	"time"
+	"compress/gzip"
 )
 
 const (
@@ -56,11 +57,23 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "static/admin.html")
 }
 
-func jsonReply(w http.ResponseWriter, j interface{}) {
+func jsonReply(w http.ResponseWriter, gz bool, j interface{}) {
 	t1 := time.Now()
 	w.Header().Set("Content-type", "application/json; charset=utf-8")
-	enc := json.NewEncoder(w)
-	err := enc.Encode(j)
+	if gz {
+		w.Header().Set("Content-Encoding", "gzip")
+	}
+	var err error
+	if (gz) {
+		var w2 *gzip.Writer
+		w2 = gzip.NewWriter(w)
+		defer w2.Close()
+		enc := json.NewEncoder(w2)
+		err = enc.Encode(j)
+	} else {
+		enc := json.NewEncoder(w)
+		err = enc.Encode(j)
+	}
 	report500OnError(w, "Unable to serialize the response", err)
 	t2 := time.Now()
 	log.Printf("Delay to encode: %s\n", (t2.Sub(t1)))
@@ -88,7 +101,7 @@ func RandomPendingConvention(w http.ResponseWriter, r *http.Request, email strin
 	cc, err := backend.GetRawConventions(DB)
 	nb := len(cc)
 	if nb == 0 {
-		jsonReply(w, PendingConventionMsg{backend.Convention{}, nil, 0})
+		jsonReply(w, false, PendingConventionMsg{backend.Convention{}, nil, 0})
 		return
 	}
 	c := cc[rand.Intn(nb)];
@@ -96,7 +109,7 @@ func RandomPendingConvention(w http.ResponseWriter, r *http.Request, email strin
 	if report500OnError(w, "Unable to get the possible tutors", err) {
 		return
 	}
-	jsonReply(w, PendingConventionMsg{c, known, nb})
+	jsonReply(w, false, PendingConventionMsg{c, known, nb})
 }
 
 func GetAllConventions(w http.ResponseWriter, r *http.Request, email string) {
@@ -107,7 +120,7 @@ func GetAllConventions(w http.ResponseWriter, r *http.Request, email string) {
 	if report500OnError(w, "Unable to get the conventions ", err) {
 		return
 	}
-	jsonReply(w, conventions)
+	jsonReply(w, true, conventions)
 }
 
 
@@ -116,7 +129,7 @@ func GetAdmins(w http.ResponseWriter, r *http.Request, email string) {
 	if report500OnError(w, "Unable to get the possible admins", err) {
 		return
 	}
-	jsonReply(w, admins)
+	jsonReply(w, true, admins)
 }
 
 func NewAdmin(w http.ResponseWriter, r *http.Request, email string) {
@@ -136,7 +149,7 @@ func GetUser(w http.ResponseWriter, r *http.Request, email string) {
 	if report500OnError(w, "Unable to get user '" + email + "'", err) {
 		return
 	}
-	jsonReply(w, u)
+	jsonReply(w, false, u)
 }
 
 func RmUser(w http.ResponseWriter, r *http.Request, email string) {
@@ -174,7 +187,12 @@ func GetDefense(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	_, err  = w.Write([]byte(cnt))
+	//Compress
+	w.Header().Set("Content-type", "text/plain; charset=utf-8")
+	w.Header().Set("Content-Encoding", "gzip")
+	w2 := gzip.NewWriter(w)
+	defer w2.Close()
+	_, err = w2.Write([]byte(cnt));
 	report500OnError(w, "Unable to send the defense content", err)
 }
 
@@ -261,7 +279,7 @@ func ChangeProfile(w http.ResponseWriter, r *http.Request, email string) {
 	if report500OnError(w, "Unable to get user '" + email +"'", err) {
 		return
 	}
-	jsonReply(w, u)
+	jsonReply(w, false, u)
 }
 
 type PasswordRenewal struct {
@@ -331,7 +349,7 @@ func UpdateTutor(w http.ResponseWriter, r *http.Request, email string) {
 	}
 	//TODO: mail both tutors and the student
 	//backend.Mail(cfg, string[]{string(oldTutor), string(newTutor), string(c.Student.P.Email)}, "tutor_update.txt", c.Tutor);
-	jsonReply(w, c)
+	jsonReply(w, false, c)
 }
 
 
