@@ -216,11 +216,10 @@ function getAllConventions() {
     getConventions(function(data) {
         if (!conventions) {
             conventions = data;
-            if (conventions.length == 0) {
-                $("#waiting").html("Nothing to display");
-            } else {
-                $("#waiting").hide();
+            if (user.Role.length == "") {
                 showPage(undefined, "myStudents");
+            } else {
+                showPage(undefined, "conventions");
             }
         } else {
             conventions = data;
@@ -235,7 +234,6 @@ function shiftSelect(e, me, root, cl) {
         var p = tr.prev();
         while (p.length > 0) {
             var lbl = p.find(cl);
-            console.log(lbl);
             if (lbl.hasClass("checked")) {
                 break;
             } else {
@@ -293,14 +291,26 @@ function displayMyStudents() {
     var myStudents = conventions.filter(function (c) {
         return c.Tutor.Email == user.Email;
     });
-    console.log(myStudents);
     var html = Handlebars.getTemplate("myStudents")(myStudents);
     var root = $("#cnt").html(html);
-    $("#table-myStudents").tablesorter({headers: {0: {"sorter": false}}});
+    $("#table-myStudents").tablesorter({headers: {0: {"sorter": false},5: {"sorter": false}}});
     root.find(':checkbox').checkbox();
     root.find('tbody').find(':checkbox').checkbox().on('toggle', function(e) {generateMailto(root);});
-    root.find('.checkbox').click(function (e) {shiftSelect(e, this, root);});
-    root.find(".mailto").on('toggle', function() {toggleMailCheckboxes(root);});
+
+    root.find('.mail-checkbox-stu').click(function (e) {
+        shiftSelect(e, this, root,'.mail-checkbox-stu');
+    });
+    root.find(".mailto-students").on('toggle', function (e) {
+        toggleMailCheckboxes(e.currentTarget, ".mail-checkbox-students", root);
+    });
+    root.find('.mail-checkbox-s').click(function (e) {
+        shiftSelect(e, this, root,'.mail-checkbox-s');
+    });
+    root.find(".mailto-sups").on('toggle', function (e) {
+        toggleMailCheckboxes(e.currentTarget, ".mail-checkbox-sup", root);
+    });
+
+
 }
 
 function generateMailto(root) {
