@@ -125,44 +125,32 @@ func GetConventions2(db *sql.DB, emitter string) ([]Convention, error) {
 	var q string
 	var rows *sql.Rows
 	if len(u.Role) == 0 {
-		/*q = "select stu.firstname, stu.lastname, stu.email, stu.tel, students.promotion, students.major, startTime, endTime, tut.firstname, tut.lastname, tut.email, tut.tel," +
-				"midTermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title " +
-				" from internships, users as stu, users as tut, students where students.email = stu.email and internships.student = stu.email and tut.email = internships.tutor" +
-				" and tutor=$1";*/
 		q = "select stu.firstname, stu.lastname, stu.email, stu.tel, students.promotion, students.major, startTime, endTime, tut.firstname, tut.lastname, tut.email, tut.tel, midTermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title " +
 		" from internships" +
 		" join users as stu on stu.email = internships.student" +
 		" join users as tut on tut.email = internships.tutor" +
 		" join students on students.email = stu.email" +
 		" and tutor=$1"
-		if allConventions == nil {
-			allConventions, err = db.Prepare(q)
+		if allMyConventions == nil {
+			allMyConventions, err = db.Prepare(q)
 		}
 		if err != nil {
 			return conventions, err
 		}
-
-		/*stmt, err := db.Prepare(q)
-		if err != nil {
-			return conventions, err
-		}                              */
-		rows, err = allConventions.Query(emitter)
-		//rows, err = db.Query(q, emitter)
+		rows, err = allMyConventions.Query(emitter)
 	} else {
-/*		q = "select stu.firstname, stu.lastname, stu.email, stu.tel, students.promotion, students.major, startTime, endTime, tut.firstname, tut.lastname, tut.email, tut.tel," +
-				"midTermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title " +
-				" from internships, users as stu, users as tut, students where students.email = stu.email and internships.student = stu.email and tut.email = internships.tutor";*/
 		q = "select stu.firstname, stu.lastname, stu.email, stu.tel, students.promotion, students.major, startTime, endTime, tut.firstname, tut.lastname, tut.email, tut.tel, midTermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title " +
 		" from internships" +
 		" join users as stu on stu.email = internships.student" +
 		" join users as tut on tut.email = internships.tutor" +
 		" join students on students.email = stu.email"
-		/*stmt, err := db.Prepare(q)
+		if allConventions != nil {
+			allConventions, err = db.Prepare(q)
+		}
 		if err != nil {
 			return conventions, err
 		}
-		rows, err = stmt.Query()*/
-		rows, err = db.Query(q)
+		rows, err = allConventions.Query(q)
 	}
 
 	if err != nil {
