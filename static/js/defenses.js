@@ -2,7 +2,12 @@
  * Created by fhermeni on 10/07/2014.
  */
 
+var users;
+
 function showDefenses(t) {
+    syncGetUsers(function (us) {
+        users = us;
+    });
     getEmbeddedDefenses(function(data) {
         defenses = JSON.parse(data);
         var html = Handlebars.getTemplate("defense-init")(embed2(defenses));
@@ -394,6 +399,9 @@ function publicDefenses(d) {
 
 function showJuryService() {
     getEmbeddedDefenses(function (data) {
+        syncGetUsers(function (us) {
+            users = us;
+        });
         var d = JSON.parse(data);
         var html = Handlebars.getTemplate("juries")(jury_service(rmEmptyJuries(embed2(d))));
         var root = $("#cnt");
@@ -415,6 +423,9 @@ function showJuryService() {
 
 function rawJuries() {
     getEmbeddedDefenses(function (data) {
+        syncGetUsers(function (us) {
+            users = us;
+        });
         var d = JSON.parse(data);
         var txt = Handlebars.getTemplate("rawJuries")(jury_service(rmEmptyJuries(embed2(d))));
         $("#modal").html(txt).modal('show');
@@ -424,8 +435,6 @@ function rawJuries() {
 
 function jury_service(defenses) {
     var count = {};
-    var users;
-    syncGetUsers(function(d) {users = d});
     defenses.sessions.forEach(function (s) {
         s.jury.forEach(function (j) {
             j.commission.forEach(function (e) {
@@ -493,10 +502,6 @@ function embed2(def) {
 }
 
 function fullname2Email(fn) {
-    var users;
-    syncGetUsers(function (us) {
-        users = us;
-    });
     var got = undefined;
     users.forEach(function (u) {
             if (fn == u.Firstname + " " + u.Lastname) {
