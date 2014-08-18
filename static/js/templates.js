@@ -94,8 +94,6 @@ Handlebars.registerHelper('majorOptions', function(m) {
 });
 
 Handlebars.registerHelper('tutorOptions', function(m) {
-    var users;
-    syncGetUsers(function(data) {users = data});
     var b = "";
     users.forEach(function (o) {
         var selected = m == o.Email ? " selected " : "";
