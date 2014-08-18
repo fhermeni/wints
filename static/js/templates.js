@@ -171,8 +171,8 @@ Handlebars.registerHelper('committeeOptions', function(a, opts) {
     b = "<option >?</option>";
     opts.forEach(function (o) {
         var fn = o.Firstname + " " + o.Lastname;
-        var selected = a == fn ? " selected " : "";
-        b += "<option " + selected +">" + fn + "</option>";
+        var selected = a == o.Email ? " selected " : "";
+        b += "<option " + selected +" value='" + o.Email + "'>" + fn + "</option>";
     });
     return new Handlebars.SafeString(b);
 });

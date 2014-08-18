@@ -2,23 +2,17 @@
  * Created by fhermeni on 10/07/2014.
  */
 
-function showDefenses() {
+function showDefenses(t) {
     getEmbeddedDefenses(function(data) {
         defenses = JSON.parse(data);
-        if (!defenses.visio) {
-            defenses.visio = {};
-        }
-        defenses.sessions.forEach(function (s) {
-            s.jury.forEach(function (j) {
-                if (!j.time) {
-                    j.time = s.date;
-                }
-            })
-        });
-        var html = Handlebars.getTemplate("defense-init")(defenses);
+        var html = Handlebars.getTemplate("defense-init")(embed2(defenses));
         $("#cnt").html(html);
         $('[data-toggle="reset-defense-confirmation"]').confirmation({onConfirm: prepareSchedule});
-        showCoarseDefenseForm();
+        if (t == "schedule") {
+            showCoarseDefenseForm();
+        } else {
+            showDefensePlanningForm();
+        }
     }, function() {
         console.log("unknown");
         defenses = {
@@ -26,7 +20,7 @@ function showDefenses() {
             sessions: [],
             private:{}
         };
-        var html = Handlebars.getTemplate("defense-init")(defenses);
+        var html = Handlebars.getTemplate("defense-init")(embed2(defenses));
         $('[data-toggle="reset-defense-confirmation"]').confirmation({onConfirm: prepareSchedule});
         $("#cnt").html(html);
     });
@@ -243,7 +237,7 @@ function sortableOptions() {
 }
 
 function showCoarseDefenseForm() {
-    var html = Handlebars.getTemplate("defenses-coarse")(defenses);
+    var html = Handlebars.getTemplate("defenses-coarse")(embed2(defenses));
     $("#defenses-form").html(html);
     $(".students").sortable(sortableOptions());
 }
@@ -255,7 +249,7 @@ function showDefensePlanningForm() {
             defenses.tutors.push(u);
         });
         console.log(defenses.tutors);
-        var html = Handlebars.getTemplate("defenses-planning")(defenses);
+        var html = Handlebars.getTemplate("defenses-planning")(embed2(defenses));
         $("#defenses-form").html(html);
         //$(".students").sortable(sortableOptions());
         $('#pool').affix({
@@ -268,7 +262,7 @@ function showDefensePlanningForm() {
 }
 
 function displayDefenses(i) {
-    var html = Handlebars.getTemplate("defenses-show-" + i)(rmEmptyJuries(defenses));
+    var html = Handlebars.getTemplate("defenses-show-" + i)(rmEmptyJuries(embed2(defenses)));
     window.open( "data:x-application/external;charset=utf-8," + escape(html));
 }
 
@@ -401,16 +395,28 @@ function publicDefenses(d) {
 function showJuryService() {
     getEmbeddedDefenses(function (data) {
         var d = JSON.parse(data);
-        var html = Handlebars.getTemplate("juries")(jury_service(rmEmptyJuries(d)));
-        $("#cnt").html(html);
-    });
+        var html = Handlebars.getTemplate("juries")(jury_service(rmEmptyJuries(embed2(d))));
+        var root = $("#cnt");
+        root.html(html);
+        root.find(':checkbox').checkbox();
+        root.find('tbody').find(':checkbox').checkbox().on('toggle', function (e) {
+            generateMailto(root);
+        });
+        root.find('.mail-checkbox').click(function (e) {
+            shiftSelect(e, this, root,'.mail-checkbox-j');
+        });
 
+        root.find(".mailto").on('toggle', function (e) {
+            toggleMailCheckboxes(e.currentTarget, ".mail-checkbox-jury", root);
+        });
+
+    });
 }
 
 function rawJuries() {
     getEmbeddedDefenses(function (data) {
         var d = JSON.parse(data);
-        var txt = Handlebars.getTemplate("rawJuries")(jury_service(rmEmptyJuries(d)));
+        var txt = Handlebars.getTemplate("rawJuries")(jury_service(rmEmptyJuries(embed2(d))));
         $("#modal").html(txt).modal('show');
     });
 }
@@ -435,8 +441,68 @@ function jury_service(defenses) {
     });
     arr = [];
     Object.keys(count).forEach(function (e) {
-        arr.push({user: e, count: count[e]});
-            }
+            users.forEach(function (u) {
+                if (u.Email == e) {
+                    arr.push({user: u, count: count[e]});
+                    return true;
+                }
+            })
+        }
     );
     return arr;
+}
+
+/**
+ * Substitute jury fullname by their email
+ * @param def
+ */
+function embed2(def) {
+   var d = {
+       filter : def.filter,
+       pool : def.pool,
+       tutors : def.tutors,
+       private : def.private,
+       visio: def.visio,
+       sessions : []
+   };
+   def.sessions.forEach(function (s) {
+     var ns = {
+         date: s.date,
+         jury: []
+     };
+      d.sessions.push(ns);
+       s.jury.forEach(function(j) {
+           var nj = {
+               room : j.room,
+               students : j.students,
+               id : j.id,
+               date : j.date,
+               commission : []
+           };
+           j.commission.forEach(function (fn) {
+               if (fn.length > 1) {
+                   nj.commission.push(fullname2Email(fn));
+               } else {
+                   nj.commission.push("");
+               }
+           });
+           ns.jury.push(nj);
+       });
+   });
+   return d;
+}
+
+function fullname2Email(fn) {
+    var users;
+    syncGetUsers(function (us) {
+        users = us;
+    });
+    var got = undefined;
+    users.forEach(function (u) {
+            if (fn == u.Firstname + " " + u.Lastname) {
+                got = u.Email;
+                return true;
+            }
+        });
+    return got;
 }

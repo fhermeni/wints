@@ -200,8 +200,10 @@ function refresh() {
         displayTutors();
     } else if (currentPage == "privileges") {
         showPrivileges();
-    } else if (currentPage == "defenses") {
-        showDefenses();
+    } else if (currentPage == "defenses-schedule") {
+        showDefenses("schedule");
+    } else if (currentPage == "defenses-juries") {
+        showDefenses("juries");
     } else if (currentPage == "pending") {
         pickOne();
     } else if (currentPage == "juries") {

@@ -10,7 +10,6 @@ var (
 	errDefenseExists = errors.New("The defense already exists")
 )
 
-
 func Defense(db *sql.DB, id string) (string, error) {
 	var cnt string
 	err := db.QueryRow("select content from defenses where id=$1", id).Scan(&cnt)
