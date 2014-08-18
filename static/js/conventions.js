@@ -410,9 +410,11 @@ function getUploadData(kind, email) {
         sizeError:"The file cannot exceed 10MB",
         onFileError: function(file, error) {
             console.log("Erreur: " + error);
+            reportError(error);
     },
         onFileSuccess: function(file, data) {
             $("#dl-" + kind).removeAttr("disabled");
+            reportSuccess("Report uploaded");
         },
         multi: false}
 }

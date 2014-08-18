@@ -539,7 +539,7 @@ func main() {
 	r.HandleFunc(ROOT_API+"/conventions/{email}/final/report", GetReport("final")).Methods("GET")
 	r.HandleFunc(ROOT_API+"/conventions/{email}/final/mark", MarkKind(UpdateMark, "final")).Methods("POST")
 	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/deadline", UpdateDeadline("supReport")).Methods("POST")
-	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/report", UploadReport("major")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/report", UploadReport("supReport")).Methods("POST")
 	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/mark", MarkKind(UpdateMark, "supReport")).Methods("POST")
 	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/report", GetReport("supReport")).Methods("GET")
 
