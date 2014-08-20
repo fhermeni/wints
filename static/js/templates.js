@@ -129,6 +129,7 @@ Handlebars.registerHelper('slot', function(d) {
     return twoD(date.getDate()) + "/" + twoD(date.getMonth() + 1) + "/" + date.getFullYear() + " " + twoD(date.getHours()) + ":00";*/
 });
 
+
 Handlebars.registerHelper('majors', function(emails) {
     var majors = {};
     emails.forEach(function (e) {
