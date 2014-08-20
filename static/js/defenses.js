@@ -13,7 +13,6 @@ function showDefenses(t) {
     });
     getEmbeddedDefenses(function(data) {
         defenses = JSON.parse(data);
-        console.log(defenses);
         if (!defenses.pool[0] instanceof Object) {
             defenses = embed2(defenses);
         }
