@@ -3,14 +3,13 @@
         <div class="pagination">
             <ul class="defenses-pages">
                 <li class="previous">
-                    <a href="#" class="fui-arrow-left"></a>
+                    <a href="#" class="fui-arrow-left" onclick="prevSession()"></a>
                 </li>
-
                 {{#each sessions}}
                     <li><a onclick="show_session({{@index}})">{{inc @index}}</a></li>
                 {{/each}}
                 <li class="next">
-                    <a href="#" class="fui-arrow-right"></a>
+                    <a href="#" class="fui-arrow-right" onclick="nextSession()"></a>
                 </li>
             </ul>
         </div>

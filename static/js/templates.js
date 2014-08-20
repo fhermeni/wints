@@ -131,6 +131,7 @@ Handlebars.registerHelper('slot', function(d) {
 
 Handlebars.registerHelper('majors', function(emails) {
     var majors = {};
+    //console.log(emails);
     emails.forEach(function (e) {
         if (e.Major) {
             majors[e.Major] = true;
@@ -181,10 +182,9 @@ Handlebars.registerHelper('inc', function(d) {
 
 Handlebars.registerHelper('slotEntry', function(e) {
     if (e) {
-        var c = getConvention(e);
-        var buf = c.Stu.P.Firstname + " " + c.Stu.P.Lastname + " (" + c.Stu.Major + ")";
-        buf += " <span onclick='switchVisibility(this)' class='glyphicon glyphicon-eye-" + (defenses.private[c.Stu.P.Email] ? "close late" : "open") + "'></span>";
-        buf += " <span onclick='switchVisio(this)' class='glyphicon " + (defenses.visio[c.Stu.P.Email] ? "glyphicon-facetime-video" : "glyphicon-user") + "'></span>";
+        var buf = e.P.Firstname + " " + e.P.Lastname + " (" + e.Major + ")";
+        buf += " <span onclick='switchVisibility(this)' class='glyphicon glyphicon-eye-" + (defenses.private[e.P.Email] ? "close late" : "open") + "'></span>";
+        buf += " <span onclick='switchVisio(this)' class='glyphicon " + (defenses.visio[e.P.Email] ? "glyphicon-facetime-video" : "glyphicon-user") + "'></span>";
         return new Handlebars.SafeString(buf);
     }
     return "Break";
@@ -245,6 +245,21 @@ Handlebars.registerHelper('reportGrade', function(r) {
 Handlebars.registerHelper('grade', function(g) {
     return g < 0 ? "?" : g;
 });
+
+Handlebars.registerHelper('student', function(g) {
+    if (!g || g.length== 0) {
+        return "break";
+    }
+    var buf = g.P.Firstname + " " + g.P.Lastname;
+    if (defenses.private[g.P.Email]) {
+        buf += " <span class='glyphicon glyphicon-eye-close'></span>";
+    }
+    if (defenses.visio[g.P.Email]) {
+        buf += " <span class='glyphicon glyphicon-facetime-video'></span>";
+    }
+    return new Handlebars.SafeString(buf);
+});
+
 
 function df(d, active) {
     var date = new Date(Date.parse(d));

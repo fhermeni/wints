@@ -183,3 +183,15 @@ th.rotate > div {
 #recaptcha_area {
     margin:auto;
 }
+
+.listing-students {
+    font-size: 14px;
+}
+
+.listing-students h6 {
+    font-size: 20px;
+}
+
+.listing-students h4 {
+    font-size: 24px;
+}
