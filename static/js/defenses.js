@@ -89,6 +89,7 @@ function saveJury(i) {
     storeDefenses();
 }
 
+
 function saveLists() {
     var raw = [];
     var pool = [];
