@@ -30,7 +30,6 @@ function showDefenses(t) {
         } else {
             console.log("no need to convert");
         }
-        console.log(defenses);
         //debugger;
         //console.log(embed2(defenses));
         if (t == "schedule") {
@@ -101,7 +100,6 @@ function saveJury(i) {
         s.jury.forEach(function (x) {
             if (x.id == idx) {
                 x.commission[jidx] = m;
-                console.log(x);
                 return true;
             }
         })

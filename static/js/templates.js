@@ -131,7 +131,6 @@ Handlebars.registerHelper('slot', function(d) {
 
 Handlebars.registerHelper('majors', function(emails) {
     var majors = {};
-    //console.log(emails);
     emails.forEach(function (e) {
         if (e.Major) {
             majors[e.Major] = true;
