@@ -411,7 +411,7 @@ function publicDefenses(d) {
 
             newSession.jury.push(myJury);
             j.students.forEach(function (stu) {
-                var c = getConvention(stu);
+                var c = getConvention(stu.P.Email);
                 if (c) {
                     //get its fn,ln
                     var myStudent = {
