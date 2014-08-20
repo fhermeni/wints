@@ -42,6 +42,7 @@ function storeDefenses() {
 function saveSessionDate(i) {
     var id = $(i).attr("data-session");
     defenses.sessions[id].date = $(i).val();
+    storeDefenses();
 }
 
 function saveRoom(i) {
@@ -55,6 +56,7 @@ function saveRoom(i) {
             }
         })
     });
+    storeDefenses();
 }
 
 function saveTime(i) {
@@ -68,6 +70,7 @@ function saveTime(i) {
             }
         })
     });
+    storeDefenses();
 }
 
 function saveJury(i) {
@@ -83,6 +86,7 @@ function saveJury(i) {
         })
     });
     //Set the checkbox value accordingly
+    storeDefenses();
 }
 
 function saveLists() {
@@ -109,6 +113,7 @@ function saveLists() {
         });
     });
     defenses.pool = pool;
+    storeDefenses();
 }
 
 function prepareSchedule() {
