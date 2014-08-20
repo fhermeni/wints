@@ -397,7 +397,6 @@ function publicDefenses(d) {
     var long = {};
     long.sessions = [];
     d.sessions.forEach(function (session) {
-        console.log(session);
         var newSession = {date: session.date, jury:[]};
         long.sessions.push(newSession);
         session.jury.forEach(function (j) {
