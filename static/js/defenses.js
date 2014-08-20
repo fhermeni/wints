@@ -14,7 +14,10 @@ function showDefenses(t) {
     getEmbeddedDefenses(function(data) {
         defenses = JSON.parse(data);
         if (!defenses.pool[0] instanceof Object) {
+            console.log("Conversion");
             defenses = embed2(defenses);
+        } else {
+            console.log("no need to convert");
         }
         console.log(defenses);
         //debugger;

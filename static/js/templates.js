@@ -250,6 +250,7 @@ Handlebars.registerHelper('student', function(g) {
     if (!g || g.length== 0) {
         return "break";
     }
+
     var buf = g.P.Firstname + " " + g.P.Lastname;
     if (defenses.private[g.P.Email]) {
         buf += " <span class='glyphicon glyphicon-eye-close'></span>";
