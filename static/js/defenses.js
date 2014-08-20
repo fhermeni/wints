@@ -13,7 +13,7 @@ function showDefenses(t) {
     });
     getEmbeddedDefenses(function(data) {
         defenses = JSON.parse(data);
-        if (!defenses.pool[0] instanceof Object) {
+        if (typeof(defenses.pool[0])=="string") {
             console.log("Conversion");
             defenses = embed2(defenses);
         } else {
