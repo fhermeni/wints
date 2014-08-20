@@ -7,6 +7,17 @@ var users;
 var currentSession = 0;
 var allChecked = false;
 
+function getUser(u) {
+    var e = undefined;
+    users.forEach(function (x) {
+        if (x.Email == u) {
+            e = x;
+            return true;
+        }
+    });
+    return e;
+}
+
 function showDefenses(t) {
     syncGetUsers(function (us) {
         users = us;
@@ -394,7 +405,7 @@ function publicDefenses(d) {
         session.jury.forEach(function (j) {
             var myJury = {
                 students : [],
-                commission : j.commission,
+                commission : [],
                 room : j.room,
                 id : j.id,
                 time : j.date
@@ -422,6 +433,19 @@ function publicDefenses(d) {
                     myJury.students.push(myStudent);
                 } else {
                     myJury.students.push({});
+                }
+            });
+            j.commission.forEach(function (u) {
+                var user = getUser(u);
+                if (user == undefined) {
+                    myJury.commission.push(undefined);
+                } else {
+                    myJury.commission.push(
+                        {
+                            Firstname: user.Firstname,
+                            Lastname : user.Lastname
+                        }
+                    );
                 }
             });
         });

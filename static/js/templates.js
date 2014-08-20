@@ -144,7 +144,7 @@ Handlebars.registerHelper('commission', function(emails) {
     var cnt = [];
     emails.forEach(function (e) {
         if (e) {
-            cnt.push(e);
+            cnt.push(e.Firstname + " " + e.Lastname);
         } else {
             cnt.push("?")
         }
