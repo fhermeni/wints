@@ -19,9 +19,6 @@ function getUser(u) {
 }
 
 function showDefenses(t) {
-    syncGetUsers(function (us) {
-        users = us;
-    });
     getEmbeddedDefenses(function(data) {
         defenses = JSON.parse(data);
         if (typeof(defenses.pool[0])=="string") {

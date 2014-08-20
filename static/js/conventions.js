@@ -13,6 +13,12 @@ $( document ).ready(function () {
         user = d;
     });
 
+    if (user.Role != "admin") {
+        syncGetUsers(function (us) {
+            users = us;
+        });
+    }
+
     if (!user) {
         window.location.href = "/";
     }
