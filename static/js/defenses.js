@@ -13,6 +13,13 @@ function showDefenses(t) {
     });
     getEmbeddedDefenses(function(data) {
         defenses = JSON.parse(data);
+        console.log(defenses);
+        if (!defenses.pool[0] instanceof Object) {
+            defenses = embed2(defenses);
+        }
+        console.log(defenses);
+        //debugger;
+        //console.log(embed2(defenses));
         if (t == "schedule") {
             showCoarseDefenseForm();
         } else {
@@ -65,7 +72,7 @@ function saveTime(i) {
     defenses.sessions.forEach(function (s) {
         s.jury.forEach(function (x) {
             if (x.id == idx) {
-                x.time = r;
+                x.date = r;
                 return false;
             }
         })
@@ -81,7 +88,8 @@ function saveJury(i) {
         s.jury.forEach(function (x) {
             if (x.id == idx) {
                 x.commission[jidx] = m;
-                return false;
+                console.log(x);
+                return true;
             }
         })
     });
@@ -239,7 +247,7 @@ function sortableOptions() {
 }
 
 function showCoarseDefenseForm() {
-    var html = Handlebars.getTemplate("defenses-coarse")(embed2(defenses));
+    var html = Handlebars.getTemplate("defenses-coarse")(defenses);
     $("#cnt").html(html);
     $(".students").sortable(sortableOptions());
 }
@@ -272,7 +280,7 @@ function showDefensePlanningForm() {
         users.forEach(function (u) {
             defenses.tutors.push(u);
         });
-        var html = Handlebars.getTemplate("defenses-planning2")(rmEmptyJuries(embed2(defenses)));
+        var html = Handlebars.getTemplate("defenses-planning2")(rmEmptyJuries(defenses));
         var root = $("#cnt");
         root.html(html);
         root.find(':checkbox').checkbox().on('toggle', function (e) {
@@ -283,7 +291,7 @@ function showDefensePlanningForm() {
 }
 
 function displayDefenses(i) {
-    var html = Handlebars.getTemplate("defenses-show-" + i)(rmEmptyJuries(embed2(defenses)));
+    var html = Handlebars.getTemplate("defenses-show-" + i)(rmEmptyJuries(defenses));
     window.open( "data:x-application/external;charset=utf-8," + escape(html));
 }
 
@@ -378,6 +386,7 @@ function publicDefenses(d) {
     var long = {};
     long.sessions = [];
     d.sessions.forEach(function (session) {
+        console.log(session);
         var newSession = {date: session.date, jury:[]};
         long.sessions.push(newSession);
         session.jury.forEach(function (j) {
@@ -432,7 +441,7 @@ function showJuryService() {
             users = us;
         });
         var d = JSON.parse(data);
-        var html = Handlebars.getTemplate("juries")(jury_service(rmEmptyJuries(embed2(d))));
+        var html = Handlebars.getTemplate("juries")(jury_service(rmEmptyJuries(d)));
         var root = $("#cnt");
         root.html(html);
         root.find(':checkbox').checkbox();
@@ -456,7 +465,7 @@ function rawJuries() {
             users = us;
         });
         var d = JSON.parse(data);
-        var txt = Handlebars.getTemplate("rawJuries")(jury_service(rmEmptyJuries(embed2(d))));
+        var txt = Handlebars.getTemplate("rawJuries")(jury_service(rmEmptyJuries(d)));
         $("#modal").html(txt).modal('show');
     });
 }
