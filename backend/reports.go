@@ -5,6 +5,9 @@ import (
 	"database/sql"
 	"encoding/base64"
 	"errors"
+	"bytes"
+	"archive/tar"
+	"log"
 )
 
 var (
@@ -73,3 +76,47 @@ func UpdateDeadline(db *sql.DB, s, kind string, t time.Time) error {
 	return SingleUpdate(db, errUnknownReport, sql, s, kind, t)
 }
 
+func Reports(db *sql.DB, kind string, from []string) ([]byte, error) {
+	buf := new(bytes.Buffer)
+	tw := tar.NewWriter(buf)
+	var missing string
+	for _, student := range from {
+		c, err := GetConvention(db, student)
+		if err != nil {
+			return []byte{}, err
+		}
+		if !c.SupReport.IsIn {
+			missing = missing + c.Stu.P.Firstname + " " + c.Stu.P.Lastname + "\n";
+			continue;
+		}
+		report, err := Report(db, student, kind)
+		log.Printf("%s %d\n", student, len(report))
+		if err != nil {
+		}
+		hdr := &tar.Header{
+			Name: c.Stu.P.Lastname + "-" + kind + ".pdf",
+			Size: int64(len(report))}
+		if err := tw.WriteHeader(hdr); err != nil {
+			return []byte{}, err
+		}
+		if _, err := tw.Write(report); err != nil {
+			return []byte{}, err
+		}
+	}
+	if len(missing) > 0 {
+		hdr := &tar.Header{
+			Name: "missing_reports.txt",
+			Size: int64(len(missing))}
+		if err := tw.WriteHeader(hdr); err != nil {
+			return []byte{}, err
+		}
+		if _, err := tw.Write([]byte(missing)); err != nil {
+			return []byte{}, err
+		}
+	}
+	if err := tw.Close(); err != nil {
+		return []byte{}, err
+	}
+	log.Printf("%s\n", missing)
+	return buf.Bytes(), nil
+}

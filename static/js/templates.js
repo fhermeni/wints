@@ -132,7 +132,7 @@ Handlebars.registerHelper('slot', function(d) {
 Handlebars.registerHelper('majors', function(emails) {
     var majors = {};
     emails.forEach(function (e) {
-        if (e.Major) {
+        if (e && e.Major) {
             majors[e.Major] = true;
         }
     });

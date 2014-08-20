@@ -429,6 +429,14 @@ function publicDefenses(d) {
                     myJury.students.push({});
                 }
             });
+            //Insert breaks
+            if (myJury.students.length > 3) {
+                if (myJury.students.length == 4) {
+                    myJury.students.splice(2, 0, undefined)
+                } else {
+                    myJury.students.splice(3, 0, undefined)
+                }
+            }
             j.commission.forEach(function (u) {
                 var user = getUser(u);
                 if (user == undefined) {
@@ -577,4 +585,23 @@ function fullname2Email(fn) {
             }
         });
     return got;
+}
+
+function getReports(id) {
+    defenses.sessions.forEach(function (s) {
+        s.jury.forEach(function (j) {
+            if (j.id == id) {
+                var emails = [];
+                j.students.forEach(function (u) {
+                    if (u) {
+                        emails.push(u.P.Email);
+                    }
+                });
+                downloadReports("supReport", emails, function(data) {
+                    window.open(data);
+                });
+                return true;
+            }
+        });
+    });
 }

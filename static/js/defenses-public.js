@@ -46,6 +46,7 @@ function showDefenses() {
         url: "/api/v1/defenses?fmt=public"
     }).done(function(data) {
             defenses = JSON.parse(data);
+            console.log(defenses);
             var html = Handlebars.getTemplate("defenses-show-planning2")(defenses);
             $("#defenses").html(html);
             showDay(0);

@@ -456,6 +456,23 @@ func GrantRole(w http.ResponseWriter, r *http.Request, email string) {
 	backend.Mail(cfg, []string{target}, "mails/priv_" + string(role) + ".txt", nil)
 }
 
+
+type ReportsRequest struct {
+	Kind string
+	Students []string
+}
+func GetReports(w http.ResponseWriter, r *http.Request, email string) {
+	var req ReportsRequest
+	if err := jsonRequest(w, r, &req); err != nil {
+		return
+	}
+	cnt, err := backend.Reports(DB, req.Kind, req.Students)
+	if report500OnError(w, "Unable to make the archive", err) {
+		return
+	}
+	fileReply(w, "application/x-tar", "reports-" + req.Kind + ".tar", cnt)
+}
+
 func RequireToken(cb func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		n, _ := backend.ExtractEmail(r)
@@ -542,6 +559,9 @@ func main() {
 	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/report", UploadReport("supReport")).Methods("POST")
 	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/mark", MarkKind(UpdateMark, "supReport")).Methods("POST")
 	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/report", GetReport("supReport")).Methods("GET")
+
+	//Reports
+	r.HandleFunc(ROOT_API+"/reports", RequireRole(GetReports,"admin")).Methods("POST")
 
 	//Profile management
 	r.HandleFunc(ROOT_API+"/profile", RequireToken(GetUser)).Methods("GET")

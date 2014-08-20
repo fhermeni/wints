@@ -160,3 +160,14 @@ function getEmbeddedDefenses(ok, no) {
 function updateMark(student, kind, m, ok, no) {
     postRawWithToken("/conventions/" + student + "/" + kind + "/mark", m, noCb(ok), restError(no));
 }
+
+function downloadReports(kind, students, ok, no) {
+    return $.ajax({
+        method: "POST",
+        url: ROOT_API + "/reports",
+        data: JSON.stringify({
+            Kind: kind,
+            Students: students
+        })
+    }).done(noCb(ok)).fail(restError(no));
+}
