@@ -14,6 +14,8 @@ import (
 	"io/ioutil"
 	"compress/gzip"
 	"time"
+	"strings"
+	"bytes"
 )
 
 const (
@@ -462,15 +464,22 @@ type ReportsRequest struct {
 	Students []string
 }
 func GetReports(w http.ResponseWriter, r *http.Request, email string) {
-	var req ReportsRequest
-	if err := jsonRequest(w, r, &req); err != nil {
+	kind := r.FormValue("kind")
+	emails := r.FormValue("students")
+	if len(kind) == 0 || len(emails) == 0 {
+		http.Error(w, "", http.StatusBadRequest)
 		return
 	}
-	cnt, err := backend.Reports(DB, req.Kind, req.Students)
+
+	cnt, err := backend.Reports(DB, kind, strings.Split(emails, ","))
 	if report500OnError(w, "Unable to make the archive", err) {
 		return
 	}
-	fileReply(w, "application/x-tar", "reports-" + req.Kind + ".tar", cnt)
+	var b bytes.Buffer
+	w2 := gzip.NewWriter(&b)
+	w2.Write(cnt)
+	w2.Close()
+	fileReply(w, "application/x-tar", "reports-" + kind + ".tar.gz", b.Bytes())
 }
 
 func RequireToken(cb func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
@@ -561,7 +570,7 @@ func main() {
 	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/report", GetReport("supReport")).Methods("GET")
 
 	//Reports
-	r.HandleFunc(ROOT_API+"/reports", RequireRole(GetReports,"admin")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/reports", RequireRole(GetReports,"admin")).Methods("GET")
 
 	//Profile management
 	r.HandleFunc(ROOT_API+"/profile", RequireToken(GetUser)).Methods("GET")

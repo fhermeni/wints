@@ -391,8 +391,10 @@ function switchVisio(i) {
 }
 
 function publicDefenses(d) {
+
     var long = {};
     long.sessions = [];
+    var users
     d.sessions.forEach(function (session) {
         var newSession = {date: session.date, jury:[]};
         long.sessions.push(newSession);

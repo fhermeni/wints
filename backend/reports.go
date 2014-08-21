@@ -7,7 +7,6 @@ import (
 	"errors"
 	"bytes"
 	"archive/tar"
-	"log"
 )
 
 var (
@@ -90,11 +89,12 @@ func Reports(db *sql.DB, kind string, from []string) ([]byte, error) {
 			continue;
 		}
 		report, err := Report(db, student, kind)
-		log.Printf("%s %d\n", student, len(report))
 		if err != nil {
+			return []byte{}, err
 		}
 		hdr := &tar.Header{
 			Name: c.Stu.P.Lastname + "-" + kind + ".pdf",
+			Mode: 0644,
 			Size: int64(len(report))}
 		if err := tw.WriteHeader(hdr); err != nil {
 			return []byte{}, err
@@ -106,6 +106,7 @@ func Reports(db *sql.DB, kind string, from []string) ([]byte, error) {
 	if len(missing) > 0 {
 		hdr := &tar.Header{
 			Name: "missing_reports.txt",
+			Mode: 0644,
 			Size: int64(len(missing))}
 		if err := tw.WriteHeader(hdr); err != nil {
 			return []byte{}, err
@@ -117,6 +118,5 @@ func Reports(db *sql.DB, kind string, from []string) ([]byte, error) {
 	if err := tw.Close(); err != nil {
 		return []byte{}, err
 	}
-	log.Printf("%s\n", missing)
 	return buf.Bytes(), nil
 }

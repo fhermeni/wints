@@ -246,6 +246,17 @@ Handlebars.registerHelper('grade', function(g) {
     return g < 0 ? "?" : g;
 });
 
+Handlebars.registerHelper('URIemails', function(students) {
+    var l = [];
+    students.forEach(function (s) {
+        if (s && s.P) {
+            l.push(s.P.Email);
+        }
+    });
+    return encodeURI(l.join(","));
+});
+
+
 Handlebars.registerHelper('student', function(g) {
     if (!g || g.length== 0) {
         return "break";

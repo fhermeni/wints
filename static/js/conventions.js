@@ -527,6 +527,9 @@ function newUser() {
                 function() {
                     $("#modal").modal('hide');
                     reportSuccess("Account created");
+                    syncGetUsers(function (us) {
+                        users = us;
+                    });
                     showPrivileges();
                 }, function(o) {
                     if (o.status == 409) {
@@ -538,6 +541,9 @@ function newUser() {
 function rmUser(email, div) {
     deleteUser(email, function() {
         div.remove();
+        syncGetUsers(function (us) {
+            users = us;
+        });
         reportSuccess("Account deleted")
     });
 }

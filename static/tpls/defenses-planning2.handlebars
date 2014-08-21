@@ -73,7 +73,9 @@
                                 <a class='clickable' onclick="showDetails('{{this.P.Email}}')">{{student this}}</a>
                             <br/>
                         {{/each}}
-                        <a onclick="getReports({{id}})" class="btn btn-info btn-wide"><span class="glyphicon glyphicon-cloud-download"></span>Supervisor reports</a>
+                        <p class="text-center">
+                            <a href="api/v1/reports?students={{URIemails students}}&kind=supReport" class="btn btn-info"><span class="glyphicon glyphicon-cloud-download"></span>Supervisor reports</a>
+                        </p>
                 </div>
             {{/each}}
         </div>
