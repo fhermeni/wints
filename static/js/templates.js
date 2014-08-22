@@ -269,6 +269,10 @@ Handlebars.registerHelper('student', function(g) {
     if (defenses.visio[g.P.Email]) {
         buf += " <span class='glyphicon glyphicon-facetime-video'></span>";
     }
+    var c = getConvention(g.P.Email);
+    if (!c.SupReport.IsIn) {
+        buf += " <span class='glyphicon glyphicon-file alert-danger'></span>";
+    }
     return new Handlebars.SafeString(buf);
 });
 

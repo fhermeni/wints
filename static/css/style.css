@@ -41,6 +41,9 @@ tbody {
     background-color: #d9534f;
 }
 
+.danger {
+    background-color: #d9534f;
+}
 .login {
     margin-top: 100px;
 }
