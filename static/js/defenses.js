@@ -394,7 +394,7 @@ function publicDefenses(d) {
 
     var long = {};
     long.sessions = [];
-    var users
+    var users;
     d.sessions.forEach(function (session) {
         var newSession = {date: session.date, jury:[]};
         long.sessions.push(newSession);
@@ -412,6 +412,7 @@ function publicDefenses(d) {
                 var c = getConvention(stu.P.Email);
                 if (c) {
                     //get its fn,ln
+                    //console.log(d);
                     var myStudent = {
                         P: {
                             Firstname: c.Stu.P.Firstname,
@@ -422,9 +423,8 @@ function publicDefenses(d) {
                         Subject: c.Title,
                         CompanyWWW: c.CompanyWWW,
                         Company: c.Company,
-                        private : d.private[stu],
-                        visio: d.visio[stu]
-
+                        private : d.private[stu.P.Email] ? true : false,
+                        visio: d.visio[stu.P.Email] ? true: false
                     };
                     myJury.students.push(myStudent);
                 } else {
