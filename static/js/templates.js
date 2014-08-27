@@ -295,9 +295,16 @@ Handlebars.registerHelper('student', function(g) {
     return new Handlebars.SafeString(buf);
 });
 
+Handlebars.registerHelper('longDate', function(d) {
+    var m = moment(d, "DD/MM/YYYY");
+    m.lang("fr");
+    return m.format("dddd D MMMM");
+});
+
 
 function df(d, active) {
     var date = new Date(Date.parse(d));
     var str = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
     return str;
 }
+

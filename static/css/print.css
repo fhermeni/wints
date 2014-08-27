@@ -199,6 +199,14 @@ th.rotate > div {
     font-size: 24px;
 }
 
-.print {
+.screen {
     display: none;
+}
+
+.break-after {
+    page-break-after: always;
+}
+
+.list-unstyled {
+    list-style-type: none;
 }

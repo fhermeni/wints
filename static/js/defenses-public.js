@@ -40,7 +40,7 @@ function showDay(d) {
     $("#day-" + d).toggle();
 }
 
-function showDefenses() {
+function showPlanning() {
     $.ajax({
         method: "GET",
         url: "/api/v1/defenses?fmt=public"
@@ -54,7 +54,21 @@ function showDefenses() {
     ).fail(function (data) {console.log(data)});
 }
 
+function showProgram() {
+    $.ajax({
+        method: "GET",
+        url: "/api/v1/defenses?fmt=public"
+    }).done(function(data) {
+            defenses = JSON.parse(data);
+            console.log(defenses);
+            var html = Handlebars.getTemplate("defenses-show-program")(defenses);
+            console.log(html);
+            $("#defenses").html(html);
+            showDay(0);
+        }
+    ).fail(function (data) {console.log(data)});
+}
 
-$(document).ready(function () {
+/*$(document).ready(function () {
    showDefenses();
-});
+});$*/

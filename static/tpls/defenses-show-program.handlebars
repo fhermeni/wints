@@ -1,28 +1,41 @@
-<html>
-<head></head>
-<body>
-{{#each sessions}}
-    {{#each slots}}
-        <h1>Session {{date ../date}}</h1>
-        <ul>
-            <li>Room: {{room}}</li>
-            <li>Jury:
-                <ul>
-                    {{#each committee}}
-                        <li>{{this}}</li>
-                    {{/each}}
-                </ul>
-            </li>
-        </ul>
-
-        {{#each students}}
-            <h2>{{offset @index ../../date}} {{fullname Stu.P}} - {{Stu.Promotion}}/{{Stu.Major}}</h2>
-            <ul>
-                <li>Company: {{Company}}</li>
-                <li>Title: "{{Title}}"</li>
-            </ul>
+{{#each this}}
+    <div id="day-{{@index}}" style="display:none;">
+        {{#each period}}
+            <h2 class="screen">
+                {{#if @index}}
+                    Après-midi
+                {{else}}
+                    Matin
+                {{/if}}
+            </h2>
+            {{#each jury}}
+                    <div class="break-after">
+                        <h1 class="print">Soutenance de stages</h1>
+                        <h3><span class="print">{{longDate ../date}} - </span> Jury: {{commission commission}}</h3>
+                        <h3>Salle: {{room}}</h3>
+                            <ul class="list-unstyled">
+                            {{#each students}}
+                                <li>
+                                <b>
+                                    {{offset @index ../time}}
+                                    {{#if P}}
+                                        {{P.Firstname}} {{P.Lastname}}
+                                            <small>
+                                                {{Promotion}} [{{Major}}].
+                                            </small>
+                                    {{else}}
+                                        Pause
+                                    {{/if}}
+                                </b>
+                                {{#if Company}}
+                                    {{Company}}.
+                                    <i>{{Subject}}</i>
+                                {{/if}}
+                                </li>
+                            {{/each}}
+                            </ul>
+                    </div>
+                {{/each}}
         {{/each}}
-    {{/each}}
+    </div>
 {{/each}}
-</body>
-</html>

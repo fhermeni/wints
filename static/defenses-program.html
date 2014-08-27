@@ -5,7 +5,7 @@
     <title>Survey</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/static/css/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/style.css" media="screen">
     <script src="/static/js/jquery-2.1.0.min.js"></script>
     <script src="/static/js/moment-with-langs.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
@@ -14,11 +14,13 @@
     <script src="/static/js/templates.js"></script>
     <script src="/static/js/defenses-public.js"></script>
     <script src="/static/js/mustache.js"></script>
+    <link rel="stylesheet" href="/static/css/print.css" media="print">
+
 </head>
-<body onload="showPlanning()">
+<body onload="showProgram()">
 <div class="container">
-    <h1>Planning des soutenances</h1>
-    <ul class="pager">
+    <h1 class="screen">Programme des soutenances</h1>
+    <ul class="pager screen">
         <li class="previous" id="prev-day"><a href="#" onclick="prevDay()">&larr; Previous</a></li>
         <li><h2 id="defense-day" style="display: inline">Today</h2></li>
         <li class="next" id="next-day"><a href="#" onclick="nextDay()">Next &rarr;</a></li>
