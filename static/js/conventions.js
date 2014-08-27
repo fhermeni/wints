@@ -480,7 +480,7 @@ function showDetails(s) {
                 $("#up-supervisor").hide();
             } else {
                 $("#dl-supervisor").hide();
-                $("#up-supervisor").pekeUpload(getUploadData("supervisor", c.Stu.P.Email));
+                $("#up-supervisor").pekeUpload(getUploadData("supReport", c.Stu.P.Email));
             }
             return false;
         }
