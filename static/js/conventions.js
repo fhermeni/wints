@@ -318,7 +318,15 @@ function displayMyStudents() {
     });
     var html = Handlebars.getTemplate("myStudents")(myStudents);
     var root = $("#cnt").html(html);
-    $("#table-myStudents").tablesorter({headers: {0: {"sorter": false},5: {"sorter": false}}});
+    $("#table-myStudents").tablesorter({
+        headers: {
+            0: {"sorter": false},
+            5: {"sorter": false},
+            6: {sorter: "grades"},
+            7: {sorter: "grades"},
+            8: {sorter: "grades"}
+        }
+    });
     root.find(':checkbox').checkbox();
     root.find('tbody').find(':checkbox').checkbox().on('toggle', function(e) {generateMailto(root);});
 
