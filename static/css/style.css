@@ -202,3 +202,7 @@ th.rotate > div {
 .print {
     display: none;
 }
+
+.aDay {
+    display:none;
+}

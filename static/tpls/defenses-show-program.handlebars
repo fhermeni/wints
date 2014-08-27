@@ -1,18 +1,19 @@
 {{#each this}}
-    <div id="day-{{@index}}" style="display:none;">
+    <div id="day-{{@index}}" class="aDay">
         {{#each period}}
-            <h2 class="screen">
+            <h1 class="screen">
                 {{#if @index}}
                     Après-midi
                 {{else}}
                     Matin
                 {{/if}}
-            </h2>
+            </h1>
             {{#each jury}}
                     <div class="break-after">
                         <h1 class="print">Soutenance de stages</h1>
-                        <h3><span class="print">{{longDate ../date}} - </span> Jury: {{commission commission}}</h3>
-                        <h3>Salle: {{room}}</h3>
+                        <h2 class="print">{{longDate ../date}}</h2>
+                        <h2>Jury: {{commission commission}}</h2>
+                        <h2>Salle: {{room}}</h2>
                             <ul class="list-unstyled">
                             {{#each students}}
                                 <li>
@@ -29,8 +30,25 @@
                                 </b>
                                 {{#if Company}}
                                     {{Company}}.
+                                    <br class="print"/>
                                     <i>{{Subject}}</i>
+
+                                    {{#if private}}
+                                        &nbsp;<span class="glyphicon glyphicon-eye-close" title="soutenance confidentielle"></span>
+                                    {{/if}}
+                                    {{#if visio}}
+                                        &nbsp;<span class="glyphicon glyphicon-facetime-video" title="soutenance en visio-conference"></span>
+                                    {{/if}}
+                                    <div class="print">
+                                        {{#if private}}
+                                            <span class="print" style="color: red"> [Séance confidentielle]</span>
+                                        {{/if}}
+                                        {{#if visio}}
+                                            <span class="print"> [Visio-conférence]</span>
+                                        {{/if}}
+                                    </div>
                                 {{/if}}
+                                <p class="print"></p>
                                 </li>
                             {{/each}}
                             </ul>
