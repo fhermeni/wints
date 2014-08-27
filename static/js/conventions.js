@@ -34,6 +34,20 @@ $( document ).ready(function () {
             showPendingCounter(data.Pending);
         });
     }
+
+    //Predefined table sorter for grades
+    $.tablesorter.addParser({
+        // set a unique id
+        id: 'grades',
+        is: function(s) {
+            return false;
+        },
+        format: function(s, table, cell, cellIndex) {
+            return $(cell).children().attr('data-text');
+        },
+        type: 'numeric'
+    });
+
 });
 
 function showPendingCounter(nb) {
@@ -290,7 +304,10 @@ function displayMyConventions() {
         headers: {
             0: {sorter: false},
             4: {sorter: false},
-            5: {sorter: false}
+            5: {sorter: false},
+            6: {sorter: "grades"},
+            7: {sorter: "grades"},
+            8: {sorter: "grades"}
         }
     });
 }

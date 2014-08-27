@@ -228,19 +228,38 @@ Handlebars.registerHelper('shortSlotEntry', function(s) {
     return "Break";
 });
 
+/*Handlebars.registerHelper('reportGrade', function(r) {
+    if (!r.IsIn) {
+        var date = new Date(Date.parse(r.Deadline));
+        if (date > new Date()) {
+            return new Handlebars.SafeString("<span data-text='-2' title='Deadline passed !' class='late glyphicon glyphicon-warning-sign'></span>");
+        } else {
+            return new Handlebars.SafeString("<span data-text='99'>-</span>");
+        }
+    }
+    var url = "/api/v1/conventions/" + r.Email + "/" + r.Kind + "/report";
+    var g = r.Grade >= 0 ? r.Grade : "<span title='Grade expected' data-text='-1' class='warning glyphicon glyphicon-question-sign'></span>";
+    return new Handlebars.SafeString("<a href='" + url + "' data-text='" + r.Grade + "'>" + g + " </a>");
+});  */
 Handlebars.registerHelper('reportGrade', function(r) {
     if (!r.IsIn) {
         var date = new Date(Date.parse(r.Deadline));
         if (date > new Date()) {
-            return new Handlebars.SafeString("<span title='Deadline passed !' class='late glyphicon glyphicon-warning-sign'></span>");
-        } else {
-            return "-";
+            //Deadline expired
+            return new Handlebars.SafeString("<span data-text='-2' title='Deadline passed !' class='late glyphicon glyphicon-warning-sign'></span>");
+            //return -2;
         }
+        return new Handlebars.SafeString("<span data-text='99' title='Deadline not passed'>-</span>");
+        //return 99;
     }
-    var url = "/api/v1/conventions/" + r.Email + "/" + r.Kind + "/report";
-    var g = r.Grade >= 0 ? r.Grade : "<span title='Grade expected' class='warning glyphicon glyphicon-question-sign'></span>";
-    return new Handlebars.SafeString("<a href='" + url + "'>" + g + " </a>");
+    var url = "api/v1/conventions/" + r.Email + "/" + r.Kind + "/report";
+    if (r.Grade >= 0) {
+        return new Handlebars.SafeString("<a href='" + url + "' data-text='" + r.Grade + "'>" + r.Grade + " </a>");
+    }
+    return new Handlebars.SafeString("<a href='" + url + "' data-text='98'><span title='Grade expected' class='warning glyphicon glyphicon-question-sign'></span></a>");
+
 });
+
 
 Handlebars.registerHelper('grade', function(g) {
     return g < 0 ? "?" : g;
@@ -280,8 +299,5 @@ Handlebars.registerHelper('student', function(g) {
 function df(d, active) {
     var date = new Date(Date.parse(d));
     var str = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
-    if (active && date < new Date()) {
-
-    }
     return str;
 }
