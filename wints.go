@@ -564,10 +564,10 @@ func main() {
 	r.HandleFunc(ROOT_API+"/conventions/{email}/final/report", UploadReport("final")).Methods("POST")
 	r.HandleFunc(ROOT_API+"/conventions/{email}/final/report", GetReport("final")).Methods("GET")
 	r.HandleFunc(ROOT_API+"/conventions/{email}/final/mark", MarkKind(UpdateMark, "final")).Methods("POST")
-	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/deadline", UpdateDeadline("supReport")).Methods("POST")
-	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/report", UploadReport("supReport")).Methods("POST")
-	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/mark", MarkKind(UpdateMark, "supReport")).Methods("POST")
-	r.HandleFunc(ROOT_API+"/conventions/{email}/supervisor/report", GetReport("supReport")).Methods("GET")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/supReport/deadline", UpdateDeadline("supReport")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/supReport/report", UploadReport("supReport")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/supReport/mark", MarkKind(UpdateMark, "supReport")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/supReport/report", GetReport("supReport")).Methods("GET")
 
 	//Reports
 	r.HandleFunc(ROOT_API+"/reports", RequireRole(GetReports,"admin")).Methods("GET")
