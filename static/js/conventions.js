@@ -303,8 +303,6 @@ function displayMyConventions() {
     $("#table-conventions").tablesorter({
         headers: {
             0: {sorter: false},
-            4: {sorter: false},
-            5: {sorter: false},
             6: {sorter: "grades"},
             7: {sorter: "grades"},
             8: {sorter: "grades"}
@@ -321,7 +319,6 @@ function displayMyStudents() {
     $("#table-myStudents").tablesorter({
         headers: {
             0: {"sorter": false},
-            5: {"sorter": false},
             6: {sorter: "grades"},
             7: {sorter: "grades"},
             8: {sorter: "grades"}

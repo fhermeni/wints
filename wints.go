@@ -64,9 +64,11 @@ func report500OnError(w http.ResponseWriter, header string, err error) bool {
 		case backend.ErrInvalidGrade, backend.ErrInvalidTutor, backend.ErrUserTutoring, backend.ErrCredentials, backend.ErrNoPendingRequests:
 			code = http.StatusForbidden
 			msg = err.Error()
+		default:
+			log.Printf("%s: %s\n", header, err.Error());
 		}
 		http.Error(w, msg, code)
-		log.Printf("%s: %s\n", header, err.Error());
+
 		return true
 	}
 	return false
