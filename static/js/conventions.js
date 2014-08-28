@@ -434,18 +434,19 @@ function getUploadData(kind, email) {
     return {theme:'bootstrap',
         allowedExtensions:"pdf",
         btnText:'<span class="glyphicon glyphicon-cloud-upload"></span> Put the report',
-        url: 'api/v1/conventions/' + email + '/' + kind + '/report',
+        url: 'api/v1/reports/' + kind + '/' + email + '/document',
         showFilename:false,
         invalidExtError:'PDF file expected',
         maxSize: 10,
         sizeError:"The file cannot exceed 10MB",
         onFileError: function(file, error) {
-            console.log("Erreur: " + error);
             reportError(error);
+            refresh();
     },
         onFileSuccess: function(file, data) {
             $("#dl-" + kind).removeAttr("disabled");
             reportSuccess("Report uploaded");
+            refresh()
         },
         multi: false}
 }
@@ -595,5 +596,6 @@ function setMark(stu, kind, field, input) {
     updateMark(stu, kind, mark, function() {
         getConvention(stu)[field].Grade = mark;
         refresh();
+        reportSuccess("Grade Upgraded")
     });
 }

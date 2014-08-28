@@ -158,7 +158,7 @@ function getEmbeddedDefenses(ok, no) {
 
 //Reports
 function updateMark(student, kind, m, ok, no) {
-    postRawWithToken("/conventions/" + student + "/" + kind + "/mark", m, noCb(ok), restError(no));
+    postRawWithToken("/reports/" + kind + "/" + student + "/mark", m, noCb(ok), restError(no));
 }
 
 function downloadReports(kind, students, ok, no) {

@@ -355,52 +355,50 @@ func MarkKind(cb func(http.ResponseWriter, *http.Request, string), kind string) 
 	}
 }
 
-func GetReport(kind string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		target, _ := mux.Vars(r)["email"]
-		cnt, err := backend.Report(DB, target, kind)
-		if report500OnError(w, "", err) {
-			return
-		}
+func GetReport(w http.ResponseWriter, r *http.Request, email string)  {
+	kind, _ := mux.Vars(r)["kind"]
+	student := mux.Vars(r)["student"]
+	cnt, err := backend.Report(DB, student, kind)
+	if report500OnError(w, "", err) {
+		return
+	}
+	u, _ := backend.GetUser(DB, student)
+	fileReply(w, "application/pdf", u.Lastname + "-" + kind + ".pdf", cnt)
+}
 
-		u, _ := backend.GetUser(DB, target)
-
-		fileReply(w, "application/pdf", u.Lastname + "-" + kind + ".pdf", cnt)
+func UploadReport(w http.ResponseWriter, r *http.Request, email string) {
+	kind, _ := mux.Vars(r)["kind"]
+	student := mux.Vars(r)["student"]
+	d, err := requiredContent(w, r)
+	if report500OnError(w, "", err) {
+		return
+	}
+	err = backend.SetReport(DB, student, kind, d)
+	if !report500OnError(w, "", err) {
+		w.Write([]byte("1"))
 	}
 }
 
-func UpdateDeadline(kind string) http.HandlerFunc{
-	return func(w http.ResponseWriter, r *http.Request) {
-		d, err := requiredContent(w, r)
-		if err != nil {
-			return
-		}
-		t, err := time.Parse("2/1/2006", string(d))
-		if report500OnError(w, "Invalid format", err) {
-			return
-		}
-		target, _ := mux.Vars(r)["email"]
 
-		//Other levels are ok
-		err = backend.UpdateDeadline(DB, target, kind, t)
-		report500OnError(w, "", err);
+func UpdateDeadline(w http.ResponseWriter, r *http.Request, email string) {
+	kind, _ := mux.Vars(r)["kind"]
+	student := mux.Vars(r)["student"]
+	d, err := requiredContent(w, r)
+	if err != nil {
+		return
 	}
+	t, err := time.Parse("2/1/2006", string(d))
+	if report500OnError(w, "Invalid format", err) {
+		return
+	}
+
+	err = backend.UpdateDeadline(DB, student, kind, t)
+	report500OnError(w, "", err);
 }
 
-func UploadReport(kind string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		d, err := requiredContent(w, r)
-		if report500OnError(w, "", err) {
-			return
-		}
-
-		target, _ := mux.Vars(r)["email"]
-		err = backend.SetReport(DB, target, kind, d)
-		report500OnError(w, "", err);
-	}
-}
-
-func UpdateMark(w http.ResponseWriter, r *http.Request, kind string) {
+func UpdateMark(w http.ResponseWriter, r *http.Request, email string) {
+	kind, _ := mux.Vars(r)["kind"]
+	student := mux.Vars(r)["student"]
 	d, err := requiredContent(w, r)
 	if err != nil {
 		return
@@ -410,8 +408,7 @@ func UpdateMark(w http.ResponseWriter, r *http.Request, kind string) {
 		http.Error(w, "", http.StatusBadRequest)
 		return
 	}
-	target, _ := mux.Vars(r)["email"]
-	err = backend.UpdateGrade(DB, target, kind, i)
+	err = backend.UpdateGrade(DB, student, kind, i)
 	report500OnError(w, "", err);
 }
 
@@ -458,15 +455,10 @@ func GrantRole(w http.ResponseWriter, r *http.Request, email string) {
 	backend.Mail(cfg, []string{target}, "mails/priv_" + string(role) + ".txt", nil)
 }
 
-
-type ReportsRequest struct {
-	Kind string
-	Students []string
-}
 func GetReports(w http.ResponseWriter, r *http.Request, email string) {
-	kind := r.FormValue("kind")
+	kind, _ := mux.Vars(r)["kind"]
 	emails := r.FormValue("students")
-	if len(kind) == 0 || len(emails) == 0 {
+	if len(emails) == 0 {
 		http.Error(w, "", http.StatusBadRequest)
 		return
 	}
@@ -511,12 +503,6 @@ func RequireRole(cb func(http.ResponseWriter, *http.Request, string), role strin
 }
 
 func main() {
-	/*f, err := os.Create("cpuProfile.prof")
-	if err != nil {
-		log.Fatal(err)
-	}
-	pprof.StartCPUProfile(f)
-	defer pprof.StopCPUProfile()*/
 	cfg, err := backend.ReadConfig("./wints.conf")
 	if err != nil {
 		log.Fatalln(err.Error())
@@ -552,25 +538,20 @@ func main() {
 
 	//Convention management
 	r.HandleFunc(ROOT_API+"/pending/_random", RequireRole(RandomPendingConvention, "admin")).Methods("GET")
-	r.HandleFunc(ROOT_API+"/conventions/", /*RequireRole(GetAllConventions, "major"))*/ RequireToken(GetAllConventions)).Methods("GET")
+	r.HandleFunc(ROOT_API+"/conventions/", RequireToken(GetAllConventions)).Methods("GET")
 	r.HandleFunc(ROOT_API+"/conventions/", RequireRole(CommitPendingConvention, "admin")).Methods("POST")
 	r.HandleFunc(ROOT_API+"/conventions/{email}/major", RequireRole(UpdateMajor, "major")).Methods("POST")
 	r.HandleFunc(ROOT_API+"/conventions/{email}/tutor", RequireRole(UpdateTutor, "admin")).Methods("POST")
-	r.HandleFunc(ROOT_API+"/conventions/{email}/midterm/deadline", UpdateDeadline("midterm")).Methods("POST")
-	r.HandleFunc(ROOT_API+"/conventions/{email}/midterm/report", UploadReport("midterm")).Methods("POST")
-	r.HandleFunc(ROOT_API+"/conventions/{email}/midterm/report", GetReport("midterm")).Methods("GET")
 	r.HandleFunc(ROOT_API+"/conventions/{email}/midterm/mark", MarkKind(UpdateMark, "midterm")).Methods("POST")
-	r.HandleFunc(ROOT_API+"/conventions/{email}/final/deadline", UpdateDeadline("final")).Methods("POST")
-	r.HandleFunc(ROOT_API+"/conventions/{email}/final/report", UploadReport("final")).Methods("POST")
-	r.HandleFunc(ROOT_API+"/conventions/{email}/final/report", GetReport("final")).Methods("GET")
 	r.HandleFunc(ROOT_API+"/conventions/{email}/final/mark", MarkKind(UpdateMark, "final")).Methods("POST")
-	r.HandleFunc(ROOT_API+"/conventions/{email}/supReport/deadline", UpdateDeadline("supReport")).Methods("POST")
-	r.HandleFunc(ROOT_API+"/conventions/{email}/supReport/report", UploadReport("supReport")).Methods("POST")
 	r.HandleFunc(ROOT_API+"/conventions/{email}/supReport/mark", MarkKind(UpdateMark, "supReport")).Methods("POST")
-	r.HandleFunc(ROOT_API+"/conventions/{email}/supReport/report", GetReport("supReport")).Methods("GET")
 
 	//Reports
-	r.HandleFunc(ROOT_API+"/reports", RequireRole(GetReports,"admin")).Methods("GET")
+	r.HandleFunc(ROOT_API+"/reports/{kind}/", RequireRole(GetReports,"admin")).Methods("GET")
+	r.HandleFunc(ROOT_API+"/reports/{kind}/{student}/document", RequireToken(GetReport)).Methods("GET")
+	r.HandleFunc(ROOT_API+"/reports/{kind}/{student}/document", RequireToken(UploadReport)).Methods("POST")
+	r.HandleFunc(ROOT_API+"/reports/{kind}/{student}/deadline", RequireToken(UpdateDeadline)).Methods("POST")
+	r.HandleFunc(ROOT_API+"/reports/{kind}/{student}/mark", RequireToken(UpdateMark)).Methods("POST")
 
 	//Profile management
 	r.HandleFunc(ROOT_API+"/profile", RequireToken(GetUser)).Methods("GET")

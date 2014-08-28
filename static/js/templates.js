@@ -252,7 +252,7 @@ Handlebars.registerHelper('reportGrade', function(r) {
         return new Handlebars.SafeString("<span data-text='99' title='Deadline not passed'>-</span>");
         //return 99;
     }
-    var url = "api/v1/conventions/" + r.Email + "/" + r.Kind + "/report";
+    var url = "api/v1/reports/" + r.Kind + "/" + r.Email + "/document";
     if (r.Grade >= 0) {
         return new Handlebars.SafeString("<a href='" + url + "' data-text='" + r.Grade + "'>" + r.Grade + " </a>");
     }
