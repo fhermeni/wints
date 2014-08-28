@@ -595,7 +595,7 @@ function setMark(stu, kind, field, input) {
     var mark = $(input).val();
     updateMark(stu, kind, mark, function() {
         getConvention(stu)[field].Grade = mark;
+        reportSuccess("Grade Upgraded");
         refresh();
-        reportSuccess("Grade Upgraded")
     });
 }

@@ -26,8 +26,46 @@ var DB *sql.DB
 var cfg backend.Config
 
 func report500OnError(w http.ResponseWriter, header string, err error) bool {
+
+	/*
+	errUnknownConvention = errors.New("Unknown convention")
+	errUnknownDefense = errors.New("Unknown defense")
+	errUnknownReport = errors.New("Unknown report")
+	errUserNotFound = errors.New("User not found")
+	errUnknownStudent = errors.New("Unknown student")
+
+	errConventionExists = errors.New("Convention already exists")
+	errDefenseExists = errors.New("The defense already exists")
+	errStudentExists = errors.New("Student already exists")
+	errReportExists = errors.New("Report already exists")
+	errUserExists = errors.New("User already exists")
+
+	errInvalidTutor = errors.New("The new tutor is a student")
+	errUserTutoring = errors.New("The user is tutoring students")
+	errCredentials = errors.New("Incorrect credentials")
+	errNoPendingRequests = errors.New("No password renewable request pending")
+
+
+
+	errInvalidGrade = errors.New("The grade must be between 0 and 20 (inclusive)")
+
+	 */
+	msg := "The operation did not complete. A possible bug"
+	code := http.StatusInternalServerError
+
 	if err != nil {
-		http.Error(w, "The operation did not complete. A possible bug", http.StatusInternalServerError)
+		switch (err) {
+		case backend.ErrUnknownConvention, backend.ErrUnknownDefense, backend.ErrUnknownStudent, backend.ErrUserNotFound, backend.ErrUnknownReport:
+			code = http.StatusNotFound
+			msg = err.Error()
+		case backend.ErrConventionExists, backend.ErrDefenseExists, backend.ErrStudentExists, backend.ErrReportExists, backend.ErrUserExists:
+			code = http.StatusConflict
+			msg = err.Error()
+		case backend.ErrInvalidGrade, backend.ErrInvalidTutor, backend.ErrUserTutoring, backend.ErrCredentials, backend.ErrNoPendingRequests:
+			code = http.StatusForbidden
+			msg = err.Error()
+		}
+		http.Error(w, msg, code)
 		log.Printf("%s: %s\n", header, err.Error());
 		return true
 	}

@@ -10,9 +10,9 @@ import (
 )
 
 var (
-	errReportExists = errors.New("Report already exists")
-	errUnknownReport = errors.New("Unknown report")
-	errInvalidGrade = errors.New("The grade must be between 0 and 20 (inclusive)")
+	ErrReportExists = errors.New("Report already exists")
+	ErrUnknownReport = errors.New("Unknown report")
+	ErrInvalidGrade = errors.New("The grade must be between 0 and 20 (inclusive)")
 )
 type ReportMetaData struct {
 	Kind string
@@ -24,7 +24,7 @@ type ReportMetaData struct {
 
 func NewReport(db *sql.DB, s, kind string, d time.Time) (ReportMetaData, error) {
 	sql := "insert into reports(student, kind, deadline, grade) values($1,$2,$3,$4)"
-	if err := SingleUpdate(db,  errReportExists, sql, s, kind, d, -1); err != nil {
+	if err := SingleUpdate(db,  ErrReportExists, sql, s, kind, d, -1); err != nil {
 		return ReportMetaData{}, err
 	}
 	return ReportMetaData{kind, s, d, -1, false}, nil
@@ -59,20 +59,20 @@ func Report(db *sql.DB, s string, kind string) ([]byte, error) {
 func SetReport(db *sql.DB, s string, kind string, cnt []byte) error {
 	sql := "update reports set cnt=$3 where student=$1 and kind=$2"
 	enc := base64.StdEncoding
-	return SingleUpdate(db, errUnknownReport, sql, s, kind, enc.EncodeToString(cnt))
+	return SingleUpdate(db, ErrUnknownReport, sql, s, kind, enc.EncodeToString(cnt))
 }
 
 func UpdateGrade(db *sql.DB, s, kind string, g int) error {
 	if g < 0 || g > 20 {
-		return errInvalidGrade
+		return ErrInvalidGrade
 	}
 	sql := "update reports set grade=$3 where student=$1 and kind=$2"
-	return SingleUpdate(db, errUnknownReport, sql, s, kind, g)
+	return SingleUpdate(db, ErrUnknownReport, sql, s, kind, g)
 }
 
 func UpdateDeadline(db *sql.DB, s, kind string, t time.Time) error {
 	sql := "update reports set deadline=$3 where student=$1 and kind=$2"
-	return SingleUpdate(db, errUnknownReport, sql, s, kind, t)
+	return SingleUpdate(db, ErrUnknownReport, sql, s, kind, t)
 }
 
 func Reports(db *sql.DB, kind string, from []string) ([]byte, error) {

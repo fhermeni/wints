@@ -28,9 +28,9 @@ const (
 )
 
 var (
-	errUnknownConvention = errors.New("Unknown convention")
-	errConventionExists = errors.New("Convention already exists")
-	errInvalidTutor = errors.New("The new tutor is a student")
+	ErrUnknownConvention = errors.New("Unknown convention")
+	ErrConventionExists = errors.New("Convention already exists")
+	ErrInvalidTutor = errors.New("The new tutor is a student")
 	allMyConventions *sql.Stmt = nil
 	allConventions *sql.Stmt = nil
 )
@@ -45,7 +45,7 @@ func IsTutoring(db *sql.DB, email string) (bool, error) {
 
 func RegisterInternship(db *sql.DB, c Convention, move bool) error {
 	supervisor := c.Sup
-	err := SingleUpdate(db, errConventionExists, "insert into internships (student, startTime, endTime, tutor, midtermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11, $12)",
+	err := SingleUpdate(db, ErrConventionExists, "insert into internships (student, startTime, endTime, tutor, midtermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11, $12)",
 		c.Stu.P.Email, c.Begin, c.End, c.Tutor.Email, c.Begin.Add(TWO_MONTHS), c.Company, c.CompanyWWW, supervisor.Firstname, supervisor.Lastname, supervisor.Email, supervisor.Tel, c.Title)
 	if move {
 		_, err := db.Exec("delete from pending_internships where student=$1", c.Stu.P.Email)
@@ -111,7 +111,7 @@ func GetConvention(db *sql.DB, email string) (Convention, error) {
 		return Convention{}, err
 	}
 	if (!rows.Next()) {
-		return Convention{}, errUnknownConvention
+		return Convention{}, ErrUnknownConvention
 	}
 	return scanConvention(db, rows)
 }
@@ -171,10 +171,10 @@ func UpdateTutor(db *sql.DB, student string, newTutor string)  error {
 	//new tutor is not a student
 	_, err := GetConvention(db, newTutor)
 	if err == nil {
-		return errInvalidTutor
+		return ErrInvalidTutor
 	}
 	log.Printf("student=%s new=%s\n", student, newTutor)
-	err = SingleUpdate(db, errUserNotFound, "update internships set tutor=$2 where student=$1", student, newTutor)
+	err = SingleUpdate(db, ErrUserNotFound, "update internships set tutor=$2 where student=$1", student, newTutor)
 	//userNotFound might be the student or the tutor
 	return err
 }
