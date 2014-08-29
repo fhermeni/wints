@@ -21,9 +21,11 @@ function getUser(u) {
 function showDefenses(t) {
     getEmbeddedDefenses(function(data) {
         defenses = JSON.parse(data);
-        if (typeof(defenses.pool[0])=="string") {
+        console.log(defenses);
+        if (typeof(defenses.sessions[0].jury[0].students[0])=="string") {
             console.log("Conversion");
             defenses = embed2(defenses);
+            //console.log(defenses);
         } else {
             console.log("no need to convert");
         }
@@ -120,7 +122,7 @@ function saveLists() {
                 if (!raw[id]) {
                     raw[id] = [];
                 }
-                raw[id].push(e);
+                raw[id].push(getConvention(e).Stu);
             }
         });
     });
@@ -413,7 +415,7 @@ function publicDefenses(d) {
             newSession.jury.push(myJury);
             j.students.forEach(function (stu) {
                 console.log(stu);
-                var c = getConvention(stu);
+                var c = getConvention(stu.P.Email);
                 if (c) {
                     //get its fn,ln
                     var myStudent = {
@@ -545,9 +547,9 @@ function embed2(def) {
        visio: def.visio,
        sessions : []
    };
-   def.pool.forEach(function (e) {
+   /*def.pool.forEach(function (e) {
        d.pool.push(getConvention(e).Stu);
-   });
+   });*/
    def.sessions.forEach(function (s) {
      var ns = {
          date: s.date,
@@ -562,15 +564,22 @@ function embed2(def) {
                date : j.date,
                commission : []
            };
-           j.students.forEach(function (u) {
-               if (u && u.length > 1) {
-                   var c = getConvention(u);
-                   nj.students.push(c.Stu);
-               }
-           });
+           //console.log(j);
+           if (j.students) {
+               j.students.forEach(function (u) {
+                   if (u && u.length > 1) {
+                       var c = getConvention(u);
+                       nj.students.push(c.Stu);
+                   }
+               });
+           }
            j.commission.forEach(function (fn) {
                if (fn.length > 1) {
-                   nj.commission.push(fullname2Email(fn));
+                   if  (fn.indexOf("@") < 0) {
+                       nj.commission.push(fullname2Email(fn));
+                   } else {
+                       nj.commission.push(fn);
+                   }
                } else {
                    nj.commission.push("");
                }
