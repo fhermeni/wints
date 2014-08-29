@@ -319,14 +319,17 @@ function rmEmptyJuries(defenses) {
         };
         d.sessions.push(cs);
         s.jury.forEach(function (j) {
-            var empty = true;
-            j.students.forEach(function (s) {
-                if (s != undefined && s != null && s != "") {
-                    empty = false;
+
+            if (j.students) {
+                var empty = true;
+                j.students.forEach(function (s) {
+                    if (s != undefined && s != null && s != "") {
+                        empty = false;
+                    }
+                });
+                if (!empty) {
+                    cs.jury.push(j);
                 }
-            });
-            if (!empty) {
-                cs.jury.push(j);
             }
         });
     });
@@ -409,10 +412,10 @@ function publicDefenses(d) {
 
             newSession.jury.push(myJury);
             j.students.forEach(function (stu) {
-                var c = getConvention(stu.P.Email);
+                console.log(stu);
+                var c = getConvention(stu);
                 if (c) {
                     //get its fn,ln
-                    //console.log(d);
                     var myStudent = {
                         P: {
                             Firstname: c.Stu.P.Firstname,
@@ -423,8 +426,8 @@ function publicDefenses(d) {
                         Subject: c.Title,
                         CompanyWWW: c.CompanyWWW,
                         Company: c.Company,
-                        private : d.private[stu.P.Email] ? true : false,
-                        visio: d.visio[stu.P.Email] ? true: false
+                        private : d.private[stu] ? true : false,
+                        visio: d.visio[stu] ? true: false
                     };
                     myJury.students.push(myStudent);
                 } else {

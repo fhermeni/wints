@@ -308,7 +308,10 @@ function displayMyConventions() {
             6: {sorter: "grades"},
             7: {sorter: "grades"},
             8: {sorter: "grades"}
-        }
+        },
+        theme: 'bootstrap',
+        widgets : ["columns"],
+        headerTemplate : '{content} {icon}'
     });
 }
 
@@ -325,7 +328,8 @@ function displayMyStudents() {
             6: {sorter: "grades"},
             7: {sorter: "grades"},
             8: {sorter: "grades"}
-        }
+        },
+        uitheme: 'bootstrap'
     });
     root.find(':checkbox').checkbox();
     root.find('tbody').find(':checkbox').checkbox().on('toggle', function(e) {generateMailto(root);});
