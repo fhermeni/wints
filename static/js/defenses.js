@@ -116,7 +116,6 @@ function saveLists() {
         $(l).find("li").each(function (i, s) {
             var e = $(s).attr("data-email");
             if (id == -1) {
-              //  console.log(e);
                 pool.push(e);
             } else {
                 if (!raw[id]) {
@@ -415,6 +414,7 @@ function publicDefenses(d) {
             newSession.jury.push(myJury);
             j.students.forEach(function (stu) {
                 console.log(stu);
+                console.log(d.private);
                 var c = getConvention(stu.P.Email);
                 if (c) {
                     //get its fn,ln
@@ -428,8 +428,8 @@ function publicDefenses(d) {
                         Subject: c.Title,
                         CompanyWWW: c.CompanyWWW,
                         Company: c.Company,
-                        private : d.private[stu] ? true : false,
-                        visio: d.visio[stu] ? true: false
+                        private : d.private[stu.P.Email] ? true : false,
+                        visio: d.visio[stu.P.Email] ? true: false
                     };
                     myJury.students.push(myStudent);
                 } else {
