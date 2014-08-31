@@ -275,7 +275,7 @@ function toggleMailCheckboxes(chk, cl, root) {
 
 function displayMyConventions() {
     var html = Handlebars.getTemplate("watchlist")(conventions);
-    root = $("#cnt");
+    var root = $("#cnt");
     root.html(html);
     root.find(':checkbox').checkbox();
     root.find('tbody').find(':checkbox').checkbox().on('toggle', function (e) {
@@ -362,6 +362,31 @@ function generateMailto(root) {
     } else {
         root.find(".mail-selection").attr("href","#");
     }
+}
+
+function getAProfile(e) {
+    var prof = undefined;
+    conventions.forEach(function (c) {
+       if (c.Stu.P.Email == e) {
+           prof  = c.Stu.P;
+           return true;
+       }
+    });
+    return prof;
+}
+function generatefullnames(root) {
+    var checked = root.find(".mail-checkbox.checked");
+        var fns = [];
+        checked.each(function (i, e) {
+            var em = $(e).attr("data-email");
+            var p = getAProfile(em);
+            fns.push(p.Firstname + " " + p.Lastname);
+        });
+        console.log(fns);
+        var html = Handlebars.getTemplate("raw");
+        $("#modal").html(html);
+        $("#rawContent").html(fns.join("\n"));
+        $("#modal").modal('show');
 }
 
 function orderByTutors(cc) {
