@@ -470,6 +470,43 @@ function publicDefenses(d) {
     return byDay;
 }
 
+function showService() {
+    getEmbeddedDefenses(function (data) {
+        syncGetUsers(function (us) {
+            users = us;
+        });
+        var d = JSON.parse(data);
+        var srv = service(conventions, rmEmptyJuries(d));
+        var html = Handlebars.getTemplate("service")(srv);
+        var root = $("#cnt");
+        root.html(html);
+        $("#service").tablesorter({headers: {0: {"sorter": false}}});
+        root.find(':checkbox').checkbox();
+        root.find('tbody').find(':checkbox').checkbox().on('toggle', function (e) {
+            generateMailto(root);
+        });
+        root.find('.mail-checkbox').click(function (e) {
+            shiftSelect(e, this, root,'.mail-checkbox-j');
+        });
+
+        root.find(".mailto").on('toggle', function (e) {
+            toggleMailCheckboxes(e.currentTarget, ".mail-checkbox-jury", root);
+        });
+    });
+}
+
+function rawService() {
+    getEmbeddedDefenses(function (data) {
+        syncGetUsers(function (us) {
+            users = us;
+        });
+        var d = JSON.parse(data);
+        var srv = service(conventions, rmEmptyJuries(d));
+        var txt = Handlebars.getTemplate("rawService")(srv);
+        $("#modal").html(txt).modal('show');
+    });
+}
+
 function showJuryService() {
     getEmbeddedDefenses(function (data) {
         syncGetUsers(function (us) {
@@ -479,6 +516,7 @@ function showJuryService() {
         var html = Handlebars.getTemplate("juries")(jury_service(rmEmptyJuries(d)));
         var root = $("#cnt");
         root.html(html);
+        $("#table-juries").tablesorter({headers: {0: {"sorter": false}}});
         root.find(':checkbox').checkbox();
         root.find('tbody').find(':checkbox').checkbox().on('toggle', function (e) {
             generateMailto(root);

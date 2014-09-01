@@ -228,6 +228,8 @@ function refresh() {
         pickOne();
     } else if (currentPage == "juries") {
         showJuryService();
+    } else if (currentPage == "service") {
+        showService();
     }
     else {
         console.log("Unsupported operation on '" + currentPage + "'");
@@ -382,11 +384,12 @@ function generatefullnames(root) {
             var p = getAProfile(em);
             fns.push(p.Firstname + " " + p.Lastname);
         });
-        console.log(fns);
+    if (fns.length > 0) {
         var html = Handlebars.getTemplate("raw");
         $("#modal").html(html);
         $("#rawContent").html(fns.join("\n"));
         $("#modal").modal('show');
+    }
 }
 
 function orderByTutors(cc) {
