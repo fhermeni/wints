@@ -21,21 +21,28 @@
 - tutor can adapt the report deadline OK
 - hide static pages, stay inside "/" OK
 - defenses preparation support OK
-- checkbox to mail supervisor/tutor in the first two tabs
+- checkbox to mail supervisor/tutor in the first two tabs OK
    - watchlist OK
 - upload/download reports OK
 - grade reports OK
-- watchlist: mode general, mode grades OK, no need in practice
+- watchlist: mode general, mode grades OK, no need in practice OK
 - visio/live public/private defenses: OK
-
+- public pages for the defense planning OK
+- sort by date correctly OK
+- notification for ok actions OK
+- password reset OK
 - verify email format when aligning and changing
-- sort by date correctly
+- re-assign tutors OK
+- student details depending on the privileges OK
+
 - logging
 - error reporting
 - encoding when pulling conventions
 - les fiches d'évaluations finales devraient être accessibles au jury naturellement
 - UI reports, encoding
 -
+
+- Automatic blank reports
 
 defenses:
  - coarse grain view for the student schedule

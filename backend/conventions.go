@@ -3,8 +3,9 @@ package backend
 import (
 	"time"
 	"database/sql"
-	"log"
 	"errors"
+	"strconv"
+	"log"
 )
 
 type Convention struct {
@@ -26,28 +27,47 @@ const (
 	TWO_MONTHS = 2*time.Hour*24*30
 )
 
+var (
+	ErrUnknownConvention = errors.New("Unknown convention")
+	ErrConventionExists = errors.New("Convention already exists")
+	ErrInvalidTutor = errors.New("The new tutor is a student")
+	allMyConventions *sql.Stmt = nil
+	allConventions *sql.Stmt = nil
+)
+
+func IsTutoring(db *sql.DB, email string) (bool, error) {
+	rows, err := db.Query("select internships.student,pending_internships.student from internships,pending_internships where tutor=$1", email)
+	if err != nil {
+		return false, err;
+	}
+	return rows.Next(), nil
+}
+
 func RegisterInternship(db *sql.DB, c Convention, move bool) error {
 	supervisor := c.Sup
-	_, err := db.Exec("insert into internships (student, startTime, endTime, tutor, midtermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11, $12)",
+	err := SingleUpdate(db, ErrConventionExists, "insert into internships (student, startTime, endTime, tutor, midtermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11, $12)",
 		c.Stu.P.Email, c.Begin, c.End, c.Tutor.Email, c.Begin.Add(TWO_MONTHS), c.Company, c.CompanyWWW, supervisor.Firstname, supervisor.Lastname, supervisor.Email, supervisor.Tel, c.Title)
+	if move {
+		_, err := db.Exec("delete from pending_internships where student=$1", c.Stu.P.Email)
+		if err != nil {
+			return err
+		}
+	}
+	//Create the reports
+	_, err = NewReport(db, c.Stu.P.Email, "midterm", c.Begin.Add(TWO_MONTHS))
 	if err != nil {
 		return err
 	}
-	if move {
-		res, err := db.Exec("delete from pending_internships where student=$1", c.Stu.P.Email)
-		if err != nil {
-			return err
-		}
-		nb, err := res.RowsAffected()
-		if err != nil {
-			return err
-		}
-		if nb != 1 {
-			return errors.New("No pending internship deleted with email '" + c.Stu.P.Email + "'")
-		}
+	t, _ := time.Parse("02/01/2006", "01/09/" + strconv.Itoa(time.Now().Year()))
+	_, err = NewReport(db, c.Stu.P.Email, "final", t)
+	if err != nil {
+		return err
 	}
-	log.Printf("Convention of %s validated\n", c.Stu)
-	return err
+	_, err = NewReport(db, c.Stu.P.Email, "supReport", t)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func scanConvention(db *sql.DB, rows *sql.Rows) (Convention, error) {
@@ -86,29 +106,59 @@ func GetConvention(db *sql.DB, email string) (Convention, error) {
 	"midTermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title "+
 	" from internships, users as stu, users as tut, students where students.email = $1 and stu.email = $1 and internships.student = $1 and tut.email = internships.tutor";
 
-
 	rows, err := db.Query(sql, email)
 	if err != nil {
 		return Convention{}, err
 	}
 	if (!rows.Next()) {
-		return Convention{}, errors.New("No pending convention for " + email)
+		return Convention{}, ErrUnknownConvention
 	}
 	return scanConvention(db, rows)
 }
 
-func GetConventions(db *sql.DB) ([]Convention, error) {
-	sql := "select stu.firstname, stu.lastname, stu.email, stu.tel, students.promotion, students.major, startTime, endTime, tut.firstname, tut.lastname, tut.email, tut.tel,"+
-			"midTermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title "+
-			" from internships, users as stu, users as tut, students where students.email = stu.email and internships.student = stu.email and tut.email = internships.tutor";
-	rows, err := db.Query(sql)
+func GetConventions2(db *sql.DB, emitter string) ([]Convention, error) {
 	conventions := make([]Convention, 0, 0)
+	u, err := GetUser(db, emitter)
 	if err != nil {
- 		return conventions, err
+		return conventions, err
+	}
+	var q string
+	var rows *sql.Rows
+	if len(u.Role) == 0 {
+		q = "select stu.firstname, stu.lastname, stu.email, stu.tel, students.promotion, students.major, startTime, endTime, tut.firstname, tut.lastname, tut.email, tut.tel, midTermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title " +
+		" from internships" +
+		" join users as stu on stu.email = internships.student" +
+		" join users as tut on tut.email = internships.tutor" +
+		" join students on students.email = stu.email" +
+		" and tutor=$1"
+		if allMyConventions == nil {
+			allMyConventions, err = db.Prepare(q)
+		}
+		if err != nil {
+			return conventions, err
+		}
+		rows, err = allMyConventions.Query(emitter)
+	} else {
+		q = "select stu.firstname, stu.lastname, stu.email, stu.tel, students.promotion, students.major, startTime, endTime, tut.firstname, tut.lastname, tut.email, tut.tel, midTermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title " +
+		" from internships" +
+		" join users as stu on stu.email = internships.student" +
+		" join users as tut on tut.email = internships.tutor" +
+		" join students on students.email = stu.email"
+		if allConventions == nil {
+			allConventions, err = db.Prepare(q)
+		}
+		if err != nil {
+			return conventions, err
+		}
+		rows, err = allConventions.Query()
+	}
+
+	if err != nil {
+		return conventions, err
 	}
 	defer rows.Close()
 	for rows.Next() {
- 		c, err := scanConvention(db, rows)
+		c, err := scanConvention(db, rows)
 		if err != nil {
 			return conventions, err
 		}
@@ -117,6 +167,14 @@ func GetConventions(db *sql.DB) ([]Convention, error) {
 	return conventions, nil
 }
 
-/*func SetMidtermDeadline(db *sql.DB, email string, d time.Time) error {
-	return SingleUpdate(db, "update internships set midtermDeadline=$2 where student=$1", email, d)
-} */
+func UpdateTutor(db *sql.DB, student string, newTutor string)  error {
+	//new tutor is not a student
+	_, err := GetConvention(db, newTutor)
+	if err == nil {
+		return ErrInvalidTutor
+	}
+	log.Printf("student=%s new=%s\n", student, newTutor)
+	err = SingleUpdate(db, ErrUserNotFound, "update internships set tutor=$2 where student=$1", student, newTutor)
+	//userNotFound might be the student or the tutor
+	return err
+}

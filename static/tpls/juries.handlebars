@@ -1,0 +1,31 @@
+{{#if this}}
+<h3>Jury accounting</h3>
+
+<a class="btn-sm btn-primary mail-selection"><span class="fui-mail"></span> mail selection</a>
+
+<a class="btn-sm btn-success" href="#" onclick="rawJuries()"><span class="fui-list"></span> copy to clipboard</a>
+<table class="table table-condensed table-hover" id="table-juries">
+    <thead>
+    <tr>
+        <th rowspan="2" class="sorter-false"><label class='checkbox mailto'><input type='checkbox' data-toggle='checkbox'/></label></th>
+        <th>Jury</th>
+        <th>Count</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#each this}}
+        <tr>
+            <td>
+                <label class='checkbox mail-checkbox mail-checkbox-j' data-email="{{user.Email}}">
+                    <input type='checkbox' class="mail-checkbox-jury" data-toggle='checkbox' value='{{user.Email}}'/>
+                </label>
+            </td>
+            <td>{{fullname user}}</td>
+            <td>{{count}}</td>
+        </tr>
+    {{/each}}
+    </tbody>
+</table>
+{{else}}
+    <h5 class="text-center">No tutors</h5>
+{{/if}}

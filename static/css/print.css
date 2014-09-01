@@ -1,0 +1,212 @@
+.login-background {
+    background-color: #1abc9c;
+}
+
+#profileEditor .modal-dialog {
+    width: 500px;
+}
+.action_button{
+    padding: 5px;
+    cursor: pointer;
+}
+
+tbody {
+    font-size: 80%;
+}
+.app-granted {
+    background-color: #dff0d8;
+}
+
+.status-granted {
+    background-color: #5cb85c;
+}
+
+.status-pending {
+    background-color: #5bc0de;
+}
+
+.app-open {
+    background-color: inherit;
+}
+
+.status-open {
+    background-color: #f0ad4e;
+}
+
+.app-denied {
+      background-color: #f2dede;
+}
+
+.status-rejected {
+    background-color: #d9534f;
+}
+
+.danger {
+    background-color: #d9534f;
+}
+.login {
+    margin-top: 100px;
+}
+.stat-type {
+    padding-right: 20px;
+    padding-left: 3px;
+}
+
+label.checkbox {
+    margin-right: 7px;
+    padding-left: 23px;
+    display: inline;
+}
+
+label.selector {
+    font-size: 14px;
+    margin-right: 7px;
+    padding-left: 3px;
+}
+
+label.selector a {
+    color: inherit;
+}
+
+footer {
+    margin-top: 50px;
+    text-align: right;
+}
+
+.late {
+    color: #e74c3c;
+}
+
+.warning {
+    color: #f0ad4e;
+}
+.raw {
+    font-size: 12pt;
+    font-family: courier;
+}
+
+.error-modal {
+    background-color: #E74C3C;
+    color: white;
+}
+
+/*.error-msg {
+    background-color: #E74C3C;
+    color: white;
+} */
+
+.error-msg {
+    display: none;
+    background-color: #f2dede;
+}
+.error-msg:target {
+    display: block;
+}
+
+.clickable:hover {
+    cursor: pointer;
+}
+
+/* sortable */
+
+ol.students {
+    border: 1px solid #999999;
+    list-style-type: none;
+    margin: 0 0 9px 0;
+    padding: 0;
+    font-size: 10pt;
+    min-height: 50pt;
+}
+
+ol.students li {
+    display: block;
+    margin: 3px;
+    padding: 2px 5px 2px 5px;
+    border: 1px solid #cccccc;
+    color: #0088cc;
+    background: #eeeeee;
+}
+
+ol.students li.coarse-entry {
+    display: block;
+    margin: 1px;
+    padding: 2px 2px 2px 2px;
+    border: 1px solid #cccccc;
+    color: #0088cc;
+    background: #eeeeee;
+    line-height: 1;
+}
+
+body.dragging, body.dragging * {
+    cursor: move !important;
+}
+
+.dragged {
+    position: absolute;
+    opacity: 0.5;
+    z-index: 2000;
+}
+
+ol.all-students {
+    min-height: 100pt;
+}
+ol.students li.placeholder {
+    position: relative;
+}
+ol.students li.placeholder:before {
+    position: absolute;
+}
+
+.affix-top {
+    position:static;
+}
+
+#pool.affix-top {
+    margin-top:25px;
+    width:250px;
+}
+
+#pool.affix {
+    position: fixed;
+    top:20px;
+    width:250px;
+}
+
+th.rotate {
+    height: 140px;
+    white-space: nowrap;
+}
+
+th.rotate > div {
+    transform: rotate(315deg);
+    transform-origin: right, top;
+    width: 25px;
+}
+
+#recaptcha_area {
+    margin:auto;
+}
+
+.listing-students {
+    font-size: 14px;
+}
+
+.listing-students h6 {
+    font-size: 20px;
+}
+
+.listing-students h4 {
+    font-size: 24px;
+}
+
+.screen {
+    display: none;
+}
+
+.break-after {
+    page-break-after: always;
+}
+
+.list-unstyled {
+    list-style-type: none;
+}

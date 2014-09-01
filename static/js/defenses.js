@@ -2,33 +2,40 @@
  * Created by fhermeni on 10/07/2014.
  */
 
-function showDefenses() {
-    getDefenses(function(data) {
-        defenses = JSON.parse(data);
-        if (!defenses.visio) {
-            defenses.visio = {};
+var users;
+
+var currentSession = 0;
+var allChecked = false;
+
+function getUser(u) {
+    var e = undefined;
+    users.forEach(function (x) {
+        if (x.Email == u) {
+            e = x;
+            return true;
         }
-        defenses.sessions.forEach(function (s) {
-            s.jury.forEach(function (j) {
-                if (!j.time) {
-                    j.time = s.date;
-                }
-            })
-        });
-        var html = Handlebars.getTemplate("defense-init")(defenses);
-        $("#defenses").html(html);
-        $('[data-toggle="reset-defense-confirmation"]').confirmation({onConfirm: prepareSchedule});
-        showCoarseDefenseForm();
-    }, function() {
-        console.log("unknown");
-        defenses = {
-            filter: "",
-            sessions: [],
-            private:{}
-        };
-        var html = Handlebars.getTemplate("defense-init")(defenses);
-        $('[data-toggle="reset-defense-confirmation"]').confirmation({onConfirm: prepareSchedule});
-        $("#defenses").html(html);
+    });
+    return e;
+}
+
+function showDefenses(t) {
+    getEmbeddedDefenses(function(data) {
+        defenses = JSON.parse(data);
+        console.log(defenses);
+        if (typeof(defenses.sessions[0].jury[0].students[0])=="string") {
+            console.log("Conversion");
+            defenses = embed2(defenses);
+            //console.log(defenses);
+        } else {
+            console.log("no need to convert");
+        }
+        //debugger;
+        //console.log(embed2(defenses));
+        if (t == "schedule") {
+            showCoarseDefenseForm();
+        } else {
+            showDefensePlanningForm();
+        }
     });
 }
 
@@ -47,12 +54,13 @@ function nextSession(d) {
 
 function storeDefenses() {
     console.log("saving the defenses");
-    saveDefenses(defenses);
+    saveDefenses(defenses, publicDefenses(rmEmptyJuries(defenses)));
 }
 
 function saveSessionDate(i) {
     var id = $(i).attr("data-session");
     defenses.sessions[id].date = $(i).val();
+    storeDefenses();
 }
 
 function saveRoom(i) {
@@ -66,6 +74,7 @@ function saveRoom(i) {
             }
         })
     });
+    storeDefenses();
 }
 
 function saveTime(i) {
@@ -74,11 +83,12 @@ function saveTime(i) {
     defenses.sessions.forEach(function (s) {
         s.jury.forEach(function (x) {
             if (x.id == idx) {
-                x.time = r;
+                x.date = r;
                 return false;
             }
         })
     });
+    storeDefenses();
 }
 
 function saveJury(i) {
@@ -89,11 +99,14 @@ function saveJury(i) {
         s.jury.forEach(function (x) {
             if (x.id == idx) {
                 x.commission[jidx] = m;
-                return false;
+                return true;
             }
         })
     });
+    //Set the checkbox value accordingly
+    storeDefenses();
 }
+
 
 function saveLists() {
     var raw = [];
@@ -103,13 +116,12 @@ function saveLists() {
         $(l).find("li").each(function (i, s) {
             var e = $(s).attr("data-email");
             if (id == -1) {
-              //  console.log(e);
                 pool.push(e);
             } else {
                 if (!raw[id]) {
                     raw[id] = [];
                 }
-                raw[id].push(e);
+                raw[id].push(getConvention(e).Stu);
             }
         });
     });
@@ -119,6 +131,7 @@ function saveLists() {
         });
     });
     defenses.pool = pool;
+    storeDefenses();
 }
 
 function prepareSchedule() {
@@ -244,20 +257,46 @@ function sortableOptions() {
 
 function showCoarseDefenseForm() {
     var html = Handlebars.getTemplate("defenses-coarse")(defenses);
-    $("#defenses-form").html(html);
+    $("#cnt").html(html);
     $(".students").sortable(sortableOptions());
 }
 
-function showDefensePlanningForm() {
-    var html = Handlebars.getTemplate("defenses-planning")(defenses);
-    $("#defenses-form").html(html);
-    //$(".students").sortable(sortableOptions());
-    $('#pool').affix({
-        offset: {
-            top: ($("#top-planning").position().top)
+function generateJuryMailto(root) {
+    var emails = [];
+    var checked = root.find(".mail-checkbox-students.checked");
+    checked.each(function (i, e) {
+            emails.push($(e).attr("data-email"));
+    });
+    var checked = root.find("select").each(function (i, s) {
+        var x =$(s);
+        //Associated checkbox checked ?
+        var id = $(s).attr("data-for");
+        if ($("#"+ id).hasClass("checked")) {
+            var v  = x.val();
+            emails.push(v);
         }
     });
-    show_session(0);
+    if (emails.length > 0) {
+        root.find(".mail-selection").attr("href","mailto:" + emails.join(","));
+    } else {
+        root.find(".mail-selection").attr("href","#");
+    }
+}
+
+function showDefensePlanningForm() {
+    getUsers(function (users) {
+        defenses.tutors = [];
+        users.forEach(function (u) {
+            defenses.tutors.push(u);
+        });
+        var html = Handlebars.getTemplate("defenses-planning2")(rmEmptyJuries(defenses));
+        var root = $("#cnt");
+        root.html(html);
+        root.find(':checkbox').checkbox().on('toggle', function (e) {
+            generateJuryMailto(root);
+        });
+        show_session(0);
+    });
 }
 
 function displayDefenses(i) {
@@ -268,7 +307,10 @@ function displayDefenses(i) {
 
 function rmEmptyJuries(defenses) {
     var d = {
-        sessions: []
+        sessions: [],
+        private: defenses.private,
+        visio : defenses.visio,
+        tutors : defenses.tutors
     };
     var i = 0;
     defenses.sessions.forEach(function (s) {
@@ -278,40 +320,54 @@ function rmEmptyJuries(defenses) {
         };
         d.sessions.push(cs);
         s.jury.forEach(function (j) {
-            var empty = true;
-            j.students.forEach(function (s) {
-                if (s != undefined && s != null && s != "") {
-                    empty = false;
+
+            if (j.students) {
+                var empty = true;
+                j.students.forEach(function (s) {
+                    if (s != undefined && s != null && s != "") {
+                        empty = false;
+                    }
+                });
+                if (!empty) {
+                    cs.jury.push(j);
                 }
-            });
-            if (!empty) {
-                cs.jury.push(j);
             }
         });
     });
-    console.log(d);
     return d;
 }
 
 //defenses stuff
 function show_session(nb) {
-    $(".defense-session").each(function (idx, d) {
-        if (nb == idx) {
-            $(d).show();
-        }
-        else {
-            $(d).hide();
-        }
-    });
 
-    $(".defenses-pages li").each(function (idx, d) {
-        if (nb + 1 == idx) {
+    $(".session-header").each(function (idx, d) {
+        if (nb  == idx) {
             $(d).addClass("active");
         }
         else {
             $(d).removeClass("active");
         }
     });
+    $(".session-content").each(function (idx, d) {
+        if (nb  == idx) {
+            $(d).show();
+        }
+        else {
+            $(d).hide()
+        }
+    });
+    if (nb < $(".session-header").length - 1) {
+        $(".pagination .next a").attr("onclick", "show_session(" + (nb + 1) + ")");
+    } else {
+        $(".pagination .next a").removeAttr("onclick");
+    }
+    if (nb != 0) {
+        $(".pagination .previous a").attr("onclick", "show_session(" + (nb - 1) + ")");
+    } else {
+        $(".pagination .previous a").removeAttr("onclick");
+    }
+    $(".mail-selection").attr("href","#");
+    $(':checkbox').checkbox('uncheck');
 }
 
 function switchVisibility(i) {
@@ -336,4 +392,268 @@ function switchVisio(i) {
         j.removeClass("glyphicon-user").addClass("glyphicon-facetime-video");
         defenses.visio[mail] = true;
     }
+}
+
+function publicDefenses(d) {
+
+    var long = {};
+    long.sessions = [];
+    var users;
+    d.sessions.forEach(function (session) {
+        var newSession = {date: session.date, jury:[]};
+        long.sessions.push(newSession);
+        session.jury.forEach(function (j) {
+            var myJury = {
+                students : [],
+                commission : [],
+                room : j.room,
+                id : j.id,
+                time : j.date
+            };
+
+            newSession.jury.push(myJury);
+            j.students.forEach(function (stu) {
+                console.log(stu);
+                console.log(d.private);
+                var c = getConvention(stu.P.Email);
+                if (c) {
+                    //get its fn,ln
+                    var myStudent = {
+                        P: {
+                            Firstname: c.Stu.P.Firstname,
+                            Lastname: c.Stu.P.Lastname
+                        },
+                        Major: c.Stu.Major,
+                        Promotion: c.Stu.Promotion,
+                        Subject: c.Title,
+                        CompanyWWW: c.CompanyWWW,
+                        Company: c.Company,
+                        private : d.private[stu.P.Email] ? true : false,
+                        visio: d.visio[stu.P.Email] ? true: false
+                    };
+                    myJury.students.push(myStudent);
+                } else {
+                    myJury.students.push({});
+                }
+            });
+            //Insert breaks
+            if (myJury.students.length > 3) {
+                if (myJury.students.length == 4) {
+                    myJury.students.splice(2, 0, undefined)
+                } else {
+                    myJury.students.splice(3, 0, undefined)
+                }
+            }
+            j.commission.forEach(function (u) {
+                var user = getUser(u);
+                if (user == undefined) {
+                    myJury.commission.push(undefined);
+                } else {
+                    myJury.commission.push(
+                        {
+                            Firstname: user.Firstname,
+                            Lastname : user.Lastname
+                        }
+                    );
+                }
+            });
+        });
+    });
+
+    var byDay = [];
+    for (i = 0; i < long.sessions.length; i+=2) {
+        byDay.push({
+            date: long.sessions[i].date,
+            period : [long.sessions[i], long.sessions[i+1]]
+        });
+    }
+    return byDay;
+}
+
+function showService() {
+    getEmbeddedDefenses(function (data) {
+        syncGetUsers(function (us) {
+            users = us;
+        });
+        var d = JSON.parse(data);
+        var srv = service(conventions, rmEmptyJuries(d));
+        var html = Handlebars.getTemplate("service")(srv);
+        var root = $("#cnt");
+        root.html(html);
+        $("#service").tablesorter({headers: {0: {"sorter": false}}});
+        root.find(':checkbox').checkbox();
+        root.find('tbody').find(':checkbox').checkbox().on('toggle', function (e) {
+            generateMailto(root);
+        });
+        root.find('.mail-checkbox').click(function (e) {
+            shiftSelect(e, this, root,'.mail-checkbox-j');
+        });
+
+        root.find(".mailto").on('toggle', function (e) {
+            toggleMailCheckboxes(e.currentTarget, ".mail-checkbox-jury", root);
+        });
+    });
+}
+
+function rawService() {
+    getEmbeddedDefenses(function (data) {
+        syncGetUsers(function (us) {
+            users = us;
+        });
+        var d = JSON.parse(data);
+        var srv = service(conventions, rmEmptyJuries(d));
+        var txt = Handlebars.getTemplate("rawService")(srv);
+        $("#modal").html(txt).modal('show');
+    });
+}
+
+function showJuryService() {
+    getEmbeddedDefenses(function (data) {
+        syncGetUsers(function (us) {
+            users = us;
+        });
+        var d = JSON.parse(data);
+        var html = Handlebars.getTemplate("juries")(jury_service(rmEmptyJuries(d)));
+        var root = $("#cnt");
+        root.html(html);
+        $("#table-juries").tablesorter({headers: {0: {"sorter": false}}});
+        root.find(':checkbox').checkbox();
+        root.find('tbody').find(':checkbox').checkbox().on('toggle', function (e) {
+            generateMailto(root);
+        });
+        root.find('.mail-checkbox').click(function (e) {
+            shiftSelect(e, this, root,'.mail-checkbox-j');
+        });
+
+        root.find(".mailto").on('toggle', function (e) {
+            toggleMailCheckboxes(e.currentTarget, ".mail-checkbox-jury", root);
+        });
+
+    });
+}
+
+function rawJuries() {
+    getEmbeddedDefenses(function (data) {
+        syncGetUsers(function (us) {
+            users = us;
+        });
+        var d = JSON.parse(data);
+        var txt = Handlebars.getTemplate("rawJuries")(jury_service(rmEmptyJuries(d)));
+        $("#modal").html(txt).modal('show');
+    });
+}
+
+
+function jury_service(defenses) {
+    var count = {};
+    defenses.sessions.forEach(function (s) {
+        s.jury.forEach(function (j) {
+            j.commission.forEach(function (e) {
+                if (e.length > 1) {
+                    if (!count[e]) {
+                        count[e] = 1;
+                    } else {
+                        count[e]++;
+                    }
+                }
+            })
+        });
+    });
+    arr = [];
+    Object.keys(count).forEach(function (e) {
+            users.forEach(function (u) {
+                if (u.Email == e) {
+                    arr.push({user: u, count: count[e]});
+                    return true;
+                }
+            })
+        }
+    );
+    return arr;
+}
+
+/**
+ * Substitute jury fullname by their email
+ * @param def
+ */
+function embed2(def) {
+   var d = {
+       filter : def.filter,
+       pool : [],
+       tutors : def.tutors,
+       private : def.private,
+       visio: def.visio,
+       sessions : []
+   };
+   /*def.pool.forEach(function (e) {
+       d.pool.push(getConvention(e).Stu);
+   });*/
+   def.sessions.forEach(function (s) {
+     var ns = {
+         date: s.date,
+         jury: []
+     };
+      d.sessions.push(ns);
+       s.jury.forEach(function(j) {
+           var nj = {
+               room : j.room,
+               students : [],
+               id : j.id,
+               date : j.date,
+               commission : []
+           };
+           //console.log(j);
+           if (j.students) {
+               j.students.forEach(function (u) {
+                   if (u && u.length > 1) {
+                       var c = getConvention(u);
+                       nj.students.push(c.Stu);
+                   }
+               });
+           }
+           j.commission.forEach(function (fn) {
+               if (fn.length > 1) {
+                   if  (fn.indexOf("@") < 0) {
+                       nj.commission.push(fullname2Email(fn));
+                   } else {
+                       nj.commission.push(fn);
+                   }
+               } else {
+                   nj.commission.push("");
+               }
+           });
+           ns.jury.push(nj);
+       });
+   });
+   return d;
+}
+
+function fullname2Email(fn) {
+    var got = undefined;
+    users.forEach(function (u) {
+            if (fn == u.Firstname + " " + u.Lastname) {
+                got = u.Email;
+                return true;
+            }
+        });
+    return got;
+}
+
+function getReports(id) {
+    defenses.sessions.forEach(function (s) {
+        s.jury.forEach(function (j) {
+            if (j.id == id) {
+                var emails = [];
+                j.students.forEach(function (u) {
+                    if (u) {
+                        emails.push(u.P.Email);
+                    }
+                });
+                downloadReports("supReport", emails, function(data) {
+                    window.open(data);
+                });
+                return true;
+            }
+        });
+    });
 }

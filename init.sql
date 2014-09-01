@@ -10,8 +10,9 @@ drop table if exists students;
 drop table if exists sessions;
 drop table if exists logs;
 drop type if exists app_status;
-drop table if exists users;
+drop table if exists password_renewal;
 
+drop table if exists users;
 -- user
 create table users(email text PRIMARY KEY,
 				  firstname text,
@@ -96,3 +97,9 @@ create table reports(student text REFERENCES students(email),
 
 create table defenses(id text,
                       content text);
+
+create table password_renewal(
+    email text PRIMARY KEY REFERENCES users(email) on delete cascade,
+    deadline timestamp,
+    token text UNIQUE
+)

@@ -5,7 +5,7 @@
 Handlebars.getTemplate = function(name) {
     if (Handlebars.templates === undefined || Handlebars.templates[name] === undefined) {
         $.ajax({
-            url : 'static/tpls/' + name + '.handlebars',
+            url : '/static/tpls/' + name + '.handlebars',
             success : function(data) {
                 if (Handlebars.templates === undefined) {
                     Handlebars.templates = {};
@@ -37,7 +37,7 @@ Handlebars.registerHelper('len', function(a) {
 });
 
 Handlebars.registerHelper('company', function(c) {
-    if (c.CompanyWWW != "") {
+    if (c.CompanyWWW && c.CompanyWWW != "") {
         return new Handlebars.SafeString("<a target='_blank' href='" + c.CompanyWWW + "'>" + c.Company + "</a>");
     }
     return c.Company;
@@ -66,7 +66,15 @@ Handlebars.registerHelper('deadline', function(d) {
 
 Handlebars.registerHelper('rawFullname', function(p) {
     var fn = p.Firstname + " " + p.Lastname;
-    for (i = fn.length; i < 60; i++) {
+    for (i = fn.length; i < 40; i++) {
+        fn = fn + " ";
+    }
+    return fn;
+});
+
+Handlebars.registerHelper('raw', function(p) {
+    var fn = p;
+    for (i = p.length; i < 60; i++) {
         fn = fn + " ";
     }
     return fn;
@@ -81,6 +89,15 @@ Handlebars.registerHelper('majorOptions', function(m) {
     opts.forEach(function (o) {
         var selected = m == o ? " selected " : "";
         b += "<option value='" + o + "' " + selected + " >" + o + "</option>";
+    });
+    return new Handlebars.SafeString(b);
+});
+
+Handlebars.registerHelper('tutorOptions', function(m) {
+    var b = "";
+    users.forEach(function (o) {
+        var selected = m == o.Email ? " selected " : "";
+        b += "<option value='" + o.Email + "' " + selected + " >" + o.Firstname + " " + o.Lastname + "</option>";
     });
     return new Handlebars.SafeString(b);
 });
@@ -112,22 +129,33 @@ Handlebars.registerHelper('slot', function(d) {
     return twoD(date.getDate()) + "/" + twoD(date.getMonth() + 1) + "/" + date.getFullYear() + " " + twoD(date.getHours()) + ":00";*/
 });
 
+
 Handlebars.registerHelper('majors', function(emails) {
     var majors = {};
     emails.forEach(function (e) {
-        if (e) {
-            c = getConvention(e);
-            majors[c.Stu.Major] = true;
+        if (e && e.Major) {
+            majors[e.Major] = true;
         }
     });
     return Object.keys(majors).join(", ");
+});
+
+Handlebars.registerHelper('commission', function(emails) {
+    var cnt = [];
+    emails.forEach(function (e) {
+        if (e) {
+            cnt.push(e.Firstname + " " + e.Lastname);
+        } else {
+            cnt.push("?")
+        }
+    });
+    return cnt.join(", ");
 });
 
 
 Handlebars.registerHelper('offset', function(i, date) {
     var offset = i * 30 * 60 * 1000;
     var m = moment(date, "HH:mm");
-    console.log(m.toDate() + " " + offset + " " + i);
     var from = new Date(m.toDate().getTime() + offset);
     var to = new Date(from.getTime() + 30 * 60 * 1000);
     var str = twoD(from.getHours()) + ":" + twoD(from.getMinutes()) + " - " + twoD(to.getHours()) + ":" + twoD(to.getMinutes());
@@ -142,8 +170,8 @@ Handlebars.registerHelper('committeeOptions', function(a, opts) {
     b = "<option >?</option>";
     opts.forEach(function (o) {
         var fn = o.Firstname + " " + o.Lastname;
-        var selected = a == fn ? " selected " : "";
-        b += "<option " + selected +">" + fn + "</option>";
+        var selected = a == o.Email ? " selected " : "";
+        b += "<option " + selected +" value='" + o.Email + "'>" + fn + "</option>";
     });
     return new Handlebars.SafeString(b);
 });
@@ -154,17 +182,15 @@ Handlebars.registerHelper('inc', function(d) {
 
 Handlebars.registerHelper('slotEntry', function(e) {
     if (e) {
-        var c = getConvention(e);
-        var buf = c.Stu.P.Firstname + " " + c.Stu.P.Lastname + " (" + c.Stu.Major + ")";
-        buf += " <span onclick='switchVisibility(this)' class='glyphicon glyphicon-eye-" + (defenses.private[c.Stu.P.Email] ? "close late" : "open") + "'></span>";
-        buf += " <span onclick='switchVisio(this)' class='glyphicon " + (defenses.visio[c.Stu.P.Email] ? "glyphicon-facetime-video" : "glyphicon-user") + "'></span>";
+        var buf = e.P.Firstname + " " + e.P.Lastname + " (" + e.Major + ")";
+        buf += " <span onclick='switchVisibility(this)' class='glyphicon glyphicon-eye-" + (defenses.private[e.P.Email] ? "close late" : "open") + "'></span>";
+        buf += " <span onclick='switchVisio(this)' class='glyphicon " + (defenses.visio[e.P.Email] ? "glyphicon-facetime-video" : "glyphicon-user") + "'></span>";
         return new Handlebars.SafeString(buf);
     }
     return "Break";
 });
 
 Handlebars.registerHelper('notEmptyJury', function(f) {
-    console.log(f);
     var empty = true;
     f.students.forEach(function (s) {
         if (s != undefined) {
@@ -202,29 +228,83 @@ Handlebars.registerHelper('shortSlotEntry', function(s) {
     return "Break";
 });
 
+/*Handlebars.registerHelper('reportGrade', function(r) {
+    if (!r.IsIn) {
+        var date = new Date(Date.parse(r.Deadline));
+        if (date > new Date()) {
+            return new Handlebars.SafeString("<span data-text='-2' title='Deadline passed !' class='late glyphicon glyphicon-warning-sign'></span>");
+        } else {
+            return new Handlebars.SafeString("<span data-text='99'>-</span>");
+        }
+    }
+    var url = "/api/v1/conventions/" + r.Email + "/" + r.Kind + "/report";
+    var g = r.Grade >= 0 ? r.Grade : "<span title='Grade expected' data-text='-1' class='warning glyphicon glyphicon-question-sign'></span>";
+    return new Handlebars.SafeString("<a href='" + url + "' data-text='" + r.Grade + "'>" + g + " </a>");
+});  */
 Handlebars.registerHelper('reportGrade', function(r) {
     if (!r.IsIn) {
         var date = new Date(Date.parse(r.Deadline));
         if (date > new Date()) {
-            return new Handlebars.SafeString("<span title='Deadline passed !' class='late glyphicon glyphicon-warning-sign'></span>");
-        } else {
-            return "-";
+            //Deadline expired
+            return new Handlebars.SafeString("<span data-text='-2' title='Deadline passed !' class='late glyphicon glyphicon-warning-sign'></span>");
+            //return -2;
         }
+        return new Handlebars.SafeString("<span data-text='99' title='Deadline not passed'>-</span>");
+        //return 99;
     }
-    var url = "/api/v1/conventions/" + r.Email + "/" + r.Kind + "/report";
-    var g = r.Grade >= 0 ? r.Grade : "<span title='Grade expected' class='warning glyphicon glyphicon-question-sign'></span>";
-    return new Handlebars.SafeString("<a href='" + url + "'>" + g + " </a>");
+    var url = "api/v1/reports/" + r.Kind + "/" + r.Email + "/document";
+    if (r.Grade >= 0) {
+        return new Handlebars.SafeString("<a href='" + url + "' data-text='" + r.Grade + "'>" + r.Grade + " </a>");
+    }
+    return new Handlebars.SafeString("<a href='" + url + "' data-text='98'><span title='Grade expected' class='warning glyphicon glyphicon-question-sign'></span></a>");
+
 });
+
 
 Handlebars.registerHelper('grade', function(g) {
     return g < 0 ? "?" : g;
 });
 
+Handlebars.registerHelper('URIemails', function(students) {
+    var l = [];
+    students.forEach(function (s) {
+        if (s && s.P) {
+            l.push(s.P.Email);
+        }
+    });
+    return encodeURI(l.join(","));
+});
+
+
+Handlebars.registerHelper('student', function(g) {
+    if (!g || g.length== 0) {
+        return "break";
+    }
+
+    var buf = g.P.Firstname + " " + g.P.Lastname;
+    if (defenses.private[g.P.Email]) {
+        buf += " <span class='glyphicon glyphicon-eye-close'></span>";
+    }
+    if (defenses.visio[g.P.Email]) {
+        buf += " <span class='glyphicon glyphicon-facetime-video'></span>";
+    }
+    var c = getConvention(g.P.Email);
+    if (!c.SupReport.IsIn) {
+        buf += " <span class='glyphicon glyphicon-file alert-danger'></span>";
+    }
+    return new Handlebars.SafeString(buf);
+});
+
+Handlebars.registerHelper('longDate', function(d) {
+    var m = moment(d, "DD/MM/YYYY");
+    m.lang("fr");
+    return m.format("dddd D MMMM");
+});
+
+
 function df(d, active) {
     var date = new Date(Date.parse(d));
     var str = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
-    if (active && date < new Date()) {
-
-    }
     return str;
 }
+

@@ -1,0 +1,52 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-body form-horizontal">
+            <h4>
+                <a href="mailto:{{Stu.P.Email}}">{{fullname Stu.P}}</a>
+            </h4>
+            <dl class="dl-horizontal">
+                <dt>promotion</dt>
+                <dd>{{Stu.Promotion}}</dd>
+                <dt>major</dt>
+                <dd>
+                    <select onchange="updateMajor(this,'{{Stu.P.Email}}')">
+                        {{majorOptions Stu.Major}}
+                    </select>
+                </dd>
+                <dt>academic tutor</dt>
+                <dd>
+                    <select onchange="updateTutor(this,'{{Stu.P.Email}}')">
+                        {{tutorOptions Tutor.Email}}
+                    </select>
+                </dd>
+
+
+            </dl>
+
+            <h6 class="text-center">{{company this}}</h6>
+            <dl class="dl-horizontal">
+                <dt>period</dt>
+                <dd>{{shortDate Begin}} to {{shortDate End}}</dd>
+                <dt>supervisor</dt>
+                <dd>
+                    <a href="mailto:{{Sup.Email}}">{{fullname Sup}}</a>
+                    ({{Sup.Tel}})
+                </dd>
+            </dl>
+
+                    <h6>Supervisor evaluation</h6>
+
+                    <dl class="dl-horizontal">
+                        <dt>due date</dt>
+                        <dd><input type="text" data-provide="datepicker" class="form-control date input-sm" value="{{shortDate SupReport.Deadline}}"></dd>
+                        <dt>grade</dt>
+                        <dd><input type="number" class="form-control input-sm" value="{{SupReport.Grade}}" onchange="setMark('{{Stu.P.Email}}', 'supReport','SupReport', this)"></dd>
+                    </dl>
+
+                    <a href="/api/v1/conventions/{{Stu.P.Email}}/supervisor/report" id='dl-supervisor' class='btn btn-wide btn-success'>
+                        <i class='glyphicon glyphicon-cloud-download'></i> Get the report
+                    </a>
+                    <input type="file" id="up-supervisor" name="up-supervisor" style="display: none;">
+        </div>
+    </div>
+</div>

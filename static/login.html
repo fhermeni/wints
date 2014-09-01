@@ -7,8 +7,15 @@
     <link href="static/css/flat-ui.css" rel="stylesheet">
     <script src="static/js/jquery-2.1.0.min.js"></script>
     <script src="static/js/bootstrap.min.js"></script>
+    <script src="static/js/notify.min.js"></script>
     <script src="static/js/rest.js"></script>
     <script src="static/js/jquery.placeholder.js"></script>
+    <script src="static/js/mustache.js"></script>
+    <script src="static/js/handlebars-v1.3.0.js"></script>
+    <script src="static/js/templates.js"></script>
+    <script src="static/js/notify.min.js"></script>
+    <script src="static/js/login.js"></script>
+    <script src="http://www.google.com/recaptcha/api/js/recaptcha_ajax.js"></script>
     <link rel="stylesheet" href="static/css/style.css">
 </head>
 <body class="login-background">
@@ -21,22 +28,49 @@
                     <h4>Welcome to <small>Wints</small></h4>
                 </div>
             <div class="login-form">
-                    <form method="post" action="/api/v1/login">
+                <div id="login-diag">
+                <form method="post" action="/api/v1/login">
+
                     <div class="form-group">
-                        <input name="login" class="form-control login-field" placeholder="Email" type="text"/>
-                        <label class="login-field-icon fui-user" for="login"></label>
+                        <input id=login" name="login" class="form-control login-field" placeholder="Email" type="text"/>
+                        <label class="login-field-icon fui-user"></label>
                     </div>
 
                     <div class="form-group" id="group-password">
                         <input name="password" class="form-control login-field" placeholder="Password" type="password"/>
-                        <label class="login-field-icon fui-lock" for="login"></label>
+                        <label class="login-field-icon fui-lock"></label>
                     </div>
                         <input type="submit" class="btn btn-primary btn-lg btn-block" value="Log in">
-                    <a class="login-link" href="#">Lost your password</a>
-                    </form>
+                    <a class="login-link" onclick="flipForm('login-diag','reset-diag')">Lost your password</a>
+
+                </form>
+            </div>
+                <div id="reset-diag" style="display: none">
+                    <div class="form-group">
+                        <input id="email" name="email" class="form-control login-field" placeholder="Email" type="text"/>
+                        <label class="login-field-icon fui-user"></label>
+                    </div>
+
+                    <div class="text-center">
+                    <script type="text/javascript"
+                            src="http://www.google.com/recaptcha/api/challenge?k=6Lc3GfgSAAAAAL_sJatbvpi4GWTMiguv6s42iC1Y">
+                    </script>
+                    <noscript>
+                        <iframe src="http://www.google.com/recaptcha/api/noscript?k=6Lc3GfgSAAAAAL_sJatbvpi4GWTMiguv6s42iC1Y"
+                                height="300" width="500" frameborder="0"></iframe><br>
+                        <textarea name="recaptcha_challenge_field" rows="3" cols="40" class="text-center">
+                        </textarea>
+                        <input type="hidden" name="recaptcha_response_field" value="manual_challenge">
+                    </noscript>
+
+                    <a onclick="resetPassword()" class="btn btn-danger btn-lg btn-block">Reset my password</a>
+                    <a class="login-link" onclick="flipForm('reset-diag','login-diag')">Cancel</a>
+                    </div>
                 </div>
+            </div>
         </div>
     </div>
+    <div id="modal" class="modal fade"></div>
 </div>
 </body>
 </html>

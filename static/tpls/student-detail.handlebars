@@ -8,18 +8,12 @@
                 <dt>promotion</dt>
                 <dd>{{Stu.Promotion}}</dd>
                 <dt>major</dt>
-                <dd>
-                    <select onchange="updateMajor(this,'{{Stu.P.Email}}')">
-                        {{majorOptions Stu.Major}}
-                    </select>
-                </dd>
+                <dd>{{Stu.Major}}</dd>
                 <dt>academic tutor</dt>
                 <dd>
                     <a href="mailto:{{Tutor.Email}}">{{fullname Tutor}}</a>
                     ({{Tutor.Tel}})
                 </dd>
-
-
             </dl>
 
             <h6 class="text-center">{{company this}}</h6>

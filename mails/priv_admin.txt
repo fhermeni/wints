@@ -1,0 +1,11 @@
+Subject:[Wints] Privilege updated to "admin"
+
+From your dashboard, you can now:
+- manage the student you are supervising
+- view every internships
+- import conventions from the convention server
+- access accounting informations
+- prepare defenses
+
+Regards,
+Fabien Hermenier

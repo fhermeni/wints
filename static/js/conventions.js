@@ -4,12 +4,20 @@ var user;
 var defenses;
 var currentPage;
 
+var waitingBlock;
 
 $( document ).ready(function () {
+    waitingBlock = $("#cnt").clone().html();
     //Check access
     getProfile(function(d) {
         user = d;
     });
+
+    if (user.Role != "admin") {
+        syncGetUsers(function (us) {
+            users = us;
+        });
+    }
 
     if (!user) {
         window.location.href = "/";
@@ -26,6 +34,20 @@ $( document ).ready(function () {
             showPendingCounter(data.Pending);
         });
     }
+
+    //Predefined table sorter for grades
+    $.tablesorter.addParser({
+        // set a unique id
+        id: 'grades',
+        is: function(s) {
+            return false;
+        },
+        format: function(s, table, cell, cellIndex) {
+            return $(cell).children().attr('data-text');
+        },
+        type: 'numeric'
+    });
+
 });
 
 function showPendingCounter(nb) {
@@ -37,6 +59,9 @@ function showPendingCounter(nb) {
 }
 
 function pickOne() {
+    var html = Handlebars.getTemplate("pending")({});
+    $("#cnt").html(html);
+
     randomPending(function(data) {
         if (data.length == 0) {
             success();
@@ -176,9 +201,7 @@ function pickKnown() {
 }
 
 function showPage(li, id) {
-    $(".page").each(function (idx, d){
-        d.style.display = d.id == id ? "block" : "none";
-    });
+    $("#cnt").html(waitingBlock);
     $("#menu-pages").find("li").removeClass("active");
     if (li) {
         $(li.parentNode).addClass("active");
@@ -188,6 +211,7 @@ function showPage(li, id) {
 }
 
 function refresh() {
+    //reset the div
     if (currentPage == "myStudents") {
         displayMyStudents();
     } else if (currentPage == "conventions") {
@@ -196,11 +220,18 @@ function refresh() {
         displayTutors();
     } else if (currentPage == "privileges") {
         showPrivileges();
-    } else if (currentPage == "defenses") {
-        showDefenses();
+    } else if (currentPage == "defenses-schedule") {
+        showDefenses("schedule");
+    } else if (currentPage == "defenses-juries") {
+        showDefenses("juries");
     } else if (currentPage == "pending") {
         pickOne();
-    } else {
+    } else if (currentPage == "juries") {
+        showJuryService();
+    } else if (currentPage == "service") {
+        showService();
+    }
+    else {
         console.log("Unsupported operation on '" + currentPage + "'");
     }
 }
@@ -209,11 +240,10 @@ function getAllConventions() {
     getConventions(function(data) {
         if (!conventions) {
             conventions = data;
-            if (conventions.length == 0) {
-                $("#waiting").html("Nothing to display");
-            } else {
-                $("#waiting").hide();
+            if (user.Role.length == "") {
                 showPage(undefined, "myStudents");
+            } else {
+                showPage(undefined, "conventions");
             }
         } else {
             conventions = data;
@@ -228,7 +258,6 @@ function shiftSelect(e, me, root, cl) {
         var p = tr.prev();
         while (p.length > 0) {
             var lbl = p.find(cl);
-            console.log(lbl);
             if (lbl.hasClass("checked")) {
                 break;
             } else {
@@ -248,7 +277,7 @@ function toggleMailCheckboxes(chk, cl, root) {
 
 function displayMyConventions() {
     var html = Handlebars.getTemplate("watchlist")(conventions);
-    root = $("#conventions");
+    var root = $("#cnt");
     root.html(html);
     root.find(':checkbox').checkbox();
     root.find('tbody').find(':checkbox').checkbox().on('toggle', function (e) {
@@ -277,8 +306,14 @@ function displayMyConventions() {
         headers: {
             0: {sorter: false},
             4: {sorter: false},
-            5: {sorter: false}
-        }
+            5: {sorter: false},
+            6: {sorter: "grades"},
+            7: {sorter: "grades"},
+            8: {sorter: "grades"}
+        },
+        theme: 'bootstrap',
+        widgets : ["columns"],
+        headerTemplate : '{content} {icon}'
     });
 }
 
@@ -287,12 +322,34 @@ function displayMyStudents() {
         return c.Tutor.Email == user.Email;
     });
     var html = Handlebars.getTemplate("myStudents")(myStudents);
-    var root = $("#myStudents").html(html);
-    $("#table-myStudents").tablesorter({headers: {0: {"sorter": false}}});
+    var root = $("#cnt").html(html);
+    $("#table-myStudents").tablesorter({
+        headers: {
+            0: {"sorter": false},
+            5: {"sorter": false},
+            6: {sorter: "grades"},
+            7: {sorter: "grades"},
+            8: {sorter: "grades"}
+        },
+        uitheme: 'bootstrap'
+    });
     root.find(':checkbox').checkbox();
     root.find('tbody').find(':checkbox').checkbox().on('toggle', function(e) {generateMailto(root);});
-    root.find('.checkbox').click(function (e) {shiftSelect(e, this, root);});
-    root.find(".mailto").on('toggle', function() {toggleMailCheckboxes(root);});
+
+    root.find('.mail-checkbox-stu').click(function (e) {
+        shiftSelect(e, this, root,'.mail-checkbox-stu');
+    });
+    root.find(".mailto-students").on('toggle', function (e) {
+        toggleMailCheckboxes(e.currentTarget, ".mail-checkbox-students", root);
+    });
+    root.find('.mail-checkbox-s').click(function (e) {
+        shiftSelect(e, this, root,'.mail-checkbox-s');
+    });
+    root.find(".mailto-sups").on('toggle', function (e) {
+        toggleMailCheckboxes(e.currentTarget, ".mail-checkbox-sup", root);
+    });
+
+
 }
 
 function generateMailto(root) {
@@ -306,6 +363,32 @@ function generateMailto(root) {
         root.find(".mail-selection").attr("href","mailto:" + emails.join(","));
     } else {
         root.find(".mail-selection").attr("href","#");
+    }
+}
+
+function getAProfile(e) {
+    var prof = undefined;
+    conventions.forEach(function (c) {
+       if (c.Stu.P.Email == e) {
+           prof  = c.Stu.P;
+           return true;
+       }
+    });
+    return prof;
+}
+function generatefullnames(root) {
+    var checked = root.find(".mail-checkbox.checked");
+        var fns = [];
+        checked.each(function (i, e) {
+            var em = $(e).attr("data-email");
+            var p = getAProfile(em);
+            fns.push(p.Firstname + " " + p.Lastname);
+        });
+    if (fns.length > 0) {
+        var html = Handlebars.getTemplate("raw");
+        $("#modal").html(html);
+        $("#rawContent").html(fns.join("\n"));
+        $("#modal").modal('show');
     }
 }
 
@@ -371,7 +454,7 @@ function getConvention(m) {
 
 function displayTutors() {
         var html = Handlebars.getTemplate("tutors")(orderByTutors(conventions));
-        var root = $("#assignments").html(html);
+        var root = $("#cnt").html(html);
         $("#table-assignments").tablesorter({headers: {0: {"sorter": false}}});
     root.find(':checkbox').checkbox();
     root.find('tbody').find(':checkbox').checkbox().on('toggle', function(e) {generateMailto(root);});
@@ -383,25 +466,41 @@ function getUploadData(kind, email) {
     return {theme:'bootstrap',
         allowedExtensions:"pdf",
         btnText:'<span class="glyphicon glyphicon-cloud-upload"></span> Put the report',
-        url: 'api/v1/conventions/' + email + '/' + kind + '/report',
+        url: 'api/v1/reports/' + kind + '/' + email + '/document',
         showFilename:false,
         invalidExtError:'PDF file expected',
         maxSize: 10,
         sizeError:"The file cannot exceed 10MB",
         onFileError: function(file, error) {
-            console.log("Erreur: " + error);
+            reportError(error);
+            refresh();
     },
         onFileSuccess: function(file, data) {
             $("#dl-" + kind).removeAttr("disabled");
+            reportSuccess("Report uploaded");
+            refresh()
         },
         multi: false}
 }
+
+function showNewUser() {
+    var buf = Handlebars.getTemplate("new-user")({});
+    $("#modal").html(buf).modal('show');
+}
+
 function showDetails(s) {
     conventions.forEach(function (c) {
         if (c.Stu.P.Email == s) {
-            var buf = Handlebars.getTemplate("student-detail")(c);
+            var buf = "";
+            if (user.Role == "") {
+                buf = Handlebars.getTemplate("student-detail")(c);
+            } else if (user.Role == "major") {
+                buf = Handlebars.getTemplate("student-detail-major")(c);
+            } else {
+                buf = Handlebars.getTemplate("student-detail-admin")(c);
+            }
             $("#modal").html(buf).modal('show');
-            $('#modal').find('.date')/*.datepicker({format:"dd/mm/yyyy"})*/
+            $('#modal').find('.date')
                 .on("changeDate", function(e){
                     setMidtermDeadline(c.Stu.P.Email, e.date, function(){
                         c.MidtermReport = e.date;
@@ -414,17 +513,8 @@ function showDetails(s) {
                 $("#up-supervisor").hide();
             } else {
                 $("#dl-supervisor").hide();
-                $("#up-supervisor").pekeUpload(getUploadData("supervisor", c.Stu.P.Email));
+                $("#up-supervisor").pekeUpload(getUploadData("supReport", c.Stu.P.Email));
             }
-
-            /*if (c.FinalReport.IsIn) {
-                $("#dl-final").show();
-                $("#up-final").hide();
-            } else {
-                $("#dl-final").hide();
-                $("#up-final").pekeUpload(getUploadData("final", c.Stu.P.Email));
-            }  */
-
             return false;
         }
     });
@@ -444,29 +534,76 @@ function updateMajor(s, email) {
         });
 }
 
+function updateTutor(s, email) {
+    var val = $(s).val();
+    setTutor(email,val,
+        function(data) {
+            conventions.forEach(function (c) {
+                if (c.Stu.P.Email == email) {
+                    c.Tutor = data.Tutor;
+                    return false;
+                }
+            });
+            refresh();
+            reportSuccess("Tutor changed")
+        });
+}
+
 function showPrivileges() {
     getUsers(function(data) {
         var others = data.filter(function (u) {
             return u.Email != user.Email;
         });
+        //The base
         var html = Handlebars.getTemplate("privileges")(others);
-        $("#privileges").html(html);
-        $('[data-toggle="deluser-confirmation"]').confirmation({onConfirm: rmUser});
+        $("#cnt").html(html);
+        $('[data-toggle="deluser-confirmation"]').each(function (i, a) {
+            var j = $(a);
+            j.confirmation({onConfirm: function() {rmUser(j.attr("data-user"), j.parent().parent().parent())}});
+        });
     });
 }
 
 function updatePrivilege(select, email) {
-    setPrivilege(email, $(select).val());
+    setPrivilege(email, $(select).val(),
+    function() {
+        $.notify("Privilege updated", {
+             position:"top center",
+             autoHideDelay: 1000,
+             className : "success"})
+    }
+    );
 }
 
 function newUser() {
+    if (missing("lbl-nu-fn") || missing("lbl-nu-ln") || missing("lbl-nu-email")) {
+        return false;
+    }
     createUser($("#lbl-nu-fn").val(), $("#lbl-nu-ln").val(),
                 $("#lbl-nu-tel").val(), $("#lbl-nu-email").val(),
-                $("#lbl-nu-priv").val(), function() {$("#modal").hide()});
+                $("#lbl-nu-priv").val(),
+                function() {
+                    $("#modal").modal('hide');
+                    reportSuccess("Account created");
+                    syncGetUsers(function (us) {
+                        users = us;
+                    });
+                    showPrivileges();
+                }, function(o) {
+                    if (o.status == 409) {
+                        $("#lbl-nu-email").notify("This email is already registered");
+                    }
+                });
 }
 
-function rmUser() {
-    deleteUser($(this).attr("user"), function() {$(this).parent().parent().parent().remove();});
+function rmUser(email, div) {
+    deleteUser(email, function() {
+        div.remove();
+        syncGetUsers(function (us) {
+            users = us;
+        });
+        reportSuccess("Account deleted")
+    });
 }
 
 function rawTutors() {
@@ -490,6 +627,7 @@ function setMark(stu, kind, field, input) {
     var mark = $(input).val();
     updateMark(stu, kind, mark, function() {
         getConvention(stu)[field].Grade = mark;
+        reportSuccess("Grade Upgraded");
         refresh();
     });
 }

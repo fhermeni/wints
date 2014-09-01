@@ -7,16 +7,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="static/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link rel="stylesheet" href="static/css/flat-ui.css">
-    <!--<link rel="stylesheet" href="static/css/my-flat-ui.css">-->
-    <!--<link rel="stylesheet" href="static/css/datepicker3.css">-->
     <link rel="stylesheet" href="static/css/style.css">
     <link rel="stylesheet" href="static/css/bootstrap-datetimepicker.min.css">
     <script src="static/js/jquery-2.1.0.min.js"></script>
     <script src="static/js/jquery.cookie.js"></script>
+    <script src="static/js/notify.min.js"></script>
     <script src="static/js/moment-with-langs.min.js"></script>
-    <!--<script src="static/js/langs.min.js"></script>-->
     <script src="static/js/bootstrap-datetimepicker.min.js"></script>
-    <!--<script src="static/js/bootstrap-datepicker-fixed.js"></script>-->
     <script src="static/js/flatui-radio.js"></script>
     <script src="static/js/flatui-checkbox.js"></script>
     <script src="static/js/bootstrap.min.js"></script>
@@ -29,9 +26,9 @@
     <script src="static/js/conventions.js"></script>
     <script src="static/js/defenses.js"></script>
     <script src="static/js/jquery.tablesorter.min.js"></script>
-    <script src="static/js/mustache.js"></script>
     <script src="static/js/jquery-sortable-min.js"></script>
     <script src="static/js/pekeUpload.min.js"></script>
+    <script src="static/js/service.js"></script>
 </head>
 <body>
 <div class="container">
@@ -39,29 +36,33 @@
         <div class="container-fluid">
             <div>
                 <ul id="menu-pages" class="nav navbar-nav navbar-left">
-                    <li><a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="fullname">Fullname</span><b class="caret"></b></a><span class="dropdown-arrow"></span>
+                    <li><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> <span id="fullname">Fullname</span><b class="caret"></b></a><span class="dropdown-arrow"></span>
                         <ul class="dropdown-menu" role="menu">
                             <li><a href="#" onclick="showProfileEditor()"><span class="fui-new"></span> Edit profile</a></li>
                             <li><a href="api/v1/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
                         </ul>
                     </li>
-                    <li class="tutorItem" style="display: none;"><a onclick="showPage(this, 'myStudents');">My students</a></li>
-                    <li class="majorItem adminItem rootItem" style="display: none;"><a onclick="showPage(this, 'conventions');">Watchlist</a></li>
-                    <li class="adminItem rootItem" style="display: none;"><a onclick="showPage(this, 'pending')">Pending conventions <span id="pending-counter"></span></a></li>
+                    <li class="tutorItem" style="display: none;"><a onclick="showPage(this, 'myStudents');"><i class="glyphicon glyphicon-briefcase"></i> My students</a></li>
+                    <li class="majorItem adminItem rootItem" style="display: none;"><a onclick="showPage(this, 'conventions');"><i class="glyphicon glyphicon-eye-open"></i> Watchlist</a></li>
+                    <li class="adminItem rootItem" style="display: none;"><a onclick="showPage(this, 'pending')"><i class="glyphicon glyphicon-filter"></i> Import<span id="pending-counter"></span></a></li>
                     <li class="adminItem rootItem" style="display: none;">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Defenses<b class="caret"></b></a><span class="dropdown-arrow"></span>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-picture"></i> Defenses<b class="caret"></b></a><span class="dropdown-arrow"></span>
                         <ul class="dropdown-menu" role="menu">
-                            <li><a onclick="showPage(this, 'defenses')">Prepare defenses</a></li>
-                            <li><a onclick="showPage(this, 'defenses_assignments')">Assignments</a></li>
+                            <li><a onclick="showPage(this, 'defenses-schedule')"><i class="glyphicon glyphicon-calendar"></i> schedule</a></li>
+                            <li><a onclick="showPage(this, 'defenses-juries')"><i class="glyphicon glyphicon-user"></i> juries</a></li>
+                            <li><a href="/static/defenses-planning.html" target="_blank"><i class="glyphicon glyphicon-link"></i> planning</a></li>
+                            <li><a href="/static/defenses-program.html" target="_blank"><i class="glyphicon glyphicon-link"></i> program</a></li>
                         </ul>
+                    </li>
+                    <li class="adminItem rootItem" style="display: none">
+                        <a onclick="showPage(this, 'service')"><i class="glyphicon glyphicon-euro"></i> Service</a>
                     </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     <li class="adminItem rootItem" style="display: none">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="fui-gear"></span><b class="caret"></b></a><span class="dropdown-arrow"></span>
                         <ul class="dropdown-menu" role="menu">
-                            <li class="adminItem rootItem" style="display: none;"><a onclick="showPage(undefined, 'assignments')">Tutors</a></li>
-                            <li class="rootItem" style="display: none;"><a onclick="showPage(undefined, 'privileges')">Permissions</a></li>
+                            <li><a onclick="showPage(undefined, 'privileges')"><i class="glyphicon glyphicon-lock"></i> permissions</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -69,160 +70,15 @@
         </div>
     </nav>
 
-    <div class="page text-center" id="waiting" data-url="waiting">
-        <div>
-            <img src="static/img/spinner.gif" alt="spinner"/>
-        </div>
-        <h5>Loading data ...</h5>
-    </div>
-
     <!-- the students I am supervising -->
-    <div class="page" id="myStudents" data-url="myStudents" style="display: none"></div>
-
-    <!-- list conventions -->
-    <div class="page" id="conventions" data-url="conventions" style="display: none"></div>
-
-    <!-- pending page -->
-    <div id="pending" data-url="pending" class="page" style="display: none">
-        <div class="text-right">
-            <small><span id="completed">NB</span>% completed</small>
+    <div class="page" id="cnt">
+        <div class="text-center">
+            <img src="/static/img/spinner.gif" alt="spinner"/>
         </div>
-        <div class="progress">
-            <div id="progress" class="progress-bar progress-bar-success" style="width: 0;"></div>
-        </div>
-
-        <div id="alignment-box">
-            <div class="text-center">
-                <h3 id="student"></h3>
-                <span id="from"></span> to <span id="to"></span>: <a id="companyWWW"><span id="company"></span></a>
-            </div>
-
-            <div class="row">
-                <div class="col-sm-5 col-lg-offset-1">
-                    <h6>Tutor in the convention</h6>
-
-                    <form class="form-horizontal">
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label" for="th-tutor-fn">Firstname</label>
-
-                            <div class="col-sm-6">
-                                <input type="text" class="input-sm form-control" id="th-tutor-fn">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label" for="th-tutor-ln">Lastname</label>
-
-                            <div class="col-sm-6">
-                                <input type="text" class="input-sm form-control" id="th-tutor-ln">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label" for="th-tutor-email">Email</label>
-
-                            <div class="col-sm-6">
-                                <input type="email" class="input-sm form-control" id="th-tutor-email">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-sm-2 control-label" for="th-tutor-tel">Tel</label>
-
-                            <div class="col-sm-6">
-                                <input type="text" class="input-sm form-control" id="th-tutor-tel">
-                            </div>
-                        </div>
-                    </form>
-                    <div class="text-center">
-                        <button id="pick-theory" class="btn-wide btn btn-lg text-center" onclick="pickTheory()">Choose</button>
-                    </div>
-
-                </div>
-                <div class="col-sm-2 text-center">
-                    <h1>OR</h1>
-                </div>
-                <div class="col-sm-4 text-center">
-                    <h6>Available tutor(s)</h6>
-                    <label for="known-tutor-selector"></label><select id="known-tutor-selector">
-                    <option value="fabien.hermenier@unice.fr">Fabien Hermenier</option>
-                </select>
-
-                    <div class="">
-                        <button id="btn-choose-known" class="btn-wide btn btn-lg text-center" onclick="pickKnown()">
-                            Choose
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <h5 class="text-center">Loading ...</h5>
     </div>
-
-    <!-- Students per tutor -->
-    <div id="assignments" data-url="assignments" class="page" style="display: none"></div>
-
-    <!-- Privileges -->
-    <div id="privileges" data-url="privileges" class="page" style="display: none"></div>
-
-    <!-- defenses -->
-    <div id="defenses" data-url="defenses" class="page" style="display: none"></div>
 
     <div id="modal" class="modal fade"></div>
-
-    <!-- new user -->
-    <div class="modal fade" id="new-user">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">New user</div>
-                <div class="modal-body form-horizontal">
-                    <div class="form-horizontal">
-                        <div id="newUser-err"></div>
-                        <div class="form-group">
-                            <label for="lbl-nu-fn" class="col-sm-3 control-label">Firstname</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control" id="lbl-nu-fn" placeholder="firstname"/>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="lbl-nu-ln" class="col-sm-3 control-label">Lastname</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control" id="lbl-nu-ln" placeholder="lastname"/>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="lbl-nu-email" class="col-sm-3 control-label">Email</label>
-                            <div class="col-sm-9">
-                                <input type="email" class="form-control" id="lbl-nu-email" placeholder="email"/>
-                            </div>
-                        </div>
-
-
-                        <div class="form-group">
-                            <label for="lbl-nu-tel" class="col-sm-3 control-label">Telephon</label>
-                            <div class="col-sm-9">
-                                <input type="text" class="form-control" id="lbl-nu-tel" placeholder="telephon"/>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="lbl-nu-priv" class="col-sm-3 control-label">Permissions</label>
-                            <div class="col-sm-9">
-                                <select id="lbl-nu-priv">
-                                    <option value=""></option>
-                                    <option value="admin">admin</option>
-                                    <option value="root">root</option>
-                                    <option value="major">major</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="text-right">
-                            <button type="button" class="btn btn-success" onclick="newUser()">Create</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 </div>
 <footer>
     <div class="container">

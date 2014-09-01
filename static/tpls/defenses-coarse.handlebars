@@ -6,7 +6,7 @@
                 {{#each jury}}
                     <ol class="students" data-jury="{{id}}">
                         {{#each students}}
-                            <li class="coarse-entry" data-email="{{this}}">{{slotEntry this}}</li>
+                            <li class="coarse-entry" data-email="{{this.P.Email}}">{{slotEntry this}}</li>
                         {{/each}}
                     </ol>
                 {{/each}}

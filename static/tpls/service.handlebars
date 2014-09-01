@@ -1,0 +1,61 @@
+{{#if this}}
+<h3>Service</h3>
+<a class="btn-sm btn-primary mail-selection"><span class="fui-mail"></span> mail selection</a>
+<a class="btn-sm btn-success" href="#" onclick="rawService()"><span class="fui-list"></span> copy to clipboard</a>
+<br/>
+<table class="table table-condensed table-hover tablesorter" id="service">
+    <thead>
+    <tr>
+        <th><label class='checkbox mailto'><input type='checkbox' data-toggle='checkbox'/></label></th>
+        <th>User</th>
+        <th>Tutoring</th>
+        <th>Committees</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#each this}}
+        <tr>
+            <td>
+                <label class='checkbox mail-checkbox mail-checkbox-j' data-email="{{P.Email}}">
+                    <input type='checkbox' class="mail-checkbox-jury" data-toggle='checkbox' value='{{P.Email}}'/>
+                </label>
+            </td>
+            <td class="text-left">
+                <a href="mailto:{{P.Email}}">{{fullname P}}</a>
+            </td>
+            <td>
+            {{#if tutored}}
+                {{len tutored}}
+                <span class="small">
+                    (
+                    {{#each studentsMajor}}
+                        {{this}}
+                    {{/each}}
+                    )
+                    </span>
+            {{else}}
+                -
+            {{/if}}
+            </td>
+            <td>
+                {{#if juries}}
+                    {{len juries}}
+                    <span class="small">
+                    (
+                        {{#each juriesMajor}}
+                            {{this}}
+                        {{/each}}
+                        )
+                    </span>
+                {{else}}
+                    -
+                {{/if}}
+            </td>
+
+        </tr>
+    {{/each}}
+    </tbody>
+</table>
+{{else}}
+    <h5 class="text-center">No tutors</h5>
+{{/if}}
