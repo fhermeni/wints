@@ -21,7 +21,16 @@ function getUser(u) {
 function showDefenses(t) {
     getEmbeddedDefenses(function(data) {
         defenses = JSON.parse(data);
-        console.log(defenses);
+        if (defenses.pool.length > 0) {
+            var p = [];
+            defenses.pool.forEach(function (e) {
+                var c = getConvention(e);
+                p.push(c.Stu)
+            });
+            defenses.pool = p;
+        }
+
+        //console.log(defenses);
         if (typeof(defenses.sessions[0].jury[0].students[0])=="string") {
             console.log("Conversion");
             defenses = embed2(defenses);
