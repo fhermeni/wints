@@ -21,7 +21,7 @@ function getUser(u) {
 function showDefenses(t) {
     getEmbeddedDefenses(function(data) {
         defenses = JSON.parse(data);
-        if (defenses.pool.length > 0) {
+        if (defenses.pool.length > 0 && typeof(defenses.pool[0]) == "string") {
             var p = [];
             defenses.pool.forEach(function (e) {
                 var c = getConvention(e);
@@ -125,7 +125,9 @@ function saveLists() {
         $(l).find("li").each(function (i, s) {
             var e = $(s).attr("data-email");
             if (id == -1) {
-                pool.push(e);
+                console.log(e);
+                console.log(getConvention(e));
+                pool.push(getConvention(e).Stu);
             } else {
                 if (!raw[id]) {
                     raw[id] = [];
