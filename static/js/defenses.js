@@ -391,6 +391,7 @@ function switchVisibility(i) {
         j.removeClass("glyphicon-eye-close").removeClass("late").addClass("glyphicon-eye-open");
         defenses.private[mail] = false;
     }
+    storeDefenses();
 }
 
 function switchVisio(i) {
@@ -403,6 +404,7 @@ function switchVisio(i) {
         j.removeClass("glyphicon-user").addClass("glyphicon-facetime-video");
         defenses.visio[mail] = true;
     }
+    storeDefenses();
 }
 
 function publicDefenses(d) {
