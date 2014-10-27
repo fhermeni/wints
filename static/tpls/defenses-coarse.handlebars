@@ -17,7 +17,7 @@
         <h6>Outsiders</h6>
         <ol class="students" data-jury="-1">
             {{#each pool}}
-                <li data-email="{{this}}">{{slotEntry this}}</li>
+                <li data-email="{{this.P.Email}}">{{slotEntry this}}</li>
             {{/each}}
         </ol>
         </div>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Student dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="static/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="static/css/flat-ui.css">
+    <link rel="stylesheet" href="static/css/style.css">
+    <script src="static/js/jquery-2.1.0.min.js"></script>
+    <script src="static/js/jquery.cookie.js"></script>
+    <script src="static/js/notify.min.js"></script>
+    <script src="static/js/bootstrap.min.js"></script>
+    <script src="static/js/bootstrap-confirmation.js"></script>
+    <script src="static/js/handlebars-v1.3.0.js"></script>
+    <script src="static/js/rest.js"></script>
+    <script src="static/js/profile.js"></script>
+    <script src="static/js/pekeUpload.min.js"></script>
+    <script src="static/js/templates.js"></script>
+    <script src="static/js/student.js"></script>
+</head>
+<body>
+<div class="container">
+    <nav class="navbar navbar-default navbar-embossed navbar-inverse" role="navigation">
+        <div class="container-fluid">
+            <div>
+                <ul id="menu-pages" class="nav navbar-nav navbar-left">
+                    <li><a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-user"></i> <span id="fullname">Fullname</span><b class="caret"></b></a><span class="dropdown-arrow"></span>
+                        <ul class="dropdown-menu" role="menu">
+                            <li><a href="#" onclick="showProfileEditor()"><span class="fui-new"></span> Edit profile</a></li>
+                            <li><a href="api/v1/logout"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="row">
+    <div class="col-md-6 col-md-offset-3">
+    <h3>Company <a class="btn btn-success" onclick="updateCompany()">Update</a></h3>
+    <dl class="dl-horizontal">
+        <dt>Internship subject</dt>
+        <dd>
+            <input id="title" type="text" class="form-control input-sm">
+        </dd>
+        <dt>Company name</dt>
+        <dd>
+            <input id="company-name" type="text" class="form-control input-sm">
+        </dd>
+        <dt>Company website</dt>
+        <dd>
+            <input id="company-www" type="text" class="form-control input-sm">
+        </dd>
+        <dt>Training period</dt>
+        <dd><span id="begin"></span> - <span id="end"></span></dd>
+    </dl>
+    </div>
+    </div>
+
+    <h3>Contacts</h3>
+    <div class="row">
+        <div class="col-md-6">
+        <h4 class="text-center">Company supervisor <a class="btn btn-success" onclick="updateSupervisor()">Update</a></h4>
+            <dl class="dl-horizontal">
+                <dt>Firstname</dt>
+                <dd>
+                    <input id="sup-fn" type="text" class="form-control input-sm">
+                </dd>
+                <dt>Lastname</dt>
+                <dd>
+                    <input id="sup-ln" type="text" class="form-control input-sm">
+                </dd>
+                <dt>Email</dt>
+                <dd>
+                    <input id="sup-email" type="text" class="form-control input-sm">
+                </dd>
+                <dt>Tel</dt>
+                <dd>
+                    <input id="sup-tel" type="text" class="form-control input-sm">
+                </dd>
+            </dl>
+        </div>
+        <div class="col-md-6">
+        <h4 class="text-center">Academic tutor</h4>
+            <dl class="dl-horizontal">
+                <dt>Name</dt>
+                <dd id="tutor-name"></dd>
+                <dt>Tel</dt>
+                <dd id="tutor-tel"></dd>
+            </dl>
+        </div>
+    </div>
+
+    <h3>Reports</h3>
+    <ul>
+        <li>Reports must be uploaded as PDF file (10 MB max.)</li>
+        <li><a href="/static/docs/consignesRapports.pdf">Writing guide (in french)</a></li>
+    </ul>
+    <p></p>
+    <div class="row">
+        <div class="col-md-4">
+            <h4 class="text-center">Initial planning</h4>
+            <dl class="dl-horizontal">
+                <dt>Due date</dt>
+                <dd id="deadline-planning"></dd>
+            </dl>
+            <div class="text-center">
+            <button id='dl-planning' class='btn btn-success'><i class='glyphicon glyphicon-cloud-download'></i> Download</button>
+            <input type="file" id="up-planning" name="up-planning" style="display: none;">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <h4 class="text-center">Midterm report</h4>
+            <dl class="dl-horizontal">
+                <dt>Due date</dt>
+                <dd id="deadline-midterm"></dd>
+                <dt>Grade</dt>
+                <dd id="grade-midterm"></dd>
+            </dl>
+            <div class="text-center">
+            <button id='dl-midterm' class='btn btn-success'><i class='glyphicon glyphicon-cloud-download'></i> Download</button>
+            <input type="file" id="up-midterm" name="up-midterm" style="display: none;">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <h4 class="text-center">Final report</h4>
+            <dl class="dl-horizontal">
+                <dt>Due date</dt>
+                <dd id="deadline-final"></dd>
+                <dt>Grade</dt>
+                <dd id="grade-final"></dd>
+            </dl>
+            <div class="text-center">
+            <button id='dl-final' class='btn btn-success'><i class='glyphicon glyphicon-cloud-download'></i> Download</button>
+            <input type="file" id="up-final" name="up-final" style="display: none;">
+            </div>
+        </div>
+    </div>
+
+    <div id="modal" class="modal fade"></div>
+</div>
+<footer>
+    <div class="container">
+        <p>© University Nice Sophia Antipolis 2013-2014</p>
+    </div>
+</footer>
+</body>
+</html>

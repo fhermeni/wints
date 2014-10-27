@@ -27,29 +27,6 @@ var cfg backend.Config
 
 func report500OnError(w http.ResponseWriter, header string, err error) bool {
 
-	/*
-	errUnknownConvention = errors.New("Unknown convention")
-	errUnknownDefense = errors.New("Unknown defense")
-	errUnknownReport = errors.New("Unknown report")
-	errUserNotFound = errors.New("User not found")
-	errUnknownStudent = errors.New("Unknown student")
-
-	errConventionExists = errors.New("Convention already exists")
-	errDefenseExists = errors.New("The defense already exists")
-	errStudentExists = errors.New("Student already exists")
-	errReportExists = errors.New("Report already exists")
-	errUserExists = errors.New("User already exists")
-
-	errInvalidTutor = errors.New("The new tutor is a student")
-	errUserTutoring = errors.New("The user is tutoring students")
-	errCredentials = errors.New("Incorrect credentials")
-	errNoPendingRequests = errors.New("No password renewable request pending")
-
-
-
-	errInvalidGrade = errors.New("The grade must be between 0 and 20 (inclusive)")
-
-	 */
 	msg := "The operation did not complete. A possible bug"
 	code := http.StatusInternalServerError
 
@@ -75,15 +52,20 @@ func report500OnError(w http.ResponseWriter, header string, err error) bool {
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
-	_, err := backend.ExtractEmail(r)
+	email, err := backend.ExtractEmail(r)
 	if err != nil {
 		http.ServeFile(w, r, "static/login.html")
 	} else {
-		http.Redirect(w, r, "/home", 302)
+		_, err := backend.GetConvention(DB, email)
+		if err == nil {
+			http.Redirect(w, r, "/student", 302)
+		} else {
+			http.Redirect(w, r, "/admin", 302)
+		}
 	}
 }
 
-func homeHandler(w http.ResponseWriter, r *http.Request) {
+func adminHandler(w http.ResponseWriter, r *http.Request) {
 	n, err := backend.ExtractEmail(r)
 	if report500OnError(w, "Unable to get the email from the token", err) {
 		return
@@ -97,6 +79,22 @@ func homeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.ServeFile(w, r, "static/admin.html")
+}
+
+func studentHandler(w http.ResponseWriter, r *http.Request) {
+	n, err := backend.ExtractEmail(r)
+	if report500OnError(w, "Unable to get the email from the token", err) {
+		return
+	}
+	if len(n) == 0 {
+		http.Redirect(w, r, "/", 302)
+		return
+	}
+	_, err = backend.GetUser(DB, n)
+	if report500OnError(w, "No user having email '" + n + "'", err) {
+		return
+	}
+	http.ServeFile(w, r, "static/student.html")
 }
 
 func jsonReply(w http.ResponseWriter, gz bool, j interface{}) {
@@ -452,6 +450,36 @@ func UpdateMark(w http.ResponseWriter, r *http.Request, email string) {
 	report500OnError(w, "", err);
 }
 
+type Company struct {
+	Name string
+	WWW string
+	Title string
+}
+func UpdateCompany(w http.ResponseWriter, r *http.Request, student string) {
+	var c Company
+	if err := jsonRequest(w, r, &c); err != nil {
+		report500OnError(w, "", err)
+		return
+	}
+
+	err := backend.UpdateCompany(DB, student, c.Name, c.WWW, c.Title)
+	if report500OnError(w, "", err) {
+		return
+	}
+}
+
+func UpdateSupervisor(w http.ResponseWriter, r *http.Request, student string) {
+	var u backend.User
+	if err := jsonRequest(w, r, &u); err != nil {
+		report500OnError(w, "", err)
+		return
+	}
+	err:= backend.UpdateSupervisor(DB, student, u)
+	if report500OnError(w, "", err) {
+		return
+	}
+}
+
 func myStudent(w http.ResponseWriter, mine, target string) bool {
 	u, err := backend.GetUser(DB, target);
 	if err != nil {
@@ -542,6 +570,14 @@ func RequireRole(cb func(http.ResponseWriter, *http.Request, string), role strin
 	}
 }
 
+func GetConvention(w http.ResponseWriter, r *http.Request, email string) {
+	c, err := backend.GetConvention(DB, email)
+	if report500OnError(w, "unable to get the convention of '" + email + "'", err) {
+		return
+	}
+	jsonReply(w, true, c)
+}
+
 func main() {
 	cfg, err := backend.ReadConfig("./wints.conf")
 	if err != nil {
@@ -573,8 +609,10 @@ func main() {
 	//Rest stuff
 	r := mux.NewRouter()
 
+	//the dashboards
 	r.HandleFunc("/", rootHandler)
-	r.HandleFunc("/home", homeHandler)
+	r.HandleFunc("/admin", adminHandler)
+	r.HandleFunc("/student", studentHandler)
 
 	//Convention management
 	r.HandleFunc(ROOT_API+"/pending/_random", RequireRole(RandomPendingConvention, "admin")).Methods("GET")
@@ -585,6 +623,12 @@ func main() {
 	r.HandleFunc(ROOT_API+"/conventions/{email}/midterm/mark", MarkKind(UpdateMark, "midterm")).Methods("POST")
 	r.HandleFunc(ROOT_API+"/conventions/{email}/final/mark", MarkKind(UpdateMark, "final")).Methods("POST")
 	r.HandleFunc(ROOT_API+"/conventions/{email}/supReport/mark", MarkKind(UpdateMark, "supReport")).Methods("POST")
+	r.HandleFunc(ROOT_API+"/conventions/{email}/major", RequireRole(UpdateMajor, "major")).Methods("POST")
+
+	//Student stuff
+	r.HandleFunc(ROOT_API+"/convention", RequireToken(GetConvention)).Methods("GET")
+	r.HandleFunc(ROOT_API+"/convention/company", RequireToken(UpdateCompany)).Methods("POST")
+	r.HandleFunc(ROOT_API+"/convention/supervisor", RequireToken(UpdateSupervisor)).Methods("POST")
 
 	//Reports
 	r.HandleFunc(ROOT_API+"/reports/{kind}/", RequireRole(GetReports,"admin")).Methods("GET")

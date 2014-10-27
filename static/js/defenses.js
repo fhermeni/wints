@@ -21,7 +21,16 @@ function getUser(u) {
 function showDefenses(t) {
     getEmbeddedDefenses(function(data) {
         defenses = JSON.parse(data);
-        console.log(defenses);
+        if (defenses.pool.length > 0 && typeof(defenses.pool[0]) == "string") {
+            var p = [];
+            defenses.pool.forEach(function (e) {
+                var c = getConvention(e);
+                p.push(c.Stu)
+            });
+            defenses.pool = p;
+        }
+
+        //console.log(defenses);
         if (typeof(defenses.sessions[0].jury[0].students[0])=="string") {
             console.log("Conversion");
             defenses = embed2(defenses);
@@ -116,7 +125,9 @@ function saveLists() {
         $(l).find("li").each(function (i, s) {
             var e = $(s).attr("data-email");
             if (id == -1) {
-                pool.push(e);
+                console.log(e);
+                console.log(getConvention(e));
+                pool.push(getConvention(e).Stu);
             } else {
                 if (!raw[id]) {
                     raw[id] = [];
@@ -380,6 +391,7 @@ function switchVisibility(i) {
         j.removeClass("glyphicon-eye-close").removeClass("late").addClass("glyphicon-eye-open");
         defenses.private[mail] = false;
     }
+    storeDefenses();
 }
 
 function switchVisio(i) {
@@ -392,6 +404,7 @@ function switchVisio(i) {
         j.removeClass("glyphicon-user").addClass("glyphicon-facetime-video");
         defenses.visio[mail] = true;
     }
+    storeDefenses();
 }
 
 function publicDefenses(d) {

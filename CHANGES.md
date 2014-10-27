@@ -69,7 +69,32 @@ finalReport(_id, cnt)
 ## Version 2.0 ##
 
 - tutor view
+
+
 - student view
+
+Supervisor contact RW
+internship title RW
+
+tutor contact details RO
+dates RO
+
+My Reports
+
+Planning: Deadline, upload/download
+
+Midterm: Deadline, upload/download, grade (click for the comments)
+
+Final: ", ", "
+
+Supervisor observations:
+midterm
+final
+grade
+
+Defense: X,x,x
+
+
 
 ## Version 3.0 ##
 - midterm evaluation

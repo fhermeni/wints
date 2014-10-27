@@ -178,3 +178,13 @@ func UpdateTutor(db *sql.DB, student string, newTutor string)  error {
 	//userNotFound might be the student or the tutor
 	return err
 }
+
+func UpdateCompany(db *sql.DB, stu, name, www, title string) error {
+	return SingleUpdate(db, ErrUnknownConvention,
+		"update internships set company=$2, companywww=$3, title=$4 where student=$1", stu, name, www, title)
+}
+
+func UpdateSupervisor(db *sql.DB, stu string, u User) error {
+	return SingleUpdate(db, ErrUnknownConvention,
+		"update internships set supervisorfn=$2, supervisorln=$3, supervisoremail=$4, supervisortel=$5 where student=$1", stu, u.Firstname, u.Lastname, u.Email, u.Tel)
+}

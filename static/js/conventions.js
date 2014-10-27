@@ -13,7 +13,7 @@ $( document ).ready(function () {
         user = d;
     });
 
-    if (user.Role != "admin") {
+    if (user.Role == "admin" || user.Role =="root") {
         syncGetUsers(function (us) {
             users = us;
         });
