@@ -5,23 +5,40 @@ import (
 	"io/ioutil"
 )
 
-type Config struct {
-	WWWConventionsLogin string
-	WWWConventionsPassword string
-	WWWConventionsURL string
-	RefreshPeriod string
-	MidtermReportDeadline string
-	DBurl string
-	Port int
-	RecaptchaPk string
-	Logfile string
-	SMTPServer string
-	SMTPUsername string
-	SMTPPassword string
-	SMTPSender string
-	WWW string
+type PullerConfig struct {
+	Login string
+	Password string
+	Url string
+	Period string
+}
+
+type MailerConfig struct {
+	Server string
+	Login string
+	Password string
+	Sender string
+}
+
+type DbConfig struct {
+	Url string
+}
+
+type HttpConfig struct {
+	Host string
 	Certificate string
 	PrivateKey string
+}
+
+type ReportsConfig struct {
+	MidtermAfter string
+}
+type Config struct {
+	Puller PullerConfig
+	Reports ReportsConfig	
+	Db DbConfig
+	Mailer MailerConfig
+	Http HttpConfig
+	Logfile string
 }
 
 func Load(path string) (Config, error) {

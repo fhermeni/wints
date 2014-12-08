@@ -272,7 +272,7 @@ func PasswordReset(w http.ResponseWriter, r *http.Request) {
 	err = mailer.Mail([]string{string(email)}, "mails/account_reset.txt", struct {
 				WWW   string
 				Token string
-			}{cfg.WWW, token})
+			}{cfg.Http.Host, token})
 	report500OnError(w, "Unable to send the token for a password reset by mail", err)
 }
 
@@ -583,33 +583,28 @@ func GetConvention(w http.ResponseWriter, r *http.Request, email string) {
 
 func main() {
 	cfg, err := config.Load("./wints.conf")
-	mailer = mail.NewMailer(cfg.SMTPServer, cfg.SMTPUsername, cfg.SMTPPassword, cfg.SMTPSender)
+	mailer = mail.NewMailer(cfg.Mailer.Server, cfg.Mailer.Login, cfg.Mailer.Password, cfg.Mailer.Sender)
 	if err != nil {
 		log.Fatalln("Error while parsing wints.conf: " + err.Error())
 	}
-	dbUrl := os.Getenv("DATABASE_URL")
-
-	if len(dbUrl) == 0 {
-		dbUrl = cfg.DBurl
-	}
-
+	
 	if len(os.Getenv("PORT")) == 0 {
 		log.Fatalln("Missing the env variable $PORT")
 	}
-	DB, err = sql.Open("postgres", dbUrl)
+	DB, err = sql.Open("postgres", cfg.Db.Url)
 	if err != nil {
 		log.Fatalln("Unable to connect to the Database: " + err.Error())
 	}
 	defer DB.Close()
 	for _, v := range os.Args {
 		if v == "-s" {
-			delay, err := time.ParseDuration(cfg.RefreshPeriod)
+			delay, err := time.ParseDuration(cfg.Puller.Period)
 			if err != nil {
 				log.Fatalln("Unable to parse refresh duration: " + err.Error())
 			}
-			backend.DaemonConventionsPuller(DB, cfg.WWWConventionsURL,
-				cfg.WWWConventionsLogin,
-				cfg.WWWConventionsPassword,
+			backend.DaemonConventionsPuller(DB, cfg.Puller.Url,
+				cfg.Puller.Login,
+				cfg.Puller.Password,
 				delay);
 		}
 	}
@@ -666,7 +661,7 @@ func main() {
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", fileHandler))
 	http.Handle("/", r)
 	log.Println("Daemon started")
-	err = http.ListenAndServeTLS(":"+os.Getenv("PORT"), cfg.Certificate, cfg.PrivateKey, nil)
+	err = http.ListenAndServeTLS(":"+os.Getenv("PORT"), cfg.Http.Certificate, cfg.Http.PrivateKey, nil)
 	if err != nil {
 		log.Fatalf("Unable to listen on port " + os.Getenv("PORT") + ": %s\n", err)
 	}
