@@ -588,6 +588,10 @@ func main() {
 	if len(dbUrl) == 0 {
 		dbUrl = cfg.DBurl
 	}
+
+	if len(os.Getenv("PORT")) == 0 {
+		log.Fatalln("Missing the env variable $PORT")
+	}
 	DB, err = sql.Open("postgres", dbUrl)
 	if err != nil {
 		log.Fatalln(err.Error())
