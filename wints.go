@@ -581,7 +581,7 @@ func GetConvention(w http.ResponseWriter, r *http.Request, email string) {
 func main() {
 	cfg, err := backend.ReadConfig("./wints.conf")
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Fatalln("Error while parsing wints.conf: " + err.Error())
 	}
 	dbUrl := os.Getenv("DATABASE_URL")
 
