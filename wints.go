@@ -54,8 +54,7 @@ func report500OnError(w http.ResponseWriter, header string, err error) bool {
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	email, err := backend.ExtractEmail(r)
 	if err != nil {
-		http.ServeFile(w, r, "static/login.html")
-		log.Println("No email: " + err.Error());
+		http.ServeFile(w, r, "static/login.html")		
 	} else {
 		_, err := backend.GetConvention(DB, email)
 		if err == nil {
@@ -595,7 +594,7 @@ func main() {
 	}
 	DB, err = sql.Open("postgres", dbUrl)
 	if err != nil {
-		log.Fatalln(err.Error())
+		log.Fatalln("Unable to connect to the Database: " + err.Error())
 	}
 	defer DB.Close()
 	for _, v := range os.Args {
