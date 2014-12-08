@@ -664,6 +664,6 @@ func main() {
 	log.Println("Daemon started")
 	err = http.ListenAndServeTLS(":"+os.Getenv("PORT"), cfg.Certificate, cfg.PrivateKey, nil)
 	if err != nil {
-		log.Fatalf("Unable to listen on port " + os.GetEnv("PORT") + ": %s\n", err)
+		log.Fatalf("Unable to listen on port " + os.Getenv("PORT") + ": %s\n", err)
 	}
 }
