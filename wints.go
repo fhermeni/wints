@@ -4,6 +4,8 @@ import (
 	_ "github.com/lib/pq"
 	"database/sql"
 	"github.com/fhermeni/wints/backend"
+	"github.com/fhermeni/wints/config"
+	"github.com/fhermeni/wints/mail"
 	"net/http"
 	"github.com/gorilla/mux"
 	"encoding/json"
@@ -23,7 +25,8 @@ const (
 )
 
 var DB *sql.DB
-var cfg backend.Config
+var cfg config.Config
+var mailer mail.Mailer
 
 func report500OnError(w http.ResponseWriter, header string, err error) bool {
 
@@ -266,7 +269,7 @@ func PasswordReset(w http.ResponseWriter, r *http.Request) {
 	if report500OnError(w, "Unable to generate a token for a password reset", err) {
 		return
 	}
-	err = backend.Mail(cfg, []string{string(email)}, "mails/account_reset.txt", struct {
+	err = mailer.Mail([]string{string(email)}, "mails/account_reset.txt", struct {
 				WWW   string
 				Token string
 			}{cfg.WWW, token})
@@ -520,7 +523,7 @@ func GrantRole(w http.ResponseWriter, r *http.Request, email string) {
 	if report500OnError(w, "", err) {
 		return
 	}
-	backend.Mail(cfg, []string{target}, "mails/priv_" + string(role) + ".txt", nil)
+	mailer.Mail([]string{target}, "mails/priv_" + string(role) + ".txt", nil)
 }
 
 func GetReports(w http.ResponseWriter, r *http.Request, email string) {
@@ -579,7 +582,8 @@ func GetConvention(w http.ResponseWriter, r *http.Request, email string) {
 }
 
 func main() {
-	cfg, err := backend.ReadConfig("./wints.conf")
+	cfg, err := config.Load("./wints.conf")
+	mailer = mail.NewMailer(cfg.SMTPServer, cfg.SMTPUsername, cfg.SMTPPassword, cfg.SMTPSender)
 	if err != nil {
 		log.Fatalln("Error while parsing wints.conf: " + err.Error())
 	}

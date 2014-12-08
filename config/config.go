@@ -1,4 +1,4 @@
-package backend
+package config
 
 import (
 	"encoding/json"
@@ -24,7 +24,7 @@ type Config struct {
 	PrivateKey string
 }
 
-func ReadConfig(path string) (Config, error) {
+func Load(path string) (Config, error) {
 	var c Config
  	cnt, err := ioutil.ReadFile(path)
 	if err != nil {

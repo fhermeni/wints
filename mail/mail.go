@@ -1,4 +1,4 @@
-package backend
+package mail
 
 import (
 	"text/template"
@@ -10,7 +10,24 @@ import (
 	"io/ioutil"
 )
 
-func Mail(cfg Config, to []string, input string, data interface{}) error {
+type Mailer struct {
+	server string
+	username string
+	password string
+	sender string
+}
+
+func NewMailer(srv, login, passwd, emitter string) Mailer {
+	m := Mailer{
+		server: srv,
+		username: login,
+		password: passwd,
+		sender: emitter,
+	}
+	return m
+}
+
+func (m *Mailer) Mail(to []string, input string, data interface{}) error {
 
 	var out []byte
 
@@ -29,17 +46,17 @@ func Mail(cfg Config, to []string, input string, data interface{}) error {
 		out = b.Bytes()
 	}
 
-	hostname,_,err := net.SplitHostPort(cfg.SMTPServer)
+	hostname,_,err := net.SplitHostPort(m.server)
 	if err != nil {
 		return err
 	}
-	auth := smtp.PlainAuth("", cfg.SMTPUsername, cfg.SMTPPassword, hostname)
+	auth := smtp.PlainAuth("", m.username, m.password, hostname)
 	tls := &tls.Config{ServerName: hostname, InsecureSkipVerify: true}
 	go func() {
-		err := SendMail(cfg.SMTPServer,
+		err := sendMail(m.server,
 			auth,
 			tls,
-			cfg.SMTPSender, to,
+			m.sender, to,
 			out)
 		if err != nil {
 			log.Printf("Unable to send a mail: %s\n", err.Error())
@@ -49,7 +66,7 @@ func Mail(cfg Config, to []string, input string, data interface{}) error {
 }
 
 
-func SendMail(addr string, a smtp.Auth, tlsCfg *tls.Config, from string, to []string, msg []byte) error {
+func sendMail(addr string, a smtp.Auth, tlsCfg *tls.Config, from string, to []string, msg []byte) error {
 	c, err := smtp.Dial(addr)
 	if err != nil {
 		return err
