@@ -601,7 +601,7 @@ func main() {
 		if v == "-s" {
 			delay, err := time.ParseDuration(cfg.RefreshPeriod)
 			if err != nil {
-				log.Fatalln(err.Error())
+				log.Fatalln("Unable to parse refresh duration: " + err.Error())
 			}
 			backend.DaemonConventionsPuller(DB, cfg.WWWConventionsURL,
 				cfg.WWWConventionsLogin,
@@ -664,6 +664,6 @@ func main() {
 	log.Println("Daemon started")
 	err = http.ListenAndServeTLS(":"+os.Getenv("PORT"), cfg.Certificate, cfg.PrivateKey, nil)
 	if err != nil {
-		log.Fatalf("%s\n", err)
+		log.Fatalf("Unable to listen on port " + os.GetEnv("PORT") + ": %s\n", err)
 	}
 }
