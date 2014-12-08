@@ -20,6 +20,8 @@ type Config struct {
 	SMTPPassword string
 	SMTPSender string
 	WWW string
+	Certificate string
+	PrivateKey string
 }
 
 func ReadConfig(path string) (Config, error) {

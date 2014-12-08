@@ -55,6 +55,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	email, err := backend.ExtractEmail(r)
 	if err != nil {
 		http.ServeFile(w, r, "static/login.html")
+		log.Println("No email: " + err.Error());
 	} else {
 		_, err := backend.GetConvention(DB, email)
 		if err == nil {
@@ -662,7 +663,7 @@ func main() {
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", fileHandler))
 	http.Handle("/", r)
 	log.Println("Daemon started")
-	err = http.ListenAndServe(":"+os.Getenv("PORT"), nil)
+	err = http.ListenAndServeTLS(":"+os.Getenv("PORT"), cfg.Certificate, cfg.PrivateKey, nil)
 	if err != nil {
 		log.Fatalf("%s\n", err)
 	}
