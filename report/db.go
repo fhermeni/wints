@@ -62,47 +62,25 @@ func (s *DbService) SetDeadline(kind, email string, t time.Time) error {
 	return db.SingleUpdate(s.db, ErrUnknown, sql, email, kind, t)
 }
 
-/*
-func (s *DbService) Tar(us *UserService, kind string, emails [] string) ([]byte, error) {
-	buf := new(bytes.Buffer)
-	tw := tar.NewWriter(buf)
-	var missing string
-	for _, student := range emails {
-		c, err := user.Get(s.db, student)
-		if err != nil {
-			return []byte{}, err
-		}
-		report, err := s.Content(student, kind)
-		if err != nil {
-			missing = missing + c.Fullname() + "\n";
-			continue;			
-		}
-		hdr := &tar.Header{
-			Name: c.Lastname + "-" + kind + ".pdf",
-			Mode: 0644,
-			Size: int64(len(report))}
-		if err := tw.WriteHeader(hdr); err != nil {
-			return []byte{}, err
-		}
-		if _, err := tw.Write(report); err != nil {
-			return []byte{}, err
-		}
+func (s *DbService) List(email string) ([]MetaData, error) {
+	q := "select deadline, grade, kind from reports where student=$1"
+	rows, err := s.db.Query(q, email)
+	reports := make([]MetaData, 0, 0)
+	if err != nil {
+		return reports, err
 	}
-	if len(missing) > 0 {
-		hdr := &tar.Header{
-			Name: "missing_reports.txt",
-			Mode: 0644,
-			Size: int64(len(missing))}
-		if err := tw.WriteHeader(hdr); err != nil {
-			return []byte{}, err
+	defer rows.Close()
+	var date time.Time
+	var grade sql.NullInt64
+	var kind string
+
+	for rows.Next() {
+		rows.Scan(&date, &grade, &kind)
+		if !grade.Valid {
+			grade.Int64 = -1
 		}
-		if _, err := tw.Write([]byte(missing)); err != nil {
-			return []byte{}, err
-		}
+		m := MetaData{kind, email, date, int(grade.Int64)}
+		reports = append(reports, m)
 	}
-	if err := tw.Close(); err != nil {
-		return []byte{}, err
-	}
-	return buf.Bytes(), nil	
+	return reports, nil
 }
-*/

@@ -30,4 +30,5 @@ type ReportService interface {
 	SetContent(kind, email string, cnt []byte) error
 	SetGrade(kind, email string, r int) error
 	SetDeadline(kind, email string, t time.Time) error	
+	List(email string) ([]MetaData, error)
 }
