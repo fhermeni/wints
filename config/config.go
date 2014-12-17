@@ -6,17 +6,17 @@ import (
 )
 
 type PullerConfig struct {
-	Login string
+	Login    string
 	Password string
-	Url string
-	Period string
+	Url      string
+	Period   string
 }
 
 type MailerConfig struct {
-	Server string
-	Login string
+	Server   string
+	Login    string
 	Password string
-	Sender string
+	Sender   string
 }
 
 type DbConfig struct {
@@ -24,26 +24,26 @@ type DbConfig struct {
 }
 
 type HttpConfig struct {
-	Host string
+	Host        string
 	Certificate string
-	PrivateKey string
+	PrivateKey  string
 }
 
 type ReportsConfig struct {
 	MidtermAfter string
 }
 type Config struct {
-	Puller PullerConfig
-	Reports ReportsConfig	
-	Db DbConfig
-	Mailer MailerConfig
-	Http HttpConfig
+	Puller  PullerConfig
+	Reports ReportsConfig
+	Db      DbConfig
+	Mailer  MailerConfig
+	Http    HttpConfig
 	Logfile string
 }
 
 func Load(path string) (Config, error) {
 	var c Config
- 	cnt, err := ioutil.ReadFile(path)
+	cnt, err := ioutil.ReadFile(path)
 	if err != nil {
 		return c, err
 	}

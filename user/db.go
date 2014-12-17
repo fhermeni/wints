@@ -1,9 +1,9 @@
-package user;
+package user
 
-import (	
-	"database/sql"	
+import (
+	"code.google.com/p/go.crypto/bcrypt"
+	"database/sql"
 	"github.com/fhermeni/wints/db"
-	"code.google.com/p/go.crypto/bcrypt"	
 	"time"
 )
 
@@ -41,7 +41,7 @@ func (s *DbService) Get(email string) (User, error) {
 	if err != nil {
 		return User{}, ErrNotFound
 	}
-	return User{fn, ln, email, tel, role}, nil	
+	return User{fn, ln, email, tel, role}, nil
 }
 
 func (s *DbService) GetByRole(p string) ([]User, error) {
@@ -66,7 +66,7 @@ func (s *DbService) SetPassword(email string, oldP, newP []byte) error {
 	if err := s.db.QueryRow("select password from users where email=$1", email).Scan(&p); err != nil {
 		return ErrCredentials
 	}
-	if (bcrypt.CompareHashAndPassword(p, oldP) != nil) {
+	if bcrypt.CompareHashAndPassword(p, oldP) != nil {
 		return ErrCredentials
 	}
 
@@ -108,11 +108,11 @@ func (s *DbService) NewPassword(token string, newP []byte) (string, error) {
 	return email, err
 }
 
-func (s *DbService) Rm(email string) error {	
-	return SingleUpdate(db, ErrUserNotFound, "DELETE FROM users where email=$1", email)
+func (s *DbService) Rm(email string) error {
+	return db.SingleUpdate(s.db, ErrNotFound, "DELETE FROM users where email=$1", email)
 }
 
-func (s *DbService) PasswordRenewalRequest(email string) (string, error) {
+func (s *DbService) ResetPassword(email string) (string, error) {
 	//In case a request already exists
 	s.db.QueryRow("delete from password_renewal where email=$1", email)
 	token := rand_str(32)
@@ -122,5 +122,5 @@ func (s *DbService) PasswordRenewalRequest(email string) (string, error) {
 		//Not very sure, might be a SQL error or a connexion error as well.
 		return "", ErrNotFound
 	}
- 	return token, err
+	return token, err
 }

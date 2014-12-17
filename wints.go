@@ -1,23 +1,23 @@
 package main
 
 import (
-	_ "github.com/lib/pq"
+	"bytes"
+	"compress/gzip"
 	"database/sql"
+	"encoding/json"
 	"github.com/fhermeni/wints/backend"
 	"github.com/fhermeni/wints/config"
 	"github.com/fhermeni/wints/mail"
-	"net/http"
 	"github.com/gorilla/mux"
-	"encoding/json"
+	_ "github.com/lib/pq"
+	"io/ioutil"
 	"log"
+	"math/rand"
+	"net/http"
 	"os"
 	"strconv"
-	"math/rand"
-	"io/ioutil"
-	"compress/gzip"
-	"time"
 	"strings"
-	"bytes"
+	"time"
 )
 
 const (
@@ -34,7 +34,7 @@ func report500OnError(w http.ResponseWriter, header string, err error) bool {
 	code := http.StatusInternalServerError
 
 	if err != nil {
-		switch (err) {
+		switch err {
 		case backend.ErrUnknownConvention, backend.ErrUnknownDefense, backend.ErrUnknownStudent, backend.ErrUserNotFound, backend.ErrUnknownReport:
 			code = http.StatusNotFound
 			msg = err.Error()
@@ -45,7 +45,7 @@ func report500OnError(w http.ResponseWriter, header string, err error) bool {
 			code = http.StatusForbidden
 			msg = err.Error()
 		default:
-			log.Printf("%s: %s\n", header, err.Error());
+			log.Printf("%s: %s\n", header, err.Error())
 		}
 		http.Error(w, msg, code)
 
@@ -57,7 +57,7 @@ func report500OnError(w http.ResponseWriter, header string, err error) bool {
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	email, err := backend.ExtractEmail(r)
 	if err != nil {
-		http.ServeFile(w, r, "static/login.html")		
+		http.ServeFile(w, r, "static/login.html")
 	} else {
 		_, err := backend.GetConvention(DB, email)
 		if err == nil {
@@ -78,7 +78,7 @@ func adminHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	_, err = backend.GetUser(DB, n)
-	if report500OnError(w, "No user having email '" + n + "'", err) {
+	if report500OnError(w, "No user having email '"+n+"'", err) {
 		return
 	}
 	http.ServeFile(w, r, "static/admin.html")
@@ -94,7 +94,7 @@ func studentHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	_, err = backend.GetUser(DB, n)
-	if report500OnError(w, "No user having email '" + n + "'", err) {
+	if report500OnError(w, "No user having email '"+n+"'", err) {
 		return
 	}
 	http.ServeFile(w, r, "static/student.html")
@@ -106,7 +106,7 @@ func jsonReply(w http.ResponseWriter, gz bool, j interface{}) {
 		w.Header().Set("Content-Encoding", "gzip")
 	}
 	var err error
-	if (gz) {
+	if gz {
 		var w2 *gzip.Writer
 		w2 = gzip.NewWriter(w)
 		defer w2.Close()
@@ -121,9 +121,9 @@ func jsonReply(w http.ResponseWriter, gz bool, j interface{}) {
 
 func fileReply(w http.ResponseWriter, mime, filename string, cnt []byte) {
 	w.Header().Set("Content-type", mime)
-	w.Header().Set("Content-disposition", "attachment; filename=" + filename)
+	w.Header().Set("Content-disposition", "attachment; filename="+filename)
 	_, err := w.Write(cnt)
-	report500OnError(w, "Unable to serve file '" + filename + "'", err)
+	report500OnError(w, "Unable to serve file '"+filename+"'", err)
 }
 
 func jsonRequest(w http.ResponseWriter, r *http.Request, j interface{}) error {
@@ -144,7 +144,7 @@ func RandomPendingConvention(w http.ResponseWriter, r *http.Request, email strin
 		jsonReply(w, false, PendingConventionMsg{backend.Convention{}, nil, 0})
 		return
 	}
-	c := cc[rand.Intn(nb)];
+	c := cc[rand.Intn(nb)]
 	known, err := backend.Admins(DB)
 	if report500OnError(w, "Unable to get the possible tutors", err) {
 		return
@@ -159,7 +159,6 @@ func GetAllConventions(w http.ResponseWriter, r *http.Request, email string) {
 	}
 	jsonReply(w, true, conventions)
 }
-
 
 func GetAdmins(w http.ResponseWriter, r *http.Request, email string) {
 	admins, err := backend.Admins(DB)
@@ -176,14 +175,14 @@ func NewAdmin(w http.ResponseWriter, r *http.Request, email string) {
 		return
 	}
 	_, err = backend.NewUser(DB, nu)
-	if report500OnError(w, "Unable to create the user " + nu.String(), err) {
+	if report500OnError(w, "Unable to create the user "+nu.String(), err) {
 		return
 	}
 }
 
 func GetUser(w http.ResponseWriter, r *http.Request, email string) {
 	u, err := backend.GetUser(DB, email)
-	if report500OnError(w, "Unable to get user '" + email + "'", err) {
+	if report500OnError(w, "Unable to get user '"+email+"'", err) {
 		return
 	}
 	jsonReply(w, false, u)
@@ -192,29 +191,29 @@ func GetUser(w http.ResponseWriter, r *http.Request, email string) {
 func RmUser(w http.ResponseWriter, r *http.Request, email string) {
 	target, _ := mux.Vars(r)["email"]
 	err := backend.RmUser(DB, target)
-	if report500OnError(w, "Unable to remove user '" + email + "'", err) {
+	if report500OnError(w, "Unable to remove user '"+email+"'", err) {
 		return
 	}
 }
 
 func GetDefense(w http.ResponseWriter, r *http.Request) {
 	fmt := r.FormValue("fmt")
-	if (len(fmt) == 0) {
+	if len(fmt) == 0 {
 		fmt = "embedded"
 	}
 	var cnt string
 	var err error
-	switch (fmt) {
+	switch fmt {
 	case "public":
 		cnt, err = backend.LongDefense(DB, "si/ifi")
 	case "embedded":
 		email, _ := backend.ExtractEmail(r)
-		if (len(email) == 0) {
+		if len(email) == 0 {
 			http.Redirect(w, r, "/", 302)
-	    	return
+			return
 		}
 		u, err := backend.GetUser(DB, email)
-		if report500OnError(w, "Unknown user '" + email + "'", err) {
+		if report500OnError(w, "Unknown user '"+email+"'", err) {
 			return
 		}
 		if u.CompatibleRole("admin") {
@@ -229,7 +228,7 @@ func GetDefense(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Encoding", "gzip")
 	w2 := gzip.NewWriter(w)
 	defer w2.Close()
-	_, err = w2.Write([]byte(cnt));
+	_, err = w2.Write([]byte(cnt))
 	report500OnError(w, "Unable to send the defense content", err)
 }
 
@@ -253,11 +252,11 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	password := r.PostFormValue("password")
 	_, err := backend.Register(DB, login, password)
 	if err != nil {
-		http.Redirect(w, r, "/#badLogin", 302);
+		http.Redirect(w, r, "/#badLogin", 302)
 		return
 	}
 	backend.SetSession(login, w)
-	http.Redirect(w, r, "/", 302);
+	http.Redirect(w, r, "/", 302)
 }
 
 func PasswordReset(w http.ResponseWriter, r *http.Request) {
@@ -270,15 +269,15 @@ func PasswordReset(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	err = mailer.Mail([]string{string(email)}, "mails/account_reset.txt", struct {
-				WWW   string
-				Token string
-			}{cfg.Http.Host, token})
+		WWW   string
+		Token string
+	}{cfg.Http.Host, token})
 	report500OnError(w, "Unable to send the token for a password reset by mail", err)
 }
 
 func Logout(w http.ResponseWriter, r *http.Request, email string) {
-	backend.ClearSession(w);
-	http.Redirect(w, r, "/", 302);
+	backend.ClearSession(w)
+	http.Redirect(w, r, "/", 302)
 }
 
 func CommitPendingConvention(w http.ResponseWriter, r *http.Request, email string) {
@@ -295,13 +294,12 @@ func CommitPendingConvention(w http.ResponseWriter, r *http.Request, email strin
 			return
 		}
 	}
-	err = backend.RegisterInternship(DB, c, true);
+	err = backend.RegisterInternship(DB, c, true)
 	if report500OnError(w, "Unable to register the internship", err) {
 		return
 	}
 	backend.RescanPending(DB, c)
 }
-
 
 func ChangeProfile(w http.ResponseWriter, r *http.Request, email string) {
 	var p backend.User
@@ -313,7 +311,7 @@ func ChangeProfile(w http.ResponseWriter, r *http.Request, email string) {
 		return
 	}
 	u, err := backend.GetUser(DB, email)
-	if report500OnError(w, "Unable to get user '" + email +"'", err) {
+	if report500OnError(w, "Unable to get user '"+email+"'", err) {
 		return
 	}
 	jsonReply(w, false, u)
@@ -343,13 +341,12 @@ func NewPassword(w http.ResponseWriter, r *http.Request) {
 	}
 	_, err = backend.Register(DB, email, password)
 	if err != nil {
-		http.Redirect(w, r, "/#badLogin", 302);
+		http.Redirect(w, r, "/#badLogin", 302)
 		return
 	}
 	backend.SetSession(email, w)
-	http.Redirect(w, r, "/", 302);
+	http.Redirect(w, r, "/", 302)
 }
-
 
 func UpdateMajor(w http.ResponseWriter, r *http.Request, email string) {
 	target, _ := mux.Vars(r)["email"]
@@ -358,7 +355,7 @@ func UpdateMajor(w http.ResponseWriter, r *http.Request, email string) {
 		return
 	}
 	err = backend.SetMajor(DB, target, string(m))
-	if report500OnError(w, "Unable to update the major of '" + target + "' to " + string(m), err) {
+	if report500OnError(w, "Unable to update the major of '"+target+"' to "+string(m), err) {
 		return
 	}
 }
@@ -389,14 +386,13 @@ func UpdateTutor(w http.ResponseWriter, r *http.Request, email string) {
 	jsonReply(w, false, c)
 }
 
-
 func MarkKind(cb func(http.ResponseWriter, *http.Request, string), kind string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cb(w, r, kind)
 	}
 }
 
-func GetReport(w http.ResponseWriter, r *http.Request, email string)  {
+func GetReport(w http.ResponseWriter, r *http.Request, email string) {
 	kind, _ := mux.Vars(r)["kind"]
 	student := mux.Vars(r)["student"]
 	cnt, err := backend.Report(DB, student, kind)
@@ -404,7 +400,7 @@ func GetReport(w http.ResponseWriter, r *http.Request, email string)  {
 		return
 	}
 	u, _ := backend.GetUser(DB, student)
-	fileReply(w, "application/pdf", u.Lastname + "-" + kind + ".pdf", cnt)
+	fileReply(w, "application/pdf", u.Lastname+"-"+kind+".pdf", cnt)
 }
 
 func UploadReport(w http.ResponseWriter, r *http.Request, email string) {
@@ -420,7 +416,6 @@ func UploadReport(w http.ResponseWriter, r *http.Request, email string) {
 	}
 }
 
-
 func UpdateDeadline(w http.ResponseWriter, r *http.Request, email string) {
 	kind, _ := mux.Vars(r)["kind"]
 	student := mux.Vars(r)["student"]
@@ -434,7 +429,7 @@ func UpdateDeadline(w http.ResponseWriter, r *http.Request, email string) {
 	}
 
 	err = backend.UpdateDeadline(DB, student, kind, t)
-	report500OnError(w, "", err);
+	report500OnError(w, "", err)
 }
 
 func UpdateMark(w http.ResponseWriter, r *http.Request, email string) {
@@ -450,14 +445,15 @@ func UpdateMark(w http.ResponseWriter, r *http.Request, email string) {
 		return
 	}
 	err = backend.UpdateGrade(DB, student, kind, i)
-	report500OnError(w, "", err);
+	report500OnError(w, "", err)
 }
 
 type Company struct {
-	Name string
-	WWW string
+	Name  string
+	WWW   string
 	Title string
 }
+
 func UpdateCompany(w http.ResponseWriter, r *http.Request, student string) {
 	var c Company
 	if err := jsonRequest(w, r, &c); err != nil {
@@ -477,14 +473,14 @@ func UpdateSupervisor(w http.ResponseWriter, r *http.Request, student string) {
 		report500OnError(w, "", err)
 		return
 	}
-	err:= backend.UpdateSupervisor(DB, student, u)
+	err := backend.UpdateSupervisor(DB, student, u)
 	if report500OnError(w, "", err) {
 		return
 	}
 }
 
 func myStudent(w http.ResponseWriter, mine, target string) bool {
-	u, err := backend.GetUser(DB, target);
+	u, err := backend.GetUser(DB, target)
 	if err != nil {
 		return false
 	}
@@ -523,7 +519,7 @@ func GrantRole(w http.ResponseWriter, r *http.Request, email string) {
 	if report500OnError(w, "", err) {
 		return
 	}
-	mailer.Mail([]string{target}, "mails/priv_" + string(role) + ".txt", nil)
+	mailer.Mail([]string{target}, "mails/priv_"+string(role)+".txt", nil)
 }
 
 func GetReports(w http.ResponseWriter, r *http.Request, email string) {
@@ -542,13 +538,13 @@ func GetReports(w http.ResponseWriter, r *http.Request, email string) {
 	w2 := gzip.NewWriter(&b)
 	w2.Write(cnt)
 	w2.Close()
-	fileReply(w, "application/x-tar", "reports-" + kind + ".tar.gz", b.Bytes())
+	fileReply(w, "application/x-tar", "reports-"+kind+".tar.gz", b.Bytes())
 }
 
 func RequireToken(cb func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		n, _ := backend.ExtractEmail(r)
-		if (len(n) == 0) {
+		if len(n) == 0 {
 			http.Redirect(w, r, "/", 302)
 			return
 		}
@@ -559,7 +555,7 @@ func RequireToken(cb func(http.ResponseWriter, *http.Request, string)) http.Hand
 func RequireRole(cb func(http.ResponseWriter, *http.Request, string), role string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		email, _ := backend.ExtractEmail(r)
-		if (len(email) == 0) {
+		if len(email) == 0 {
 			http.Redirect(w, r, "/", 302)
 			return
 		}
@@ -575,7 +571,7 @@ func RequireRole(cb func(http.ResponseWriter, *http.Request, string), role strin
 
 func GetConvention(w http.ResponseWriter, r *http.Request, email string) {
 	c, err := backend.GetConvention(DB, email)
-	if report500OnError(w, "unable to get the convention of '" + email + "'", err) {
+	if report500OnError(w, "unable to get the convention of '"+email+"'", err) {
 		return
 	}
 	jsonReply(w, true, c)
@@ -587,7 +583,7 @@ func main() {
 	if err != nil {
 		log.Fatalln("Error while parsing wints.conf: " + err.Error())
 	}
-	
+
 	if len(os.Getenv("PORT")) == 0 {
 		log.Fatalln("Missing the env variable $PORT")
 	}
@@ -605,7 +601,7 @@ func main() {
 			backend.DaemonConventionsPuller(DB, cfg.Puller.Url,
 				cfg.Puller.Login,
 				cfg.Puller.Password,
-				delay);
+				delay)
 		}
 	}
 
@@ -634,7 +630,7 @@ func main() {
 	r.HandleFunc(ROOT_API+"/convention/supervisor", RequireToken(UpdateSupervisor)).Methods("POST")
 
 	//Reports
-	r.HandleFunc(ROOT_API+"/reports/{kind}/", RequireRole(GetReports,"admin")).Methods("GET")
+	r.HandleFunc(ROOT_API+"/reports/{kind}/", RequireRole(GetReports, "admin")).Methods("GET")
 	r.HandleFunc(ROOT_API+"/reports/{kind}/{student}/document", RequireToken(GetReport)).Methods("GET")
 	r.HandleFunc(ROOT_API+"/reports/{kind}/{student}/document", RequireToken(UploadReport)).Methods("POST")
 	r.HandleFunc(ROOT_API+"/reports/{kind}/{student}/deadline", RequireToken(UpdateDeadline)).Methods("POST")
@@ -663,6 +659,6 @@ func main() {
 	log.Println("Daemon started")
 	err = http.ListenAndServeTLS(":"+os.Getenv("PORT"), cfg.Http.Certificate, cfg.Http.PrivateKey, nil)
 	if err != nil {
-		log.Fatalf("Unable to listen on port " + os.Getenv("PORT") + ": %s\n", err)
+		log.Fatalf("Unable to listen on port "+os.Getenv("PORT")+": %s\n", err)
 	}
 }

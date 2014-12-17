@@ -1,19 +1,19 @@
 package backend
 
 import (
-	_ "github.com/lib/pq"
-	"database/sql"
-	"errors"
 	"code.google.com/p/go.crypto/bcrypt"
 	"crypto/rand"
+	"database/sql"
+	"errors"
+	_ "github.com/lib/pq"
 	"time"
 )
 
 var (
-	ErrUserExists = errors.New("User already exists")
-	ErrUserNotFound = errors.New("User not found")
-	ErrUserTutoring = errors.New("The user is tutoring students")
-	ErrCredentials = errors.New("Incorrect credentials")
+	ErrUserExists        = errors.New("User already exists")
+	ErrUserNotFound      = errors.New("User not found")
+	ErrUserTutoring      = errors.New("The user is tutoring students")
+	ErrCredentials       = errors.New("Incorrect credentials")
 	ErrNoPendingRequests = errors.New("No password renewable request pending")
 )
 
@@ -22,24 +22,24 @@ type User struct {
 	Lastname  string
 	Email     string
 	Tel       string
-	Role	  string
+	Role      string
 }
 
 func (p User) String() string {
-	return p.Firstname + " " + p.Lastname + " (" + p.Email + ")";
+	return p.Firstname + " " + p.Lastname + " (" + p.Email + ")"
 }
 
 func (p User) CompatibleRole(r string) bool {
-	if (p.Role == "root") {
+	if p.Role == "root" {
 		return true
 	}
 	if p.Role == "admin" && r != "root" {
-		return true;
+		return true
 	}
 	if p.Role == "major" && r == "major" {
-		return true;
+		return true
 	}
-	return false;
+	return false
 }
 
 func Register(db *sql.DB, email, password string) (User, error) {
@@ -53,7 +53,7 @@ func Register(db *sql.DB, email, password string) (User, error) {
 	return User{fn, ln, email, tel, r}, nil
 }
 
-func NewUser(db *sql.DB, p User) (string,error) {
+func NewUser(db *sql.DB, p User) (string, error) {
 	newPassword := rand_str(64) //Hard to guess
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.MinCost)
 	if err != nil {
@@ -61,7 +61,7 @@ func NewUser(db *sql.DB, p User) (string,error) {
 	}
 	_, err = db.Exec("insert into users(email, firstname, lastname, tel, password, role) values ($1,$2,$3,$4,$5,$6)", p.Email, p.Firstname, p.Lastname, p.Tel, hashedPassword, p.Role)
 	if err != nil {
-		return "", ErrUserExists;
+		return "", ErrUserExists
 	}
 	token, err := PasswordRenewalRequest(db, p.Email)
 	return token, err
@@ -72,7 +72,7 @@ func RmUser(db *sql.DB, email string) error {
 	if err != nil {
 		return err
 	}
-	if (ok) {
+	if ok {
 		return ErrUserTutoring
 	}
 	return SingleUpdate(db, ErrUserNotFound, "DELETE FROM users where email=$1", email)
@@ -119,7 +119,7 @@ func ChangePassword(db *sql.DB, email string, oldPassword, newPassword []byte) e
 	if err := db.QueryRow("select password from users where email=$1", email).Scan(&p); err != nil {
 		return ErrCredentials
 	}
-	if (bcrypt.CompareHashAndPassword(p, oldPassword) != nil) {
+	if bcrypt.CompareHashAndPassword(p, oldPassword) != nil {
 		return ErrCredentials
 	}
 
@@ -152,7 +152,7 @@ func PasswordRenewalRequest(db *sql.DB, email string) (string, error) {
 		//Not very sure, might be a SQL error or a connexion error as well.
 		return "", ErrUserNotFound
 	}
- 	return token, err
+	return token, err
 }
 
 func NewPassword(db *sql.DB, token string, newPassword []byte) (string, error) {

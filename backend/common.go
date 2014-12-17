@@ -3,14 +3,14 @@ package backend
 import "database/sql"
 
 const (
-	CONFLICT = iota
+	CONFLICT  = iota
 	DUPLICATE = iota
-	MISSING = iota
+	MISSING   = iota
 )
 
 type WintsError struct {
 	Kind int
-	Err error
+	Err  error
 }
 
 func (w *WintsError) Error() string {

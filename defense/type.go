@@ -1,5 +1,4 @@
-package defense;
-
+package defense
 
 import (
 	"errors"
@@ -7,7 +6,7 @@ import (
 
 var (
 	ErrUnknown = errors.New("Unknown defense")
-	ErrExists = errors.New("The defense already exists")
+	ErrExists  = errors.New("The defense already exists")
 )
 
 type DefenseService interface {

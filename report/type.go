@@ -1,22 +1,22 @@
-package report;
+package report
 
 import (
-	"time"	
-	"errors"	
+	"errors"
+	"time"
 )
 
 var (
-	ErrExists = errors.New("Report already exists")
-	ErrUnknown = errors.New("Unknown report")
+	ErrExists       = errors.New("Report already exists")
+	ErrUnknown      = errors.New("Unknown report")
 	ErrInvalidGrade = errors.New("The grade must be between 0 and 20 (inclusive)")
+	ErrConflict     = errors.New("The report has not been uploaded")
 )
 
-
 type MetaData struct {
-	Kind string
-	Email string
+	Kind     string
+	Email    string
 	Deadline time.Time
-	Grade int	
+	Grade    int
 }
 
 func (m *MetaData) isGraded() bool {
@@ -29,6 +29,6 @@ type ReportService interface {
 	Content(kind, email string) ([]byte, error)
 	SetContent(kind, email string, cnt []byte) error
 	SetGrade(kind, email string, r int) error
-	SetDeadline(kind, email string, t time.Time) error	
+	SetDeadline(kind, email string, t time.Time) error
 	List(email string) ([]MetaData, error)
 }

@@ -1,27 +1,28 @@
 package user
 
 import (
-	"errors"
 	"crypto/rand"
+	"errors"
 )
+
 type User struct {
 	Firstname string
 	Lastname  string
 	Email     string
 	Tel       string
-	Role	  string
+	Role      string
 }
 
 var (
-	ErrExists = errors.New("User already exists")
-	ErrNotFound = errors.New("User not found")
-	ErrUserTutoring = errors.New("The user is tutoring students")
-	ErrCredentials = errors.New("Incorrect credentials")
+	ErrExists            = errors.New("User already exists")
+	ErrNotFound          = errors.New("User not found")
+	ErrUserTutoring      = errors.New("The user is tutoring students")
+	ErrCredentials       = errors.New("Incorrect credentials")
 	ErrNoPendingRequests = errors.New("No password renewable request pending")
 )
 
 func (p User) String() string {
-	return p.Firstname + " " + p.Lastname + " (" + p.Email + ")";
+	return p.Firstname + " " + p.Lastname + " (" + p.Email + ")"
 }
 
 func (p User) Fullname() string {
@@ -33,7 +34,7 @@ type UserService interface {
 	New(p User) error
 	Rm(email string) error
 	Get(email string) (User, error)
-	GetByRole(p string) ([]User, error)
+	List(roles ...string) ([]User, error)
 	SetPassword(email string, oldP, newP []byte) error
 	SetProfile(email, fn, ln, tel string) error
 	SetRole(email, priv string) error

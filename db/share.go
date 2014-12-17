@@ -1,8 +1,9 @@
-package db;
+package db
 
 import (
 	"database/sql"
 )
+
 func SingleUpdate(db *sql.DB, errNoUpdate error, q string, args ...interface{}) error {
 	res, err := db.Exec(q, args...)
 	if err != nil {

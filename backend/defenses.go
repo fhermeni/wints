@@ -7,7 +7,7 @@ import (
 
 var (
 	ErrUnknownDefense = errors.New("Unknown defense")
-	ErrDefenseExists = errors.New("The defense already exists")
+	ErrDefenseExists  = errors.New("The defense already exists")
 )
 
 func Defense(db *sql.DB, id string) (string, error) {
@@ -16,7 +16,7 @@ func Defense(db *sql.DB, id string) (string, error) {
 	return cnt, err
 }
 
-func NewDefense(db *sql.DB, id , cnt string) error {
+func NewDefense(db *sql.DB, id, cnt string) error {
 	return SingleUpdate(db, ErrDefenseExists, "insert into defenses(id, content) values($1,$2)", id, cnt)
 }
 

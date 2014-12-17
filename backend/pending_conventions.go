@@ -1,15 +1,15 @@
 package backend
 
 import (
-	"strings"
-	"net/http"
-	"encoding/csv"
-	"io"
-	"fmt"
-	"time"
-	"strconv"
 	"database/sql"
+	"encoding/csv"
+	"fmt"
+	"io"
 	"log"
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
 )
 
 const (
@@ -23,7 +23,7 @@ const (
 	companyWWW      = 23
 	begin           = 38
 	end             = 39
-	titleIdx		= 50
+	titleIdx        = 50
 	supervisorFn    = 61
 	supervisorLn    = 62
 	supervisorEmail = 63
@@ -35,7 +35,7 @@ const (
 )
 
 func cleanUser(fn, ln, email, tel string) User {
-	return User{cleanName(fn),cleanName(ln),clean(email),clean(tel),""}
+	return User{cleanName(fn), cleanName(ln), clean(email), clean(tel), ""}
 }
 
 func cleanName(str string) string {
@@ -47,7 +47,7 @@ func clean(str string) string {
 }
 
 func CountPending(db *sql.DB) (int, error) {
-	sql := "select count(*) from pending_internships";
+	sql := "select count(*) from pending_internships"
 	var nb int
 	err := db.QueryRow(sql).Scan(&nb)
 	if err != nil {
@@ -57,8 +57,8 @@ func CountPending(db *sql.DB) (int, error) {
 }
 
 func PullConventions(db *sql.DB, url, login, password string) {
-	err := InspectRawConventions2(db,url, login,password,
-						[]string{"Master%20IFI", "Master%20IMAFA", "MAM%205", "SI%205","Master%202%20SSTIM-images"}, time.Now().Year())
+	err := InspectRawConventions2(db, url, login, password,
+		[]string{"Master%20IFI", "Master%20IMAFA", "MAM%205", "SI%205", "Master%202%20SSTIM-images"}, time.Now().Year())
 	if err != nil {
 		log.Printf("Unable to pull the conventions: %s\n", err)
 	}
@@ -72,7 +72,7 @@ func DaemonConventionsPuller(db *sql.DB, url, login, password string, delay time
 		for {
 			select {
 			case <-ticker.C:
-				PullConventions(db, url, login, password);
+				PullConventions(db, url, login, password)
 			case <-quit:
 				ticker.Stop()
 				return
@@ -93,17 +93,17 @@ func ScanPendingConvention(rows *sql.Rows) (Convention, error) {
 	if err != nil {
 		return Convention{}, err
 	}
-	stu := Student{User{stuFn, stuLn, stuEmail, stuTel,""}, promo, ""}
+	stu := Student{User{stuFn, stuLn, stuEmail, stuTel, ""}, promo, ""}
 	tutor := User{tutorFn, tutorLn, tutorEmail, tutorTel, ""}
 	sup := User{supFn, supLn, supEmail, supTel, ""}
-	return Convention{stu, sup, tutor, company, companyWWW, start, end, ReportMetaData{},ReportMetaData{},ReportMetaData{}, title}, nil
+	return Convention{stu, sup, tutor, company, companyWWW, start, end, ReportMetaData{}, ReportMetaData{}, ReportMetaData{}, title}, nil
 }
 
 func GetRawConventions(db *sql.DB) ([]Convention, error) {
 	sql := "select users.firstname, users.lastname, users.email, users.tel, students.promotion, startTime, endTime, tutorFn, " +
-			"tutorLn, tutorEmail, tutorTel, midTermDeadline," +
-			"company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title" +
-			" from pending_internships, users, students where students.email = pending_internships.student and users.email = pending_internships.student"
+		"tutorLn, tutorEmail, tutorTel, midTermDeadline," +
+		"company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title" +
+		" from pending_internships, users, students where students.email = pending_internships.student and users.email = pending_internships.student"
 
 	rows, err := db.Query(sql)
 	cc := make([]Convention, 0, 0)
@@ -118,7 +118,7 @@ func GetRawConventions(db *sql.DB) ([]Convention, error) {
 		}
 		cc = append(cc, c)
 	}
- 	return cc, err;
+	return cc, err
 }
 
 func InspectRawConvention(db *sql.DB, c Convention) error {
@@ -129,7 +129,7 @@ func InspectRawConvention(db *sql.DB, c Convention) error {
 	}
 	err = NewStudent(db, c.Stu)
 	if err != nil {
- 		return err
+		return err
 	}
 
 	tutor := c.Tutor
@@ -142,8 +142,8 @@ func InspectRawConvention(db *sql.DB, c Convention) error {
 
 func RescanPending(db *sql.DB, c Convention) error {
 	sql := "select student, midTermDeadline," +
-			"company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, starttime, endtime, midtermdeadline" +
-			" from pending_internships where tutorEmail=$1"
+		"company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, starttime, endtime, midtermdeadline" +
+		" from pending_internships where tutorEmail=$1"
 	var student, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title string
 	var md, begin, end time.Time
 
@@ -153,7 +153,7 @@ func RescanPending(db *sql.DB, c Convention) error {
 	if err != nil {
 		return err
 	}
-	defer rows.Close();
+	defer rows.Close()
 	for rows.Next() {
 		//All
 		rows.Scan(&student, &md, &company, &companyWWW, &supervisorFn, &supervisorLn, &supervisorEmail, &supervisorTel, &begin, &end, &md, &title)
@@ -180,7 +180,7 @@ func RegisterPendingInternship(db *sql.DB, c Convention) error {
 	return err
 }
 
-func InspectRawConventions2(db *sql.DB, url, login, password string, promotions []string, year int ) error {
+func InspectRawConventions2(db *sql.DB, url, login, password string, promotions []string, year int) error {
 	for _, p := range promotions {
 		err := getRawConventions2(db, url, login, password, year, p)
 		if err != nil {
@@ -236,10 +236,10 @@ func getRawConventions2(db *sql.DB, url, login, password string, year int, promo
 		if len(companyWWW) != 0 && !strings.HasPrefix(companyWWW, "http") {
 			companyWWW = "http://" + companyWWW
 		}
-		c := Convention{stu, supervisor, tutor, clean(record[company]), companyWWW, startTime, endTime, ReportMetaData{},ReportMetaData{}, ReportMetaData{}, title}
+		c := Convention{stu, supervisor, tutor, clean(record[company]), companyWWW, startTime, endTime, ReportMetaData{}, ReportMetaData{}, ReportMetaData{}, title}
 		InspectRawConvention(db, c)
-		nb++;
+		nb++
 	}
-	log.Printf("Parsed %d conventions for promotion %s/%d\n", nb, promotion, year);
+	log.Printf("Parsed %d conventions for promotion %s/%d\n", nb, promotion, year)
 	return nil
 }

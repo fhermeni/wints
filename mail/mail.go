@@ -1,28 +1,28 @@
 package mail
 
 import (
-	"text/template"
-	"net/smtp"
 	"bytes"
 	"crypto/tls"
-	"net"
-	"log"
 	"io/ioutil"
+	"log"
+	"net"
+	"net/smtp"
+	"text/template"
 )
 
 type Mailer struct {
-	server string
+	server   string
 	username string
 	password string
-	sender string
+	sender   string
 }
 
 func NewMailer(srv, login, passwd, emitter string) Mailer {
 	m := Mailer{
-		server: srv,
+		server:   srv,
 		username: login,
 		password: passwd,
-		sender: emitter,
+		sender:   emitter,
 	}
 	return m
 }
@@ -46,7 +46,7 @@ func (m *Mailer) Mail(to []string, input string, data interface{}) error {
 		out = b.Bytes()
 	}
 
-	hostname,_,err := net.SplitHostPort(m.server)
+	hostname, _, err := net.SplitHostPort(m.server)
 	if err != nil {
 		return err
 	}
@@ -64,7 +64,6 @@ func (m *Mailer) Mail(to []string, input string, data interface{}) error {
 	}()
 	return err
 }
-
 
 func sendMail(addr string, a smtp.Auth, tlsCfg *tls.Config, from string, to []string, msg []byte) error {
 	c, err := smtp.Dial(addr)

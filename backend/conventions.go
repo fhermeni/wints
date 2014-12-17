@@ -1,44 +1,43 @@
 package backend
 
 import (
-	"time"
 	"database/sql"
 	"errors"
-	"strconv"
 	"log"
+	"strconv"
+	"time"
 )
 
 type Convention struct {
-	Stu        Student
-	Sup        User
-	Tutor      User
-	Company    string
-	CompanyWWW string
-	Begin      time.Time
-	End        time.Time
+	Stu           Student
+	Sup           User
+	Tutor         User
+	Company       string
+	CompanyWWW    string
+	Begin         time.Time
+	End           time.Time
 	MidtermReport ReportMetaData
-	FinalReport ReportMetaData
-	SupReport ReportMetaData
-	Title	string
+	FinalReport   ReportMetaData
+	SupReport     ReportMetaData
+	Title         string
 }
 
-
 const (
-	TWO_MONTHS = 2*time.Hour*24*30
+	TWO_MONTHS = 2 * time.Hour * 24 * 30
 )
 
 var (
-	ErrUnknownConvention = errors.New("Unknown convention")
-	ErrConventionExists = errors.New("Convention already exists")
-	ErrInvalidTutor = errors.New("The new tutor is a student")
-	allMyConventions *sql.Stmt = nil
-	allConventions *sql.Stmt = nil
+	ErrUnknownConvention           = errors.New("Unknown convention")
+	ErrConventionExists            = errors.New("Convention already exists")
+	ErrInvalidTutor                = errors.New("The new tutor is a student")
+	allMyConventions     *sql.Stmt = nil
+	allConventions       *sql.Stmt = nil
 )
 
 func IsTutoring(db *sql.DB, email string) (bool, error) {
 	rows, err := db.Query("select internships.student,pending_internships.student from internships,pending_internships where tutor=$1", email)
 	if err != nil {
-		return false, err;
+		return false, err
 	}
 	return rows.Next(), nil
 }
@@ -58,7 +57,7 @@ func RegisterInternship(db *sql.DB, c Convention, move bool) error {
 	if err != nil {
 		return err
 	}
-	t, _ := time.Parse("02/01/2006", "01/09/" + strconv.Itoa(time.Now().Year()))
+	t, _ := time.Parse("02/01/2006", "01/09/"+strconv.Itoa(time.Now().Year()))
 	_, err = NewReport(db, c.Stu.P.Email, "final", t)
 	if err != nil {
 		return err
@@ -82,7 +81,7 @@ func scanConvention(db *sql.DB, rows *sql.Rows) (Convention, error) {
 	if err != nil {
 		return Convention{}, err
 	}
-	stu := Student{User{stuFn, stuLn, stuMail, stuTel,""}, promo, major}
+	stu := Student{User{stuFn, stuLn, stuMail, stuTel, ""}, promo, major}
 	tutor := User{tutorFn, tutorLn, tutorEmail, tutorTel, ""}
 	sup := User{supFn, supLn, supEmail, supTel, ""}
 	mid, err := GetReportMetaData(db, stuMail, "midterm")
@@ -102,15 +101,15 @@ func scanConvention(db *sql.DB, rows *sql.Rows) (Convention, error) {
 }
 
 func GetConvention(db *sql.DB, email string) (Convention, error) {
-	sql := "select stu.firstname, stu.lastname, stu.email, stu.tel, students.promotion, students.major, startTime, endTime, tut.firstname, tut.lastname, tut.email, tut.tel,"+
-	"midTermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title "+
-	" from internships, users as stu, users as tut, students where students.email = $1 and stu.email = $1 and internships.student = $1 and tut.email = internships.tutor";
+	sql := "select stu.firstname, stu.lastname, stu.email, stu.tel, students.promotion, students.major, startTime, endTime, tut.firstname, tut.lastname, tut.email, tut.tel," +
+		"midTermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title " +
+		" from internships, users as stu, users as tut, students where students.email = $1 and stu.email = $1 and internships.student = $1 and tut.email = internships.tutor"
 
 	rows, err := db.Query(sql, email)
 	if err != nil {
 		return Convention{}, err
 	}
-	if (!rows.Next()) {
+	if !rows.Next() {
 		return Convention{}, ErrUnknownConvention
 	}
 	return scanConvention(db, rows)
@@ -126,11 +125,11 @@ func GetConventions2(db *sql.DB, emitter string) ([]Convention, error) {
 	var rows *sql.Rows
 	if len(u.Role) == 0 {
 		q = "select stu.firstname, stu.lastname, stu.email, stu.tel, students.promotion, students.major, startTime, endTime, tut.firstname, tut.lastname, tut.email, tut.tel, midTermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title " +
-		" from internships" +
-		" join users as stu on stu.email = internships.student" +
-		" join users as tut on tut.email = internships.tutor" +
-		" join students on students.email = stu.email" +
-		" and tutor=$1"
+			" from internships" +
+			" join users as stu on stu.email = internships.student" +
+			" join users as tut on tut.email = internships.tutor" +
+			" join students on students.email = stu.email" +
+			" and tutor=$1"
 		if allMyConventions == nil {
 			allMyConventions, err = db.Prepare(q)
 		}
@@ -140,10 +139,10 @@ func GetConventions2(db *sql.DB, emitter string) ([]Convention, error) {
 		rows, err = allMyConventions.Query(emitter)
 	} else {
 		q = "select stu.firstname, stu.lastname, stu.email, stu.tel, students.promotion, students.major, startTime, endTime, tut.firstname, tut.lastname, tut.email, tut.tel, midTermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title " +
-		" from internships" +
-		" join users as stu on stu.email = internships.student" +
-		" join users as tut on tut.email = internships.tutor" +
-		" join students on students.email = stu.email"
+			" from internships" +
+			" join users as stu on stu.email = internships.student" +
+			" join users as tut on tut.email = internships.tutor" +
+			" join students on students.email = stu.email"
 		if allConventions == nil {
 			allConventions, err = db.Prepare(q)
 		}
@@ -167,7 +166,7 @@ func GetConventions2(db *sql.DB, emitter string) ([]Convention, error) {
 	return conventions, nil
 }
 
-func UpdateTutor(db *sql.DB, student string, newTutor string)  error {
+func UpdateTutor(db *sql.DB, student string, newTutor string) error {
 	//new tutor is not a student
 	_, err := GetConvention(db, newTutor)
 	if err == nil {
