@@ -3,7 +3,6 @@ package backend
 import (
 	"database/sql"
 	"errors"
-	"log"
 	"strconv"
 	"time"
 )
@@ -172,7 +171,6 @@ func UpdateTutor(db *sql.DB, student string, newTutor string) error {
 	if err == nil {
 		return ErrInvalidTutor
 	}
-	log.Printf("student=%s new=%s\n", student, newTutor)
 	err = SingleUpdate(db, ErrUserNotFound, "update internships set tutor=$2 where student=$1", student, newTutor)
 	//userNotFound might be the student or the tutor
 	return err
