@@ -1,0 +1,71 @@
+-- reset if needed then create the tables required to store internship stuff
+
+drop table if exists reports;
+drop table if exists internships;
+drop table if exists conventions;
+drop table if exists sessions;
+drop table if exists password_renewal;
+drop table if exists defenses;
+drop table if exists users;
+
+-- user
+create table users(email text PRIMARY KEY,
+				  firstname text,
+				  lastname text,
+				  tel text,
+				  password text,
+				  role integer
+				  );
+
+-- sessions
+create table sessions(email text REFERENCES users(email) on delete cascade,
+		      token text,
+		      last timestamp,
+		      constraint pk_uid PRIMARY KEY(email)
+		      );
+
+create table internships(student text PRIMARY KEY REFERENCES users(email) on delete cascade,
+                        startTime timestamp,
+                        endTime timeStamp,
+                        tutor text REFERENCES users(email),
+                        company text,
+                        companyWWW text,
+                        supervisorFn text,
+                        supervisorLn text,
+                        supervisorEmail text,
+                        supervisorTel text,
+                        title text
+);
+
+create table conventions(student text PRIMARY KEY REFERENCES users(email) on delete cascade,
+                        startTime timestamp,
+                        endTime timeStamp,
+                        tutorFn text,
+                        tutorLn text,
+                        tutorEmail text,
+                        tutorTel text,                        
+                        company text,
+                        companyWWW text,
+                        supervisorFn text,
+                        supervisorLn text,
+                        supervisorEmail text,
+                        supervisorTel text,
+                        title text
+);
+
+create table reports(student text REFERENCES users(email) on delete cascade,
+                        kind text,
+                        deadline timestamp,
+                        grade integer,
+                        cnt bytea,
+                        constraint pk_reports PRIMARY KEY(student, kind)
+                        );
+
+create table defenses(id text,
+                      content text);
+
+create table password_renewal(
+    email text PRIMARY KEY REFERENCES users(email) on delete cascade,
+    deadline timestamp,
+    token text UNIQUE
+)
