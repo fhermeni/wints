@@ -8,7 +8,7 @@ import (
 )
 
 func (srv *Service) SetSupervisor(stu string, t internship.Supervisor) error {
-	sql := "update internships set tutorFn=$1, tutorLn=$2, tutorTel=$3, tutorEmail=$4 where student=$5"
+	sql := "update internships set supervisorFn=$1, supervisorLn=$2, supervisorTel=$3, supervisorEmail=$4 where student=$5"
 	return SingleUpdate(srv.Db, internship.ErrUnknownInternship, sql, t.Firstname, t.Lastname, t.Tel, t.Email, stu)
 }
 
@@ -18,11 +18,12 @@ func (srv *Service) SetCompany(stu string, c internship.Company) error {
 }
 
 func (srv *Service) Internship(stu string) (internship.Internship, error) {
-	sql := "select student.firstname, student.lastname, student.email, student.tel, tut.firstname, tut.lastname, tut.tel, tut.email, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, startTime, endTime, company, companyWWW from internships, user as student, user as tut where student=$1 and internship.tutor=tut.email and internship.student = student.email"
-	rows, err := srv.Db.Query(sql)
+	sql := "select stu.firstname, stu.lastname, stu.email, stu.tel, tut.firstname, tut.lastname, tut.email, tut.tel, tut.role, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, startTime, endTime, company, companyWWW from internships, users as stu, users as tut where internships.tutor=tut.email and internships.student = stu.email and stu.email = $1"
+	rows, err := srv.Db.Query(sql, stu)
 	if err != nil {
 		return internship.Internship{}, internship.ErrUnknownInternship
 	}
+	defer rows.Close()
 	return scanInternship(rows), nil
 }
 

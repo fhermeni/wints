@@ -27,11 +27,7 @@ type User struct {
 	Email string
 	//User telephon
 	Tel string
-	//User role:
-	// 'student' for a student,
-	//'major' for a major head
-	//'admin' for an administrator
-	//'root' for the super user
+	//User role
 	Role Privilege
 }
 

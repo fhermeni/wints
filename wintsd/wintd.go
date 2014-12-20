@@ -13,7 +13,12 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func setup() (config.Config, mail.Mailer, *datastore.Service) {
+const (
+	DEFAULT_LOGIN    = "root@localhost.com"
+	DEFAULT_PASSWORD = "wints"
+)
+
+func setup() (config.Config, mail.Mailer, *datastore.Service, bool) {
 	cfgPath := flag.String("conf", "./wints.conf", "daemon configuration file")
 	reset := flag.Bool("reset", false, "Reset the root account")
 	flag.Parse()
@@ -39,30 +44,17 @@ func setup() (config.Config, mail.Mailer, *datastore.Service) {
 	}
 	log.Println("Database connection: OK")
 
-	if *reset {
-		err = datastore.Reset(DB)
+	return cfg, mailer, ds, *reset
+}
+func main() {
+	_, _, ds, reset := setup()
+	defer ds.Db.Close()
+
+	if reset {
+		err := datastore.Reset(ds.Db, DEFAULT_LOGIN, DEFAULT_PASSWORD)
 		if err != nil {
 			log.Fatalln("Unable to reset the root account: " + err.Error())
 		}
 		log.Println("Root account reset. Don't forgot to delete it once logged")
 	}
-	return cfg, mailer, ds
-}
-func main() {
-	_, _, ds := setup()
-	defer ds.Db.Close()
-
-	/*	for _, v := range os.Args {
-		if v == "-s" {
-			delay, err := time.ParseDuration(cfg.Puller.Period)
-			if err != nil {
-				log.Fatalln("Unable to parse refresh duration: " + err.Error())
-			}
-			backend.DaemonConventionsPuller(DB, cfg.Puller.Url,
-				cfg.Puller.Login,
-				cfg.Puller.Password,
-				delay)
-		}
-	}*/
-
 }

@@ -27,7 +27,7 @@ create table sessions(email text REFERENCES users(email) on delete cascade,
 create table internships(student text PRIMARY KEY REFERENCES users(email) on delete cascade,
                         startTime timestamp,
                         endTime timeStamp,
-                        tutor text REFERENCES users(email),
+                        tutor text REFERENCES users(email), --prevent to delete the tutor if he is tutoring someone
                         company text,
                         companyWWW text,
                         supervisorFn text,

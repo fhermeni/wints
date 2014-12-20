@@ -18,7 +18,7 @@ type Service interface {
 	NewUser(p User) error
 	RmUser(email string) error
 	User(email string) (User, error)
-	Users(roles ...string) ([]User, error)
+	Users() ([]User, error)
 	SetUserPassword(email string, oldP, newP []byte) error
 	SetUserProfile(email, fn, ln, tel string) error
 	SetUserRole(email, priv string) error
@@ -27,11 +27,10 @@ type Service interface {
 
 	//Reports management
 
-	NewReport(kind, email string, date time.Time) (ReportHeader, error)
+	PlanReport(kind, email string, date time.Time) (ReportHeader, error)
 	Report(kind, email string) (ReportHeader, error)
 	ReportContent(kind, email string) ([]byte, error)
 	SetReportContent(kind, email string, cnt []byte) error
 	SetReportGrade(kind, email string, r int) error
 	SetReportDeadline(kind, email string, t time.Time) error
-	Reports(email string) ([]ReportHeader, error)
 }

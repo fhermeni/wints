@@ -35,7 +35,7 @@ func (s *Service) NewUser(p internship.User) error {
 	return nil
 }
 
-func (s *Service) Get(email string) (internship.User, error) {
+func (s *Service) User(email string) (internship.User, error) {
 	var fn, ln, tel string
 	var role internship.Privilege
 	err := s.Db.QueryRow("select firstname, lastname, tel, role from users where email=$1", email).Scan(&fn, &ln, &tel, &role)
@@ -45,24 +45,29 @@ func (s *Service) Get(email string) (internship.User, error) {
 	return internship.User{Firstname: fn, Lastname: ln, Email: email, Tel: tel, Role: role}, nil
 }
 
-func (s *Service) GetByRole(p string) ([]internship.User, error) {
-	rows, err := s.Db.Query("select firstname, lastname, users.email, tel from users where role=$1", p)
+func (s *Service) RmUser(email string) error {
+	return SingleUpdate(s.Db, internship.ErrUnknownUser, "DELETE FROM users where email=$1", email)
+}
+
+func (s *Service) Users() ([]internship.User, error) {
+	rows, err := s.Db.Query("select firstname, lastname, email, tel, role from users")
 	users := make([]internship.User, 0, 0)
 	if err != nil {
 		return users, err
 	}
 	defer rows.Close()
-	var fn, ln, email, tel string
-	var role internship.Privilege
 	for rows.Next() {
+		var fn, ln, email, tel string
+		var role internship.Privilege
 		rows.Scan(&fn, &ln, &email, &tel, &role)
+		u := internship.User{Firstname: fn, Lastname: ln, Email: email, Tel: tel, Role: role}
 		//Get the role if exists
-		users = append(users, internship.User{Firstname: fn, Lastname: ln, Email: email, Tel: tel, Role: role})
+		users = append(users, u)
 	}
 	return users, nil
 }
 
-func (s *Service) SetPassword(email string, oldP, newP []byte) error {
+func (s *Service) SetUserPassword(email string, oldP, newP []byte) error {
 	//Get the password
 	var p []byte
 	if err := s.Db.QueryRow("select password from users where email=$1", email).Scan(&p); err != nil {
@@ -83,11 +88,11 @@ func (s *Service) SetPassword(email string, oldP, newP []byte) error {
 	return SingleUpdate(s.Db, internship.ErrUnknownUser, "update users set password=$2 where email=$1", email, hash)
 }
 
-func (s *Service) SetProfile(email, fn, ln, tel string) error {
+func (s *Service) SetUserProfile(email, fn, ln, tel string) error {
 	return SingleUpdate(s.Db, internship.ErrUnknownUser, "update users set firstname=$1, lastname=$2, tel=$3 where email=$4", fn, ln, tel, email)
 }
 
-func (s *Service) SetRole(email, priv string) error {
+func (s *Service) SetUserRole(email string, priv internship.Privilege) error {
 	return SingleUpdate(s.Db, internship.ErrUnknownUser, "update users set role=$2 where email=$1", email, priv)
 }
 
@@ -108,10 +113,6 @@ func (s *Service) NewPassword(token string, newP []byte) (string, error) {
 	}
 	_, err = s.Db.Exec("delete from password_renewal where token=$1", token)
 	return email, err
-}
-
-func (s *Service) Rm(email string) error {
-	return SingleUpdate(s.Db, internship.ErrUnknownUser, "DELETE FROM users where email=$1", email)
 }
 
 func (s *Service) ResetPassword(email string) (string, error) {
