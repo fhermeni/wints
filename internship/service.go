@@ -33,4 +33,6 @@ type Service interface {
 	SetReportContent(kind, email string, cnt []byte) error
 	SetReportGrade(kind, email string, r int) error
 	SetReportDeadline(kind, email string, t time.Time) error
+
+	ResetRootAccount() error
 }

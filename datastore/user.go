@@ -24,7 +24,7 @@ func (s *Service) Login(email, password string) (internship.User, error) {
 
 func (s *Service) NewUser(p internship.User) error {
 	newPassword := rand_str(64) //Hard to guess
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.MinCost)
+	hashedPassword, err := hash([]byte(newPassword))
 	if err != nil {
 		return err
 	}
@@ -104,7 +104,7 @@ func (s *Service) NewPassword(token string, newP []byte) (string, error) {
 		return "", internship.ErrNoPendingRequests
 	}
 	//Make the new one
-	hash, err := bcrypt.GenerateFromPassword(newP, bcrypt.MinCost)
+	hash, err := hash(newP)
 	if err != nil {
 		return "", err
 	}

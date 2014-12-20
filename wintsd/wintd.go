@@ -13,11 +13,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-const (
-	DEFAULT_LOGIN    = "root@localhost.com"
-	DEFAULT_PASSWORD = "wints"
-)
-
 func setup() (config.Config, mail.Mailer, *datastore.Service, bool) {
 	cfgPath := flag.String("conf", "./wints.conf", "daemon configuration file")
 	reset := flag.Bool("reset", false, "Reset the root account")
@@ -51,7 +46,7 @@ func main() {
 	defer ds.Db.Close()
 
 	if reset {
-		err := datastore.Reset(ds.Db, DEFAULT_LOGIN, DEFAULT_PASSWORD)
+		err := ds.ResetRootAccount()
 		if err != nil {
 			log.Fatalln("Unable to reset the root account: " + err.Error())
 		}
