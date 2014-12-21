@@ -21,12 +21,12 @@ func SingleUpdate(db *sql.DB, errNoUpdate error, q string, args ...interface{}) 
 	return nil
 }
 
-func rand_str(str_size int) string {
+func rand_str(str_size int) []byte {
 	alphanum := "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 	var bytes = make([]byte, str_size)
 	rand.Read(bytes)
 	for i, b := range bytes {
 		bytes[i] = alphanum[b%byte(len(alphanum))]
 	}
-	return string(bytes)
+	return bytes
 }

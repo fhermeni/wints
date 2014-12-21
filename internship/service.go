@@ -14,15 +14,15 @@ type Service interface {
 
 	//User management
 
-	Login(email, password string) (User, error)
-	NewUser(p User) error
+	Login(email string, password []byte) (User, error)
+	NewUser(p User) ([]byte, error)
 	RmUser(email string) error
 	User(email string) (User, error)
 	Users() ([]User, error)
 	SetUserPassword(email string, oldP, newP []byte) error
 	SetUserProfile(email, fn, ln, tel string) error
 	SetUserRole(email, priv string) error
-	NewPassword(token string, newP []byte) (string, error)
+	NewPassword(token, newP []byte) (string, error)
 	ResetPassword(email string) (string, error)
 
 	//Reports management

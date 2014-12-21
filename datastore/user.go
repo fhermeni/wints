@@ -10,29 +10,30 @@ import (
 
 //Prepared requests
 
-func (s *Service) Login(email, password string) (internship.User, error) {
-	var fn, ln, tel, p string
+func (s *Service) Login(email string, password []byte) (internship.User, error) {
+	var fn, ln, tel string
+	var p []byte
 	var r internship.Privilege
 	if err := s.Db.QueryRow("select firstname, lastname, tel, password, role from users where email=$1", email).Scan(&fn, &ln, &tel, &p, &r); err != nil {
 		return internship.User{}, internship.ErrCredentials
 	}
-	if err := bcrypt.CompareHashAndPassword([]byte(p), []byte(password)); err != nil {
+	if err := bcrypt.CompareHashAndPassword(p, password); err != nil {
 		return internship.User{}, internship.ErrCredentials
 	}
 	return internship.User{Firstname: fn, Lastname: ln, Email: email, Tel: tel, Role: r}, nil
 }
 
-func (s *Service) NewUser(p internship.User) error {
+func (s *Service) NewUser(p internship.User) ([]byte, error) {
 	newPassword := rand_str(64) //Hard to guess
-	hashedPassword, err := hash([]byte(newPassword))
+	hashedPassword, err := hash(newPassword)
 	if err != nil {
-		return err
+		return []byte{}, err
 	}
 	_, err = s.Db.Exec("insert into users(email, firstname, lastname, tel, password, role) values ($1,$2,$3,$4,$5,$6)", p.Email, p.Firstname, p.Lastname, p.Tel, hashedPassword, p.Role)
 	if err != nil {
-		return internship.ErrUserExists
+		return []byte{}, internship.ErrUserExists
 	}
-	return nil
+	return newPassword, nil
 }
 
 func (s *Service) User(email string) (internship.User, error) {
@@ -96,7 +97,7 @@ func (s *Service) SetUserRole(email string, priv internship.Privilege) error {
 	return SingleUpdate(s.Db, internship.ErrUnknownUser, "update users set role=$2 where email=$1", email, priv)
 }
 
-func (s *Service) NewPassword(token string, newP []byte) (string, error) {
+func (s *Service) NewPassword(token, newP []byte) (string, error) {
 	//Delete possible renew requests
 	var email string
 	err := s.Db.QueryRow("select email from password_renewal where token=$1", token).Scan(&email)
@@ -115,7 +116,7 @@ func (s *Service) NewPassword(token string, newP []byte) (string, error) {
 	return email, err
 }
 
-func (s *Service) ResetPassword(email string) (string, error) {
+func (s *Service) ResetPassword(email string) ([]byte, error) {
 	//In case a request already exists
 	s.Db.QueryRow("delete from password_renewal where email=$1", email)
 	token := rand_str(32)
@@ -123,7 +124,7 @@ func (s *Service) ResetPassword(email string) (string, error) {
 	_, err := s.Db.Exec("insert into password_renewal(email,token,deadline) values($1,$2,$3)", email, token, time.Now().Add(d))
 	if err != nil {
 		//Not very sure, might be a SQL error or a connexion error as well.
-		return "", internship.ErrUnknownUser
+		return []byte{}, internship.ErrUnknownUser
 	}
 	return token, err
 }
