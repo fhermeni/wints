@@ -29,12 +29,15 @@ type HttpConfig struct {
 	PrivateKey  string
 }
 
-type ReportsConfig struct {
-	MidtermAfter string
+type ReportsDef struct {
+	Name     string
+	Deadline string
+	Value    string
 }
+
 type Config struct {
 	Puller  PullerConfig
-	Reports ReportsConfig
+	Reports []ReportsDef
 	Db      DbConfig
 	Mailer  MailerConfig
 	Http    HttpConfig

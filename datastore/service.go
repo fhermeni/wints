@@ -41,3 +41,13 @@ func (s *Service) ResetRootAccount() error {
 	err = SingleUpdate(s.Db, errors.New("Unable to set the default password"), "insert into users (email, password, firstname, lastname, tel, role) values ($1,$2,'The','Root','118218',$3)", DEFAULT_LOGIN, hashedPassword, internship.ROOT)
 	return err
 }
+
+func (s *Service) Install() error {
+	_, err := s.Db.Exec(create)
+	return err
+}
+
+func (s *Service) Clean() error {
+	_, err := s.Db.Exec(clean)
+	return err
+}
