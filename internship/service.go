@@ -7,6 +7,9 @@ type Service interface {
 
 	//Internship management
 
+	//New internship
+	NewInternship(student, tutor string, from, to time.Time, c Company, sup Supervisor, Title string) error
+
 	//Get the internship associated to a given student
 	Internship(stu string) (Internship, error)
 

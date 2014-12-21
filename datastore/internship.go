@@ -2,10 +2,17 @@ package datastore
 
 import (
 	"database/sql"
+	"errors"
 	"time"
 
 	"github.com/fhermeni/wints/internship"
 )
+
+func (srv *Service) NewInternship(student, tutor string, from, to time.Time, c internship.Company, sup internship.Supervisor, title string) error {
+	sql := "insert into internships(student, tutor, startTime, endTime, title, supervisorFn, supervisorLn, supervisorTel, supervisorEmail, company, companyWWW) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)"
+	err := SingleUpdate(srv.Db, errors.New("Bouh"), sql, student, tutor, from, to, title, sup.Firstname, sup.Lastname, sup.Tel, sup.Email, c.Name, c.WWW)
+	return err
+}
 
 func (srv *Service) SetSupervisor(stu string, t internship.Supervisor) error {
 	sql := "update internships set supervisorFn=$1, supervisorLn=$2, supervisorTel=$3, supervisorEmail=$4 where student=$5"

@@ -6,6 +6,7 @@ import (
 	"github.com/fhermeni/wints/internship"
 
 	"code.google.com/p/go.crypto/bcrypt"
+	"github.com/lib/pq"
 )
 
 //Prepared requests
@@ -47,7 +48,13 @@ func (s *Service) User(email string) (internship.User, error) {
 }
 
 func (s *Service) RmUser(email string) error {
-	return SingleUpdate(s.Db, internship.ErrUnknownUser, "DELETE FROM users where email=$1", email)
+	err := SingleUpdate(s.Db, internship.ErrUnknownUser, "DELETE FROM users where email=$1", email)
+	if e, ok := err.(*pq.Error); ok {
+		if e.Constraint == "internships_tutor_fkey" {
+			return internship.ErrUserTutoring
+		}
+	}
+	return err
 }
 
 func (s *Service) Users() ([]internship.User, error) {

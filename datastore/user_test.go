@@ -100,6 +100,11 @@ func TestWorkflow(t *testing.T) {
 	//Need an internship to play with conflicts
 	c := internship.Company{Name: "foo", WWW: "bar"}
 	sup := internship.Supervisor{Firstname: "foo", Lastname: "bar", Email: "toto@bac.com", Tel: "12345"}
-	i := internship.Internship{Student: u1, Tutor: u2, Start: time.Now(), End: time.Now, Title: "My Internship", Cpy: c, Sup: sup}
+	err = s.NewInternship(u1.Email, u2.Email, time.Now(), time.Now(), c, sup, "My")
+	assert.NoError(t, err)
+	//Cannot remove u2
+	assert.Equal(t, internship.ErrUserTutoring, s.RmUser(u2.Email))
+	assert.NoError(t, s.RmUser(u1.Email))
+	assert.NoError(t, s.RmUser(u2.Email))
 
 }
