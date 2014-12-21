@@ -10,7 +10,7 @@ import (
 
 //Prepared requests
 
-func (s *Service) Login(email string, password []byte) (internship.User, error) {
+func (s *Service) Registered(email string, password []byte) (internship.User, error) {
 	var fn, ln, tel string
 	var p []byte
 	var r internship.Privilege

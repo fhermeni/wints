@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"os"
 	"testing"
+	"time"
 
 	"github.com/fhermeni/wints/internship"
 	"github.com/stretchr/testify/assert"
@@ -66,20 +67,20 @@ func TestWorkflow(t *testing.T) {
 	assert.Equal(t, "987654", u.Tel)
 
 	//Login
-	_, err = s.Login(u1.Email, []byte{})
+	_, err = s.Registered(u1.Email, []byte{})
 	assert.Equal(t, internship.ErrCredentials, err)
 
 	//ResetRootAccount -- to be aware of the current password
 	assert.NoError(t, s.ResetRootAccount())
-	u, err = s.Login(DEFAULT_LOGIN, []byte(DEFAULT_PASSWORD))
+	u, err = s.Registered(DEFAULT_LOGIN, []byte(DEFAULT_PASSWORD))
 	assert.NoError(t, err)
 	assert.NotNil(t, u)
 
 	//SetUserPassword()
 	assert.NoError(t, s.SetUserPassword(DEFAULT_LOGIN, []byte(DEFAULT_PASSWORD), []byte("test")))
-	_, err = s.Login(DEFAULT_LOGIN, []byte("test"))
+	_, err = s.Registered(DEFAULT_LOGIN, []byte("test"))
 	assert.NoError(t, err)
-	_, err = s.Login("foo", []byte("test"))
+	_, err = s.Registered("foo", []byte("test"))
 	assert.Equal(t, internship.ErrCredentials, err)
 
 	//NewPassword && ResetPassword
@@ -91,11 +92,14 @@ func TestWorkflow(t *testing.T) {
 	assert.NoError(t, err)
 	l, err := s.NewPassword(tok, []byte("baz"))
 	assert.Equal(t, "foo@bar.com", l)
-	u, err = s.Login("foo@bar.com", []byte("baz"))
+	u, err = s.Registered("foo@bar.com", []byte("baz"))
 	assert.NoError(t, err)
 	assert.Equal(t, "toto", u.Firstname)
 
 	//RmUsers
 	//Need an internship to play with conflicts
+	c := internship.Company{Name: "foo", WWW: "bar"}
+	sup := internship.Supervisor{Firstname: "foo", Lastname: "bar", Email: "toto@bac.com", Tel: "12345"}
+	i := internship.Internship{Student: u1, Tutor: u2, Start: time.Now(), End: time.Now, Title: "My Internship", Cpy: c, Sup: sup}
 
 }

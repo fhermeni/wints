@@ -7,14 +7,25 @@ type Service interface {
 
 	//Internship management
 
+	//Get the internship associated to a given student
 	Internship(stu string) (Internship, error)
+
+	//Set the supervisor for the internship of a given student
 	SetSupervisor(stu string, sup Supervisor) error
+
+	//Set the company for the internship of a given student
 	SetCompany(stu string, c Company) error
+
+	//Get all the internships
 	Internships() ([]Internship, error)
 
 	//User management
 
-	Login(email string, password []byte) (User, error)
+	//Test if the credentials match a user
+	Registered(email string, password []byte) (User, error)
+
+	//Create a new user
+	//Returns the resulting password
 	NewUser(p User) ([]byte, error)
 	RmUser(email string) error
 	User(email string) (User, error)
