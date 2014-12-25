@@ -23,10 +23,13 @@ func getDB(t *testing.T) *sql.DB {
 	}
 	return DB
 }
-func TestWorkflow(t *testing.T) {
+func TestUserWorkflow(t *testing.T) {
 	db := getDB(t)
+	defer db.Close()
 	s, err := NewService(db)
 	assert.NoError(t, err)
+	assert.NoError(t, s.Clean())
+	assert.NoError(t, s.Install())
 	//NewUser
 	u1 := internship.User{Firstname: "foo", Lastname: "bar", Email: "foo@bar.com", Tel: "0123456", Role: internship.STUDENT}
 	_, err = s.NewUser(u1)
@@ -72,13 +75,13 @@ func TestWorkflow(t *testing.T) {
 
 	//ResetRootAccount -- to be aware of the current password
 	assert.NoError(t, s.ResetRootAccount())
-	u, err = s.Registered(DEFAULT_LOGIN, []byte(DEFAULT_PASSWORD))
+	u, err = s.Registered(DefaultLogin, []byte(DefaultPassword))
 	assert.NoError(t, err)
 	assert.NotNil(t, u)
 
 	//SetUserPassword()
-	assert.NoError(t, s.SetUserPassword(DEFAULT_LOGIN, []byte(DEFAULT_PASSWORD), []byte("test")))
-	_, err = s.Registered(DEFAULT_LOGIN, []byte("test"))
+	assert.NoError(t, s.SetUserPassword(DefaultLogin, []byte(DefaultPassword), []byte("test")))
+	_, err = s.Registered(DefaultLogin, []byte("test"))
 	assert.NoError(t, err)
 	_, err = s.Registered("foo", []byte("test"))
 	assert.Equal(t, internship.ErrCredentials, err)

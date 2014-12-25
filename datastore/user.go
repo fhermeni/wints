@@ -15,7 +15,7 @@ func (s *Service) Registered(email string, password []byte) (internship.User, er
 	var fn, ln, tel string
 	var p []byte
 	var r internship.Privilege
-	if err := s.Db.QueryRow("select firstname, lastname, tel, password, role from users where email=$1", email).Scan(&fn, &ln, &tel, &p, &r); err != nil {
+	if err := s.DB.QueryRow("select firstname, lastname, tel, password, role from users where email=$1", email).Scan(&fn, &ln, &tel, &p, &r); err != nil {
 		return internship.User{}, internship.ErrCredentials
 	}
 	if err := bcrypt.CompareHashAndPassword(p, password); err != nil {
@@ -25,12 +25,12 @@ func (s *Service) Registered(email string, password []byte) (internship.User, er
 }
 
 func (s *Service) NewUser(p internship.User) ([]byte, error) {
-	newPassword := rand_str(64) //Hard to guess
+	newPassword := randomBytes(64) //Hard to guess
 	hashedPassword, err := hash(newPassword)
 	if err != nil {
 		return []byte{}, err
 	}
-	_, err = s.Db.Exec("insert into users(email, firstname, lastname, tel, password, role) values ($1,$2,$3,$4,$5,$6)", p.Email, p.Firstname, p.Lastname, p.Tel, hashedPassword, p.Role)
+	_, err = s.DB.Exec("insert into users(email, firstname, lastname, tel, password, role) values ($1,$2,$3,$4,$5,$6)", p.Email, p.Firstname, p.Lastname, p.Tel, hashedPassword, p.Role)
 	if err != nil {
 		return []byte{}, internship.ErrUserExists
 	}
@@ -40,7 +40,7 @@ func (s *Service) NewUser(p internship.User) ([]byte, error) {
 func (s *Service) User(email string) (internship.User, error) {
 	var fn, ln, tel string
 	var role internship.Privilege
-	err := s.Db.QueryRow("select firstname, lastname, tel, role from users where email=$1", email).Scan(&fn, &ln, &tel, &role)
+	err := s.DB.QueryRow("select firstname, lastname, tel, role from users where email=$1", email).Scan(&fn, &ln, &tel, &role)
 	if err != nil {
 		return internship.User{}, internship.ErrUnknownUser
 	}
@@ -48,7 +48,7 @@ func (s *Service) User(email string) (internship.User, error) {
 }
 
 func (s *Service) RmUser(email string) error {
-	err := SingleUpdate(s.Db, internship.ErrUnknownUser, "DELETE FROM users where email=$1", email)
+	err := SingleUpdate(s.DB, internship.ErrUnknownUser, "DELETE FROM users where email=$1", email)
 	if e, ok := err.(*pq.Error); ok {
 		if e.Constraint == "internships_tutor_fkey" {
 			return internship.ErrUserTutoring
@@ -58,7 +58,7 @@ func (s *Service) RmUser(email string) error {
 }
 
 func (s *Service) Users() ([]internship.User, error) {
-	rows, err := s.Db.Query("select firstname, lastname, email, tel, role from users")
+	rows, err := s.DB.Query("select firstname, lastname, email, tel, role from users")
 	users := make([]internship.User, 0, 0)
 	if err != nil {
 		return users, err
@@ -78,7 +78,7 @@ func (s *Service) Users() ([]internship.User, error) {
 func (s *Service) SetUserPassword(email string, oldP, newP []byte) error {
 	//Get the password
 	var p []byte
-	if err := s.Db.QueryRow("select password from users where email=$1", email).Scan(&p); err != nil {
+	if err := s.DB.QueryRow("select password from users where email=$1", email).Scan(&p); err != nil {
 		return internship.ErrCredentials
 	}
 	if bcrypt.CompareHashAndPassword(p, oldP) != nil {
@@ -86,28 +86,28 @@ func (s *Service) SetUserPassword(email string, oldP, newP []byte) error {
 	}
 
 	//Delete possible renew requests
-	s.Db.QueryRow("delete from password_renewal where user=$1", email)
+	s.DB.QueryRow("delete from password_renewal where user=$1", email)
 
 	//Make the new one
 	hash, err := bcrypt.GenerateFromPassword(newP, bcrypt.MinCost)
 	if err != nil {
 		return err
 	}
-	return SingleUpdate(s.Db, internship.ErrUnknownUser, "update users set password=$2 where email=$1", email, hash)
+	return SingleUpdate(s.DB, internship.ErrUnknownUser, "update users set password=$2 where email=$1", email, hash)
 }
 
 func (s *Service) SetUserProfile(email, fn, ln, tel string) error {
-	return SingleUpdate(s.Db, internship.ErrUnknownUser, "update users set firstname=$1, lastname=$2, tel=$3 where email=$4", fn, ln, tel, email)
+	return SingleUpdate(s.DB, internship.ErrUnknownUser, "update users set firstname=$1, lastname=$2, tel=$3 where email=$4", fn, ln, tel, email)
 }
 
 func (s *Service) SetUserRole(email string, priv internship.Privilege) error {
-	return SingleUpdate(s.Db, internship.ErrUnknownUser, "update users set role=$2 where email=$1", email, priv)
+	return SingleUpdate(s.DB, internship.ErrUnknownUser, "update users set role=$2 where email=$1", email, priv)
 }
 
 func (s *Service) NewPassword(token, newP []byte) (string, error) {
 	//Delete possible renew requests
 	var email string
-	err := s.Db.QueryRow("select email from password_renewal where token=$1", token).Scan(&email)
+	err := s.DB.QueryRow("select email from password_renewal where token=$1", token).Scan(&email)
 	if err != nil {
 		return "", internship.ErrNoPendingRequests
 	}
@@ -116,19 +116,19 @@ func (s *Service) NewPassword(token, newP []byte) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if err := SingleUpdate(s.Db, internship.ErrUnknownUser, "update users set password=$2 where email=$1", email, hash); err != nil {
+	if err := SingleUpdate(s.DB, internship.ErrUnknownUser, "update users set password=$2 where email=$1", email, hash); err != nil {
 		return "", err
 	}
-	_, err = s.Db.Exec("delete from password_renewal where token=$1", token)
+	_, err = s.DB.Exec("delete from password_renewal where token=$1", token)
 	return email, err
 }
 
 func (s *Service) ResetPassword(email string) ([]byte, error) {
 	//In case a request already exists
-	s.Db.QueryRow("delete from password_renewal where email=$1", email)
-	token := rand_str(32)
+	s.DB.QueryRow("delete from password_renewal where email=$1", email)
+	token := randomBytes(32)
 	d, _ := time.ParseDuration("48h")
-	_, err := s.Db.Exec("insert into password_renewal(email,token,deadline) values($1,$2,$3)", email, token, time.Now().Add(d))
+	_, err := s.DB.Exec("insert into password_renewal(email,token,deadline) values($1,$2,$3)", email, token, time.Now().Add(d))
 	if err != nil {
 		//Not very sure, might be a SQL error or a connexion error as well.
 		return []byte{}, internship.ErrUnknownUser

@@ -1,12 +1,13 @@
 package backend
 
 import (
-	"code.google.com/p/go.crypto/bcrypt"
 	"crypto/rand"
 	"database/sql"
 	"errors"
-	_ "github.com/lib/pq"
 	"time"
+
+	"code.google.com/p/go.crypto/bcrypt"
+	_ "github.com/lib/pq"
 )
 
 var (
@@ -54,7 +55,7 @@ func Register(db *sql.DB, email, password string) (User, error) {
 }
 
 func NewUser(db *sql.DB, p User) (string, error) {
-	newPassword := rand_str(64) //Hard to guess
+	newPassword := randomBytes(64) //Hard to guess
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.MinCost)
 	if err != nil {
 		return "", err
@@ -78,7 +79,7 @@ func RmUser(db *sql.DB, email string) error {
 	return SingleUpdate(db, ErrUserNotFound, "DELETE FROM users where email=$1", email)
 }
 
-func rand_str(str_size int) string {
+func randomBytes(str_size int) string {
 	alphanum := "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 	var bytes = make([]byte, str_size)
 	rand.Read(bytes)
@@ -145,7 +146,7 @@ func GrantPrivilege(db *sql.DB, email, priv string) error {
 func PasswordRenewalRequest(db *sql.DB, email string) (string, error) {
 	//In case a request already exists
 	db.QueryRow("delete from password_renewal where email=$1", email)
-	token := rand_str(32)
+	token := randomBytes(32)
 	d, _ := time.ParseDuration("48h")
 	_, err := db.Exec("insert into password_renewal(email,token,deadline) values($1,$2,$3)", email, token, time.Now().Add(d))
 	if err != nil {

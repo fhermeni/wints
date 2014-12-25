@@ -48,7 +48,7 @@ func setup() (config.Config, mail.Mailer, *datastore.Service, bool, bool, bool) 
 		log.Fatalln("Unable to setup the mailer: " + err.Error())
 	}
 
-	DB, err := sql.Open("postgres", cfg.Db.Url)
+	DB, err := sql.Open("postgres", cfg.DB.URL)
 	if err != nil {
 		log.Fatalln("Unable to connect to the Database: " + err.Error())
 	}
@@ -63,7 +63,7 @@ func setup() (config.Config, mail.Mailer, *datastore.Service, bool, bool, bool) 
 
 func main() {
 	_, _, ds, reset, clean, install := setup()
-	defer ds.Db.Close()
+	defer ds.DB.Close()
 
 	if (install || clean) && confirm() {
 		if clean {

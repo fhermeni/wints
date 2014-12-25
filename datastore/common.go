@@ -1,4 +1,3 @@
-//Utilities for database related stuff
 package datastore
 
 import (
@@ -6,6 +5,7 @@ import (
 	"database/sql"
 )
 
+//SingleUpdate executes a query that aims are affecting only 1 row.
 func SingleUpdate(db *sql.DB, errNoUpdate error, q string, args ...interface{}) error {
 	res, err := db.Exec(q, args...)
 	if err != nil {
@@ -21,9 +21,9 @@ func SingleUpdate(db *sql.DB, errNoUpdate error, q string, args ...interface{}) 
 	return nil
 }
 
-func rand_str(str_size int) []byte {
+func randomBytes(s int) []byte {
 	alphanum := "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-	var bytes = make([]byte, str_size)
+	var bytes = make([]byte, s)
 	rand.Read(bytes)
 	for i, b := range bytes {
 		bytes[i] = alphanum[b%byte(len(alphanum))]

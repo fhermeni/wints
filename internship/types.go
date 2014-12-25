@@ -1,4 +1,3 @@
-//Basic types used to manipulate internships
 package internship
 
 import (
@@ -6,7 +5,7 @@ import (
 	"time"
 )
 
-//The user privileges
+//Privilege aims at giving the possible level of privilege for a user.
 type Privilege int
 
 //The different level of privileges
@@ -17,7 +16,8 @@ const (
 	ROOT
 )
 
-//Denotes a user that can log in
+//User denotes a person that can authenticate.
+//Students, major administrator, administrator or super user can authenticate
 type User struct {
 	//User firstname
 	Firstname string
@@ -31,6 +31,7 @@ type User struct {
 	Role Privilege
 }
 
+//Privileges denotes the string value associated to each level of privilege
 var Privileges = [...]string{"student", "major", "admin", "root"}
 
 func (p Privilege) String() string {
@@ -42,12 +43,12 @@ func (p User) String() string {
 	return p.Fullname() + " (" + p.Email + ")"
 }
 
-//User fullname, starting with the firstname
+//Fullname provides the user fullname, starting with its firstname
 func (p User) Fullname() string {
 	return p.Firstname + " " + p.Lastname
 }
 
-//To represent the header of a report
+//ReportHeader provides the metadata associated to a student report
 type ReportHeader struct {
 	//The report identifier
 	Kind string
@@ -57,12 +58,12 @@ type ReportHeader struct {
 	Grade int
 }
 
-//Checks if a report has been graded
+//Graded indicates if a report has been graded by its tutor or not
 func (m *ReportHeader) Graded() bool {
 	return m.Grade >= 0
 }
 
-//Denotes a compary
+//Company is just a composite to store meaningful information for a company hosting a student.
 type Company struct {
 	//The company name
 	Name string
@@ -70,7 +71,7 @@ type Company struct {
 	WWW string
 }
 
-//Denotes the company supervisor
+//Supervisor just gather informations to contact a company supervisor
 type Supervisor struct {
 	Firstname string
 	Lastname  string
@@ -78,7 +79,7 @@ type Supervisor struct {
 	Tel       string
 }
 
-//Type to denotes an internship
+//Internship is the core type to specify required data related to an internship
 type Internship struct {
 	//The student
 	Student User
@@ -101,7 +102,7 @@ type Internship struct {
 //Predefined errors
 var (
 	ErrReportExists      = errors.New("Report already exists")
-	ErrUnknownReport     = errors.New("Unknown report")
+	ErrUnknownReport     = errors.New("Unknown report or user")
 	ErrInvalidGrade      = errors.New("The grade must be between 0 and 20 (inclusive)")
 	ErrReportConflict    = errors.New("The report has not been uploaded")
 	ErrInternshipExists  = errors.New("Internship already exists")
@@ -111,4 +112,5 @@ var (
 	ErrUserTutoring      = errors.New("The user is tutoring students")
 	ErrCredentials       = errors.New("Incorrect credentials")
 	ErrNoPendingRequests = errors.New("No password renewable request pending")
+	ErrInvalidPeriod     = errors.New("invalid internship period")
 )
