@@ -60,6 +60,17 @@ func TestInternshipWorkflow(t *testing.T) {
 	assert.Equal(t, i, is[0])
 
 	//setters
+	c.Name = "fa"
+	assert.NoError(t, s.SetCompany(stu.Email, c))
+	i, err = s.Internship(stu.Email)
+	assert.NoError(t, err)
+	assert.Equal(t, c, i.Cpy)
+
+	sup.Firstname = "bar"
+	assert.NoError(t, s.SetSupervisor(stu.Email, sup))
+	i, err = s.Internship(stu.Email)
+	assert.NoError(t, err)
+	assert.Equal(t, sup, i.Sup)
 
 	//reports
 }
