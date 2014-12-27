@@ -24,7 +24,6 @@ type Service interface {
 	Internships() ([]Internship, error)
 
 	//User management
-
 	//Test if the credentials match a user
 	Registered(email string, password []byte) (User, error)
 

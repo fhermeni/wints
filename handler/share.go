@@ -1,5 +1,6 @@
 package handler
 
+/*
 import (
 	"compress/gzip"
 	"encoding/json"
@@ -102,3 +103,4 @@ func ClearSession(response http.ResponseWriter) {
 	}
 	http.SetCookie(response, cookie)
 }
+*/

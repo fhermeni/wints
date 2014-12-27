@@ -7,52 +7,34 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSetUserPassword(t *testing.T) {
+func TestUserManagement(t *testing.T) {
 	var mock MockBackend
-	u := internship.User{Email: "toto"}
-	f, _ := NewService(&mock, u)
+
+	f, _ := NewService(&mock, internship.User{Email: "toto", Role: internship.STUDENT})
+	//Update _my_ password
 	assert.NoError(t, f.SetUserPassword("toto", []byte{}, []byte{}))
 	assert.Equal(t, ErrPermission, f.SetUserPassword("titi", []byte{}, []byte{}))
-}
 
-func TestSetUserProfile(t *testing.T) {
-	var mock MockBackend
-	u := internship.User{Email: "toto"}
-	f, _ := NewService(&mock, u)
+	//Change _my_ profile
 	assert.NoError(t, f.SetUserProfile("toto", "fn", "ln", "0123"))
 	assert.Equal(t, ErrPermission, f.SetUserProfile("titi", "fn", "ln", "0123"))
-}
 
-func TestSetUserRole(t *testing.T) {
-	var mock MockBackend
-	u := internship.User{Email: "toto", Role: internship.STUDENT}
-	f, _ := NewService(&mock, u)
+	//Manage role
 	assert.Equal(t, ErrPermission, f.SetUserRole("titi", internship.ADMIN)) //no enough rights
 
-	//no self-promotion
 	f, _ = NewService(&mock, internship.User{Email: "toto", Role: internship.ADMIN})
-	assert.Equal(t, ErrPermission, f.SetUserRole("toto", internship.ROOT))
+	assert.Equal(t, ErrPermission, f.SetUserRole("toto", internship.ROOT)) //no self-promotion
+	assert.NoError(t, f.SetUserRole("titi", internship.ADMIN))             //okok
 
-	//okok
-	assert.NoError(t, f.SetUserRole("titi", internship.ADMIN))
-}
-
-func TestResetPassword(t *testing.T) {
-	var mock MockBackend
-	u := internship.User{Email: "toto", Role: internship.STUDENT}
-	f, _ := NewService(&mock, u)
+	//Reset password
 	_, err := f.ResetPassword("titi")
 	assert.Equal(t, ErrPermission, err)
-
 	_, err = f.ResetPassword("toto")
 	assert.NoError(t, err)
-}
 
-func TestUser(t *testing.T) {
-	var mock MockBackend
-	u := internship.User{Email: "toto", Role: internship.STUDENT}
-	f, _ := NewService(&mock, u)
-	_, err := f.User("toto")
+	//User()
+	f, _ = NewService(&mock, internship.User{Email: "toto", Role: internship.STUDENT})
+	_, err = f.User("toto")
 	assert.NoError(t, err)
 	_, err = f.User("titi")
 	assert.Equal(t, ErrPermission, err)
@@ -60,24 +42,18 @@ func TestUser(t *testing.T) {
 	f, _ = NewService(&mock, internship.User{Email: "toto", Role: internship.ADMIN})
 	_, err = f.User("titi")
 	assert.NoError(t, err)
-}
 
-func TestUsers(t *testing.T) {
-	var mock MockBackend
-	u := internship.User{Email: "toto", Role: internship.STUDENT}
-	f, _ := NewService(&mock, u)
-	_, err := f.Users()
+	//Users()
+	f, _ = NewService(&mock, internship.User{Email: "toto", Role: internship.STUDENT})
+	_, err = f.Users()
 	assert.Equal(t, ErrPermission, err)
 
 	f, _ = NewService(&mock, internship.User{Email: "toto", Role: internship.ADMIN})
 	_, err = f.Users()
 	assert.NoError(t, err)
-}
 
-func TestRmUser(t *testing.T) {
-	var mock MockBackend
-	u := internship.User{Email: "toto", Role: internship.STUDENT}
-	f, _ := NewService(&mock, u)
+	//RmUser()
+	f, _ = NewService(&mock, internship.User{Email: "toto", Role: internship.STUDENT})
 	assert.Equal(t, ErrPermission, f.RmUser("foo"))
 
 	f, _ = NewService(&mock, internship.User{Email: "toto", Role: internship.ROOT})

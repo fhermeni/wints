@@ -1,11 +1,12 @@
-package report
+package handler
 
+/*
 import (
 	"github.com/fhermeni/wints/handler"
 	"github.com/fhermeni/wints/user"
 	"github.com/gorilla/mux"
 	"log"
-	"net/http"	
+	"net/http"
 	"time"
 )
 
@@ -67,7 +68,7 @@ func SetDeadline(srv ReportService, w http.ResponseWriter, r *http.Request) {
 func SetMark(srv ReportService, w http.ResponseWriter, r *http.Request) {
 	kind, _ := mux.Vars(r)["kind"]
 	student := mux.Vars(r)["stu"]
-	var d int	 
+	var d int
 	if handler.JsonRequest(w, r, &d) != nil {
 		log.Println("bad request")
 		return
@@ -113,3 +114,4 @@ func SetContent(srv ReportService, w http.ResponseWriter, r *http.Request) {
 	}
 	w.Write([]byte("1"))
 }
+*/

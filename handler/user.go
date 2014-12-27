@@ -1,10 +1,13 @@
-package user
+package handler
+
+/*package user
 
 import (
-	"github.com/fhermeni/wints/handler"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
+
+	"github.com/fhermeni/wints/handler"
+	"github.com/gorilla/mux"
 )
 
 func reportError(w http.ResponseWriter, msg string, e error) bool {
@@ -25,18 +28,18 @@ func reportError(w http.ResponseWriter, msg string, e error) bool {
 	return false
 }
 
-func Routes(us UserService) []handler.Route{
+func Routes(us UserService) []handler.Route {
 	return []handler.Route{
-		handler.Route{"GET", "/profile",withService(Profile, us)},
+		handler.Route{"GET", "/profile", withService(Profile, us)},
 		handler.Route{"PUT", "/profile", withService(SetProfile, us)},
 		handler.Route{"PUT", "/profile/password", withService(SetPassword, us)},
 		handler.Route{"POST", "/profile/password", withService(NewPassword, us)},
 		handler.Route{"DELETE", "/profile/password", withService(ResetPassword, us)},
-		handler.Route{"GET", "/users/",withService(Admins, us)},
-		handler.Route{"POST", "/users/",withService(NewAdmin, us)},
-		handler.Route{"POST", "/users/{email}/{role}",withService(SetRole, us)},
-		handler.Route{"POST", "/login",withService(SetRole, us)},
-		handler.Route{"POST", "/users/{email}",withService(Login, us)},
+		handler.Route{"GET", "/users/", withService(Admins, us)},
+		handler.Route{"POST", "/users/", withService(NewAdmin, us)},
+		handler.Route{"POST", "/users/{email}/{role}", withService(SetRole, us)},
+		handler.Route{"POST", "/login", withService(SetRole, us)},
+		handler.Route{"POST", "/users/{email}", withService(Login, us)},
 	}
 }
 
@@ -52,7 +55,7 @@ func Profile(us UserService, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	u, err := us.Get(email)
-	if reportError(w, "Unable to get user '" + email + "'", err) {
+	if reportError(w, "Unable to get user '"+email+"'", err) {
 		return
 	}
 	handler.JsonReply(w, false, u)
@@ -73,7 +76,7 @@ func SetProfile(us UserService, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	u, err := us.Get(email)
-	if reportError(w, "Unable to get user '" + email + "'", err) {
+	if reportError(w, "Unable to get user '"+email+"'", err) {
 		return
 	}
 	handler.JsonReply(w, false, u)
@@ -90,11 +93,11 @@ func SetPassword(us UserService, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var p PasswordRenewal	
+	var p PasswordRenewal
 	if handler.JsonRequest(w, r, &p) != nil {
-		return	
+		return
 	}
-	err = us.SetPassword(email, []byte(p.Old), []byte(p.New))	
+	err = us.SetPassword(email, []byte(p.Old), []byte(p.New))
 	reportError(w, "Unable to change the password", err)
 }
 
@@ -103,7 +106,7 @@ func ResetPassword(us UserService, w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
-	var email string	
+	var email string
 	if handler.JsonRequest(w, r, &email) != nil {
 		return
 	}
@@ -115,7 +118,7 @@ func ResetPassword(us UserService, w http.ResponseWriter, r *http.Request) {
 	/*err = mailer.Mail([]string{string(email)}, "mails/account_reset.txt", struct {
 		WWW   string
 		Token string
-	}{cfg.Http.Host, token})*/
+	}{cfg.Http.Host, token})
 	//reportError(w, "Unable to send the token for a password reset by mail", err)
 }
 
@@ -141,7 +144,7 @@ func SetRole(us UserService, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	target, _ := mux.Vars(r)["email"]
-	var role string	
+	var role string
 	if handler.JsonRequest(w, r, &role) != nil {
 		return
 	}
@@ -154,35 +157,35 @@ func SetRole(us UserService, w http.ResponseWriter, r *http.Request) {
 }
 
 func NewAdmin(us UserService, w http.ResponseWriter, r *http.Request) {
-		_, err := handler.Session(w, r)
+	_, err := handler.Session(w, r)
 	if err != nil {
 		return
 	}
-	var nu User	
+	var nu User
 	if handler.JsonRequest(w, r, &nu) != nil {
 		return
 	}
 	err = us.New(nu)
-	if reportError(w, "Unable to create the user " + nu.Fullname(), err) {
+	if reportError(w, "Unable to create the user "+nu.Fullname(), err) {
 		return
 	}
 }
 
-func RmUser(us UserService, w http.ResponseWriter, r *http.Request) {	
+func RmUser(us UserService, w http.ResponseWriter, r *http.Request) {
 	target, _ := mux.Vars(r)["email"]
 	err := us.Rm(target)
 	reportError(w, "Unable to remove user '"+target+"'", err)
 }
 
-func Admins(us UserService, w http.ResponseWriter, r *http.Request) {		
-	users, err := us.List("tutor","major","admin","roles")
+func Admins(us UserService, w http.ResponseWriter, r *http.Request) {
+	users, err := us.List("tutor", "major", "admin", "roles")
 	if err != nil {
 		reportError(w, "Unable to list users", err)
 	}
 	handler.JsonReply(w, false, users)
 }
 
-func Login(us UserService, w http.ResponseWriter, r *http.Request) {		
+func Login(us UserService, w http.ResponseWriter, r *http.Request) {
 	login := r.PostFormValue("login")
 	password := r.PostFormValue("password")
 	_, err := us.Register(login, password)
@@ -192,4 +195,4 @@ func Login(us UserService, w http.ResponseWriter, r *http.Request) {
 	}
 	handler.SetSession(login, w)
 	http.Redirect(w, r, "/", 302)
-}
+}*/
