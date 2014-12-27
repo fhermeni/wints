@@ -98,7 +98,7 @@ func (v *Service) NewUser(p internship.User) ([]byte, error) {
 }
 
 func (v *Service) RmUser(email string) error {
-	if v.my.Role == internship.ROOT {
+	if v.my.Role == internship.ROOT && email != v.my.Email {
 		return v.srv.RmUser(email)
 	}
 	return ErrPermission
@@ -135,8 +135,8 @@ func (v *Service) SetUserProfile(email, fn, ln, tel string) error {
 }
 
 //Change user role
-func (v *Service) SetUserRole(email, priv string) error {
-	if v.my.Role >= internship.ADMIN {
+func (v *Service) SetUserRole(email string, priv internship.Privilege) error {
+	if v.my.Role >= internship.ADMIN && email != v.my.Email {
 		return v.srv.SetUserRole(email, priv)
 	}
 	return ErrPermission

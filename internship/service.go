@@ -48,7 +48,7 @@ type Service interface {
 	SetUserProfile(email, fn, ln, tel string) error
 
 	//Change user role
-	SetUserRole(email, priv string) error
+	SetUserRole(email string, priv Privilege) error
 
 	//Ask for a password reset.
 	//Return a token used to declare the new password (see NewPassword)

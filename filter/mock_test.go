@@ -36,7 +36,11 @@ func (m *MockBackend) User(email string) (internship.User, error) {
 	return internship.User{}, nil
 }
 func (m *MockBackend) Users() ([]internship.User, error) {
-	return []internship.User{}, nil
+	return []internship.User{
+		internship.User{Email: "stu", Role: internship.STUDENT},
+		internship.User{Email: "adm", Role: internship.ADMIN},
+		internship.User{Email: "stu2", Role: internship.STUDENT},
+	}, nil
 }
 func (m *MockBackend) SetUserPassword(email string, oldP, newP []byte) error {
 	return nil
@@ -44,7 +48,7 @@ func (m *MockBackend) SetUserPassword(email string, oldP, newP []byte) error {
 func (m *MockBackend) SetUserProfile(email, fn, ln, tel string) error {
 	return nil
 }
-func (m *MockBackend) SetUserRole(email, priv string) error {
+func (m *MockBackend) SetUserRole(email string, priv internship.Privilege) error {
 	return nil
 }
 func (m *MockBackend) ResetPassword(email string) (string, error) {
