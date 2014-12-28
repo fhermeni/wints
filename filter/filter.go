@@ -22,8 +22,8 @@ func (v *Service) isTutoring(stu string) bool {
 
 //NewService wraps a current unfiltered service to restrict the operation
 //with regards to a given user
-func NewService(srv internship.Service, u internship.User) (Service, error) {
-	return Service{my: u, srv: srv}, nil
+func NewService(srv internship.Service, u internship.User) (*Service, error) {
+	return &Service{my: u, srv: srv}, nil
 }
 
 func (v *Service) NewInternship(student, tutor string, from, to time.Time, c internship.Company, sup internship.Supervisor, Title string) error {

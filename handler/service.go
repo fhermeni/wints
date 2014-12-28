@@ -1,10 +1,9 @@
 package handler
 
 import (
-	"encoding/json"
 	"errors"
-	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/fhermeni/wints/internship"
 	"github.com/gorilla/mux"
@@ -26,7 +25,12 @@ func NewService(backend internship.Service) Service {
 	fs := http.Dir("static/")
 	fileHandler := http.FileServer(fs)
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", fileHandler))
+	http.Handle("/", r)
 	return Service{backend: backend, r: r}
+}
+
+func (s *Service) Listen(p int, cert, pk string) error {
+	return http.ListenAndServeTLS(":"+strconv.Itoa(p), cert, pk, nil)
 }
 
 func userMngt(s Service) {
@@ -34,17 +38,75 @@ func userMngt(s Service) {
 	s.r.HandleFunc("/users/{email}", serviceHandler(user, s)).Methods("GET")
 	s.r.HandleFunc("/users/", serviceHandler(users, s)).Methods("GET")
 	s.r.HandleFunc("/users/{email}", serviceHandler(rmUser, s)).Methods("DELETE")
-	s.r.HandleFunc("/users/{email}/profile", serviceHandler(setProfile, s)).Methods("PUT")
-	//The routes
-	/*
-		TODO
-		PUT /users/{email}/role -> SetRole()
-		POST /users/ -> NewUser()
-		DELETE /users/{email}/password -> ResetPassword()
-		PUT /users/{email}/password -> SetPassword()
-		POST /users/{email}/password -> NewPassword()
-		POST /users/{email}/login -> Registered()
-	*/
+	s.r.HandleFunc("/users/{email}/profile", serviceHandler(setUserProfile, s)).Methods("PUT")
+	s.r.HandleFunc("/users/{email}/role", serviceHandler(setUserRole, s)).Methods("PUT")
+	s.r.HandleFunc("/users/", serviceHandler(newUser, s)).Methods("POST")
+	s.r.HandleFunc("/users/{email}/password", serviceHandler(resetPassword, s)).Methods("DELETE")
+	s.r.HandleFunc("/users/{email}/password", serviceHandler(setPassword, s)).Methods("PUT")
+	s.r.HandleFunc("/newPassword", serviceHandler(newPassword, s)).Methods("POST")
+	s.r.HandleFunc("/login", serviceHandler(login, s)).Methods("POST") //FAIL
+}
+
+type PasswordUpdate struct {
+	Old []byte
+	New []byte
+}
+
+type NewPassword struct {
+	Token []byte
+	New   []byte
+}
+
+func login(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	var email string
+	var password []byte
+	_, err := srv.Registered(email, password)
+	return err
+}
+
+func newPassword(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	var u NewPassword
+	err := jsonRequest(w, r, &u)
+	if err != nil {
+		return err
+	}
+	_, err = srv.NewPassword(u.Token, u.New) //Email of the guy
+	return err
+}
+
+func setPassword(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	e := mux.Vars(r)["email"]
+	var u PasswordUpdate
+	err := jsonRequest(w, r, &u)
+	if err != nil {
+		return err
+	}
+	return srv.SetUserPassword(e, u.Old, u.New)
+}
+
+func resetPassword(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	e := mux.Vars(r)["email"]
+	_, err := srv.ResetPassword(e) //skip the token, should go to the mail
+	return err
+}
+
+func newUser(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	var u internship.User
+	err := jsonRequest(w, r, &u)
+	if err != nil {
+		return err
+	}
+	_, err = srv.NewUser(u) //ignore the password
+	return err
+}
+
+func setUserRole(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	var p internship.Privilege
+	err := jsonRequest(w, r, &p)
+	if err != nil {
+		return err
+	}
+	return srv.SetUserRole(mux.Vars(r)["email"], p)
 }
 
 type ProfileUpdate struct {
@@ -53,56 +115,25 @@ type ProfileUpdate struct {
 	Tel       string
 }
 
-func setProfile(srv Service, w http.ResponseWriter, r *http.Request) error {
+func setUserProfile(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var p ProfileUpdate
 	err := jsonRequest(w, r, &p)
 	if err != nil {
 		return err
 	}
-	return srv.backend.SetUserProfile(mux.Vars(r)["email"], p.Firstname, p.Lastname, p.Tel)
+	return srv.SetUserProfile(mux.Vars(r)["email"], p.Firstname, p.Lastname, p.Tel)
 }
 
-func user(srv Service, w http.ResponseWriter, r *http.Request) error {
-	us, err := srv.backend.User(mux.Vars(r)["email"])
+func user(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	us, err := srv.User(mux.Vars(r)["email"])
 	return writeJSONIfOk(err, w, us)
 }
 
-func rmUser(srv Service, w http.ResponseWriter, r *http.Request) error {
-	return srv.backend.RmUser(mux.Vars(r)["email"])
+func rmUser(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	return srv.RmUser(mux.Vars(r)["email"])
 }
 
-func users(srv Service, w http.ResponseWriter, r *http.Request) error {
-	us, err := srv.backend.Users()
+func users(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	us, err := srv.Users()
 	return writeJSONIfOk(err, w, us)
-}
-
-func jsonRequest(w http.ResponseWriter, r *http.Request, j interface{}) error {
-	dec := json.NewDecoder(r.Body)
-	return dec.Decode(&j)
-}
-
-func writeJSONIfOk(e error, w http.ResponseWriter, j interface{}) error {
-	if e != nil {
-		return nil
-	}
-	w.Header().Set("Content-type", "application/json; charset=utf-8")
-	enc := json.NewEncoder(w)
-	return enc.Encode(j)
-}
-
-func serviceHandler(cb func(Service, http.ResponseWriter, *http.Request) error, srv Service) http.HandlerFunc {
-	//Get the session
-	return func(w http.ResponseWriter, r *http.Request) {
-		e := cb(srv, w, r)
-		switch e {
-		case internship.ErrUnknownUser, internship.ErrUnknownReport, internship.ErrUnknownInternship:
-			http.Error(w, e.Error(), http.StatusNotFound)
-			return
-		case internship.ErrReportExists, internship.ErrUserExists, internship.ErrInternshipExists:
-			http.Error(w, e.Error(), http.StatusConflict)
-			return
-		default:
-			log.Printf("Unsupported error: %s\n", e.Error())
-		}
-	}
 }
