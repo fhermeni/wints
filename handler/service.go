@@ -30,8 +30,7 @@ func NewService(backend internship.Service) Service {
 	reportMngt(s)
 	fs := http.Dir("static/")
 	fileHandler := http.FileServer(fs)
-	r.PathPrefix("/static/").Handler(fileHandler)
-	//r.PathPrefix("/static/").Handler(http.StripPrefix("/static", fileHandler))
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", fileHandler))
 	http.Handle("/", s.r)
 	r.HandleFunc("/", home(backend)).Methods("GET")
 	return s
@@ -96,13 +95,13 @@ func student(srv internship.Service, w http.ResponseWriter, r *http.Request) err
 }
 
 type PasswordUpdate struct {
-	Old []byte
-	New []byte
+	Old string
+	New string
 }
 
 type NewPassword struct {
-	Token []byte
-	New   []byte
+	Token string
+	New   string
 }
 
 func login(srv internship.Service) http.HandlerFunc {
@@ -143,18 +142,18 @@ func newPassword(srv internship.Service, w http.ResponseWriter, r *http.Request)
 	if err != nil {
 		return err
 	}
-	_, err = srv.NewPassword(u.Token, u.New) //Email of the guy
+	_, err = srv.NewPassword([]byte(u.Token), []byte(u.New)) //Email of the guy
 	return err
 }
 
 func setPassword(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
-	e := mux.Vars(r)["email"]
 	var u PasswordUpdate
 	err := jsonRequest(w, r, &u)
+	e := mux.Vars(r)["email"]
 	if err != nil {
 		return err
 	}
-	return srv.SetUserPassword(e, u.Old, u.New)
+	return srv.SetUserPassword(e, []byte(u.Old), []byte(u.New))
 }
 
 func resetPassword(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
