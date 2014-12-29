@@ -2,8 +2,10 @@ package handler
 
 import (
 	"errors"
+	"io/ioutil"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/fhermeni/wints/internship"
 	"github.com/gorilla/mux"
@@ -26,7 +28,11 @@ func NewService(backend internship.Service) Service {
 	fileHandler := http.FileServer(fs)
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", fileHandler))
 	http.Handle("/", r)
-	return Service{backend: backend, r: r}
+	s := Service{backend: backend, r: r}
+	userMngt(s)
+	internshipsMngt(s)
+	reportMngt(s)
+	return s
 }
 
 func (s *Service) Listen(p int, cert, pk string) error {
@@ -136,4 +142,88 @@ func rmUser(srv internship.Service, w http.ResponseWriter, r *http.Request) erro
 func users(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	us, err := srv.Users()
 	return writeJSONIfOk(err, w, us)
+}
+
+func reportMngt(s Service) {
+	s.r.HandleFunc("/internships/{email}/reports/{kind}", serviceHandler(report, s)).Methods("GET")
+	s.r.HandleFunc("/internships/{email}/reports/{kind}/content", serviceHandler(reportContent, s)).Methods("GET")
+	s.r.HandleFunc("/internships/{email}/reports/{kind}/content", serviceHandler(setReportContent, s)).Methods("POST")
+	s.r.HandleFunc("/internships/{email}/reports/{kind}/grade", serviceHandler(setReportGrade, s)).Methods("POST")
+	s.r.HandleFunc("/internships/{email}/reports/{kind}/dealine", serviceHandler(setReportDeadline, s)).Methods("POST")
+	/*
+		PlanReport(student string, r ReportHeader) error -> NO REST CALL
+	*/
+}
+
+func report(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	h, err := srv.Report(mux.Vars(r)["kind"], mux.Vars(r)["email"])
+	return writeJSONIfOk(err, w, h)
+}
+
+func reportContent(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	cnt, err := srv.ReportContent(mux.Vars(r)["kind"], mux.Vars(r)["email"])
+	return fileReplyIfOk(err, w, "application/pdf", mux.Vars(r)["kind"]+".pdf", cnt)
+}
+
+func setReportContent(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	cnt, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return err
+	}
+	err = srv.SetReportContent(mux.Vars(r)["kind"], mux.Vars(r)["email"], cnt)
+	return err
+}
+
+func setReportGrade(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	var n int
+	err := jsonRequest(w, r, &n)
+	if err != nil {
+		return err
+	}
+	err = srv.SetReportGrade(mux.Vars(r)["kind"], mux.Vars(r)["email"], n)
+	return err
+}
+func setReportDeadline(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	var t time.Time
+	err := jsonRequest(w, r, &t)
+	if err != nil {
+		return err
+	}
+	err = srv.SetReportDeadline(mux.Vars(r)["kind"], mux.Vars(r)["email"], t)
+	return err
+}
+
+func internshipsMngt(s Service) {
+	s.r.HandleFunc("/internships/{email}", serviceHandler(getInternship, s)).Methods("GET")
+	s.r.HandleFunc("/internships/", serviceHandler(internships, s)).Methods("GET")
+	s.r.HandleFunc("/internships/{email}/supervisor", serviceHandler(setSupervisor, s)).Methods("POST")
+	s.r.HandleFunc("/internships/{email}/company", serviceHandler(setCompany, s)).Methods("POST")
+}
+
+func getInternship(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	i, err := srv.Internship(mux.Vars(r)["email"])
+	return writeJSONIfOk(err, w, i)
+}
+
+func internships(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	i, err := srv.Internships()
+	return writeJSONIfOk(err, w, i)
+}
+
+func setCompany(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	var c internship.Company
+	err := jsonRequest(w, r, &c)
+	if err != nil {
+		return err
+	}
+	return srv.SetCompany(mux.Vars(r)["email"], c)
+}
+
+func setSupervisor(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	var s internship.Supervisor
+	err := jsonRequest(w, r, &s)
+	if err != nil {
+		return err
+	}
+	return srv.SetSupervisor(mux.Vars(r)["email"], s)
 }
