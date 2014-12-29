@@ -30,7 +30,8 @@ func NewService(backend internship.Service) Service {
 	reportMngt(s)
 	fs := http.Dir("static/")
 	fileHandler := http.FileServer(fs)
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", fileHandler))
+	r.PathPrefix("/static/").Handler(fileHandler)
+	//r.PathPrefix("/static/").Handler(http.StripPrefix("/static", fileHandler))
 	http.Handle("/", s.r)
 	r.HandleFunc("/", home(backend)).Methods("GET")
 	return s
@@ -78,7 +79,8 @@ func userMngt(s Service) {
 	s.r.HandleFunc("/api/v1/users/{email}/password", serviceHandler(resetPassword, s)).Methods("DELETE")
 	s.r.HandleFunc("/api/v1/users/{email}/password", serviceHandler(setPassword, s)).Methods("PUT")
 	s.r.HandleFunc("/api/v1/newPassword", serviceHandler(newPassword, s)).Methods("POST")
-	s.r.HandleFunc("/api/v1/login", login(s.backend)).Methods("POST") //FAIL
+	s.r.HandleFunc("/api/v1/login", login(s.backend)).Methods("POST")  //FAIL
+	s.r.HandleFunc("/api/v1/logout", logout(s.backend)).Methods("GET") //FAIL
 	s.r.HandleFunc("/admin", serviceHandler(admin, s)).Methods("GET")
 	s.r.HandleFunc("/student", serviceHandler(student, s)).Methods("GET")
 }
@@ -105,19 +107,30 @@ type NewPassword struct {
 
 func login(srv internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Here")
 		login := r.PostFormValue("login")
 		password := r.PostFormValue("password")
 		_, err := srv.Registered(login, []byte(password))
 		if err != nil {
-			log.Println("Bad credentials: " + err.Error())
 			http.Redirect(w, r, "/#badLogin", 302)
+			return
 		}
-		log.Println("Valid credentials")
 		cookie := &http.Cookie{
 			Name:  "session",
 			Value: login,
 			Path:  "/",
+		}
+		http.SetCookie(w, cookie)
+		http.Redirect(w, r, "/", 302)
+	}
+}
+
+func logout(srv internship.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		cookie := &http.Cookie{
+			Name:   "session",
+			Value:  "",
+			Path:   "/",
+			MaxAge: -1,
 		}
 		http.SetCookie(w, cookie)
 		http.Redirect(w, r, "/", 302)
