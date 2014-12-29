@@ -1,0 +1,64 @@
+    <!doctype html>
+    <html>
+        <head>
+            <title>Authentification</title>
+            <link rel="stylesheet" href="static/css/bootstrap.min.css">
+            <link rel="stylesheet" href="static/css/bootflat.min.css">
+            <link rel="stylesheet" href="static/css/login.css">
+        </head>
+
+        <body>
+        <div class="container">
+        <div class="row">
+        <div class="col-md-2 col-md-offset-2">                        
+        <div class=" login-icon">
+                    <img src="static/img/uns.png" style="background: #edeff1; padding: 5px; width: 128px"/>
+                    <h4>Welcome to <small>Wints</small></h4>                
+                    </div>
+        </div>
+        <div class="col-md-5 login-screen">
+            <div class="login-form">
+                <div id="login-diag">                    
+                <form method="post" action="/api/v1/login">
+                    <div class="form-group">
+                        <input id="login" name="login" class="form-control login-field" placeholder="Email" type="text"/>
+                        <label class="login-field-icon fui-user"></label>
+                    </div>
+
+                    <div class="form-group" id="group-password">
+                        <input name="password" class="form-control login-field" placeholder="Password" type="password"/>
+                        <label class="login-field-icon fui-lock"></label>
+                    </div>
+                    <div class="text-center alert alert-danger" id="badLogin">Invalid email or password</div>
+                    <input type="submit" class="btn btn-info btn-lg btn-block" value="Log in">
+                    <a class="login-link" onclick="flipForm('login-diag','reset-diag')">lost your password ?</a>
+                </form>
+            </div>
+                <div id="reset-diag" style="display: none">
+                    <div class="form-group">
+                        <input id="email" name="email" class="form-control login-field" placeholder="Email" type="text"/>
+                        <label class="login-field-icon fui-user"></label>
+                    </div>
+                    <div class="text-center">
+                    <a onclick="resetPassword()" class="btn btn-danger btn-lg btn-block">Reset my password</a>
+                    <a class="login-link" onclick="flipForm('reset-diag','login-diag')">Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+
+            <!-- Bootstrap -->
+            <script src="static/js/jquery-2.1.3.min.js"></script>
+            <script src="static/js/bootstrap.min.js"></script>
+            <script src="static/js/login.js"></script>
+
+            <!-- Bootflat's JS files.-->
+            <script src="static/js/icheck.min.js"></script>
+            <script src="static/js/jquery.fs.selecter.min.js"></script>
+            <script src="static/js/jquery.fs.stepper.min.js"></script>
+
+            <script src="static/js/notify.min.js"></script>
+        </body>
+    </html>

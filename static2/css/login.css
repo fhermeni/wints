@@ -1,0 +1,28 @@
+.row {
+	margin-top: 100px;
+}
+.login-icon {		
+	padding: 10px;
+	width: 96px;
+}
+.login-screen {
+padding: 25px;
+background-color: #edeff1;
+border-radius: 6px;
+}
+
+body {
+	background: #37BC9B;
+}
+
+.login {
+	margin-top: 100px;	
+	color: #fff;
+}
+
+.alert {
+    display: none;    
+}
+.alert:target {
+    display: block;
+}	
