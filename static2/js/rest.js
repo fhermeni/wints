@@ -49,6 +49,13 @@ function user(ok, no) {
     }).done(noCb(ok)).fail(restError(no));
 }
 
+function users(ok, no) {    
+    return $.ajax({
+        method: "GET",
+        url: ROOT_API + "/users/",        
+    }).done(noCb(ok)).fail(restError(no));
+}
+
 function setUser(fn, ln, tel, ok, no) {
     var email = document.cookie.split("=")[1]
         return $.ajax({
@@ -65,4 +72,12 @@ function setPassword(old, n, ok, no) {
         url: ROOT_API + "/users/" + email + "/password",
         data: JSON.stringify({Old: old, New:n})
     }).done(noCb(ok)).fail(restError(no));    
+}
+
+function internships(ok, no) {
+    var email = document.cookie.split("=")[1];
+    return $.ajax({
+        method: "GET",
+        url: ROOT_API + "/internships/"        
+    }).done(noCb(ok)).fail(restError(no));   
 }

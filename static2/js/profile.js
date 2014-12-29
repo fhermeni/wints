@@ -1,12 +1,8 @@
-var myself;
-
-$( document ).ready(function() {
-	user(function(u) {
-        myself = u;
-        $("#fullname").html(u.Firstname + " " + u.Lastname);		
-	});	
-	}
-)
+function showMyServices(r) {
+    for (i = 0; i <= r; i++) {
+        $(".role-" + i).show()
+    }
+}
 
 function showProfileEditor() {
     var buf = Handlebars.getTemplate("profileEditor")(myself);

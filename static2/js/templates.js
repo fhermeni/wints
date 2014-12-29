@@ -20,7 +20,7 @@ Handlebars.getTemplate = function(name) {
 };
 
 Handlebars.registerHelper('fullname', function(p) {
-    return p.Lastname + " " + p.Firstname;
+    return p.Firstname + " " + p.Lastname;
 });
 
 Handlebars.registerHelper('shortFullname', function(p) {
@@ -103,16 +103,12 @@ Handlebars.registerHelper('tutorOptions', function(m) {
 });
 
 Handlebars.registerHelper('roleOptions', function(m) {
-    var opts = {
-        '':"None",
-        "major" : "Major",
-        "admin" : "Admin",
-        "root"  : "Root"
-    };
+    var opts = ["none","major","admin","root"];
     var b = '';
-    Object.keys(opts).forEach(function (k) {
-        var selected = m == k ? " selected " : "";
-        b += "<option value='" + k + "' " + selected + " >" + opts[k] + "</option>";
+    var i = 0;
+    opts.forEach(function (k) {
+        var selected = (i++) == m ? " selected " : "";
+        b += "<option value='" + k + "' " + selected + " >" + k + "</option>";
     });
     return new Handlebars.SafeString(b);
 });
