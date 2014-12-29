@@ -46,6 +46,16 @@ func (srv *Service) SetCompany(stu string, c internship.Company) error {
 	return SingleUpdate(srv.DB, internship.ErrUnknownInternship, sql, c.WWW, c.Name, stu)
 }
 
+func (srv *Service) SetMajor(stu, m string) error {
+	sql := "update internships set major=$2 where student=$1"
+	return SingleUpdate(srv.DB, internship.ErrUnknownInternship, sql, stu, m)
+}
+
+func (srv *Service) SetPromotion(stu, p string) error {
+	sql := "update internships set promotion=$2 where student=$1"
+	return SingleUpdate(srv.DB, internship.ErrUnknownInternship, sql, stu, p)
+}
+
 func (srv *Service) Internship(stu string) (internship.Internship, error) {
 	sql := "select stu.firstname, stu.lastname, stu.email, stu.tel, tut.firstname, tut.lastname, tut.email, tut.tel, tut.role, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, startTime, endTime, company, companyWWW from internships, users as stu, users as tut where internships.tutor=tut.email and internships.student = stu.email and stu.email = $1"
 	rows, err := srv.DB.Query(sql, stu)

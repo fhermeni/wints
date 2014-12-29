@@ -3,8 +3,8 @@ package handler
 import (
 	"errors"
 	"io/ioutil"
+	"log"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/fhermeni/wints/internship"
@@ -24,33 +24,73 @@ func NewService(backend internship.Service) Service {
 	//Rest stuff
 	r := mux.NewRouter()
 
-	fs := http.Dir("static/")
-	fileHandler := http.FileServer(fs)
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", fileHandler))
-	http.Handle("/", r)
 	s := Service{backend: backend, r: r}
 	userMngt(s)
 	internshipsMngt(s)
 	reportMngt(s)
+	fs := http.Dir("static/")
+	fileHandler := http.FileServer(fs)
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", fileHandler))
+	http.Handle("/", s.r)
+	r.HandleFunc("/", home(backend)).Methods("GET")
 	return s
 }
 
-func (s *Service) Listen(p int, cert, pk string) error {
-	return http.ListenAndServeTLS(":"+strconv.Itoa(p), cert, pk, nil)
+func home(backend internship.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Println(r.Method + " " + r.URL.String())
+		var err error
+		cookie, err := r.Cookie("session")
+		if err != nil || len(cookie.Value) == 0 {
+			http.ServeFile(w, r, "static/login.html")
+			return
+		}
+		u, err := backend.User(cookie.Value)
+		if err == internship.ErrUnknownUser {
+			http.ServeFile(w, r, "static/login.html")
+			return
+		} else if err != nil {
+			log.Println("Unable to get the user behind the cookie: " + err.Error())
+			http.Error(w, "", http.StatusInternalServerError)
+			return
+		}
+
+		if u.Role == internship.STUDENT {
+			http.Redirect(w, r, "student", 302)
+		} else {
+			http.Redirect(w, r, "admin", 302)
+		}
+	}
+}
+
+func (s *Service) Listen(host string, cert, pk string) error {
+	return http.ListenAndServeTLS(host, cert, pk, nil)
 }
 
 func userMngt(s Service) {
 
-	s.r.HandleFunc("/users/{email}", serviceHandler(user, s)).Methods("GET")
-	s.r.HandleFunc("/users/", serviceHandler(users, s)).Methods("GET")
-	s.r.HandleFunc("/users/{email}", serviceHandler(rmUser, s)).Methods("DELETE")
-	s.r.HandleFunc("/users/{email}/profile", serviceHandler(setUserProfile, s)).Methods("PUT")
-	s.r.HandleFunc("/users/{email}/role", serviceHandler(setUserRole, s)).Methods("PUT")
-	s.r.HandleFunc("/users/", serviceHandler(newUser, s)).Methods("POST")
-	s.r.HandleFunc("/users/{email}/password", serviceHandler(resetPassword, s)).Methods("DELETE")
-	s.r.HandleFunc("/users/{email}/password", serviceHandler(setPassword, s)).Methods("PUT")
-	s.r.HandleFunc("/newPassword", serviceHandler(newPassword, s)).Methods("POST")
-	s.r.HandleFunc("/login", serviceHandler(login, s)).Methods("POST") //FAIL
+	s.r.HandleFunc("/api/v1/users/{email}", serviceHandler(user, s)).Methods("GET")
+	s.r.HandleFunc("/api/v1/users/", serviceHandler(users, s)).Methods("GET")
+	s.r.HandleFunc("/api/v1/users/{email}", serviceHandler(rmUser, s)).Methods("DELETE")
+	s.r.HandleFunc("/api/v1/users/{email}/profile", serviceHandler(setUserProfile, s)).Methods("PUT")
+	s.r.HandleFunc("/api/v1/users/{email}/role", serviceHandler(setUserRole, s)).Methods("PUT")
+	s.r.HandleFunc("/api/v1/users/", serviceHandler(newUser, s)).Methods("POST")
+	s.r.HandleFunc("/api/v1/users/{email}/password", serviceHandler(resetPassword, s)).Methods("DELETE")
+	s.r.HandleFunc("/api/v1/users/{email}/password", serviceHandler(setPassword, s)).Methods("PUT")
+	s.r.HandleFunc("/api/v1/newPassword", serviceHandler(newPassword, s)).Methods("POST")
+	s.r.HandleFunc("/api/v1/login", login(s.backend)).Methods("POST") //FAIL
+	s.r.HandleFunc("/admin", serviceHandler(admin, s)).Methods("GET")
+	s.r.HandleFunc("/student", serviceHandler(student, s)).Methods("GET")
+}
+
+func admin(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	http.ServeFile(w, r, "static/admin.html")
+	return nil
+}
+
+func student(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	http.ServeFile(w, r, "static/student.html")
+	return nil
 }
 
 type PasswordUpdate struct {
@@ -63,11 +103,25 @@ type NewPassword struct {
 	New   []byte
 }
 
-func login(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
-	var email string
-	var password []byte
-	_, err := srv.Registered(email, password)
-	return err
+func login(srv internship.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Println("Here")
+		login := r.PostFormValue("login")
+		password := r.PostFormValue("password")
+		_, err := srv.Registered(login, []byte(password))
+		if err != nil {
+			log.Println("Bad credentials: " + err.Error())
+			http.Redirect(w, r, "/#badLogin", 302)
+		}
+		log.Println("Valid credentials")
+		cookie := &http.Cookie{
+			Name:  "session",
+			Value: login,
+			Path:  "/",
+		}
+		http.SetCookie(w, cookie)
+		http.Redirect(w, r, "/", 302)
+	}
 }
 
 func newPassword(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
@@ -145,11 +199,11 @@ func users(srv internship.Service, w http.ResponseWriter, r *http.Request) error
 }
 
 func reportMngt(s Service) {
-	s.r.HandleFunc("/internships/{email}/reports/{kind}", serviceHandler(report, s)).Methods("GET")
-	s.r.HandleFunc("/internships/{email}/reports/{kind}/content", serviceHandler(reportContent, s)).Methods("GET")
-	s.r.HandleFunc("/internships/{email}/reports/{kind}/content", serviceHandler(setReportContent, s)).Methods("POST")
-	s.r.HandleFunc("/internships/{email}/reports/{kind}/grade", serviceHandler(setReportGrade, s)).Methods("POST")
-	s.r.HandleFunc("/internships/{email}/reports/{kind}/dealine", serviceHandler(setReportDeadline, s)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}", serviceHandler(report, s)).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/content", serviceHandler(reportContent, s)).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/content", serviceHandler(setReportContent, s)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/grade", serviceHandler(setReportGrade, s)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/dealine", serviceHandler(setReportDeadline, s)).Methods("POST")
 	/*
 		PlanReport(student string, r ReportHeader) error -> NO REST CALL
 	*/
@@ -194,10 +248,12 @@ func setReportDeadline(srv internship.Service, w http.ResponseWriter, r *http.Re
 }
 
 func internshipsMngt(s Service) {
-	s.r.HandleFunc("/internships/{email}", serviceHandler(getInternship, s)).Methods("GET")
-	s.r.HandleFunc("/internships/", serviceHandler(internships, s)).Methods("GET")
-	s.r.HandleFunc("/internships/{email}/supervisor", serviceHandler(setSupervisor, s)).Methods("POST")
-	s.r.HandleFunc("/internships/{email}/company", serviceHandler(setCompany, s)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}", serviceHandler(getInternship, s)).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/", serviceHandler(internships, s)).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/{email}/supervisor", serviceHandler(setSupervisor, s)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/company", serviceHandler(setCompany, s)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/major", serviceHandler(setMajor, s)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/promotion", serviceHandler(setPromotion, s)).Methods("POST")
 }
 
 func getInternship(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
@@ -217,6 +273,24 @@ func setCompany(srv internship.Service, w http.ResponseWriter, r *http.Request) 
 		return err
 	}
 	return srv.SetCompany(mux.Vars(r)["email"], c)
+}
+
+func setMajor(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	var c string
+	err := jsonRequest(w, r, &c)
+	if err != nil {
+		return err
+	}
+	return srv.SetMajor(mux.Vars(r)["email"], c)
+}
+
+func setPromotion(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	var c string
+	err := jsonRequest(w, r, &c)
+	if err != nil {
+		return err
+	}
+	return srv.SetPromotion(mux.Vars(r)["email"], c)
 }
 
 func setSupervisor(srv internship.Service, w http.ResponseWriter, r *http.Request) error {

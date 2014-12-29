@@ -9,6 +9,7 @@ import (
 
 	"github.com/fhermeni/wints/config"
 	"github.com/fhermeni/wints/datastore"
+	"github.com/fhermeni/wints/handler"
 	"github.com/fhermeni/wints/mail"
 
 	_ "github.com/lib/pq"
@@ -62,7 +63,7 @@ func setup() (config.Config, mail.Mailer, *datastore.Service, bool, bool, bool) 
 }
 
 func main() {
-	_, _, ds, reset, clean, install := setup()
+	cfg, _, ds, reset, clean, install := setup()
 	defer ds.DB.Close()
 
 	if (install || clean) && confirm() {
@@ -81,13 +82,15 @@ func main() {
 			log.Println("Table created")
 		}
 		os.Exit(0)
-	}
-
-	if reset {
+	} else if reset {
 		err := ds.ResetRootAccount()
 		if err != nil {
 			log.Fatalln("Unable to reset the root account: " + err.Error())
 		}
 		log.Println("Root account reset. Don't forgot to delete it once logged")
+	} else {
+		www := handler.NewService(ds)
+		log.Println("Listening on " + cfg.HTTP.Host)
+		www.Listen(cfg.HTTP.Host, cfg.HTTP.Certificate, cfg.HTTP.PrivateKey)
 	}
 }

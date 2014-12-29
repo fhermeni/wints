@@ -20,6 +20,10 @@ type Service interface {
 	//Set the company for the internship of a given student
 	SetCompany(stu string, c Company) error
 
+	SetMajor(stu string, m string) error
+
+	SetPromotion(stu string, p string) error
+
 	//Get all the internships
 	Internships() ([]Internship, error)
 
@@ -51,7 +55,7 @@ type Service interface {
 
 	//Ask for a password reset.
 	//Return a token used to declare the new password (see NewPassword)
-	ResetPassword(email string) (string, error)
+	ResetPassword(email string) ([]byte, error)
 
 	//Declare the new password using an authentication token
 	NewPassword(token, newP []byte) (string, error)

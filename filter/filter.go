@@ -54,6 +54,20 @@ func (v *Service) SetSupervisor(stu string, sup internship.Supervisor) error {
 	return ErrPermission
 }
 
+func (v *Service) SetMajor(stu, m string) error {
+	if v.ownByStudent(stu) || v.isTutoring(stu) || v.my.Role >= internship.ADMIN {
+		return v.srv.SetMajor(stu, m)
+	}
+	return ErrPermission
+}
+
+func (v *Service) SetPromotion(stu, p string) error {
+	if v.ownByStudent(stu) || v.isTutoring(stu) || v.my.Role >= internship.ADMIN {
+		return v.srv.SetPromotion(stu, p)
+	}
+	return ErrPermission
+}
+
 func (v *Service) SetCompany(stu string, c internship.Company) error {
 	if v.ownByStudent(stu) || v.isTutoring(stu) || v.my.Role >= internship.ADMIN {
 		return v.srv.SetCompany(stu, c)
@@ -142,11 +156,11 @@ func (v *Service) SetUserRole(email string, priv internship.Privilege) error {
 	return ErrPermission
 }
 
-func (v *Service) ResetPassword(email string) (string, error) {
+func (v *Service) ResetPassword(email string) ([]byte, error) {
 	if v.my.Email == email {
 		return v.srv.ResetPassword(email)
 	}
-	return "", ErrPermission
+	return []byte{}, ErrPermission
 }
 
 func (v *Service) NewPassword(token, newP []byte) (string, error) {
