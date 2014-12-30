@@ -107,8 +107,8 @@ Handlebars.registerHelper('roleOptions', function(m) {
     var b = '';
     var i = 0;
     opts.forEach(function (k) {
-        var selected = (i++) == m ? " selected " : "";
-        b += "<option value='" + k + "' " + selected + " >" + k + "</option>";
+        var selected = i == m ? " selected " : "";
+        b += "<option value='" + (i++) + "' " + selected + " >" + k + "</option>";
     });
     return new Handlebars.SafeString(b);
 });

@@ -1,0 +1,67 @@
+{{#if this}}
+<h3>{{len this}} internships</h3>
+<a class="btn-sm btn-primary mail-selection"><span class="fui-mail"></span> mail selection</a>
+<a class="btn-sm btn-primary" onclick="generatefullnames($('#cnt'))"><span class="fui-list"></span> selection fullname'</a>
+<table class="table table-condensed table-hover" id="table-conventions">
+    <thead>
+    <tr>
+        <th class="sorter-false">
+            <label class='checkbox mailto-students'>
+                <input type='checkbox' data-toggle='checkbox'/>
+            </label>
+        </th>
+        <th>Student</th>
+        <th>Promotion</th>
+        <th>Major</th>
+        <th class="sorter-false">
+            <label class='checkbox mailto-sups'>
+                <input type='checkbox' data-toggle='checkbox'/>
+            </label>
+            Supervisor
+        </th>
+        <th class="sorter-false">
+            <label class='checkbox mailto-tutors'>
+                <input type='checkbox' data-toggle='checkbox'/>
+            </label>
+            Tutor
+        </th>
+        <th class="sorter-false rotate"><div><span>Midterm eval.</span></div></th>
+        <th class="sorter-false rotate"><div><span>Final eval.</span></div></th>
+        <th class="sorter-false rotate"><div><span>Supervisor eval.</span></div></th>
+        <th class="sorter-false rotate"><div><span>Defense</span></div></th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#each this}}
+        <tr>
+            <td>
+                <label class='checkbox mail-checkbox mail-checkbox-stu' data-email="{{Stu.P.Email}}">
+                    <input type='checkbox' class="mail-checkbox-students" data-toggle='checkbox' value='{{Stu.P.Email}}'/>
+                </label>
+            </td>
+            <td><a class='clickable' onclick="showDetails('{{Stu.P.Email}}')">{{shortFullname Stu.P}}</a></td>
+            <td>{{Stu.Promotion}}</td>
+            <td>{{Stu.Major}}</td>
+            <td>
+                <label class='checkbox mail-checkbox mail-checkbox-s' data-email="{{Sup.Email}}">
+                    <input type='checkbox' class="mail-checkbox-sup" data-toggle='checkbox' value='{{Sup.Email}}'/>
+                </label>
+                <a href='mailto:{{Sup.Email}}' title='{{fullname Sup}}'>{{shortFullname Sup}}</a>
+            </td>
+            <td>
+                <label class='checkbox mail-checkbox mail-checkbox-t' data-email="{{Tutor.Email}}">
+                    <input type='checkbox' class="mail-checkbox-tutors" data-toggle='checkbox' value='{{Tutor.Email}}'/>
+                </label>
+                <a href='mailto:{{Tutor.Email}}' title='{{fullname Tutor}}'>{{shortFullname Tutor}}</a>
+            </td>
+            <td>{{reportGrade MidtermReport}}</td>
+            <td>{{reportGrade FinalReport}}</td>
+            <td>{{reportGrade SupReport}}</td>
+            <td>{{grade Defense.Grade}}</td>
+        </tr>
+    {{/each}}
+    </tbody>
+</table>
+{{else}}
+    <h5 class="text-center">No internships to watch</h5>
+{{/if}}

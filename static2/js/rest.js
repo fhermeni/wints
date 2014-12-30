@@ -56,6 +56,29 @@ function users(ok, no) {
     }).done(noCb(ok)).fail(restError(no));
 }
 
+function newUser(fn, ln, tel, email, role, ok, no) {
+    return $.ajax({
+        method: "POST",
+        url: ROOT_API + "/users/",
+        data: JSON.stringify({Firstname: fn, Lastname:ln, Tel: tel, Role: role,Email: email})
+    }).done(noCb(ok));        
+}
+
+function rmUser(email, ok, no) {
+    return $.ajax({
+        method: "DELETE",
+        url: ROOT_API + "/users/" + email,        
+    }).done(noCb(ok), restError(no));        
+}
+
+function setUserRole(email, r, ok, no) {    
+    return $.ajax({
+        method: "PUT",
+        url: ROOT_API + "/users/" + email + "/role",
+        data: JSON.stringify(r)
+    }).done(noCb(ok)).fail(restError(no));    
+}
+
 function setUser(fn, ln, tel, ok, no) {
     var email = document.cookie.split("=")[1]
         return $.ajax({
@@ -81,3 +104,5 @@ function internships(ok, no) {
         url: ROOT_API + "/internships/"        
     }).done(noCb(ok)).fail(restError(no));   
 }
+
+

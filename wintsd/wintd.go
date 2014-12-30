@@ -27,9 +27,11 @@ func confirm() bool {
 }
 
 /*
- --install -> check there is no user table. Ok -> install.sql
- --force-install -> clean.sql & install.sql
- --root-account
+ --test-db
+ --invitation XXX
+ --install
+ --test-mailer
+ --test-feeder
 */
 func setup() (config.Config, mail.Mailer, *datastore.Service, bool, bool, bool) {
 	cfgPath := flag.String("conf", "./wints.conf", "daemon configuration file")
