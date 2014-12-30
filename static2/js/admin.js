@@ -141,10 +141,7 @@ function addUser() {
                 function() {
                     $("#modal").modal('hide');
                     reportSuccess("Account created");
-                    syncGetUsers(function (us) {
-                        users = us;
-                    });
-                    showPrivileges();                    
+                    refresh();                    
                 }, function(o) {                	
                     if (o.status == 409) {
                         $("#lbl-nu-email").notify("Already used");
