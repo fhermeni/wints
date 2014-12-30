@@ -61,14 +61,14 @@ function newUser(fn, ln, tel, email, role, ok, no) {
         method: "POST",
         url: ROOT_API + "/users/",
         data: JSON.stringify({Firstname: fn, Lastname:ln, Tel: tel, Role: role,Email: email})
-    }).done(noCb(ok));        
+    }).done(noCb(ok)).fail(restError(no));        
 }
 
 function rmUser(email, ok, no) {
     return $.ajax({
         method: "DELETE",
         url: ROOT_API + "/users/" + email,        
-    }).done(noCb(ok), restError(no));        
+    }).done(noCb(ok)).fail(restError(no));        
 }
 
 function setUserRole(email, r, ok, no) {    

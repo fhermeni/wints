@@ -145,9 +145,9 @@ function addUser() {
                         users = us;
                     });
                     showPrivileges();                    
-                }, function(o) {
+                }, function(o) {                	
                     if (o.status == 409) {
-                        $("#lbl-nu-email").notify("This email is already registered");
+                        $("#lbl-nu-email").notify("Already used");
                     }
                 });
 }
