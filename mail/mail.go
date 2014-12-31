@@ -10,15 +10,15 @@ import (
 	"text/template"
 )
 
-type Mailer struct {
+type SMTP struct {
 	server   string
 	username string
 	password string
 	sender   string
 }
 
-func NewMailer(srv, login, passwd, emitter string) Mailer {
-	m := Mailer{
+func NewSMTP(srv, login, passwd, emitter string) SMTP {
+	m := SMTP{
 		server:   srv,
 		username: login,
 		password: passwd,
@@ -27,7 +27,7 @@ func NewMailer(srv, login, passwd, emitter string) Mailer {
 	return m
 }
 
-func (m *Mailer) Mail(to []string, input string, data interface{}) error {
+func (m *SMTP) Mail(to []string, input string, data interface{}) error {
 
 	var out []byte
 

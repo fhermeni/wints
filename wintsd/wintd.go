@@ -33,7 +33,7 @@ func confirm() bool {
  --test-mailer
  --test-feeder
 */
-func setup() (config.Config, mail.Mailer, *datastore.Service, bool, bool, bool) {
+func setup() (config.Config, mail.SMTP, *datastore.Service, bool, bool, bool) {
 	cfgPath := flag.String("conf", "./wints.conf", "daemon configuration file")
 	reset := flag.Bool("reset", false, "Reset the root account")
 	install := flag.Bool("install", false, "/!\\ Create database tables")
@@ -46,7 +46,7 @@ func setup() (config.Config, mail.Mailer, *datastore.Service, bool, bool, bool) 
 	}
 	log.Println("Parsing " + *cfgPath + ": OK")
 
-	mailer := mail.NewMailer(cfg.Mailer.Server, cfg.Mailer.Login, cfg.Mailer.Password, cfg.Mailer.Sender)
+	mailer := mail.NewSMTP(cfg.Mailer.Server, cfg.Mailer.Login, cfg.Mailer.Password, cfg.Mailer.Sender)
 	if err != nil {
 		log.Fatalln("Unable to setup the mailer: " + err.Error())
 	}

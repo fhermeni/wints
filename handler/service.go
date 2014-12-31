@@ -32,13 +32,12 @@ func NewService(backend internship.Service) Service {
 	fileHandler := http.FileServer(fs)
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", fileHandler))
 	http.Handle("/", s.r)
-	r.HandleFunc("/", home(backend)).Methods("GET")
+	s.r.HandleFunc("/", home(backend)).Methods("GET")
 	return s
 }
 
 func home(backend internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println(r.Method + " " + r.URL.String())
 		var err error
 		cookie, err := r.Cookie("session")
 		if err != nil || len(cookie.Value) == 0 {
@@ -75,7 +74,7 @@ func userMngt(s Service) {
 	s.r.HandleFunc("/api/v1/users/{email}/profile", serviceHandler(setUserProfile, s)).Methods("PUT")
 	s.r.HandleFunc("/api/v1/users/{email}/role", serviceHandler(setUserRole, s)).Methods("PUT")
 	s.r.HandleFunc("/api/v1/users/", serviceHandler(newUser, s)).Methods("POST")
-	s.r.HandleFunc("/api/v1/users/{email}/password", serviceHandler(resetPassword, s)).Methods("DELETE")
+	s.r.HandleFunc("/api/v1/users/{email}/password", resetPassword(s.backend)).Methods("DELETE")
 	s.r.HandleFunc("/api/v1/users/{email}/password", serviceHandler(setPassword, s)).Methods("PUT")
 	s.r.HandleFunc("/api/v1/newPassword", serviceHandler(newPassword, s)).Methods("POST")
 	s.r.HandleFunc("/api/v1/login", login(s.backend)).Methods("POST")  //FAIL
@@ -156,10 +155,16 @@ func setPassword(srv internship.Service, w http.ResponseWriter, r *http.Request)
 	return srv.SetUserPassword(e, []byte(u.Old), []byte(u.New))
 }
 
-func resetPassword(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
-	e := mux.Vars(r)["email"]
-	_, err := srv.ResetPassword(e) //skip the token, should go to the mail
-	return err
+func resetPassword(srv internship.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		e := mux.Vars(r)["email"]
+		token, err := srv.ResetPassword(e)
+		if err != nil {
+			log.Println("Unable to get the reset token for " + e + ": " + err.Error())
+			return
+		}
+		log.Println("Reset token for " + e + " " + string(token))
+	}
 }
 
 func newUser(srv internship.Service, w http.ResponseWriter, r *http.Request) error {

@@ -157,10 +157,7 @@ func (v *Service) SetUserRole(email string, priv internship.Privilege) error {
 }
 
 func (v *Service) ResetPassword(email string) ([]byte, error) {
-	if v.my.Email == email {
-		return v.srv.ResetPassword(email)
-	}
-	return []byte{}, ErrPermission
+	return v.srv.ResetPassword(email)
 }
 
 func (v *Service) NewPassword(token, newP []byte) (string, error) {
