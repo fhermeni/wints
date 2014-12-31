@@ -29,6 +29,21 @@ function missing(id) {
     }
     return false;
 }
+
+function equals(f1, f2) {
+    var v1 = $("#" + f1).val();
+    if (v1.length < 8) {
+        $("#" + f1).notify("Passwords must be 8 characters long minimum");
+        return false;
+    }
+    var v2 = $("#" + f2).val();
+    if (v1 != v2) {
+        $("#" + f2).notify("Password do not match");
+        return false;
+    }
+    return true;
+}
+
 function reportSuccess(msg) {
     $.notify(msg, {autoHideDelay: 1000, className: "success", globalPosition: "top center"})
 }

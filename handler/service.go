@@ -76,11 +76,12 @@ func userMngt(s Service) {
 	s.r.HandleFunc("/api/v1/users/", serviceHandler(newUser, s)).Methods("POST")
 	s.r.HandleFunc("/api/v1/users/{email}/password", resetPassword(s.backend)).Methods("DELETE")
 	s.r.HandleFunc("/api/v1/users/{email}/password", serviceHandler(setPassword, s)).Methods("PUT")
-	s.r.HandleFunc("/api/v1/newPassword", serviceHandler(newPassword, s)).Methods("POST")
+	s.r.HandleFunc("/api/v1/newPassword", newPassword(s.backend)).Methods("POST")
 	s.r.HandleFunc("/api/v1/login", login(s.backend)).Methods("POST")  //FAIL
 	s.r.HandleFunc("/api/v1/logout", logout(s.backend)).Methods("GET") //FAIL
 	s.r.HandleFunc("/admin", serviceHandler(admin, s)).Methods("GET")
 	s.r.HandleFunc("/student", serviceHandler(student, s)).Methods("GET")
+	s.r.HandleFunc("/resetPassword", password).Methods("GET")
 }
 
 func admin(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
@@ -91,6 +92,10 @@ func admin(srv internship.Service, w http.ResponseWriter, r *http.Request) error
 func student(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	http.ServeFile(w, r, "static/student.html")
 	return nil
+}
+
+func password(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "static/new_password.html")
 }
 
 type PasswordUpdate struct {
@@ -135,14 +140,33 @@ func logout(srv internship.Service) http.HandlerFunc {
 	}
 }
 
-func newPassword(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
-	var u NewPassword
-	err := jsonRequest(w, r, &u)
-	if err != nil {
-		return err
+func newPassword(srv internship.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		token := r.PostFormValue("token")
+		password := r.PostFormValue("password")
+		email, err := srv.NewPassword([]byte(token), []byte(password))
+		switch err {
+		case internship.ErrNoPendingRequests:
+			http.Redirect(w, r, "/resetPassword?token="+token+"#noRequest", 302)
+			return
+		case internship.ErrUnknownUser:
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		case nil:
+			//log the user
+			cookie := &http.Cookie{
+				Name:  "session",
+				Value: email,
+				Path:  "/",
+			}
+			http.SetCookie(w, cookie)
+			http.Redirect(w, r, "/", 302)
+		default:
+			log.Println("Unable to reset the password for token " + token + ": " + err.Error())
+			http.Error(w, "Unable to reset the password", http.StatusInternalServerError)
+			return
+		}
 	}
-	_, err = srv.NewPassword([]byte(u.Token), []byte(u.New)) //Email of the guy
-	return err
 }
 
 func setPassword(srv internship.Service, w http.ResponseWriter, r *http.Request) error {

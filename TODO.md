@@ -23,12 +23,11 @@
 #### login page
 
 - [x] login
-- [ ] ask for password reset
-- [ ]
+- [x] ask for password reset
 
 #### password reset
 
-- [ ] reset password
+- [x] reset password
 
 #### admin
 - [x] profile update
