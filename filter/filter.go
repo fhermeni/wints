@@ -26,9 +26,16 @@ func NewService(srv internship.Service, u internship.User) (*Service, error) {
 	return &Service{my: u, srv: srv}, nil
 }
 
-func (v *Service) NewInternship(student, tutor string, from, to time.Time, c internship.Company, sup internship.Supervisor, Title string) error {
+func (v *Service) NewInternship(student, tutor string, from, to time.Time, c internship.Company, sup internship.Person, Title string) error {
 	if v.my.Role >= internship.ADMIN {
 		return v.srv.NewInternship(student, tutor, from, to, c, sup, Title)
+	}
+	return ErrPermission
+}
+
+func (v *Service) NewConvention(c internship.Convention) error {
+	if v.my.Role == internship.ROOT {
+		return v.srv.NewConvention(c)
 	}
 	return ErrPermission
 }
@@ -47,7 +54,7 @@ func (v *Service) Internship(stu string) (internship.Internship, error) {
 	return i, nil
 }
 
-func (v *Service) SetSupervisor(stu string, sup internship.Supervisor) error {
+func (v *Service) SetSupervisor(stu string, sup internship.Person) error {
 	if v.ownByStudent(stu) || v.isTutoring(stu) || v.my.Role >= internship.ADMIN {
 		return v.srv.SetSupervisor(stu, sup)
 	}

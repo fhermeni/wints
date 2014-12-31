@@ -71,8 +71,8 @@ type Company struct {
 	WWW string
 }
 
-//Supervisor just gather informations to contact a company supervisor
-type Supervisor struct {
+//Person just gather informations to contact a company supervisor
+type Person struct {
 	Firstname string
 	Lastname  string
 	Email     string
@@ -86,7 +86,7 @@ type Internship struct {
 	//The academic tutor
 	Tutor User
 	//the company supervisor
-	Sup Supervisor
+	Sup Person
 	//The company
 	Cpy Company
 	//First day of the internship
@@ -97,6 +97,21 @@ type Internship struct {
 	Title string
 	//The headers for each
 	Reports []ReportHeader
+	//The student promotion
+	Promotion string
+	//The student major
+	Major string
+}
+
+type Convention struct {
+	Student    Person
+	Tutor      Person
+	Supervisor Person
+	Cpy        Company
+	Begin      time.Time
+	End        time.Time
+	Title      string
+	Promotion  string
 }
 
 //Predefined errors
@@ -113,4 +128,5 @@ var (
 	ErrCredentials       = errors.New("Incorrect credentials")
 	ErrNoPendingRequests = errors.New("No password renewable request pending")
 	ErrInvalidPeriod     = errors.New("invalid internship period")
+	ErrConventionExists  = errors.New("convention already scanned")
 )

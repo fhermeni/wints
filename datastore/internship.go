@@ -8,12 +8,12 @@ import (
 	"github.com/lib/pq"
 )
 
-func (srv *Service) NewInternship(student, tutor string, from, to time.Time, c internship.Company, sup internship.Supervisor, title string) error {
+func (srv *Service) NewInternship(student, tutor string, from, to time.Time, c internship.Company, sup internship.Person, title string) error {
 	if from.After(to) {
 		return internship.ErrInvalidPeriod
 	}
 	sql := "insert into internships(student, tutor, startTime, endTime, title, supervisorFn, supervisorLn, supervisorTel, supervisorEmail, company, companyWWW) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)"
-	res, err := srv.DB.Exec(sql, student, tutor, from, to, title, sup.Firstname, sup.Lastname, sup.Tel, sup.Email, c.Name, c.WWW)
+	_, err := srv.DB.Exec(sql, student, tutor, from, to, title, sup.Firstname, sup.Lastname, sup.Tel, sup.Email, c.Name, c.WWW)
 	if err != nil {
 		if e, ok := err.(*pq.Error); ok {
 			if e.Constraint == "internships_student_fkey" || e.Constraint == "internships_tutor_fkey" {
@@ -26,17 +26,10 @@ func (srv *Service) NewInternship(student, tutor string, from, to time.Time, c i
 		return err
 
 	}
-	nb, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if nb != 1 {
-		return internship.ErrInternshipExists
-	}
 	return err
 }
 
-func (srv *Service) SetSupervisor(stu string, t internship.Supervisor) error {
+func (srv *Service) SetSupervisor(stu string, t internship.Person) error {
 	sql := "update internships set supervisorFn=$1, supervisorLn=$2, supervisorTel=$3, supervisorEmail=$4 where student=$5"
 	return SingleUpdate(srv.DB, internship.ErrUnknownInternship, sql, t.Firstname, t.Lastname, t.Tel, t.Email, stu)
 }
@@ -82,7 +75,7 @@ func scanInternship(r *sql.Rows) (internship.Internship, error) {
 	stu := internship.User{Firstname: stuFn, Lastname: stuLn, Email: stuEmail, Tel: stuTel, Role: internship.STUDENT}
 	tut := internship.User{Firstname: tutFn, Lastname: tutLn, Email: tutEmail, Tel: tutTel, Role: tutRole}
 	c := internship.Company{Name: company, WWW: companyWWW}
-	sup := internship.Supervisor{Firstname: supFn, Lastname: supLn, Email: supEmail, Tel: supTel}
+	sup := internship.Person{Firstname: supFn, Lastname: supLn, Email: supEmail, Tel: supTel}
 	return internship.Internship{Student: stu, Sup: sup, Tutor: tut, Cpy: c, Begin: start, End: end, Title: title}, nil
 }
 

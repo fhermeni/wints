@@ -17,10 +17,11 @@ const (
 
 //PullerConfig allows to configure the puller that browse the convention database
 type PullerConfig struct {
-	Login    string
-	Password string
-	URL      string
-	Period   string
+	Login      string
+	Password   string
+	URL        string
+	Period     string
+	Promotions []string
 }
 
 //MailerConfig allows to configure the mailing service

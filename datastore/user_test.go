@@ -102,7 +102,7 @@ func TestUserWorkflow(t *testing.T) {
 	//RmUsers
 	//Need an internship to play with conflicts
 	c := internship.Company{Name: "foo", WWW: "bar"}
-	sup := internship.Supervisor{Firstname: "foo", Lastname: "bar", Email: "toto@bac.com", Tel: "12345"}
+	sup := internship.Person{Firstname: "foo", Lastname: "bar", Email: "toto@bac.com", Tel: "12345"}
 	err = s.NewInternship(u1.Email, u2.Email, time.Now(), time.Now(), c, sup, "My")
 	assert.NoError(t, err)
 	//Cannot remove u2

@@ -335,7 +335,7 @@ func setPromotion(srv internship.Service, w http.ResponseWriter, r *http.Request
 }
 
 func setSupervisor(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
-	var s internship.Supervisor
+	var s internship.Person
 	err := jsonRequest(w, r, &s)
 	if err != nil {
 		return err

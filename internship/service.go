@@ -9,13 +9,13 @@ type Service interface {
 	//Internship management
 
 	//New internship
-	NewInternship(student, tutor string, from, to time.Time, c Company, sup Supervisor, Title string) error
+	NewInternship(student, tutor string, from, to time.Time, c Company, sup Person, Title string) error
 
 	//Get the internship associated to a given student
 	Internship(stu string) (Internship, error)
 
 	//Set the supervisor for the internship of a given student
-	SetSupervisor(stu string, sup Supervisor) error
+	SetSupervisor(stu string, sup Person) error
 
 	//Set the company for the internship of a given student
 	SetCompany(stu string, c Company) error
@@ -70,4 +70,6 @@ type Service interface {
 	SetReportDeadline(kind, email string, t time.Time) error
 
 	ResetRootAccount() error
+
+	NewConvention(c Convention) error
 }

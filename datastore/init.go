@@ -38,7 +38,10 @@ create table internships(student text PRIMARY KEY REFERENCES users(email) on del
                         title text
 );
 
-create table conventions(student text PRIMARY KEY REFERENCES users(email) on delete cascade,
+create table conventions(studenEmail text PRIMARY KEY,
+                        studenFn text,
+                        studenLn text,
+                        studenTel text,
                         startTime timestamp with time zone,
                         endTime timeStamp with time zone,
                         tutorFn text,
