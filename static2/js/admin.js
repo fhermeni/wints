@@ -53,7 +53,7 @@ function refresh() {
     } else if (currentPage == "defenses-juries") {
         showDefenses("juries");
     } else if (currentPage == "pending") {
-        pickOne();
+        showPendingConventions();
     } else if (currentPage == "juries") {
         showJuryService();
     } else if (currentPage == "service") {
@@ -155,3 +155,17 @@ function removeUser(email, div) {
         reportSuccess("Account deleted")
     });
 }
+
+function showPendingConventions() {
+    conventions(function(cc) {        
+        if (cc.length > 0) {
+            $("#pending-counter").html(" <span class='badge'>" + cc.length + "</span>");
+        } else {
+            $("#pending-counter").html("");
+        }        
+        var html = Handlebars.getTemplate("pending")(cc[0]);
+        $("#cnt").html(html);
+        $("#cnt").find("select").selecter();
+    });
+}
+

@@ -28,6 +28,7 @@ func NewService(backend internship.Service) Service {
 	userMngt(s)
 	internshipsMngt(s)
 	reportMngt(s)
+	conventionMgnt(s)
 	fs := http.Dir("static/")
 	fileHandler := http.FileServer(fs)
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", fileHandler))

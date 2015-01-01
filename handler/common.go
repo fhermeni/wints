@@ -16,7 +16,7 @@ func jsonRequest(w http.ResponseWriter, r *http.Request, j interface{}) error {
 
 func writeJSONIfOk(e error, w http.ResponseWriter, j interface{}) error {
 	if e != nil {
-		return nil
+		return e
 	}
 	w.Header().Set("Content-type", "application/json; charset=utf-8")
 	enc := json.NewEncoder(w)

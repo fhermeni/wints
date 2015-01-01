@@ -119,12 +119,19 @@ function resetPassword(email, ok, no) {
     }).done(noCb(ok)).fail(restError(no));        
 }
 
-function internships(ok, no) {
-    var email = document.cookie.split("=")[1];
+function internships(ok, no) { 
     return $.ajax({
         method: "GET",
         url: ROOT_API + "/internships/"        
     }).done(noCb(ok)).fail(restError(no));   
+}
+
+function conventions(ok, no) {
+    return $.ajax({
+        method: "GET",
+        url: ROOT_API + "/conventions/"        
+    }).done(noCb(ok)).fail(restError(no));   
+
 }
 
 
