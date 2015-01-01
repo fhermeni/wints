@@ -54,7 +54,7 @@ Handlebars.registerHelper('shortCompany', function(c) {
     return n;
 });
 
-Handlebars.registerHelper('deadline', function(d) {
+Handlebars.registerHelper('date', function(d) {
     var date = new Date(Date.parse(d));
     var now = new Date();
     var str = twoD(date.getDate()) + "/" + twoD(date.getMonth() + 1) + "/" + twoD(date.getFullYear());
@@ -93,14 +93,15 @@ Handlebars.registerHelper('majorOptions', function(m) {
     return new Handlebars.SafeString(b);
 });
 
-Handlebars.registerHelper('tutorOptions', function(m) {
-    var b = "";
-    users.forEach(function (o) {
-        var selected = m == o.Email ? " selected " : "";
-        b += "<option value='" + o.Email + "' " + selected + " >" + o.Firstname + " " + o.Lastname + "</option>";
+
+Handlebars.registerHelper('userSelecter', function(users) {
+    var b = "";    
+    users.forEach(function (o) {        
+        b += "<option value='" + o.Email + "'>" + o.Firstname + " " + o.Lastname + "</option>";
     });
     return new Handlebars.SafeString(b);
 });
+
 
 Handlebars.registerHelper('roleOptions', function(m) {
     var opts = ["none","major","admin","root"];

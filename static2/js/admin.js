@@ -156,16 +156,86 @@ function removeUser(email, div) {
     });
 }
 
-function showPendingConventions() {
-    conventions(function(cc) {        
-        if (cc.length > 0) {
-            $("#pending-counter").html(" <span class='badge'>" + cc.length + "</span>");
-        } else {
-            $("#pending-counter").html("");
-        }        
-        var html = Handlebars.getTemplate("pending")(cc[0]);
-        $("#cnt").html(html);
-        $("#cnt").find("select").selecter();
+
+function pickBestMatching(tutor, users) {    
+    var res = undefined;
+    users.forEach(function (t) {
+        var known_ln  = t.Lastname;
+        if (tutor.Lastname.indexOf(known_ln) > -1 || known_ln.indexOf(tutor.Lastname) > -1) {
+            res = t;
+            return false;
+        }
     });
+    if (res == undefined) {
+        var firstLetter = tutor.Lastname[0];
+        users.forEach(function (t) {
+            var knownFirstLetter = t.Lastname[0];
+            if (firstLetter >= knownFirstLetter) {
+                res =  t;
+            }
+        });
+    }
+    return res;
+}
+
+function showPendingConventions() {
+    conventions(function(cc) {
+        users(function (uss) {            
+            if (cc.length > 0) {
+                $("#pending-counter").html(" <span class='badge'>" + cc.length + "</span>");
+            } else {
+                $("#pending-counter").html("");
+            }        
+            var html = Handlebars.getTemplate("pending")({
+                c: cc[0], users : uss
+            });
+            $("#cnt").html(html);
+            $("#cnt").find("select").selecter();
+            //Find the most appropriate predefined tutor            
+            var best = pickBestMatching(cc[0].Tutor, uss)
+            $("#known-tutor-selector").val(best.Email)            
+
+            if (best.Lastname == cc[0].Tutor.Lastname) {                
+                d=$('#pick-theory');
+                d.confirmation({onConfirm: pickTheory, placement: "top", title: "Sure ? It's a perfect match !"});
+                d.removeAttr("onclick");
+                k=$("#btn-choose-known");
+                k.attr("onclick", "pickKnown()");
+                k.confirmation('destroy');
+            } else {
+                d=$('#pick-theory');
+                d.attr("onclick","pickTheory()");
+                d.confirmation('destroy');
+
+                k=$("#btn-choose-known");
+                k.confirmation({onConfirm: pickKnown, placement: "bottom", title: "Sure ? Tutorhey differ !"});
+                k.removeAttr("onclick");
+            }
+        });
+    });
+}
+
+function pickTheory(cc) {
+    cc.Tutor.Firstname = $("#th-tutor-fn").val();
+    cc.Tutor.Lastname = $("#th-tutor-ln").val();
+    cc.Tutor.Email = $("#th-tutor-email").val();
+    cc.Tutor.Tel = $("#th-tutor-tel").val();
+    commitConvention(cc, function() {
+        reportSuccess("internship added");       
+        refresh()
+    });
+}
+
+function pickKnown(cc) {
+    user($("#known-tutor-selector").val(), function(us) {
+        cc.Tutor = us
+        cc.Cpy.Name = 0;
+        cc.Title = 0;
+        commitConvention(cc, function() {
+        reportSuccess("internship added");       
+        refresh()
+    });
+
+    })
 }
 
