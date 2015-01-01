@@ -72,4 +72,5 @@ type Service interface {
 	ResetRootAccount() error
 
 	NewConvention(c Convention) error
+	Conventions() ([]Convention, error)
 }

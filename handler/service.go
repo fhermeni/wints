@@ -288,6 +288,15 @@ func setReportDeadline(srv internship.Service, w http.ResponseWriter, r *http.Re
 	return err
 }
 
+func conventionMgnt(s Service) {
+	s.r.HandleFunc("/api/v1/conventions/", serviceHandler(conventions, s)).Methods("GET")
+}
+
+func conventions(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	c, err := srv.Conventions()
+	return writeJSONIfOk(err, w, c)
+}
+
 func internshipsMngt(s Service) {
 	s.r.HandleFunc("/api/v1/internships/{email}", serviceHandler(getInternship, s)).Methods("GET")
 	s.r.HandleFunc("/api/v1/internships/", serviceHandler(internships, s)).Methods("GET")

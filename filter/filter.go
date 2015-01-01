@@ -34,10 +34,17 @@ func (v *Service) NewInternship(student, tutor string, from, to time.Time, c int
 }
 
 func (v *Service) NewConvention(c internship.Convention) error {
-	if v.my.Role == internship.ROOT {
+	if v.my.Role >= internship.ADMIN {
 		return v.srv.NewConvention(c)
 	}
 	return ErrPermission
+}
+
+func (v *Service) Conventions() ([]internship.Convention, error) {
+	if v.my.Role >= internship.ADMIN {
+		return v.srv.Conventions()
+	}
+	return []internship.Convention{}, ErrPermission
 }
 
 func (v *Service) Internship(stu string) (internship.Internship, error) {
