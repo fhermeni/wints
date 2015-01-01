@@ -2,8 +2,8 @@ package feeder
 
 import (
 	"encoding/csv"
-	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -40,8 +40,8 @@ type HTTPFeeder struct {
 	promotions []string
 }
 
-func NewHTTPFeeder(url, login, password string, promotions []string) HTTPFeeder {
-	return HTTPFeeder{url: url, login: login, password: password, promotions: promotions}
+func NewHTTPFeeder(url, login, password string, promotions []string) *HTTPFeeder {
+	return &HTTPFeeder{url: url, login: login, password: password, promotions: promotions}
 }
 
 func cleanPerson(fn, ln, email, tel string) internship.Person {
@@ -92,7 +92,6 @@ func (f *HTTPFeeder) scan(year int, prom string) ([]internship.Convention, error
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			fmt.Println("Error:", err)
 			return conventions, err
 		}
 		student := cleanPerson(record[stuFn], record[stuLn], record[stuEmail], record[stuTel])
@@ -125,24 +124,42 @@ func (f *HTTPFeeder) scan(year int, prom string) ([]internship.Convention, error
 	return conventions, err
 }
 
-func (f *HTTPFeeder) InjectConventions(s internship.Service) (int, error) {
-	year := time.Now().Year()
+func (f *HTTPFeeder) injectOnePromotion(s internship.Service, y int, p string) (int, error) {
 	nb := 0
-	var err error
-	for _, prom := range f.promotions {
-		conventions, err := f.scan(year, prom)
-		if err != nil {
+	conventions, err := f.scan(y, p)
+	if err != nil {
+		log.Println("Unable to scan promotion" + p + ": " + err.Error())
+		return nb, err
+	}
+	for _, c := range conventions {
+		err = s.NewConvention(c)
+		if err == nil {
+			nb++
+		} else if err != internship.ErrConventionExists {
+			log.Println("Unable insert a convention: " + err.Error())
 			return nb, err
-		}
-		for _, c := range conventions {
-			err = s.NewConvention(c)
-			if err != internship.ErrConventionExists {
-				return nb, err
-			} else if err != nil {
-				nb++
-			}
-			//Other error is ok
 		}
 	}
 	return nb, err
+}
+
+func (f *HTTPFeeder) InjectConventions(s internship.Service) {
+	year := time.Now().Year()
+	type empty struct{}
+	res := make([]int, len(f.promotions))
+	errors := make([]error, len(f.promotions))
+	sem := make(chan empty, len(f.promotions)) // semaphore pattern
+
+	for i, prom := range f.promotions {
+		go func(i int, p string) {
+			nb, err := f.injectOnePromotion(s, year, p)
+			res[i] = nb
+			errors[i] = err
+			sem <- empty{}
+		}(i, prom)
+	}
+	// wait for goroutines to finish
+	for i := 0; i < len(f.promotions); i++ {
+		<-sem
+	}
 }

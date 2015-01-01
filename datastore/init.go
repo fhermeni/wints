@@ -1,14 +1,16 @@
 package datastore
 
 const (
-	clean = `drop table if exists reports;
+	create = `
+drop table if exists reports;
 drop table if exists internships;
 drop table if exists conventions;
 drop table if exists sessions;
 drop table if exists password_renewal;
 drop table if exists defenses;
-drop table if exists users;`
-	create = `create table users(email text PRIMARY KEY,
+drop table if exists users;
+
+    create table users(email text PRIMARY KEY,
 				  firstname text,
 				  lastname text,
 				  tel text,
@@ -38,10 +40,10 @@ create table internships(student text PRIMARY KEY REFERENCES users(email) on del
                         title text
 );
 
-create table conventions(studenEmail text PRIMARY KEY,
-                        studenFn text,
-                        studenLn text,
-                        studenTel text,
+create table conventions(studentEmail text PRIMARY KEY,
+                        studentFn text,
+                        studentLn text,
+                        studentTel text,
                         startTime timestamp with time zone,
                         endTime timeStamp with time zone,
                         tutorFn text,

@@ -52,9 +52,3 @@ func (s *Service) Install() error {
 	_, err := s.DB.Exec(create)
 	return err
 }
-
-//Clean the database.
-func (s *Service) Clean() error {
-	_, err := s.DB.Exec(clean)
-	return err
-}

@@ -5,7 +5,8 @@
 ### Backend
 
 - [ ] mailing system
-- [ ] convention pulling
+- [x] convention pulling
+- [ ] convention to internships
 - [ ] defenses
 - [ ] distribution
 - [ ] cross-compilation
