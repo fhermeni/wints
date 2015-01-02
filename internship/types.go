@@ -14,6 +14,8 @@ const (
 	MAJOR
 	ADMIN
 	ROOT
+	//DateLayout indicates the date format
+	DateLayout = "02/01/2006 15:04"
 )
 
 //User denotes a person that can authenticate.
@@ -56,11 +58,39 @@ type ReportHeader struct {
 	Deadline time.Time
 	//The grade, between 0 and 20 if graded. <0 if it is waiting for a grade
 	Grade int
+	//The tutor comment
+	Comment string
+}
+
+//ReportsDef allows to define internship reports
+type ReportDef struct {
+	Name     string
+	Deadline string
+	Value    string
 }
 
 //Graded indicates if a report has been graded by its tutor or not
 func (m *ReportHeader) Graded() bool {
 	return m.Grade >= 0
+}
+
+//ReportHeader allows to instantiate a report definition to a header
+func (def *ReportDef) Instantiate(from time.Time) (ReportHeader, error) {
+	switch def.Deadline {
+	case "relative":
+		shift, err := time.ParseDuration(def.Value)
+		if err != nil {
+			return ReportHeader{}, err
+		}
+		return ReportHeader{Kind: def.Name, Deadline: from.Add(shift)}, nil
+	case "absolute":
+		at, err := time.Parse(DateLayout, def.Value)
+		if err != nil {
+			return ReportHeader{}, err
+		}
+		return ReportHeader{Kind: def.Name, Deadline: at}, nil
+	}
+	return ReportHeader{}, errors.New("Unsupported time definition '" + def.Deadline + "'")
 }
 
 //Company is just a composite to store meaningful information for a company hosting a student.

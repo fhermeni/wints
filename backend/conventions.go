@@ -3,7 +3,6 @@ package backend
 import (
 	"database/sql"
 	"errors"
-	"strconv"
 	"time"
 )
 
@@ -39,33 +38,6 @@ func IsTutoring(db *sql.DB, email string) (bool, error) {
 		return false, err
 	}
 	return rows.Next(), nil
-}
-
-func RegisterInternship(db *sql.DB, c Convention, move bool) error {
-	supervisor := c.Sup
-	err := SingleUpdate(db, ErrConventionExists, "insert into internships (student, startTime, endTime, tutor, midtermDeadline, company, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11, $12)",
-		c.Stu.P.Email, c.Begin, c.End, c.Tutor.Email, c.Begin.Add(TWO_MONTHS), c.Company, c.CompanyWWW, supervisor.Firstname, supervisor.Lastname, supervisor.Email, supervisor.Tel, c.Title)
-	if move {
-		_, err := db.Exec("delete from pending_internships where student=$1", c.Stu.P.Email)
-		if err != nil {
-			return err
-		}
-	}
-	//Create the reports
-	_, err = NewReport(db, c.Stu.P.Email, "midterm", c.Begin.Add(TWO_MONTHS))
-	if err != nil {
-		return err
-	}
-	t, _ := time.Parse("02/01/2006", "01/09/"+strconv.Itoa(time.Now().Year()))
-	_, err = NewReport(db, c.Stu.P.Email, "final", t)
-	if err != nil {
-		return err
-	}
-	_, err = NewReport(db, c.Stu.P.Email, "supReport", t)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func scanConvention(db *sql.DB, rows *sql.Rows) (Convention, error) {

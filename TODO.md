@@ -6,7 +6,7 @@
 
 - [ ] mailing system
 - [x] convention pulling
-- [ ] convention to internships
+- [x] convention to internships
 - [ ] defenses
 - [ ] distribution
 - [ ] cross-compilation
@@ -38,7 +38,7 @@
 - [x] new user
 - [x] rm user
 - [x] set user privileges
-- [ ] import conventions
+- [x] import conventions
 - [ ] list all internships
 
 #### student

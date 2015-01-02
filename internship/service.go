@@ -9,7 +9,7 @@ type Service interface {
 	//Internship management
 
 	//New internship
-	NewInternship(student, tutor string, from, to time.Time, c Company, sup Person, Title string) error
+	NewInternship(c Convention) error
 
 	//Get the internship associated to a given student
 	Internship(stu string) (Internship, error)
@@ -63,6 +63,7 @@ type Service interface {
 	//Reports management
 
 	PlanReport(student string, r ReportHeader) error
+	ReportDefs() []ReportDef
 	Report(kind, email string) (ReportHeader, error)
 	ReportContent(kind, email string) ([]byte, error)
 	SetReportContent(kind, email string, cnt []byte) error

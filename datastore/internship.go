@@ -8,15 +8,36 @@ import (
 	"github.com/lib/pq"
 )
 
-func (srv *Service) NewInternship(student, tutor string, from, to time.Time, c internship.Company, sup internship.Person, title string) error {
-	if from.After(to) {
+func rollback(e error, tx *sql.Tx) error {
+	err := tx.Rollback()
+	if err != nil {
+		return err
+	}
+	return e
+}
+func (srv *Service) NewInternship(c internship.Convention) error {
+	if c.Begin.After(c.End) {
 		return internship.ErrInvalidPeriod
 	}
-	sql := "insert into internships(student, tutor, startTime, endTime, title, supervisorFn, supervisorLn, supervisorTel, supervisorEmail, company, companyWWW) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)"
-	_, err := srv.DB.Exec(sql, student, tutor, from, to, title, sup.Firstname, sup.Lastname, sup.Tel, sup.Email, c.Name, c.WWW)
+	tx, err := srv.DB.Begin()
 	if err != nil {
+		return err
+	}
+	//Create the student account
+	sql := "insert into users(email, firstname, lastname, tel, password, role) values ($1,$2,$3,$4,$5,$6)"
+	_, err = tx.Exec(sql, c.Student.Email, c.Student.Firstname, c.Student.Lastname, c.Student.Tel, randomBytes(64), internship.STUDENT)
+	if err != nil {
+		return rollback(internship.ErrUserExists, tx)
+	}
+	//Create the internship
+	sql = "insert into internships(student, promotion, tutor, startTime, endTime, title, supervisorFn, supervisorLn, supervisorTel, supervisorEmail, company, companyWWW) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)"
+	_, err = tx.Exec(sql, c.Student.Email, c.Promotion, c.Tutor.Email, c.Begin, c.End, c.Title, c.Supervisor.Firstname, c.Supervisor.Lastname, c.Supervisor.Tel, c.Supervisor.Email, c.Cpy.Name, c.Cpy.WWW)
+	if err != nil {
+		if err = tx.Rollback(); err != nil {
+			return err
+		}
 		if e, ok := err.(*pq.Error); ok {
-			if e.Constraint == "internships_student_fkey" || e.Constraint == "internships_tutor_fkey" {
+			if e.Constraint == "internships_tutor_fkey" {
 				return internship.ErrUnknownUser
 			}
 			if e.Constraint == "internships_pkey" {
@@ -24,9 +45,25 @@ func (srv *Service) NewInternship(student, tutor string, from, to time.Time, c i
 			}
 		}
 		return err
-
 	}
-	return err
+	//Plan the reports
+	for _, def := range srv.ReportDefs() {
+		hdr, err := def.Instantiate(c.Begin)
+		if err != nil {
+			return rollback(err, tx)
+		}
+		sql = "insert into reports(student, kind, deadline) values($1,$2,$3)"
+		_, err = tx.Exec(sql, c.Student.Email, hdr.Kind, hdr.Deadline)
+		if err != nil {
+			return rollback(err, tx)
+		}
+	}
+	//Delete the old convetion if needed
+	_, err = tx.Exec("delete from conventions where studentEmail=$1", c.Student.Email)
+	if err != nil {
+		return rollback(err, tx)
+	}
+	return tx.Commit()
 }
 
 func (srv *Service) SetSupervisor(stu string, t internship.Person) error {

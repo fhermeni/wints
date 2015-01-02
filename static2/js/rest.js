@@ -12,11 +12,11 @@ function noCb(no) {
     };
 }
 
-function restError(no) {
-    if (no) {
+function restError(no) {    
+    if (no != undefined) {
         return no;
     }
-    return function(jqr, type, status) {
+    return function(jqr) {        
         reportError(jqr.responseText);
     }
 }
@@ -55,8 +55,7 @@ function reportError(msg) {
 var ROOT_API = "/api/v1";
 
 //Profile management
-function user(ok, no) {
-    var email = document.cookie.split("=")[1];
+function user(email, ok, no) {    
     return $.ajax({
         method: "GET",
         url: ROOT_API + "/users/" + email,
@@ -105,7 +104,7 @@ function setUser(fn, ln, tel, ok, no) {
 
 function setPassword(old, n, ok, no) {
     var email = document.cookie.split("=")[1]
-        return $.ajax({
+    return $.ajax({
         method: "PUT",
         url: ROOT_API + "/users/" + email + "/password",
         data: JSON.stringify({Old: old, New:n})
@@ -124,6 +123,14 @@ function internships(ok, no) {
         method: "GET",
         url: ROOT_API + "/internships/"        
     }).done(noCb(ok)).fail(restError(no));   
+}
+
+function newInternship(c, ok, no) {
+    return $.ajax({
+        method: "POST",
+        url: ROOT_API + "/internships/",
+        data: JSON.stringify(c)
+    }).done(noCb(ok)).fail(restError(no));    
 }
 
 function conventions(ok, no) {

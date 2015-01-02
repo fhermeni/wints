@@ -26,9 +26,9 @@ func NewService(srv internship.Service, u internship.User) (*Service, error) {
 	return &Service{my: u, srv: srv}, nil
 }
 
-func (v *Service) NewInternship(student, tutor string, from, to time.Time, c internship.Company, sup internship.Person, Title string) error {
+func (v *Service) NewInternship(c internship.Convention) error {
 	if v.my.Role >= internship.ADMIN {
-		return v.srv.NewInternship(student, tutor, from, to, c, sup, Title)
+		return v.srv.NewInternship(c)
 	}
 	return ErrPermission
 }
@@ -183,6 +183,10 @@ func (v *Service) PlanReport(student string, r internship.ReportHeader) error {
 		return v.srv.PlanReport(student, r)
 	}
 	return ErrPermission
+}
+
+func (v *Service) ReportDefs() []internship.ReportDef {
+	return v.srv.ReportDefs()
 }
 
 func (v *Service) Report(kind, email string) (internship.ReportHeader, error) {

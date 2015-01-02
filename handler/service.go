@@ -301,10 +301,20 @@ func conventions(srv internship.Service, w http.ResponseWriter, r *http.Request)
 func internshipsMngt(s Service) {
 	s.r.HandleFunc("/api/v1/internships/{email}", serviceHandler(getInternship, s)).Methods("GET")
 	s.r.HandleFunc("/api/v1/internships/", serviceHandler(internships, s)).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/", serviceHandler(newInternship, s)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/supervisor", serviceHandler(setSupervisor, s)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/company", serviceHandler(setCompany, s)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/major", serviceHandler(setMajor, s)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/promotion", serviceHandler(setPromotion, s)).Methods("POST")
+}
+
+func newInternship(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	var c internship.Convention
+	err := jsonRequest(w, r, &c)
+	if err != nil {
+		return err
+	}
+	return srv.NewInternship(c)
 }
 
 func getInternship(srv internship.Service, w http.ResponseWriter, r *http.Request) error {

@@ -2,11 +2,12 @@ var interns;
 var currentPage;
 var waitingBlock;
 var myself;
+var currentConvention;
 
 $( document ).ready(function () {
 waitingBlock = $("#cnt").clone().html();
 
-	user(function(u) {
+	user(document.cookie.split("=")[1], function(u) {
         myself = u;
         $("#fullname").html(u.Firstname + " " + u.Lastname);
         showMyServices(u.Role);
@@ -144,7 +145,7 @@ function addUser() {
                     refresh();                    
                 }, function(o) {                	
                     if (o.status == 409) {
-                        $("#lbl-nu-email").notify("Already used");
+                        $("#lbl-nu-email").notify(o.responseText);
                     }
                 });
 }
@@ -180,24 +181,30 @@ function pickBestMatching(tutor, users) {
 
 function showPendingConventions() {
     conventions(function(cc) {
-        users(function (uss) {            
+        users(function (uss) {   
+            uss = uss.filter(function (u) {
+                return u.Role != 0;
+            }); 
             if (cc.length > 0) {
                 $("#pending-counter").html(" <span class='badge'>" + cc.length + "</span>");
             } else {
                 $("#pending-counter").html("");
-            }        
+                $("#cnt").html("<h5 class='text-center'>Nothing to import</h5>")
+                return
+            }   
+            currentConvention = cc[0]     
             var html = Handlebars.getTemplate("pending")({
-                c: cc[0], users : uss
+                c: currentConvention, users : uss
             });
             $("#cnt").html(html);
-            $("#cnt").find("select").selecter();
             //Find the most appropriate predefined tutor            
-            var best = pickBestMatching(cc[0].Tutor, uss)
+            var best = pickBestMatching(currentConvention.Tutor, uss)            
             $("#known-tutor-selector").val(best.Email)            
+            $("#cnt").find("select").selecter();
 
-            if (best.Lastname == cc[0].Tutor.Lastname) {                
+            if (best.Lastname == currentConvention.Tutor.Lastname) {                
                 d=$('#pick-theory');
-                d.confirmation({onConfirm: pickTheory, placement: "top", title: "Sure ? It's a perfect match !"});
+                d.confirmation({onConfirm: pickTheory, placement: "top", title: "Sure ? It's a perfect match !", btnOkLabel: '<i class="icon-ok-sign icon-white"></i> Confirm'});
                 d.removeAttr("onclick");
                 k=$("#btn-choose-known");
                 k.attr("onclick", "pickKnown()");
@@ -208,34 +215,48 @@ function showPendingConventions() {
                 d.confirmation('destroy');
 
                 k=$("#btn-choose-known");
-                k.confirmation({onConfirm: pickKnown, placement: "bottom", title: "Sure ? Tutorhey differ !"});
+                k.confirmation({onConfirm: pickKnown, placement: "bottom", title: "Sure ? They differ !", btnOkLabel: '<i class="icon-ok-sign icon-white"></i> Confirm'});
                 k.removeAttr("onclick");
             }
         });
     });
 }
 
-function pickTheory(cc) {
-    cc.Tutor.Firstname = $("#th-tutor-fn").val();
-    cc.Tutor.Lastname = $("#th-tutor-ln").val();
-    cc.Tutor.Email = $("#th-tutor-email").val();
-    cc.Tutor.Tel = $("#th-tutor-tel").val();
-    commitConvention(cc, function() {
-        reportSuccess("internship added");       
-        refresh()
-    });
+function pickTheory() {
+     if (missing("th-tutor-fn") || missing("th-tutor-ln") || missing("th-tutor-email")  || missing("th-tutor-tel")) {
+        return false;
+    }
+    var fn = $("#th-tutor-fn").val();
+    var ln = $("#th-tutor-ln").val();
+    var email = $("#th-tutor-email").val();
+    var tel = $("#th-tutor-tel").val();
+    newUser(fn, ln, tel, email, -1, function() {        
+        currentConvention.Tutor = {Firstname: fn, Lastname: ln, Tel: tel, Email: email, Role: -1}     
+        reportSuccess("Tutor account created")
+        newInternship(currentConvention, function() {
+            reportSuccess("internship added");       
+            refresh()            
+            })
+    }, function(o) {        
+        if (o.status == 409) {
+            reportSuccess("Tutor account already exists.")
+            newInternship(currentConvention, function() {
+                reportSuccess("internship added");       
+                refresh()            
+            })
+        } else {            
+            reportError(jqr.responseText);
+        }
+    })    
 }
 
-function pickKnown(cc) {
-    user($("#known-tutor-selector").val(), function(us) {
-        cc.Tutor = us
-        cc.Cpy.Name = 0;
-        cc.Title = 0;
-        commitConvention(cc, function() {
-        reportSuccess("internship added");       
-        refresh()
-    });
-
-    })
+function pickKnown() {         
+    user($("#known-tutor-selector").val(), function(us) {        
+        currentConvention.Tutor = us
+        newInternship(currentConvention, function() {
+            reportSuccess("internship added");       
+            refresh()            
+        })
+    });    
 }
 

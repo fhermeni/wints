@@ -13,6 +13,9 @@ func (s *Service) PlanReport(email string, r internship.ReportHeader) error {
 	return SingleUpdate(s.DB, internship.ErrReportExists, sql, email, r.Kind, r.Deadline)
 }
 
+func (s *Service) ReportDefs() []internship.ReportDef {
+	return s.reportDefs
+}
 func (srv *Service) Report(k, email string) (internship.ReportHeader, error) {
 	q := "select deadline, grade from reports where student=$1 and kind=$2"
 	var d time.Time

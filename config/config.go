@@ -3,16 +3,9 @@ package config
 
 import (
 	"encoding/json"
-	"errors"
 	"io/ioutil"
-	"time"
 
 	"github.com/fhermeni/wints/internship"
-)
-
-const (
-	//DateLayout indicates the date format
-	DateLayout = "02/01/2006 15:04"
 )
 
 //PullerConfig allows to configure the puller that browse the convention database
@@ -44,17 +37,10 @@ type HTTPConfig struct {
 	PrivateKey  string
 }
 
-//ReportsDef allows to define internship reports
-type ReportsDef struct {
-	Name     string
-	Deadline string
-	Value    string
-}
-
 //Config aggregates all the subcomponents configuration parameters
 type Config struct {
 	Puller  PullerConfig
-	Reports []ReportsDef
+	Reports []internship.ReportDef
 	DB      DbConfig
 	Mailer  MailerConfig
 	HTTP    HTTPConfig
@@ -70,23 +56,4 @@ func Load(path string) (Config, error) {
 	}
 	err = json.Unmarshal(cnt, &c)
 	return c, err
-}
-
-//ReportHeader allows to instantiate a report definition to a header
-func ReportHeader(from time.Time, h ReportsDef) (internship.ReportHeader, error) {
-	switch h.Deadline {
-	case "relative":
-		shift, err := time.ParseDuration(h.Value)
-		if err != nil {
-			return internship.ReportHeader{}, err
-		}
-		return internship.ReportHeader{h.Name, from.Add(shift), -1}, nil
-	case "absolute":
-		at, err := time.Parse(DateLayout, h.Value)
-		if err != nil {
-			return internship.ReportHeader{}, err
-		}
-		return internship.ReportHeader{h.Name, at, -1}, nil
-	}
-	return internship.ReportHeader{}, errors.New("Unsupported time definition '" + h.Deadline + "'")
 }

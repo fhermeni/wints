@@ -18,17 +18,13 @@ const (
 
 //Service allows to communicate with a database
 type Service struct {
-	DB *sql.DB
+	DB         *sql.DB
+	reportDefs []internship.ReportDef
 }
 
 //NewService initiate the storage servive
-func NewService(db *sql.DB) (*Service, error) {
-	s := Service{DB: db}
-	//Test the connection just in case of lazyness
-	/*_, err := s.Internships()
-	if err != nil {
-		return &Service{}, err
-	}*/
+func NewService(db *sql.DB, reportDefs []internship.ReportDef) (*Service, error) {
+	s := Service{DB: db, reportDefs: reportDefs}
 	return &s, nil
 }
 

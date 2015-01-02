@@ -23,7 +23,7 @@ Handlebars.registerHelper('fullname', function(p) {
     return p.Firstname + " " + p.Lastname;
 });
 
-Handlebars.registerHelper('shortFullname', function(p) {
+Handlebars.registerHelper('shortFullname', function(p) {    
     name = p.Lastname + " " + p.Firstname;
     if (name.length > 20) {
         name = name.substring(0, 17) + "...";
