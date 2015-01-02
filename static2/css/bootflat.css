@@ -1072,8 +1072,8 @@ blockquote {
   padding-left: 5px;
 }
 
-.icheckbox_flat,
-.iradio_flat {
+.icheckbox,
+.iradio {
   display: inline-block;
   width: 20px;
   height: 20px;
@@ -1087,17 +1087,17 @@ blockquote {
   *display: inline;
 }
 
-.icheckbox_flat {
+.icheckbox {
   background-position: 0 0;
 }
-.icheckbox_flat.checked {
+.icheckbox.checked {
   background-position: -22px 0;
 }
-.icheckbox_flat.disabled {
+.icheckbox.disabled {
   cursor: default;
   background-position: -44px 0;
 }
-.icheckbox_flat.checked.disabled {
+.icheckbox.checked.disabled {
   background-position: -66px 0;
 }
 

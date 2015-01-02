@@ -1,24 +1,18 @@
 {{#if this}}
 <h3>{{len this}} internships</h3>
-<a class="btn-sm btn-primary mail-selection"><span class="fui-mail"></span> mail selection</a>
+<a class="btn-sm btn-primary mail-selection" onclick="mailing()"><span class="fui-mail"></span> mail selection</a>
 <a class="btn-sm btn-primary" onclick="generatefullnames($('#cnt'))"><span class="fui-list"></span> selection fullname'</a>
 <table class="table table-condensed table-hover tablesorter" id="table-conventions">
     <thead>
     <tr>
-        <th>
-        <input type='checkbox' data-toggle='checkbox' class='icheckbox_flat'/>
-        Student
+        <th class="sorter-false">
+        <input type='checkbox' data-toggle='checkbox' class='icheckbox_flat check_all'/>
         </th>
+        <th>Student</th>
         <th>Promotion</th>
         <th>Major</th>
-        <th class="sorter-false">            
-            <input type='checkbox' data-toggle='checkbox' class='icheckbox_flat'/>            
-            Supervisor
-        </th>
-        <th>            
-            <input type='checkbox' data-toggle='checkbox' class='icheckbox_flat'/>
-            Tutor
-        </th>
+        <th class="sorter-false">Supervisor</th>
+        <th>Tutor</th>
         <th class="sorter-false">Reports</th>
     </tr>
     </thead>
@@ -26,17 +20,17 @@
     {{#each this}}
         <tr>
             <td>
-            <input type='checkbox' data-toggle='checkbox' class='icheckbox_flat'/>
+            <input type='checkbox' class='icheckbox_flat' data-email='{{Student.Email}}'/>  
+            </td>
+            <td>
             <a class='clickable' onclick="showDetails('{{Stu.P.Email}}')">{{fullname Student}}</a>
             </td>
             <td>{{Promotion}}</td>
             <td>{{Major}}</td>
             <td>                
-                <input type='checkbox' class="mail-checkbox-sup icheckbox_flat" data-toggle='checkbox' value='{{Sup.Email}}'/>                
                 <a href='mailto:{{Sup.Email}}' title='{{fullname Sup}}'>{{fullname Sup}}</a>
             </td>
             <td>                
-                <input type='checkbox' class="mail-checkbox-tutors icheckbox_flat" data-toggle='checkbox' value='{{Tutor.Email}}'/>                
                 <a href='mailto:{{Tutor.Email}}' title='{{fullname Tutor}}'>{{fullname Tutor}}</a>
             </td>            
             <td>

@@ -60,40 +60,24 @@ function refresh() {
 
 function displayMyConventions() { 
 internships(function(data) {   
-    var interns = data;
-    console.log(interns);
+    var interns = data;    
     var html = Handlebars.getTemplate("watchlist")(interns);
     var root = $("#cnt");
     root.html(html);
 	if (interns.length == 0) {
     	return true
-    }    
-    /*root.find('tbody').find(':checkbox').iCheck().on('ifToggled', function (e) {
-        generateMailto(root);
-    });
-    root.find('.mail-checkbox-stu').click(function (e) {
-        shiftSelect(e, this, root,'.mail-checkbox-stu');
-    });
-    root.find('.mail-checkbox-s').click(function (e) {
-        shiftSelect(e, this, root,'.mail-checkbox-s');
-    });
-    root.find('.mail-checkbox-t').click(function (e) {
-        shiftSelect(e, this, root,'.mail-checkbox-t');
-    });
-
-    root.find(".mailto-students").on('ifToggled', function (e) {
-        toggleMailCheckboxes(e.currentTarget, ".mail-checkbox-students", root);
-    });
-    root.find(".mailto-tutors").on('ifToggled', function (e) {
-        toggleMailCheckboxes(e.currentTarget, ".mail-checkbox-tutors", root);
-    });
-    root.find(".mailto-sups").on('ifToggled', function (e) {
-        toggleMailCheckboxes(e.currentTarget, ".mail-checkbox-sup", root);
-    });    */
+    }       
     $("#table-conventions").tablesorter({            
         theme: 'bootstrap',
         widgets : ["uitheme"],
-        headerTemplate : '{content} {icon}',                
+        headerTemplate : '{content} {icon}'
+    });
+    //$("#cnt").find(":checkbox").iCheck("uncheck");    
+    $('#cnt').find(":checkbox").iCheck()
+    $('#cnt').find(".check_all").on("ifChecked", function (e) {
+        $("#cnt").find("td .icheckbox").iCheck("check")        
+    }).on("ifUnchecked", function (e) {
+        $("#cnt").find("td .icheckbox").iCheck("uncheck")        
     });
 });
 }
@@ -246,5 +230,17 @@ function pickKnown() {
             refresh()            
         })
     });    
+}
+
+function mailing() {
+    var students = [];
+    var tutors = [];
+    $(".icheckbox.checked").find(":checkbox").each(function(i, c) {
+        students.push($(c).attr("data-email"));        
+        //Get the associated tutor
+    });
+    if (students.length > 0) {
+        window.location.href = "mailto:" + students.join(",");
+    }    
 }
 
