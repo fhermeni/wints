@@ -270,13 +270,18 @@ func setReportContent(srv internship.Service, w http.ResponseWriter, r *http.Req
 	return err
 }
 
+type ReportGrade struct {
+	Grade   int
+	Comment string
+}
+
 func setReportGrade(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
-	var n int
+	var n ReportGrade
 	err := jsonRequest(w, r, &n)
 	if err != nil {
 		return err
 	}
-	err = srv.SetReportGrade(mux.Vars(r)["kind"], mux.Vars(r)["email"], n)
+	err = srv.SetReportGrade(mux.Vars(r)["kind"], mux.Vars(r)["email"], n.Grade, n.Comment)
 	return err
 }
 func setReportDeadline(srv internship.Service, w http.ResponseWriter, r *http.Request) error {

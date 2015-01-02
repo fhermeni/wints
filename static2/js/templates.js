@@ -257,6 +257,26 @@ Handlebars.registerHelper('reportGrade', function(r) {
 
 });
 
+Handlebars.registerHelper('reportHeader', function(r) {
+    var id = r.Kind[0];
+    var buf = "<span class='report-id' title='" + r.Kind + "'>" + id
+    var grade = "";    
+    var deadline = new Date(Date.parse(r.Deadline));
+    if (deadline < new Date()) {
+        //Expired
+        if (r.Grade < 0) {
+            //Missing
+            grade = "<i class='glyphicon glyphicon-warning-sign'></i>";
+        } else {
+            grade = r.Grade
+        }
+    } else {
+        //Due (question mark <-> uploaded and un-ranked) or not due
+        grade = "-"
+    }
+    buf +=  grade + "</span>"
+    return new Handlebars.SafeString(buf);    
+});
 
 Handlebars.registerHelper('grade', function(g) {
     return g < 0 ? "?" : g;

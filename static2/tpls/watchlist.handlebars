@@ -2,59 +2,50 @@
 <h3>{{len this}} internships</h3>
 <a class="btn-sm btn-primary mail-selection"><span class="fui-mail"></span> mail selection</a>
 <a class="btn-sm btn-primary" onclick="generatefullnames($('#cnt'))"><span class="fui-list"></span> selection fullname'</a>
-<table class="table table-condensed table-hover" id="table-conventions">
+<table class="table table-condensed table-hover tablesorter" id="table-conventions">
     <thead>
     <tr>
-        <th class="sorter-false">
-            <label class='checkbox mailto-students'>
-                <input type='checkbox' data-toggle='checkbox'/>
-            </label>
+        <th>
+        <input type='checkbox' data-toggle='checkbox' class='icheckbox_flat'/>
+        Student
         </th>
-        <th>Student</th>
         <th>Promotion</th>
         <th>Major</th>
-        <th class="sorter-false">
-            <label class='checkbox mailto-sups'>
-                <input type='checkbox' data-toggle='checkbox'/>
-            </label>
+        <th class="sorter-false">            
+            <input type='checkbox' data-toggle='checkbox' class='icheckbox_flat'/>            
             Supervisor
         </th>
-        <th class="sorter-false">
-            <label class='checkbox mailto-tutors'>
-                <input type='checkbox' data-toggle='checkbox'/>
-            </label>
+        <th>            
+            <input type='checkbox' data-toggle='checkbox' class='icheckbox_flat'/>
             Tutor
         </th>
-        <!--
-        <th class="sorter-false rotate"><div><span>Midterm eval.</span></div></th>
-        <th class="sorter-false rotate"><div><span>Final eval.</span></div></th>
-        <th class="sorter-false rotate"><div><span>Supervisor eval.</span></div></th>
-        <th class="sorter-false rotate"><div><span>Defense</span></div></th>-->
+        <th class="sorter-false">Reports</th>
     </tr>
     </thead>
     <tbody>
     {{#each this}}
         <tr>
             <td>
-                <label class='checkbox mail-checkbox mail-checkbox-stu' data-email="{{Stu.P.Email}}">
-                    <input type='checkbox' class="mail-checkbox-students" data-toggle='checkbox' value='{{Student.Email}}'/>
-                </label>
+            <input type='checkbox' data-toggle='checkbox' class='icheckbox_flat'/>
+            <a class='clickable' onclick="showDetails('{{Stu.P.Email}}')">{{fullname Student}}</a>
             </td>
-            <td><a class='clickable' onclick="showDetails('{{Stu.P.Email}}')">{{shortFullname Student}}</a></td>
-            <td>{{Stu.Promotion}}</td>
-            <td>{{Stu.Major}}</td>
-            <td>
-                <label class='checkbox mail-checkbox mail-checkbox-s' data-email="{{Sup.Email}}">
-                    <input type='checkbox' class="mail-checkbox-sup" data-toggle='checkbox' value='{{Sup.Email}}'/>
-                </label>
-                <a href='mailto:{{Sup.Email}}' title='{{fullname Sup}}'>{{shortFullname Sup}}</a>
+            <td>{{Promotion}}</td>
+            <td>{{Major}}</td>
+            <td>                
+                <input type='checkbox' class="mail-checkbox-sup icheckbox_flat" data-toggle='checkbox' value='{{Sup.Email}}'/>                
+                <a href='mailto:{{Sup.Email}}' title='{{fullname Sup}}'>{{fullname Sup}}</a>
             </td>
-            <td>
-                <label class='checkbox mail-checkbox mail-checkbox-t' data-email="{{Tutor.Email}}">
-                    <input type='checkbox' class="mail-checkbox-tutors" data-toggle='checkbox' value='{{Tutor.Email}}'/>
-                </label>
-                <a href='mailto:{{Tutor.Email}}' title='{{fullname Tutor}}'>{{shortFullname Tutor}}</a>
+            <td>                
+                <input type='checkbox' class="mail-checkbox-tutors icheckbox_flat" data-toggle='checkbox' value='{{Tutor.Email}}'/>                
+                <a href='mailto:{{Tutor.Email}}' title='{{fullname Tutor}}'>{{fullname Tutor}}</a>
             </td>            
+            <td>
+                {{#each Reports}}
+                <span>
+                {{reportHeader this}}
+                </span>
+                {{/each}}
+            </td>
         </tr>
     {{/each}}
     </tbody>

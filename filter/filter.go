@@ -210,9 +210,9 @@ func (v *Service) SetReportContent(kind, email string, cnt []byte) error {
 	return ErrPermission
 }
 
-func (v *Service) SetReportGrade(kind, email string, r int) error {
+func (v *Service) SetReportGrade(kind, email string, r int, comment string) error {
 	if v.my.Role >= internship.ADMIN || v.isTutoring(email) {
-		return v.srv.SetReportGrade(kind, email, r)
+		return v.srv.SetReportGrade(kind, email, r, comment)
 	}
 	return ErrPermission
 }

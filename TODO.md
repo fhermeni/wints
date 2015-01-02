@@ -10,7 +10,7 @@
 - [ ] defenses
 - [ ] distribution
 - [ ] cross-compilation
-- [ ] comments for grades
+- [x] comments for grades
 
 ### Daemon
 

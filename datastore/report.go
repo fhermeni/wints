@@ -46,12 +46,12 @@ func (srv *Service) SetReportContent(kind, email string, cnt []byte) error {
 
 }
 
-func (s *Service) SetReportGrade(kind, email string, g int) error {
+func (s *Service) SetReportGrade(kind, email string, g int, comment string) error {
 	if g < 0 || g > 20 {
 		return internship.ErrInvalidGrade
 	}
-	sql := "update reports set grade=$3 where student=$1 and kind=$2"
-	return SingleUpdate(s.DB, internship.ErrUnknownReport, sql, email, kind, g)
+	sql := "update reports set grade=$3 comment=$4 where student=$1 and kind=$2"
+	return SingleUpdate(s.DB, internship.ErrUnknownReport, sql, email, kind, g, comment)
 }
 
 func (s *Service) SetReportDeadline(kind, email string, t time.Time) error {

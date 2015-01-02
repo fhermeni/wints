@@ -140,5 +140,3 @@ function conventions(ok, no) {
     }).done(noCb(ok)).fail(restError(no));   
 
 }
-
-

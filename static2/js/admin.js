@@ -11,21 +11,14 @@ waitingBlock = $("#cnt").clone().html();
         myself = u;
         $("#fullname").html(u.Firstname + " " + u.Lastname);
         showMyServices(u.Role);
+    if (myself.Role >= 1) {
+        showPage(undefined, "conventions");
+    } else {
+        showPage(undefined, "myStudents");
+    }
+
 	});	
 	
-       internships(function(data) {
-       if (!interns) {            
-        	interns = data;
-            if (myself.Role >= 1) {
-                showPage(undefined, "conventions");
-            } else {
-                showPage(undefined, "myStudents");
-            }
-        } else {
-            interns = data;
-        }
-    }
-    );
 });
 
 function showPage(li, id) {
@@ -65,15 +58,17 @@ function refresh() {
     }
 }
 
-function displayMyConventions() {
+function displayMyConventions() { 
+internships(function(data) {   
+    var interns = data;
+    console.log(interns);
     var html = Handlebars.getTemplate("watchlist")(interns);
     var root = $("#cnt");
     root.html(html);
 	if (interns.length == 0) {
     	return true
-    }
-    root.find(':checkbox').checkbox();
-    root.find('tbody').find(':checkbox').checkbox().on('toggle', function (e) {
+    }    
+    /*root.find('tbody').find(':checkbox').iCheck().on('ifToggled', function (e) {
         generateMailto(root);
     });
     root.find('.mail-checkbox-stu').click(function (e) {
@@ -86,28 +81,21 @@ function displayMyConventions() {
         shiftSelect(e, this, root,'.mail-checkbox-t');
     });
 
-    root.find(".mailto-students").on('toggle', function (e) {
+    root.find(".mailto-students").on('ifToggled', function (e) {
         toggleMailCheckboxes(e.currentTarget, ".mail-checkbox-students", root);
     });
-    root.find(".mailto-tutors").on('toggle', function (e) {
+    root.find(".mailto-tutors").on('ifToggled', function (e) {
         toggleMailCheckboxes(e.currentTarget, ".mail-checkbox-tutors", root);
     });
-    root.find(".mailto-sups").on('toggle', function (e) {
+    root.find(".mailto-sups").on('ifToggled', function (e) {
         toggleMailCheckboxes(e.currentTarget, ".mail-checkbox-sup", root);
-    });
-    $("#table-conventions").tablesorter({
-        headers: {
-            0: {sorter: false},
-            4: {sorter: false},
-            5: {sorter: false},
-            6: {sorter: "grades"},
-            7: {sorter: "grades"},
-            8: {sorter: "grades"}
-        },
+    });    */
+    $("#table-conventions").tablesorter({            
         theme: 'bootstrap',
-        widgets : ["columns"],
-        headerTemplate : '{content} {icon}'
+        widgets : ["uitheme"],
+        headerTemplate : '{content} {icon}',                
     });
+});
 }
 
 function showPrivileges() {
@@ -198,7 +186,7 @@ function showPendingConventions() {
             });
             $("#cnt").html(html);
             //Find the most appropriate predefined tutor            
-            var best = pickBestMatching(currentConvention.Tutor, uss)            
+            var best = pickBestMatching(currentConvention.Tutor, uss)                        
             $("#known-tutor-selector").val(best.Email)            
             $("#cnt").find("select").selecter();
 

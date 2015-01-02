@@ -30,6 +30,7 @@ func (srv *Service) NewInternship(c internship.Convention) error {
 	if err != nil {
 		return rollback(internship.ErrUserExists, tx)
 	}
+	srv.ResetPassword(c.Student.Email)
 	//Create the internship
 	sql = "insert into internships(student, promotion, tutor, startTime, endTime, title, supervisorFn, supervisorLn, supervisorTel, supervisorEmail, company, companyWWW) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)"
 	_, err = tx.Exec(sql, c.Student.Email, c.Promotion, c.Tutor.Email, c.Begin, c.End, c.Title, c.Supervisor.Firstname, c.Supervisor.Lastname, c.Supervisor.Tel, c.Supervisor.Email, c.Cpy.Name, c.Cpy.WWW)
@@ -94,7 +95,12 @@ func (srv *Service) Internship(stu string) (internship.Internship, error) {
 		return internship.Internship{}, internship.ErrUnknownInternship
 	}
 	defer rows.Close()
-	return scanInternship(rows)
+	i, err := scanInternship(rows)
+	if err != nil {
+		return internship.Internship{}, err
+	}
+	err = srv.appendReports(&i)
+	return i, err
 }
 
 func scanInternship(r *sql.Rows) (internship.Internship, error) {
@@ -122,6 +128,32 @@ func scanInternship(r *sql.Rows) (internship.Internship, error) {
 	return i, err
 }
 
+func (srv *Service) appendReports(i *internship.Internship) error {
+	s := "select kind, grade, deadline, comment from reports where student=$1"
+	rows, err := srv.DB.Query(s, i.Student.Email)
+	if err != nil {
+		return err
+	}
+	i.Reports = make([]internship.ReportHeader, 0, 0)
+	for rows.Next() {
+		var kind string
+		var comment sql.NullString
+		var grade sql.NullInt64
+		var deadline time.Time
+		rows.Scan(&kind, &grade, &deadline, &comment)
+		hdr := internship.ReportHeader{Kind: kind, Deadline: deadline, Grade: -1}
+		if comment.Valid {
+			hdr.Comment = comment.String
+		}
+		if grade.Valid {
+			hdr.Grade = int(grade.Int64)
+		}
+		i.Reports = append(i.Reports, hdr)
+	}
+	defer rows.Close()
+	return err
+}
+
 func (srv *Service) Internships() ([]internship.Internship, error) {
 	sql := "select stu.firstname, stu.lastname, stu.email, stu.tel, promotion, major, tut.firstname, tut.lastname, tut.email, tut.tel, tut.role, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, startTime, endTime, company, companyWWW from internships, users as stu, users as tut where internships.tutor=tut.email and internships.student = stu.email"
 	internships := make([]internship.Internship, 0, 0)
@@ -131,8 +163,15 @@ func (srv *Service) Internships() ([]internship.Internship, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		i, _ := scanInternship(rows)
+		i, err := scanInternship(rows)
+		if err != nil {
+			return internships, err
+		}
+		err = srv.appendReports(&i)
+		if err != nil {
+			return internships, err
+		}
 		internships = append(internships, i)
 	}
-	return internships, nil
+	return internships, err
 }
