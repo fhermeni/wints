@@ -25,10 +25,11 @@
             </label>
             Tutor
         </th>
+        <!--
         <th class="sorter-false rotate"><div><span>Midterm eval.</span></div></th>
         <th class="sorter-false rotate"><div><span>Final eval.</span></div></th>
         <th class="sorter-false rotate"><div><span>Supervisor eval.</span></div></th>
-        <th class="sorter-false rotate"><div><span>Defense</span></div></th>
+        <th class="sorter-false rotate"><div><span>Defense</span></div></th>-->
     </tr>
     </thead>
     <tbody>
@@ -36,10 +37,10 @@
         <tr>
             <td>
                 <label class='checkbox mail-checkbox mail-checkbox-stu' data-email="{{Stu.P.Email}}">
-                    <input type='checkbox' class="mail-checkbox-students" data-toggle='checkbox' value='{{Stu.P.Email}}'/>
+                    <input type='checkbox' class="mail-checkbox-students" data-toggle='checkbox' value='{{Student.Email}}'/>
                 </label>
             </td>
-            <td><a class='clickable' onclick="showDetails('{{Stu.P.Email}}')">{{shortFullname Stu.P}}</a></td>
+            <td><a class='clickable' onclick="showDetails('{{Stu.P.Email}}')">{{shortFullname Student}}</a></td>
             <td>{{Stu.Promotion}}</td>
             <td>{{Stu.Major}}</td>
             <td>
@@ -53,11 +54,7 @@
                     <input type='checkbox' class="mail-checkbox-tutors" data-toggle='checkbox' value='{{Tutor.Email}}'/>
                 </label>
                 <a href='mailto:{{Tutor.Email}}' title='{{fullname Tutor}}'>{{shortFullname Tutor}}</a>
-            </td>
-            <td>{{reportGrade MidtermReport}}</td>
-            <td>{{reportGrade FinalReport}}</td>
-            <td>{{reportGrade SupReport}}</td>
-            <td>{{grade Defense.Grade}}</td>
+            </td>            
         </tr>
     {{/each}}
     </tbody>

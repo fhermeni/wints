@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"database/sql"
+	"log"
 	"time"
 
 	"github.com/fhermeni/wints/internship"
@@ -87,37 +88,42 @@ func (srv *Service) SetPromotion(stu, p string) error {
 }
 
 func (srv *Service) Internship(stu string) (internship.Internship, error) {
-	sql := "select stu.firstname, stu.lastname, stu.email, stu.tel, tut.firstname, tut.lastname, tut.email, tut.tel, tut.role, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, startTime, endTime, company, companyWWW from internships, users as stu, users as tut where internships.tutor=tut.email and internships.student = stu.email and stu.email = $1"
+	sql := "select stu.firstname, stu.lastname, stu.email, stu.tel, promotion, major, tut.firstname, tut.lastname, tut.email, tut.tel, tut.role, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, startTime, endTime, company, companyWWW from internships, users as stu, users as tut where internships.tutor=tut.email and internships.student = stu.email and stu.email = $1"
 	rows, err := srv.DB.Query(sql, stu)
 	if err != nil || !rows.Next() {
 		return internship.Internship{}, internship.ErrUnknownInternship
 	}
-
 	defer rows.Close()
 	return scanInternship(rows)
 }
 
 func scanInternship(r *sql.Rows) (internship.Internship, error) {
-	var stuFn, stuLn, stuEmail, stuTel string
+	var stuFn, stuLn, stuEmail, stuTel, prom string
+	var major sql.NullString
 	var tutFn, tutLn, tutEmail, tutTel string
 	var tutRole internship.Privilege
 	var supFn, supLn, supEmail, supTel string
 	var company, companyWWW string
 	var title string
 	var start, end time.Time
-	err := r.Scan(&stuFn, &stuLn, &stuEmail, &stuTel, &tutFn, &tutLn, &tutEmail, &tutTel, &tutRole, &supFn, &supLn, &supEmail, &supTel, &title, &start, &end, &company, &companyWWW)
+	err := r.Scan(&stuFn, &stuLn, &stuEmail, &stuTel, &prom, &major, &tutFn, &tutLn, &tutEmail, &tutTel, &tutRole, &supFn, &supLn, &supEmail, &supTel, &title, &start, &end, &company, &companyWWW)
 	if err != nil {
+		log.Println(err.Error())
 		return internship.Internship{}, err
 	}
 	stu := internship.User{Firstname: stuFn, Lastname: stuLn, Email: stuEmail, Tel: stuTel, Role: internship.STUDENT}
 	tut := internship.User{Firstname: tutFn, Lastname: tutLn, Email: tutEmail, Tel: tutTel, Role: tutRole}
 	c := internship.Company{Name: company, WWW: companyWWW}
 	sup := internship.Person{Firstname: supFn, Lastname: supLn, Email: supEmail, Tel: supTel}
-	return internship.Internship{Student: stu, Sup: sup, Tutor: tut, Cpy: c, Begin: start, End: end, Title: title}, nil
+	i := internship.Internship{Student: stu, Promotion: prom, Sup: sup, Tutor: tut, Cpy: c, Begin: start, End: end, Title: title}
+	if major.Valid {
+		i.Major = major.String
+	}
+	return i, err
 }
 
 func (srv *Service) Internships() ([]internship.Internship, error) {
-	sql := "select stu.firstname, stu.lastname, stu.email, stu.tel, tut.firstname, tut.lastname, tut.email, tut.tel, tut.role, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, startTime, endTime, company, companyWWW from internships, users as stu, users as tut where internships.tutor=tut.email and internships.student = stu.email"
+	sql := "select stu.firstname, stu.lastname, stu.email, stu.tel, promotion, major, tut.firstname, tut.lastname, tut.email, tut.tel, tut.role, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, startTime, endTime, company, companyWWW from internships, users as stu, users as tut where internships.tutor=tut.email and internships.student = stu.email"
 	internships := make([]internship.Internship, 0, 0)
 	rows, err := srv.DB.Query(sql)
 	if err != nil {
