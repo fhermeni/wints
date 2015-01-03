@@ -1,0 +1,50 @@
+{{#if this}}
+<a class="btn-sm btn-primary mail-selection" onclick="mailing()"><span class="fui-mail"></span> mail selection</a>
+<a class="btn-sm btn-success" href="#" onclick="showRawService()"><span class="fui-list"></span> copy to clipboard</a>
+<br/>
+<table class="table table-condensed table-hover tablesorter" id="service">
+    <thead>
+    <tr>
+        <th><input type='checkbox' data-toggle='checkbox' class='icheckbox_flat check_all'/></th>
+        <th>User</th>
+        <th>Tutored students</th>
+        <th>Defense committees</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#each this}}
+        <tr>
+            <td>                
+                <input type='checkbox' class="icheckbox_flat" data-toggle='checkbox' data-email='{{P.Email}}'/>                
+            </td>
+            <td class="text-left">
+                <a href="mailto:{{P.Email}}">{{fullname P}}</a>
+            </td>
+            <td>
+            {{#if Internships}}
+                {{len Internships}} ({{majors Internships}})
+            {{else}}
+                -
+            {{/if}}
+            </td>
+            <td>
+                {{#if juries}}
+                    {{len juries}}
+                    <span class="small">
+                    (
+                        {{#each juriesMajor}}
+                            {{this}}
+                        {{/each}}
+                        )
+                    </span>
+                {{else}}
+                    -
+                {{/if}}
+            </td>
+        </tr>
+    {{/each}}
+    </tbody>
+</table>
+{{else}}
+    <h5 class="text-center">No tutors</h5>
+{{/if}}

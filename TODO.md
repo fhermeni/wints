@@ -40,7 +40,10 @@
 - [x] rm user
 - [x] set user privileges
 - [x] import conventions
-- [ ] list all internships
+- [ ] edit student info/title on import to fix bad charset
+- [x] list all internships
+- [ ] profile editor
+- [x] show service
 
 #### student
 - [ ] profile update
