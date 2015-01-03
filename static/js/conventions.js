@@ -252,9 +252,9 @@ function getAllConventions() {
     );
 }
 
-function shiftSelect(e, me, root, cl) {
+function shiftSelect(e, me) {
     if (e.shiftKey || e.metaKey) {
-        var tr = $(me).closest("tr");
+        var tr = $(me).closest("tr");        
         var p = tr.prev();
         while (p.length > 0) {
             var lbl = p.find(cl);
@@ -264,8 +264,7 @@ function shiftSelect(e, me, root, cl) {
                 lbl.addClass("checked");
             }
             p = p.prev();
-        }
-        generateMailto(root);
+        }        
     }
 }
 

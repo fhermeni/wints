@@ -3,7 +3,7 @@ var currentPage;
 var waitingBlock;
 var myself;
 var currentConvention;
-
+var shiftPressed = false;
 $( document ).ready(function () {
 waitingBlock = $("#cnt").clone().html();
 
@@ -19,6 +19,15 @@ waitingBlock = $("#cnt").clone().html();
 
 	});	
 	
+    $(document).keydown(function (e) {
+        if (e.keyCode == 16) {console.log("down"); shiftPressed = true;}
+    });
+    $(document).keyup(function (e) {
+        
+        if (e.keyCode == 16) {console.log("up"); shiftPressed = false;}
+    });
+
+
 });
 
 function showPage(li, id) {
@@ -60,7 +69,7 @@ function refresh() {
 
 function displayMyConventions() { 
 internships(function(data) {   
-    var interns = data;    
+    interns = data;    
     var html = Handlebars.getTemplate("watchlist")(interns);
     var root = $("#cnt");
     root.html(html);
@@ -70,18 +79,41 @@ internships(function(data) {
     $("#table-conventions").tablesorter({            
         theme: 'bootstrap',
         widgets : ["uitheme"],
-        headerTemplate : '{content} {icon}'
+        headerTemplate : '{content} {icon}',
+        headers : {
+            0: {sorter:false}
+        }
     });
     //$("#cnt").find(":checkbox").iCheck("uncheck");    
     $('#cnt').find(":checkbox").iCheck()
     $('#cnt').find(".check_all").on("ifChecked", function (e) {
         $("#cnt").find("td .icheckbox").iCheck("check")        
     }).on("ifUnchecked", function (e) {
-        $("#cnt").find("td .icheckbox").iCheck("uncheck")        
+        $("#cnt").find("td .icheckbox").iCheck("unCheck")        
     });
+    $("#cnt").find("td .icheckbox").on("ifChecked", shiftSelect)    
 });
 }
 
+
+function shiftSelect(e) {  
+    if (shiftPressed) {        
+        var myTd = $(e.currentTarget).closest("td")
+        var tr = myTd.parent()
+        var col = tr.children().index(myTd)        
+        var p = tr.prev();
+        while (p.length > 0) {
+            var chk = $(p.children().get(col)).find(".icheckbox")            
+            if (chk.hasClass("checked")) {
+                break;
+            } else {
+                chk.iCheck("check")
+            }
+            p = p.prev();
+        }
+    }
+}
+    
 function showPrivileges() {
     users(function(data) {
         var others = data.filter(function (u) {
@@ -236,11 +268,26 @@ function mailing() {
     var students = [];
     var tutors = [];
     $(".icheckbox.checked").find(":checkbox").each(function(i, c) {
-        students.push($(c).attr("data-email"));        
-        //Get the associated tutor
+        var em = $(c).attr("data-email")                
+        students.push(em);        
+        var i = getInternship(em)
+        if (i) {
+            tutors.push(i.Tutor.Email);    
+        }                
     });
     if (students.length > 0) {
-        window.location.href = "mailto:" + students.join(",");
+        window.location.href = "mailto:" + students.join(",") + "?cc=" + tutors.join(",");
     }    
+}
+
+function getInternship(email) {
+    var i = undefined;    
+    interns.forEach(function (e) {        
+        if (e.Student.Email == email) {
+            i = e;
+            return false;
+        }
+    })
+    return i;
 }
 

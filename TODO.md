@@ -11,6 +11,7 @@
 - [ ] distribution
 - [ ] cross-compilation
 - [x] comments for grades
+- [ ] presence indicator for reports
 
 ### Daemon
 
