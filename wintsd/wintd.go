@@ -94,6 +94,11 @@ func main() {
 			log.Fatalln("Unable to create the tables: " + err.Error())
 		}
 		log.Println("Tables created")
+		err = ds.ResetRootAccount()
+		if err != nil {
+			log.Fatalln("Unable to reset the root account: " + err.Error())
+		}
+		log.Println("Root account reset. Don't forgot to delete it once logged")
 		os.Exit(0)
 	} else if reset {
 		err := ds.ResetRootAccount()
@@ -104,7 +109,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	puller := feeder.NewHTTPFeeder(cfg.Puller.URL, cfg.Puller.Login, cfg.Puller.Password, cfg.Puller.Promotions)
+	puller := feeder.NewHTTPFeeder(cfg.Puller.URL, cfg.Puller.Login, cfg.Puller.Password, cfg.Puller.Promotions, cfg.Puller.Encoding)
 	period, err := time.ParseDuration(cfg.Puller.Period)
 	if err != nil {
 		log.Fatalln("Unable to start the convention feeder: " + err.Error())

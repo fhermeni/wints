@@ -39,8 +39,7 @@
 - [x] new user
 - [x] rm user
 - [x] set user privileges
-- [x] import conventions
-- [ ] edit student info/title on import to fix bad charset
+- [x] import conventions with charset conversion
 - [x] list all internships
 - [ ] profile editor
 - [x] show service

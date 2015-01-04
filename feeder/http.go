@@ -9,6 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"code.google.com/p/go-charset/charset"
+	_ "code.google.com/p/go-charset/data"
 	"github.com/fhermeni/wints/internship"
 )
 
@@ -38,10 +40,11 @@ type HTTPFeeder struct {
 	login      string
 	password   string
 	promotions []string
+	encoding   string
 }
 
-func NewHTTPFeeder(url, login, password string, promotions []string) *HTTPFeeder {
-	return &HTTPFeeder{url: url, login: login, password: password, promotions: promotions}
+func NewHTTPFeeder(url, login, password string, promotions []string, enc string) *HTTPFeeder {
+	return &HTTPFeeder{url: url, login: login, password: password, promotions: promotions, encoding: enc}
 }
 
 func cleanPerson(fn, ln, email, tel string) internship.Person {
@@ -80,7 +83,12 @@ func (f *HTTPFeeder) scan(year int, prom string) ([]internship.Convention, error
 	if err != nil {
 		return conventions, err
 	}
-	in := csv.NewReader(res.Body)
+	//Convert to utf8
+	r, err := charset.NewReader(f.encoding, res.Body)
+	if err != nil {
+		return conventions, err
+	}
+	in := csv.NewReader(r)
 	in.Comma = ';'
 
 	//Get rid of the header
@@ -108,7 +116,6 @@ func (f *HTTPFeeder) scan(year int, prom string) ([]internship.Convention, error
 		if err != nil {
 			return conventions, err
 		}
-
 		c := internship.Convention{
 			Student:    student,
 			Supervisor: supervisor,

@@ -15,6 +15,7 @@ type PullerConfig struct {
 	URL        string
 	Period     string
 	Promotions []string
+	Encoding   string
 }
 
 //MailerConfig allows to configure the mailing service
