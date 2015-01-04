@@ -1,7 +1,6 @@
 package datastore
 
 import (
-	"database/sql"
 	"encoding/base64"
 	"time"
 
@@ -9,8 +8,8 @@ import (
 )
 
 func (s *Service) PlanReport(email string, r internship.ReportHeader) error {
-	sql := "insert into reports(student, kind, deadline) values($1,$2,$3)"
-	return SingleUpdate(s.DB, internship.ErrReportExists, sql, email, r.Kind, r.Deadline)
+	sql := "insert into reports(student, kind, deadline, grade) values($1,$2,$3)"
+	return SingleUpdate(s.DB, internship.ErrReportExists, sql, email, r.Kind, r.Deadline, -2)
 }
 
 func (s *Service) ReportDefs() []internship.ReportDef {
@@ -19,15 +18,12 @@ func (s *Service) ReportDefs() []internship.ReportDef {
 func (srv *Service) Report(k, email string) (internship.ReportHeader, error) {
 	q := "select deadline, grade from reports where student=$1 and kind=$2"
 	var d time.Time
-	var g sql.NullInt64
+	var g int
 
 	if err := srv.DB.QueryRow(q, email, k).Scan(&d, &g); err != nil {
 		return internship.ReportHeader{}, internship.ErrUnknownReport
 	}
-	if !g.Valid {
-		g.Int64 = -1
-	}
-	return internship.ReportHeader{Kind: k, Deadline: d, Grade: int(g.Int64)}, nil
+	return internship.ReportHeader{Kind: k, Deadline: d, Grade: g}, nil
 }
 
 func (s *Service) ReportContent(kind, email string) ([]byte, error) {
@@ -40,7 +36,7 @@ func (s *Service) ReportContent(kind, email string) ([]byte, error) {
 }
 
 func (srv *Service) SetReportContent(kind, email string, cnt []byte) error {
-	sql := "update reports set cnt=$3 where student=$1 and kind=$2"
+	sql := "update reports set grade=-1 and cnt=$3 where student=$1 and kind=$2"
 	enc := base64.StdEncoding
 	return SingleUpdate(srv.DB, internship.ErrUnknownReport, sql, email, kind, enc.EncodeToString(cnt))
 

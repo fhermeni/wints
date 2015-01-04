@@ -125,6 +125,13 @@ function internships(ok, no) {
     }).done(noCb(ok)).fail(restError(no));   
 }
 
+function internship(email, ok, no) { 
+    return $.ajax({
+        method: "GET",
+        url: ROOT_API + "/internships/" + email       
+    }).done(noCb(ok)).fail(restError(no));   
+}
+
 function newInternship(c, ok, no) {
     return $.ajax({
         method: "POST",

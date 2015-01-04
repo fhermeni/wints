@@ -36,9 +36,9 @@ Handlebars.registerHelper('len', function(a) {
     return a.length
 });
 
-Handlebars.registerHelper('company', function(c) {
-    if (c.CompanyWWW && c.CompanyWWW != "") {
-        return new Handlebars.SafeString("<a target='_blank' href='" + c.CompanyWWW + "'>" + c.Company + "</a>");
+Handlebars.registerHelper('company', function(c) {    
+    if (c.WWW && c.WWW != "") {
+        return new Handlebars.SafeString("<a target='_blank' href='" + c.WWW + "'>" + c.Name + "</a>");
     }
     return c.Company;
 });
@@ -225,61 +225,36 @@ Handlebars.registerHelper('shortSlotEntry', function(s) {
     return "Break";
 });
 
-/*Handlebars.registerHelper('reportGrade', function(r) {
-    if (!r.IsIn) {
-        var date = new Date(Date.parse(r.Deadline));
-        if (date > new Date()) {
-            return new Handlebars.SafeString("<span data-text='-2' title='Deadline passed !' class='late glyphicon glyphicon-warning-sign'></span>");
+Handlebars.registerHelper('shortKind', function(r) {
+    return r.Kind.substring(0,3)
+});
+
+Handlebars.registerHelper('reportStatus', function(r) {
+    var passed = new Date(Date.parse(r.Deadline)) < new Date()    
+    var style = "active"    
+    if (passed) {
+        if (r.Grade == -2) {
+            style = "warning"
         } else {
-            return new Handlebars.SafeString("<span data-text='99'>-</span>");
-        }
-    }
-    var url = "/api/v1/conventions/" + r.Email + "/" + r.Kind + "/report";
-    var g = r.Grade >= 0 ? r.Grade : "<span title='Grade expected' data-text='-1' class='warning glyphicon glyphicon-question-sign'></span>";
-    return new Handlebars.SafeString("<a href='" + url + "' data-text='" + r.Grade + "'>" + g + " </a>");
-});  */
+            if (r.Grade < 0) {
+                style = "primary"
+            } else if (r.Grade < 10) {
+                style = "danger"
+            } else {
+                style = "success"
+            }
+        } 
+    } 
+    return style;
+});
+
 Handlebars.registerHelper('reportGrade', function(r) {
-    if (!r.IsIn) {
-        var date = new Date(Date.parse(r.Deadline));
-        if (date > new Date()) {
-            //Deadline expired
-            return new Handlebars.SafeString("<span data-text='-2' title='Deadline passed !' class='late glyphicon glyphicon-warning-sign'></span>");
-            //return -2;
-        }
-        return new Handlebars.SafeString("<span data-text='99' title='Deadline not passed'>-</span>");
-        //return 99;
+    if (r.Grade == -2) {
+        return "-";
+    } else if (r.Grade == -1) {
+        return "?";
     }
-    var url = "api/v1/reports/" + r.Kind + "/" + r.Email + "/document";
-    if (r.Grade >= 0) {
-        return new Handlebars.SafeString("<a href='" + url + "' data-text='" + r.Grade + "'>" + r.Grade + " </a>");
-    }
-    return new Handlebars.SafeString("<a href='" + url + "' data-text='98'><span title='Grade expected' class='warning glyphicon glyphicon-question-sign'></span></a>");
-
-});
-
-Handlebars.registerHelper('reportHeader', function(r) {
-    var id = r.Kind[0];
-    var buf = "<span class='report-id' title='" + r.Kind + "'>" + id
-    var grade = "";    
-    var deadline = new Date(Date.parse(r.Deadline));
-    if (deadline < new Date()) {
-        //Expired
-        if (r.Grade < 0) {
-            //Missing
-            grade = "<i class='glyphicon glyphicon-warning-sign'></i>";
-        } else {
-            grade = r.Grade
-        }
-    } else {
-        //Due (question mark <-> uploaded and un-ranked) or not due
-        grade = "-"
-    }
-    buf +=  grade + "</span>"
-    return new Handlebars.SafeString(buf);    
-});
-
-Handlebars.registerHelper('grade', function(g) {
-    return g < 0 ? "?" : g;
+    return r.Grade;    
 });
 
 Handlebars.registerHelper('URIemails', function(students) {

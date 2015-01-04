@@ -362,3 +362,16 @@ function selectText(elm) {
     selection.addRange(range);
   }
 }
+
+function showInternship(s) {
+    internship(s, function (i) {
+        users(function (uss) {
+            uss = uss.filter(function (u) {
+                return u.Role != 0; //get rid of students
+            }); 
+            buf = Handlebars.getTemplate("student")({I: i, Role: myself.Role, Tutors: uss})
+            $("#modal").html(buf).modal('show');
+            $("#modal").find("select").selecter();
+        });
+    });
+}

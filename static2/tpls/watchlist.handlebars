@@ -10,27 +10,34 @@
 </button>
 </h3>
 <table class="table table-condensed table-hover tablesorter" id="table-conventions">
-    <thead>
+    {{#each this}}
+        {{#if @first}}
+            <thead>
     <tr>
-        <th class="sorter-false">
+        <th class="sorter-false" rowspan="2">
         <input type='checkbox' data-toggle='checkbox' class='icheckbox_flat check_all'/>
         </th>
-        <th>Student</th>
-        <th>Promotion</th>
-        <th>Major</th>
-        <th class="sorter-false">Supervisor</th>
-        <th>Tutor</th>
-        <th class="sorter-false">Reports</th>
+        <th rowspan="2">Student</th>
+        <th rowspan="2">Promotion</th>
+        <th rowspan="2">Major</th>
+        <th rowspan="2" class="sorter-false">Supervisor</th>
+        <th rowspan="2" >Tutor</th>
+        <th class="sorter-false" colspan="{{len Reports}}">Reports</th>
     </tr>
+    <tr>        
+        {{#each Reports}}        
+        <th>{{shortKind this}}</th>
+        {{/each}}        
+    </tr>        
     </thead>
     <tbody>
-    {{#each this}}
+    {{/if}}
         <tr>
             <td>
             <input type='checkbox' class='icheckbox_flat' data-email='{{Student.Email}}'/>  
             </td>
             <td>
-            <a class='clickable' onclick="showDetails('{{Stu.P.Email}}')">{{fullname Student}}</a>
+            <a class='clickable' onclick="showInternship('{{Student.Email}}')">{{fullname Student}}</a>
             </td>
             <td>{{Promotion}}</td>
             <td>{{Major}}</td>
@@ -40,13 +47,9 @@
             <td>                
                 <a href='mailto:{{Tutor.Email}}' title='{{fullname Tutor}}'>{{fullname Tutor}}</a>
             </td>            
-            <td>
-                {{#each Reports}}
-                <span>
-                {{reportHeader this}}
-                </span>
-                {{/each}}
-            </td>
+            {{#each Reports}}
+            <td class="{{reportStatus this}} text-center" data-text="{{this.Grade}}">{{reportGrade this}}</td>
+            {{/each}}
         </tr>
     {{/each}}
     </tbody>

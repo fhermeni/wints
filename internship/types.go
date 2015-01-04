@@ -56,7 +56,7 @@ type ReportHeader struct {
 	Kind string
 	//The report deadline
 	Deadline time.Time
-	//The grade, between 0 and 20 if graded. <0 if it is waiting for a grade
+	//The grade, between 0 and 20 if graded. <-2 if their is no report, -1 if it is waiting for a review. >=0 once graded
 	Grade int
 	//The tutor comment
 	Comment string
@@ -72,6 +72,11 @@ type ReportDef struct {
 //Graded indicates if a report has been graded by its tutor or not
 func (m *ReportHeader) Graded() bool {
 	return m.Grade >= 0
+}
+
+//Graded indicates if a report has been graded by its tutor or not
+func (m *ReportHeader) In() bool {
+	return m.Grade != -2
 }
 
 //ReportHeader allows to instantiate a report definition to a header

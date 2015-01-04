@@ -1,42 +1,38 @@
     <div class="modal-dialog">
-    <div class="model-header">
-            <h4>
-                <a href="mailto:{{Stu.P.Email}}">{{fullname Stu.P}}</a>
-            </h4>
-    </div>
     <div class="modal-content">
+    <div class="modal-header">
+            <h3 class="modal-title"><a href="mailto:{{I.Student.Email}}">{{fullname I.Student}}</a></h3>
+    </div>    
         <div class="modal-body form-horizontal">
             <dl class="dl-horizontal">
                 <dt>promotion</dt>
-                <dd>{{Stu.Promotion}}</dd>
+                <dd>{{I.Promotion}}</dd>
                 <dt>major</dt>
                 <dd>
-                    <select onchange="updateMajor(this,'{{Stu.P.Email}}')">
-                        {{majorOptions Stu.Major}}
+                    <select onchange="updateMajor(this,'{{I.Student.Email}}')">
+                        {{majorOptions I.Major}}
                     </select>
-                </dd>
+                </dd>                
                 <dt>academic tutor</dt>
                 <dd>
-                    <select onchange="updateTutor(this,'{{Stu.P.Email}}')">
-                        {{tutorOptions Tutor.Email}}
-                    </select>
+                    <a href="mailto:{{I.Tutor.Email}}">{{fullname I.Tutor}}</a>
                 </dd>
 
 
             </dl>
 
-            <h6 class="text-center">{{company this}}</h6>
+            <h4 class="text-center">{{company I.Cpy}}</h4>
             <dl class="dl-horizontal">
                 <dt>period</dt>
-                <dd>{{shortDate Begin}} to {{shortDate End}}</dd>
+                <dd>{{date I.Begin}} to {{date I.End}}</dd>
                 <dt>supervisor</dt>
                 <dd>
-                    <a href="mailto:{{Sup.Email}}">{{fullname Sup}}</a>
-                    ({{Sup.Tel}})
+                    <a href="mailto:{{I.Sup.Email}}">{{fullname I.Sup}}</a>
+                    ({{I.Sup.Tel}})
                 </dd>
             </dl>
 
-                    <h6>Supervisor evaluation</h6>
+                    <!--<h6>Supervisor evaluation</h6>
 
                     <dl class="dl-horizontal">
                         <dt>due date</dt>
@@ -48,7 +44,7 @@
                     <a href="/api/v1/conventions/{{Stu.P.Email}}/supervisor/report" id='dl-supervisor' class='btn btn-wide btn-success'>
                         <i class='glyphicon glyphicon-cloud-download'></i> Get the report
                     </a>
-                    <input type="file" id="up-supervisor" name="up-supervisor" style="display: none;">
+                    <input type="file" id="up-supervisor" name="up-supervisor" style="display: none;">-->
         </div>
     </div>
-</div>
+    </div>
