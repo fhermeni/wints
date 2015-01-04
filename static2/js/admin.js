@@ -330,6 +330,22 @@ internships(function(interns) {
 });
 }
 
+function showRawFullname(root) {
+    var checked = $(".icheckbox.checked").find(":checkbox")
+        var fns = [];
+        checked.each(function (i, e) {
+            var em = $(e).attr("data-email");
+            var i = getInternship(em);
+            fns.push(i.Student.Firstname + " " + i.Student.Lastname);
+        });
+    if (fns.length > 0) {
+        var html = Handlebars.getTemplate("raw");
+        $("#modal").html(html);
+        $("#rawContent").html(fns.join("\n"));
+        $("#modal").modal('show');
+    }
+}
+
 function selectText(elm) {
   // for Internet Explorer
   if(document.body.createTextRange) {

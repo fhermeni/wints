@@ -1,7 +1,14 @@
 {{#if this}}
-<h3>{{len this}} internships</h3>
-<a class="btn-sm btn-primary mail-selection" onclick="mailing('tutor')"><span class="fui-mail"></span> mail selection</a>
-<a class="btn-sm btn-primary" onclick="generatefullnames($('#cnt'))"><span class="fui-list"></span> selection fullname'</a>
+<h3>{{len this}} internships
+<button type="button" class="btn" onclick="mailing('tutor')">
+    <i class="glyphicon glyphicon-envelope"></i>
+    mail selection
+</button>
+<button type="button" class="btn" onclick="showRawFullname()">
+    <i class="glyphicon glyphicon-list"></i>
+    selection fullname
+</button>
+</h3>
 <table class="table table-condensed table-hover tablesorter" id="table-conventions">
     <thead>
     <tr>

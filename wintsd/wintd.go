@@ -84,6 +84,15 @@ func startFeederDaemon(f feeder.Feeder, srv internship.Service, frequency time.D
 		}
 	}()
 }
+
+func rootAccount(ds *datastore.Service) {
+	err := ds.ResetRootAccount()
+	if err != nil {
+		log.Fatalln("Unable to reset the root account: " + err.Error())
+	}
+	log.Println("Root account reset. Don't forgot to delete it once logged")
+	os.Exit(0)
+}
 func main() {
 	cfg, _, ds, reset, install := setup()
 	defer ds.DB.Close()
@@ -94,19 +103,9 @@ func main() {
 			log.Fatalln("Unable to create the tables: " + err.Error())
 		}
 		log.Println("Tables created")
-		err = ds.ResetRootAccount()
-		if err != nil {
-			log.Fatalln("Unable to reset the root account: " + err.Error())
-		}
-		log.Println("Root account reset. Don't forgot to delete it once logged")
-		os.Exit(0)
+		rootAccount(ds)
 	} else if reset {
-		err := ds.ResetRootAccount()
-		if err != nil {
-			log.Fatalln("Unable to reset the root account: " + err.Error())
-		}
-		log.Println("Root account reset. Don't forgot to delete it once logged")
-		os.Exit(0)
+		rootAccount(ds)
 	}
 
 	puller := feeder.NewHTTPFeeder(cfg.Puller.URL, cfg.Puller.Login, cfg.Puller.Password, cfg.Puller.Promotions, cfg.Puller.Encoding)
