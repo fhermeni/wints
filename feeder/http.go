@@ -139,12 +139,15 @@ func (f *HTTPFeeder) injectOnePromotion(s internship.Service, y int, p string) (
 		return nb, err
 	}
 	for _, c := range conventions {
-		err = s.NewConvention(c)
-		if err == nil {
-			nb++
-		} else if err != internship.ErrConventionExists {
-			log.Println("Unable insert a convention: " + err.Error())
-			return nb, err
+		_, err := s.Internship(c.Student.Email)
+		if err != nil {
+			err = s.NewConvention(c)
+			if err == nil {
+				nb++
+			} else if err != internship.ErrConventionExists {
+				log.Println("Unable insert a convention: " + err.Error())
+				return nb, err
+			}
 		}
 	}
 	return nb, err
