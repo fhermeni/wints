@@ -79,8 +79,17 @@ func (srv *Service) SetCompany(stu string, c internship.Company) error {
 }
 
 func (srv *Service) SetMajor(stu, m string) error {
-	sql := "update internships set major=$2 where student=$1"
-	return SingleUpdate(srv.DB, internship.ErrUnknownInternship, sql, stu, m)
+	for _, x := range srv.majors {
+		if x == m {
+			sql := "update internships set major=$2 where student=$1"
+			return SingleUpdate(srv.DB, internship.ErrUnknownInternship, sql, stu, m)
+		}
+	}
+	return internship.ErrInvalidMajor
+}
+
+func (srv *Service) Majors() []string {
+	return srv.majors
 }
 
 func (srv *Service) SetPromotion(stu, p string) error {
@@ -129,7 +138,7 @@ func scanInternship(r *sql.Rows) (internship.Internship, error) {
 }
 
 func (srv *Service) appendReports(i *internship.Internship) error {
-	s := "select kind, grade, deadline, comment from reports where student=$1"
+	s := "select kind, grade, deadline, comment from reports where student=$1 order by deadline"
 	rows, err := srv.DB.Query(s, i.Student.Email)
 	if err != nil {
 		return err

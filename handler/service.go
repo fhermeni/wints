@@ -245,10 +245,7 @@ func reportMngt(s Service) {
 	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/content", serviceHandler(reportContent, s)).Methods("GET")
 	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/content", serviceHandler(setReportContent, s)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/grade", serviceHandler(setReportGrade, s)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/dealine", serviceHandler(setReportDeadline, s)).Methods("POST")
-	/*
-		PlanReport(student string, r ReportHeader) error -> NO REST CALL
-	*/
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/deadline", serviceHandler(setReportDeadline, s)).Methods("POST")
 }
 
 func report(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
@@ -311,8 +308,13 @@ func internshipsMngt(s Service) {
 	s.r.HandleFunc("/api/v1/internships/{email}/company", serviceHandler(setCompany, s)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/major", serviceHandler(setMajor, s)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/promotion", serviceHandler(setPromotion, s)).Methods("POST")
+	s.r.HandleFunc("/api/v1/majors/", serviceHandler(majors, s)).Methods("GET")
 }
 
+func majors(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	m := srv.Majors()
+	return writeJSONIfOk(nil, w, m)
+}
 func newInternship(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var c internship.Convention
 	err := jsonRequest(w, r, &c)

@@ -164,4 +164,5 @@ var (
 	ErrNoPendingRequests = errors.New("No password renewable request pending")
 	ErrInvalidPeriod     = errors.New("invalid internship period")
 	ErrConventionExists  = errors.New("convention already scanned")
+	ErrInvalidMajor      = errors.New("Invalid major")
 )

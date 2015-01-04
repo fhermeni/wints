@@ -11,7 +11,11 @@ import (
 
 func jsonRequest(w http.ResponseWriter, r *http.Request, j interface{}) error {
 	dec := json.NewDecoder(r.Body)
-	return dec.Decode(&j)
+	err := dec.Decode(&j)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+	return err
 }
 
 func writeJSONIfOk(e error, w http.ResponseWriter, j interface{}) error {

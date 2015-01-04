@@ -4,9 +4,13 @@ var waitingBlock;
 var myself;
 var currentConvention;
 var shiftPressed = false;
+var allMajors;
 $( document ).ready(function () {
 waitingBlock = $("#cnt").clone().html();
 
+    majors(function(m) {
+        allMajors = m;
+    })
 	user(document.cookie.split("=")[1], function(u) {
         myself = u;
         $("#fullname").html(u.Firstname + " " + u.Lastname);
@@ -26,8 +30,6 @@ waitingBlock = $("#cnt").clone().html();
         
         if (e.keyCode == 16) {shiftPressed = false;}
     });
-
-
 });
 
 function showPage(li, id) {
@@ -117,7 +119,7 @@ function shiftSelect(e) {
 function showPrivileges() {
     users(function(data) {
         var others = data.filter(function (u) {
-            return u.Email != myself.Email;
+            return u.Email != myself.Email && u.Role != 0;
         });
         //The base
         var html = Handlebars.getTemplate("privileges")(others);
@@ -371,7 +373,29 @@ function showInternship(s) {
             }); 
             buf = Handlebars.getTemplate("student")({I: i, Role: myself.Role, Tutors: uss})
             $("#modal").html(buf).modal('show');
-            $("#modal").find("select").selecter();
+            $("#modal").find("select").selecter();            
         });
     });
+}
+
+function sendReportDeadline(email, kind, input) {    
+    d = moment($(input).val(),"D MMM YYYY")
+    setReportDeadline(email, kind, d.format());
+}
+
+function showReport(e, k) {    
+    reportHeader(e, k, function(r) {            
+            r.Reviewable = r.Grade != -2
+            r.Email = e
+            buf = Handlebars.getTemplate("reportEditor")(r)
+            $("#modal").html(buf).modal('show');      
+            $(".date").datepicker({format:'d M yyyy', autoclose: true, minViewMode: 0, weekStart: 1})             
+    });
+}
+
+function sendMajor(e, m) {
+    setMajor(e, m, function() {
+        reportSuccess("Major updated")
+        refresh()
+    })
 }

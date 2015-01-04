@@ -145,5 +145,35 @@ function conventions(ok, no) {
         method: "GET",
         url: ROOT_API + "/conventions/"        
     }).done(noCb(ok)).fail(restError(no));   
+}
+
+function reportHeader(email, kind, ok, no) {
+    return $.ajax({
+        method: "GET",
+        url: ROOT_API + "/internships/" + email + "/reports/" + kind
+    }).done(noCb(ok)).fail(restError(no));   
+}
+
+function setReportDeadline(email, kind, d, ok, no) {        
+    return $.ajax({
+        method: "POST",
+        url: ROOT_API + "/internships/" + email + "/reports/" + kind + "/deadline",
+        data: JSON.stringify(d)
+    }).done(noCb(ok)).fail(restError(no));    
+}
+
+function setMajor(e, m, ok, no) {
+    return $.ajax({
+        method: "POST",
+        url: ROOT_API + "/internships/" + e + "/major",
+        data: JSON.stringify(m)
+    }).done(noCb(ok)).fail(restError(no));    
+}
+
+function majors(ok, no) {
+    return $.ajax({
+        method: "GET",
+        url: ROOT_API + "/majors/",        
+    }).done(noCb(ok)).fail(restError(no));    
 
 }

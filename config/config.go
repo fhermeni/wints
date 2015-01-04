@@ -46,6 +46,7 @@ type Config struct {
 	Mailer  MailerConfig
 	HTTP    HTTPConfig
 	Logfile string
+	Majors  []string
 }
 
 //Load allows to parse a configuration for a JSON message

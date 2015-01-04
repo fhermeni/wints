@@ -39,8 +39,8 @@ Handlebars.registerHelper('len', function(a) {
 Handlebars.registerHelper('company', function(c) {    
     if (c.WWW && c.WWW != "") {
         return new Handlebars.SafeString("<a target='_blank' href='" + c.WWW + "'>" + c.Name + "</a>");
-    }
-    return c.Company;
+    } 
+    return c.Name;
 });
 
 Handlebars.registerHelper('shortCompany', function(c) {
@@ -55,13 +55,7 @@ Handlebars.registerHelper('shortCompany', function(c) {
 });
 
 Handlebars.registerHelper('date', function(d) {
-    var date = new Date(Date.parse(d));
-    var now = new Date();
-    var str = twoD(date.getDate()) + "/" + twoD(date.getMonth() + 1) + "/" + twoD(date.getFullYear());
-    if (now.getMilliseconds() > date.getMilliseconds()) {
-        return new Handlebars.SafeString("<span class='late'>" + str + "</span>");
-    }
-    return str;
+    return moment(d).format("D MMM YYYY")
 });
 
 Handlebars.registerHelper('rawFullname', function(p) {
@@ -80,13 +74,12 @@ Handlebars.registerHelper('raw', function(p) {
     return fn;
 });
 
-Handlebars.registerHelper('majorOptions', function(m) {
-    var opts = ['?', 'iam', 'al','ihm','vim','ubinet','kis','cssr','imafa','inum'];
+Handlebars.registerHelper('majorOptions', function(m) {    
     var b = "";
     if (!m) {
         m = "?";
     }
-    opts.forEach(function (o) {
+    allMajors.forEach(function (o) {
         var selected = m == o ? " selected " : "";
         b += "<option value='" + o + "' " + selected + " >" + o + "</option>";
     });
@@ -114,11 +107,6 @@ Handlebars.registerHelper('roleOptions', function(m) {
     return new Handlebars.SafeString(b);
 });
 
-
-Handlebars.registerHelper('shortDate', function(d) {
-    var date = new Date(Date.parse(d));
-    return twoD(date.getDate()) + "/" + twoD(date.getMonth() + 1) + "/" + twoD(date.getFullYear());
-});
 
 Handlebars.registerHelper('slot', function(d) {
     return d;

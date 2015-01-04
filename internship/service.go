@@ -21,6 +21,7 @@ type Service interface {
 	SetCompany(stu string, c Company) error
 
 	SetMajor(stu string, m string) error
+	Majors() []string
 
 	SetPromotion(stu string, p string) error
 

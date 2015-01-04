@@ -1,6 +1,6 @@
 {{#if this}}
 <h3>{{len this}} internships
-<button type="button" class="btn" onclick="mailing('tutor')">
+<button type="button" class="btn btn-primary" onclick="mailing('tutor')">
     <i class="glyphicon glyphicon-envelope"></i>
     mail selection
 </button>
@@ -23,12 +23,13 @@
         <th rowspan="2" class="sorter-false">Supervisor</th>
         <th rowspan="2" >Tutor</th>
         <th class="sorter-false" colspan="{{len Reports}}">Reports</th>
+        <th rowspan="2" >Def</th>
     </tr>
     <tr>        
         {{#each Reports}}        
         <th>{{shortKind this}}</th>
         {{/each}}        
-    </tr>        
+    </tr>
     </thead>
     <tbody>
     {{/if}}
@@ -48,8 +49,11 @@
                 <a href='mailto:{{Tutor.Email}}' title='{{fullname Tutor}}'>{{fullname Tutor}}</a>
             </td>            
             {{#each Reports}}
-            <td class="{{reportStatus this}} text-center" data-text="{{this.Grade}}">{{reportGrade this}}</td>
+            <td class="{{reportStatus this}} text-center" data-text="{{this.Grade}}" onclick="showReport('{{../Student.Email}}', '{{Kind}}')">            
+            {{reportGrade this}}
+            </td>            
             {{/each}}
+            <td>-</td>
         </tr>
     {{/each}}
     </tbody>

@@ -20,11 +20,12 @@ const (
 type Service struct {
 	DB         *sql.DB
 	reportDefs []internship.ReportDef
+	majors     []string
 }
 
 //NewService initiate the storage servive
-func NewService(db *sql.DB, reportDefs []internship.ReportDef) (*Service, error) {
-	s := Service{DB: db, reportDefs: reportDefs}
+func NewService(db *sql.DB, reportDefs []internship.ReportDef, majors []string) (*Service, error) {
+	s := Service{DB: db, reportDefs: reportDefs, majors: majors}
 	return &s, nil
 }
 

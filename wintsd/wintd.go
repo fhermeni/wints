@@ -57,7 +57,7 @@ func setup() (config.Config, mail.SMTP, *datastore.Service, bool, bool) {
 	if err != nil {
 		log.Fatalln("Unable to connect to the Database: " + err.Error())
 	}
-	ds, err := datastore.NewService(DB, cfg.Reports)
+	ds, err := datastore.NewService(DB, cfg.Reports, cfg.Majors)
 	if err != nil {
 		log.Fatalln("Unable to test the connection: " + err.Error())
 	}

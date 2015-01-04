@@ -75,6 +75,9 @@ func (v *Service) SetMajor(stu, m string) error {
 	return ErrPermission
 }
 
+func (v *Service) Majors() []string {
+	return v.srv.Majors()
+}
 func (v *Service) SetPromotion(stu, p string) error {
 	if v.ownByStudent(stu) || v.isTutoring(stu) || v.my.Role >= internship.ADMIN {
 		return v.srv.SetPromotion(stu, p)

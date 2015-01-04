@@ -11,7 +11,7 @@
 - [ ] distribution
 - [ ] cross-compilation
 - [x] comments for grades
-- [ ] presence indicator for reports
+- [x	] presence indicator for reports
 
 ### Daemon
 
@@ -43,6 +43,9 @@
 - [x] list all internships
 - [ ] profile editor
 - [x] show service
+- [ ] grade/comment report
+- [ ] get report
+- [ ] change report deadline
 
 #### student
 - [ ] profile update
