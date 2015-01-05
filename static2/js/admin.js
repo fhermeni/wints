@@ -246,7 +246,7 @@ function showPendingConventions() {
 
             if (best.Lastname == currentConvention.Tutor.Lastname) {                
                 d=$('#pick-theory');
-                d.confirmation({onConfirm: pickTheory, placement: "top", title: "Sure ? It's a perfect match !", btnOkLabel: '<i class="icon-ok-sign icon-white"></i> Confirm'});
+                d.confirmation({onConfirm: pickTheory, placement: "right", title: "Sure ? It's a perfect match !", btnOkLabel: '<i class="icon-ok-sign icon-white"></i> Confirm'});
                 d.removeAttr("onclick");
                 k=$("#btn-choose-known");
                 k.attr("onclick", "pickKnown()");
@@ -257,7 +257,7 @@ function showPendingConventions() {
                 d.confirmation('destroy');
 
                 k=$("#btn-choose-known");
-                k.confirmation({onConfirm: pickKnown, placement: "bottom", title: "Sure ? They differ !", btnOkLabel: '<i class="icon-ok-sign icon-white"></i> Confirm'});
+                k.confirmation({onConfirm: pickKnown, placement: "left", title: "Sure ? They differ !", btnOkLabel: '<i class="icon-ok-sign icon-white"></i> Confirm'});
                 k.removeAttr("onclick");
             }
         }
