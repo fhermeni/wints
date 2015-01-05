@@ -78,4 +78,5 @@ type Service interface {
 
 	NewConvention(c Convention) error
 	Conventions() ([]Convention, error)
+	SkipConvention(student string, skip bool) error
 }

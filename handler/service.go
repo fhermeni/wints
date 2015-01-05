@@ -12,6 +12,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var path string
+
 type Service struct {
 	backend internship.Service
 	mailer  mail.Mailer
@@ -22,18 +24,18 @@ var (
 	ErrJSONWriting = errors.New("Unable to serialize the JSON response")
 )
 
-func NewService(backend internship.Service, mailer mail.Mailer) Service {
+func NewService(backend internship.Service, mailer mail.Mailer, p string) Service {
 	//Rest stuff
 	r := mux.NewRouter()
-
+	path = p
 	s := Service{backend: backend, r: r, mailer: mailer}
 	userMngt(s, mailer)
 	internshipsMngt(s, mailer)
 	reportMngt(s, mailer)
 	conventionMgnt(s, mailer)
-	fs := http.Dir("static/")
+	fs := http.Dir(path + "/")
 	fileHandler := http.FileServer(fs)
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static", fileHandler))
+	r.PathPrefix("/" + path + "/").Handler(http.StripPrefix("/"+path, fileHandler))
 	http.Handle("/", s.r)
 	s.r.HandleFunc("/", home(backend)).Methods("GET")
 	return s
@@ -44,12 +46,12 @@ func home(backend internship.Service) http.HandlerFunc {
 		var err error
 		cookie, err := r.Cookie("session")
 		if err != nil || len(cookie.Value) == 0 {
-			http.ServeFile(w, r, "static/login.html")
+			http.ServeFile(w, r, path+"/login.html")
 			return
 		}
 		u, err := backend.User(cookie.Value)
 		if err == internship.ErrUnknownUser {
-			http.ServeFile(w, r, "static/login.html")
+			http.ServeFile(w, r, path+"/login.html")
 			return
 		} else if err != nil {
 			log.Println("Unable to get the user behind the cookie: " + err.Error())
@@ -88,17 +90,17 @@ func userMngt(s Service, mailer mail.Mailer) {
 }
 
 func admin(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
-	http.ServeFile(w, r, "static/admin.html")
+	http.ServeFile(w, r, path+"/admin.html")
 	return nil
 }
 
 func student(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
-	http.ServeFile(w, r, "static/student.html")
+	http.ServeFile(w, r, path+"/student.html")
 	return nil
 }
 
 func password(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, "static/new_password.html")
+	http.ServeFile(w, r, path+"/new_password.html")
 }
 
 type PasswordUpdate struct {
@@ -351,6 +353,16 @@ func setReportPrivate(srv internship.Service, mailer mail.Mailer, w http.Respons
 
 func conventionMgnt(s Service, mailer mail.Mailer) {
 	s.r.HandleFunc("/api/v1/conventions/", serviceHandler(conventions, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/conventions/{email}/skip", serviceHandler(skipConvention, s, mailer)).Methods("POST")
+}
+
+func skipConvention(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+	var b bool
+	err := jsonRequest(w, r, &b)
+	if err != nil {
+		return err
+	}
+	return srv.SkipConvention(mux.Vars(r)["email"], b)
 }
 
 func conventions(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {

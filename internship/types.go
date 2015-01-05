@@ -149,6 +149,8 @@ type Convention struct {
 	End        time.Time
 	Title      string
 	Promotion  string
+	//Ignore this convention
+	Skip bool
 }
 
 //Predefined errors

@@ -125,6 +125,7 @@ func (f *HTTPFeeder) scan(year int, prom string) ([]internship.Convention, error
 			Begin:      startTime,
 			End:        endTime,
 			Title:      title,
+			Skip:       false,
 		}
 		conventions = append(conventions, c)
 	}

@@ -220,18 +220,25 @@ function showPendingConventions() {
             uss = uss.filter(function (u) {
                 return u.Role != 0;
             }); 
-            if (cc.length > 0) {
-                $("#pending-counter").html(" <span class='badge'>" + cc.length + "</span>");
-            } else {
+            var ignored = []
+            cc = cc.filter(function (c) {
+                if (c.Skip) {
+                    ignored.push(c)
+                }
+                return !c.Skip
+            }); 
+            $("#pending-counter").html(" <span class='badge'>" + cc.length + (ignored.length > 0 ? "/" + ignored.length : "") + "</span>");
+            if (cc.length == 0 && ignored.length == 0) {
                 $("#pending-counter").html("");
                 $("#cnt").html("<h5 class='text-center'>Nothing to import</h5>")
                 return
-            }   
+            }               
             currentConvention = cc[0]     
             var html = Handlebars.getTemplate("pending")({
-                c: currentConvention, users : uss
-            });
-            $("#cnt").html(html);
+                c: currentConvention, users : uss, "Ignored": ignored
+            });                        
+            $("#cnt").html(html);    
+            if (cc.length > 0) {        
             //Find the most appropriate predefined tutor            
             var best = pickBestMatching(currentConvention.Tutor, uss)                        
             $("#known-tutor-selector").val(best.Email)            
@@ -253,10 +260,21 @@ function showPendingConventions() {
                 k.confirmation({onConfirm: pickKnown, placement: "bottom", title: "Sure ? They differ !", btnOkLabel: '<i class="icon-ok-sign icon-white"></i> Confirm'});
                 k.removeAttr("onclick");
             }
+        }
         });
     });
 }
 
+function sendSkipConvention(email, s) {
+    skipConvention(email, s, function() {
+        if (s) {
+            reportSuccess("Convention ignored")    
+        } else {
+            reportSuccess("The convention is no longer ignored")
+        }
+        refresh()
+    })
+}
 function pickTheory() {
      if (missing("th-tutor-fn") || missing("th-tutor-ln") || missing("th-tutor-email")  || missing("th-tutor-tel")) {
         return false;

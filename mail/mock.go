@@ -25,10 +25,6 @@ func (m *Mock) SendPasswordResetLink(u internship.User, token []byte) {
 	log.Printf("Reset token for  %s: %s\n", u.Fullname(), string(token))
 }
 
-func (m *Mock) SendProfileUpdate(u internship.User) {
-	log.Printf("New profile information for %s: %s (%s)\n", u.Email, u.Fullname(), u.Tel)
-}
-
 func (m *Mock) SendAccountRemoval(u internship.User) {
 	log.Printf("Account for %s deleted\n", u.Fullname())
 }
@@ -59,4 +55,8 @@ func (m *Mock) SendReportPrivate(s internship.User, t internship.User, kind stri
 	} else {
 		log.Printf("Hey %s, your report '%s' is now public", s.Fullname(), kind)
 	}
+}
+
+func (m *Mock) SendTest(e string) {
+	log.Println("Test mail to %s\n", e)
 }

@@ -4,9 +4,10 @@
         {{date c.Begin}} to {{date c.End}}: <a href="{{c.Cpy.WWW}}">{{c.Cpy.Name}}</a>
     </div>
 
+    {{#if c}}
     <div class="row">
-        <div class="col-sm-5 col-lg-offset-1">
-            <h6>Tutor in the convention</h6>
+        <div class="col-sm-5 col-lg-offset-0">
+            <h5>Tutor in the convention</h5>
             <form class="form-horizontal">
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="th-tutor-fn">Firstname</label>
@@ -38,26 +39,33 @@
                 </div>
             </form>
             <div class="text-center">
-                <button id="pick-theory" class="btn-wide btn btn-lg text-center" onclick="pickTheory()">Choose</button>
+                <button id="pick-theory" class="btn-wide btn btn-lg btn-primary text-center" onclick="pickTheory()">Choose</button>
             </div>
 
         </div>
         <div class="col-sm-2 text-center">
-            <h1>OR</h1>
+            <h1><a class="skip clickable" onclick="sendSkipConvention('{{c.Student.Email}}', true)" title="ignore this convention"><i class="glyphicon glyphicon-eye-close"></i></a></h1>
         </div>
-        <div class="col-sm-4 text-center">
-            <h6>Registered tutor(s)</h6>
-            <div class="form-group">
+        <div class="col-sm-5 text-right">
+            <h5>Registered tutor(s)</h5>
+            <div class="form-group text-left">
             <label for="known-tutor-selector"></label>
             <select id="known-tutor-selector">
                 {{userSelecter users}}            
             </select>
             </div>
             <div class="">
-                <button id="btn-choose-known" class="btn-wide btn btn-lg text-center" onclick="pickKnown()">
+                <button id="btn-choose-known" class="btn-wide btn btn-lg text-center btn-success" onclick="pickKnown()">
                     Choose
                 </button>
             </div>
         </div>
-    </div>
+    </div>        
+    {{/if}}
+    {{#if Ignored}}
+    <h5>Ignored conventions </h5>
+    {{#each Ignored}}
+    <a onclick="sendSkipConvention('{{Student.Email}}', false)" class="label">{{Student.Firstname}} {{Student.Lastname}} ({{Student.Email}})</a>
+    {{/each}}
+    {{/if}}
 </div>

@@ -24,6 +24,7 @@ type MailerConfig struct {
 	Login    string
 	Password string
 	Sender   string
+	Path     string
 }
 
 //DbConfig allows to configure the access to the wints database
@@ -36,6 +37,7 @@ type HTTPConfig struct {
 	Host        string
 	Certificate string
 	PrivateKey  string
+	Path        string
 }
 
 //Config aggregates all the subcomponents configuration parameters

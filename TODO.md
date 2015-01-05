@@ -14,6 +14,8 @@
 - [x] comments for grades
 - [x] presence indicator for reports
 - [x] report private/public status
+- [x] skipeable conventions
+
 ### Daemon
 
 - [x] install mode
@@ -51,6 +53,7 @@
 - [x] change major
 - [x] tutor internships
 - [x] report private/public status
+- [x] skipeable conventions
 
 #### student
 - [ ] profile update

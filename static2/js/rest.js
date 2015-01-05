@@ -147,6 +147,14 @@ function conventions(ok, no) {
     }).done(noCb(ok)).fail(restError(no));   
 }
 
+function skipConvention(email, skip, ok, no) {
+    return $.ajax({
+        method: "POST",
+        url: ROOT_API + "/conventions/" + email + "/skip",
+        data: JSON.stringify(skip)        
+    }).done(noCb(ok)).fail(restError(no));       
+}
+
 function reportHeader(email, kind, ok, no) {
     return $.ajax({
         method: "GET",

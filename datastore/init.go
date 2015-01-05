@@ -57,7 +57,8 @@ create table conventions(studentEmail text PRIMARY KEY,
                         supervisorLn text,
                         supervisorEmail text,
                         supervisorTel text,
-                        title text
+                        title text,
+                        skip boolean
 );
 
 create table reports(student text REFERENCES users(email) on delete cascade,
