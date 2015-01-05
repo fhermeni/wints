@@ -370,8 +370,8 @@ function showInternship(s) {
         users(function (uss) {
             uss = uss.filter(function (u) {
                 return u.Role != 0; //get rid of students
-            }); 
-            buf = Handlebars.getTemplate("student")({I: i, Role: myself.Role, Tutors: uss})
+            });             
+            buf = Handlebars.getTemplate("student")({I: i, Admin: myself.Role >= 3, Tutors: uss})
             $("#modal").html(buf).modal('show');            
             var c = $("#modal").find("select.select-tutor");            
             c.val(i.Tutor.Email)

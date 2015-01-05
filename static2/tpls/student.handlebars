@@ -1,9 +1,9 @@
-    <div class="modal-dialog">
+<div class="modal-dialog">
     <div class="modal-content">
     <div class="modal-header">
             <h3 class="modal-title"><a href="mailto:{{I.Student.Email}}">{{fullname I.Student}}</a></h3>
     </div>    
-        <div class="modal-body form-horizontal">
+    <div class="modal-body form-horizontal">
             <dl class="dl-horizontal">
                 <dt>promotion</dt>
                 <dd>{{I.Promotion}}</dd>
@@ -13,11 +13,13 @@
                         {{majorOptions I.Major}}
                     </select>
                 </dd>                
-                <dt>academic tutor</dt>
+                <dt>academic tutor</dt>                
                 <dd>
-                    <select class="select-tutor">
-                        {{userSelecter Tutors}}
-                    </select>                    
+                    {{#if Admin}}
+                        <select class="select-tutor">{{userSelecter Tutors}}</select>                    
+                    {{else}}
+                    <a href="mailto:{{I.Tutor.Email}}">{{fullname I.Tutor}} ({{I.Tutor.Tel}})</a>
+                    {{/if}}
                 </dd>
             </dl>
 
@@ -31,6 +33,7 @@
                     ({{I.Sup.Tel}})
                 </dd>
             </dl>
-        </div>
     </div>
+    <div class="modal-footer"></div>
     </div>
+</div>

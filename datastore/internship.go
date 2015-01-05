@@ -2,7 +2,6 @@ package datastore
 
 import (
 	"database/sql"
-	"log"
 	"time"
 
 	"github.com/fhermeni/wints/internship"
@@ -136,7 +135,6 @@ func scanInternship(r *sql.Rows) (internship.Internship, error) {
 	var start, end time.Time
 	err := r.Scan(&stuFn, &stuLn, &stuEmail, &stuTel, &prom, &major, &tutFn, &tutLn, &tutEmail, &tutTel, &tutRole, &supFn, &supLn, &supEmail, &supTel, &title, &start, &end, &company, &companyWWW)
 	if err != nil {
-		log.Println(err.Error())
 		return internship.Internship{}, err
 	}
 	stu := internship.User{Firstname: stuFn, Lastname: stuLn, Email: stuEmail, Tel: stuTel, Role: internship.NONE}

@@ -76,7 +76,7 @@ func (v *Service) SetTutor(stu string, t string) error {
 }
 
 func (v *Service) SetMajor(stu, m string) error {
-	if v.mine(stu) || v.isTutoring(stu) || v.my.Role >= internship.ADMIN {
+	if v.mine(stu) || v.isTutoring(stu) || v.my.Role >= internship.MAJOR {
 		return v.srv.SetMajor(stu, m)
 	}
 	return ErrPermission
@@ -143,14 +143,14 @@ func (v *Service) RmUser(email string) error {
 }
 
 func (v *Service) User(email string) (internship.User, error) {
-	if v.mine(email) || v.my.Role >= internship.ADMIN {
+	if v.mine(email) || v.my.Role >= internship.MAJOR {
 		return v.srv.User(email)
 	}
 	return internship.User{}, ErrPermission
 }
 
 func (v *Service) Users() ([]internship.User, error) {
-	if v.my.Role >= internship.ADMIN {
+	if v.my.Role >= internship.MAJOR {
 		return v.srv.Users()
 	}
 	return []internship.User{}, ErrPermission
