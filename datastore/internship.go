@@ -73,6 +73,11 @@ func (srv *Service) SetSupervisor(stu string, t internship.Person) error {
 	return SingleUpdate(srv.DB, internship.ErrUnknownInternship, sql, t.Firstname, t.Lastname, t.Tel, t.Email, stu)
 }
 
+func (srv *Service) SetTutor(stu string, t string) error {
+	sql := "update internships set tutor=$1 where student=$2"
+	return SingleUpdate(srv.DB, internship.ErrUnknownInternship, sql, t, stu)
+}
+
 func (srv *Service) SetCompany(stu string, c internship.Company) error {
 	sql := "update internships set companyWWW=$1, company=$2 where student=$3"
 	return SingleUpdate(srv.DB, internship.ErrUnknownInternship, sql, c.WWW, c.Name, stu)

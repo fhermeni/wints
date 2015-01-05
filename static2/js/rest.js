@@ -162,6 +162,14 @@ function setReportDeadline(email, kind, d, ok, no) {
     }).done(noCb(ok)).fail(restError(no));    
 }
 
+function setTutor(e, t, ok, no) {
+    return $.ajax({
+        method: "POST",
+        url: ROOT_API + "/internships/" + e + "/tutor",
+        data: JSON.stringify(t)
+    }).done(noCb(ok)).fail(restError(no));    
+}
+
 function setMajor(e, m, ok, no) {
     return $.ajax({
         method: "POST",

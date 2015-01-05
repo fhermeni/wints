@@ -305,6 +305,7 @@ func internshipsMngt(s Service) {
 	s.r.HandleFunc("/api/v1/internships/", serviceHandler(internships, s)).Methods("GET")
 	s.r.HandleFunc("/api/v1/internships/", serviceHandler(newInternship, s)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/supervisor", serviceHandler(setSupervisor, s)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/tutor", serviceHandler(setTutor, s)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/company", serviceHandler(setCompany, s)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/major", serviceHandler(setMajor, s)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/promotion", serviceHandler(setPromotion, s)).Methods("POST")
@@ -368,4 +369,13 @@ func setSupervisor(srv internship.Service, w http.ResponseWriter, r *http.Reques
 		return err
 	}
 	return srv.SetSupervisor(mux.Vars(r)["email"], s)
+}
+
+func setTutor(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	var s string
+	err := jsonRequest(w, r, &s)
+	if err != nil {
+		return err
+	}
+	return srv.SetTutor(mux.Vars(r)["email"], s)
 }

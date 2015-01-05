@@ -68,6 +68,13 @@ func (v *Service) SetSupervisor(stu string, sup internship.Person) error {
 	return ErrPermission
 }
 
+func (v *Service) SetTutor(stu string, t string) error {
+	if v.my.Role >= internship.ADMIN {
+		return v.srv.SetTutor(stu, t)
+	}
+	return ErrPermission
+}
+
 func (v *Service) SetMajor(stu, m string) error {
 	if v.ownByStudent(stu) || v.isTutoring(stu) || v.my.Role >= internship.ADMIN {
 		return v.srv.SetMajor(stu, m)

@@ -17,6 +17,9 @@ type Service interface {
 	//Set the supervisor for the internship of a given student
 	SetSupervisor(stu string, sup Person) error
 
+	//Set the tutor for the internship of a given student
+	SetTutor(stu string, t string) error
+
 	//Set the company for the internship of a given student
 	SetCompany(stu string, c Company) error
 

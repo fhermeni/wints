@@ -372,9 +372,12 @@ function showInternship(s) {
                 return u.Role != 0; //get rid of students
             }); 
             buf = Handlebars.getTemplate("student")({I: i, Role: myself.Role, Tutors: uss})
-            $("#modal").html(buf).modal('show');
-            $("#modal").find("select").selecter();            
-        });
+            $("#modal").html(buf).modal('show');            
+            var c = $("#modal").find(".confirm");            
+            c.val(i.Tutor.Email)
+            $("#modal").find("select.select-major").selecter({callback: function(v) {sendMajor(i.Student.Email, v)}});
+            $("#modal").find("select.select-tutor").selecter({callback: function(v) {sendTutor(i.Student.Email, v)}});
+        });        
     });
 }
 
@@ -397,5 +400,12 @@ function sendMajor(e, m) {
     setMajor(e, m, function() {
         reportSuccess("Major updated")
         refresh()
+    })
+}
+
+function sendTutor(e, s) {
+    setTutor(e, s, function() {
+        reportSuccess("Tutor updated")
+        refresh();
     })
 }

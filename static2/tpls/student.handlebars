@@ -9,16 +9,16 @@
                 <dd>{{I.Promotion}}</dd>
                 <dt>major</dt>
                 <dd>
-                    <select onchange="sendMajor('{{I.Student.Email}}',$(this).val())">
+                    <select class="select-major">
                         {{majorOptions I.Major}}
                     </select>
                 </dd>                
                 <dt>academic tutor</dt>
                 <dd>
-                    <a href="mailto:{{I.Tutor.Email}}">{{fullname I.Tutor}}</a>
+                    <select class="select-tutor">
+                        {{userSelecter Tutors}}
+                    </select>                    
                 </dd>
-
-
             </dl>
 
             <h4 class="text-center">{{company I.Cpy}}</h4>
