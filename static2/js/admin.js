@@ -381,18 +381,13 @@ function showInternship(s) {
     });
 }
 
-function sendReportDeadline(email, kind, input) {    
-    d = moment($(input).val(),"D MMM YYYY")
-    setReportDeadline(email, kind, d.format());
-}
-
-function showReport(e, k) {    
-    reportHeader(e, k, function(r) {            
+function showReport(email, kind) {    
+    reportHeader(email, kind, function(r) {            
             r.Reviewable = r.Grade != -2
-            r.Email = e
+            r.Email = email
             buf = Handlebars.getTemplate("reportEditor")(r)
             $("#modal").html(buf).modal('show');      
-            $(".date").datepicker({format:'d M yyyy', autoclose: true, minViewMode: 0, weekStart: 1})             
+            $(".date").datepicker({format:'d M yyyy', autoclose: true, minViewMode: 0, weekStart: 1}).on("changeDate", function (e) { setReportDeadline(email, kind, e.date)})             
     });
 }
 
