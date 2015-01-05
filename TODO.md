@@ -13,7 +13,7 @@
 - [ ] cross-compilation
 - [x] comments for grades
 - [x] presence indicator for reports
-
+- [x] report private/public status
 ### Daemon
 
 - [x] install mode
@@ -49,6 +49,8 @@
 - [x] change report deadline
 - [x] change tutor
 - [x] change major
+- [x] tutor internships
+- [x] report private/public status
 
 #### student
 - [ ] profile update

@@ -178,6 +178,15 @@ function setMajor(e, m, ok, no) {
     }).done(noCb(ok)).fail(restError(no));    
 }
 
+function setReportPrivate(e, k, b, ok, no) {
+    return $.ajax({
+        method: "POST",
+        url: ROOT_API + "/internships/" + e + "/reports/" + k + "/private",
+        data: JSON.stringify(b)
+    }).done(noCb(ok)).fail(restError(no));    
+}
+
+
 function majors(ok, no) {
     return $.ajax({
         method: "GET",

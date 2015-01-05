@@ -17,4 +17,5 @@ type Mailer interface {
 	SendReportUploaded(s internship.User, t internship.User, kind string)
 	SendGradeUploaded(s internship.User, t internship.User, kind string)
 	SendReportDeadline(s internship.User, t internship.User, kind string, d time.Time)
+	SendReportPrivate(s internship.User, t internship.User, kind string, b bool)
 }

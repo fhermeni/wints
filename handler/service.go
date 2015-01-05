@@ -269,6 +269,7 @@ func reportMngt(s Service, mailer mail.Mailer) {
 	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/content", serviceHandler(setReportContent, s, mailer)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/grade", serviceHandler(setReportGrade, s, mailer)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/deadline", serviceHandler(setReportDeadline, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/private", serviceHandler(setReportPrivate, s, mailer)).Methods("POST")
 }
 
 func report(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
@@ -317,6 +318,7 @@ func setReportGrade(srv internship.Service, mailer mail.Mailer, w http.ResponseW
 	}
 	return err
 }
+
 func setReportDeadline(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	var t time.Time
 	err := jsonRequest(w, r, &t)
@@ -327,6 +329,21 @@ func setReportDeadline(srv internship.Service, mailer mail.Mailer, w http.Respon
 	if err == nil {
 		if i, err := srv.Internship(mux.Vars(r)["email"]); err != nil {
 			mailer.SendReportDeadline(i.Student, i.Tutor, mux.Vars(r)["kind"], t)
+		}
+	}
+	return err
+}
+
+func setReportPrivate(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+	var b bool
+	err := jsonRequest(w, r, &b)
+	if err != nil {
+		return err
+	}
+	err = srv.SetReportPrivate(mux.Vars(r)["kind"], mux.Vars(r)["email"], b)
+	if err == nil {
+		if i, err := srv.Internship(mux.Vars(r)["email"]); err != nil {
+			mailer.SendReportPrivate(i.Student, i.Tutor, mux.Vars(r)["kind"], b)
 		}
 	}
 	return err

@@ -73,7 +73,7 @@ type Service interface {
 	SetReportContent(kind, email string, cnt []byte) error
 	SetReportGrade(kind, email string, r int, comment string) error
 	SetReportDeadline(kind, email string, t time.Time) error
-
+	SetReportPrivate(kind, email string, p bool) error
 	ResetRootAccount() error
 
 	NewConvention(c Convention) error

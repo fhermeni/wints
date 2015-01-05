@@ -61,6 +61,7 @@ type ReportHeader struct {
 	Grade int
 	//The tutor comment
 	Comment string
+	Private bool
 }
 
 //ReportsDef allows to define internship reports

@@ -1,6 +1,7 @@
 package datastore
 
 import (
+	"database/sql"
 	"encoding/base64"
 	"time"
 
@@ -8,21 +9,27 @@ import (
 )
 
 func (s *Service) PlanReport(email string, r internship.ReportHeader) error {
-	sql := "insert into reports(student, kind, deadline, grade) values($1,$2,$3)"
-	return SingleUpdate(s.DB, internship.ErrReportExists, sql, email, r.Kind, r.Deadline, -2)
+	sql := "insert into reports(student, kind, deadline, grade, private) values($1,$2,$3)"
+	return SingleUpdate(s.DB, internship.ErrReportExists, sql, email, r.Kind, r.Deadline, -2, false)
 }
 
 func (s *Service) ReportDefs() []internship.ReportDef {
 	return s.reportDefs
 }
 func (srv *Service) Report(k, email string) (internship.ReportHeader, error) {
-	q := "select deadline, grade from reports where student=$1 and kind=$2"
+	q := "select deadline, grade, comment, private from reports where student=$1 and kind=$2"
 	var d time.Time
 	var g int
-	if err := srv.DB.QueryRow(q, email, k).Scan(&d, &g); err != nil {
+	var priv bool
+	var comment sql.NullString
+	if err := srv.DB.QueryRow(q, email, k).Scan(&d, &g, &comment, &priv); err != nil {
 		return internship.ReportHeader{}, internship.ErrUnknownReport
 	}
-	return internship.ReportHeader{Kind: k, Deadline: d, Grade: g}, nil
+	hdr := internship.ReportHeader{Kind: k, Deadline: d, Grade: g, Private: priv}
+	if comment.Valid {
+		hdr.Comment = comment.String
+	}
+	return hdr, nil
 }
 
 func (s *Service) ReportContent(kind, email string) ([]byte, error) {
@@ -52,4 +59,9 @@ func (s *Service) SetReportGrade(kind, email string, g int, comment string) erro
 func (s *Service) SetReportDeadline(kind, email string, t time.Time) error {
 	sql := "update reports set deadline=$3 where student=$1 and kind=$2"
 	return SingleUpdate(s.DB, internship.ErrUnknownReport, sql, email, kind, t)
+}
+
+func (s *Service) SetReportPrivate(kind, email string, p bool) error {
+	sql := "update reports set private=$3 where student=$1 and kind=$2"
+	return SingleUpdate(s.DB, internship.ErrUnknownReport, sql, email, kind, p)
 }

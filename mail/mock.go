@@ -52,3 +52,11 @@ func (m *Mock) SendReportDeadline(s internship.User, t internship.User, kind str
 func (m *Mock) SendGradeUploaded(s internship.User, t internship.User, kind string) {
 	log.Printf("Hey %s, your tutor %s uploaded the grade for the '%s' report\n", s.Fullname(), t.Fullname(), kind)
 }
+
+func (m *Mock) SendReportPrivate(s internship.User, t internship.User, kind string, b bool) {
+	if b {
+		log.Printf("Hey %s, your report '%s' is now private", s.Fullname(), kind)
+	} else {
+		log.Printf("Hey %s, your report '%s' is now public", s.Fullname(), kind)
+	}
+}

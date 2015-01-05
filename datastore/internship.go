@@ -53,7 +53,7 @@ func (srv *Service) NewInternship(c internship.Convention) ([]byte, error) {
 		if err != nil {
 			return []byte{}, rollback(err, tx)
 		}
-		sql = "insert into reports(student, kind, deadline, grade) values($1,$2,$3,-2)"
+		sql = "insert into reports(student, kind, deadline, grade, private) values($1,$2,$3,-2, false)"
 		_, err = tx.Exec(sql, c.Student.Email, hdr.Kind, hdr.Deadline)
 		if err != nil {
 			return []byte{}, rollback(err, tx)
@@ -149,7 +149,7 @@ func scanInternship(r *sql.Rows) (internship.Internship, error) {
 }
 
 func (srv *Service) appendReports(i *internship.Internship) error {
-	s := "select kind, grade, deadline, comment from reports where student=$1 order by deadline"
+	s := "select kind, grade, deadline, comment, private from reports where student=$1 order by deadline"
 	rows, err := srv.DB.Query(s, i.Student.Email)
 	if err != nil {
 		return err
@@ -160,8 +160,9 @@ func (srv *Service) appendReports(i *internship.Internship) error {
 		var comment sql.NullString
 		var grade sql.NullInt64
 		var deadline time.Time
-		rows.Scan(&kind, &grade, &deadline, &comment)
-		hdr := internship.ReportHeader{Kind: kind, Deadline: deadline, Grade: -1}
+		var priv bool
+		rows.Scan(&kind, &grade, &deadline, &comment, &priv)
+		hdr := internship.ReportHeader{Kind: kind, Deadline: deadline, Grade: -1, Private: priv}
 		if comment.Valid {
 			hdr.Comment = comment.String
 		}

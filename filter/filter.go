@@ -234,6 +234,13 @@ func (v *Service) SetReportDeadline(kind, email string, t time.Time) error {
 	return ErrPermission
 }
 
+func (v *Service) SetReportPrivate(kind, email string, p bool) error {
+	if v.my.Role >= internship.ADMIN || v.isTutoring(email) {
+		return v.srv.SetReportPrivate(kind, email, p)
+	}
+	return ErrPermission
+}
+
 func (v *Service) ResetRootAccount() error {
 	if v.my.Role == internship.ROOT {
 		return v.srv.ResetRootAccount()

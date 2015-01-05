@@ -69,6 +69,35 @@ function refresh() {
     }
 }
 
+function displayMyStudents() {
+internships(function(data) {  
+    mine = data.filter(function (i) {
+        return i.Tutor.Email == myself.Email
+    });        
+    var html = Handlebars.getTemplate("tutoring")(mine);
+    var root = $("#cnt");
+    root.html(html);
+    if (mine.length == 0) {
+        return true
+    }       
+    $("#table-conventions").tablesorter({            
+        theme: 'bootstrap',
+        widgets : ["uitheme"],
+        headerTemplate : '{content} {icon}',
+        headers : {
+            0: {sorter:false}
+        }
+    });    
+    $('#cnt').find(":checkbox").iCheck()
+    $('#cnt').find(".check_all").on("ifChecked", function (e) {
+        $("#cnt").find("td .icheckbox").iCheck("check")        
+    }).on("ifUnchecked", function (e) {
+        $("#cnt").find("td .icheckbox").iCheck("unCheck")        
+    });
+    $("#cnt").find("td .icheckbox").on("ifChecked", shiftSelect)    
+});
+}
+
 function displayMyConventions() { 
 internships(function(data) {   
     interns = data;    
@@ -387,6 +416,9 @@ function showReport(email, kind) {
             r.Email = email
             buf = Handlebars.getTemplate("reportEditor")(r)
             $("#modal").html(buf).modal('show');      
+            $(':checkbox').iCheck()
+                .on('ifChecked', function(){setReportPrivate(email, kind, true)})
+                .on('ifUnchecked', function(){setReportPrivate(email, kind, false)})
             $(".date").datepicker({format:'d M yyyy', autoclose: true, minViewMode: 0, weekStart: 1}).on("changeDate", function (e) { setReportDeadline(email, kind, e.date)})             
     });
 }

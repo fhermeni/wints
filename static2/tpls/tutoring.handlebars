@@ -1,0 +1,59 @@
+{{#if this}}
+<h3>{{len this}} internships
+<button type="button" class="btn btn-primary" onclick="mailing()">
+    <i class="glyphicon glyphicon-envelope"></i>
+    mail selection
+</button>
+</h3>
+<table class="table table-hover tablesorter" id="table-conventions">
+    {{#each this}}
+        {{#if @first}}
+            <thead>
+    <tr>
+        <th class="sorter-false" rowspan="2">
+        <input type='checkbox' data-toggle='checkbox' class='icheckbox_flat check_all'/>
+        </th>
+        <th rowspan="2">Student</th>
+        <th rowspan="2">Promotion</th>
+        <th rowspan="2">Major</th>
+        <th rowspan="2" class="sorter-false">Supervisor</th>
+        <th rowspan="2" class="sorter-false">Company</th>
+        <th class="sorter-false text-center" colspan="{{len Reports}}">Reports</th>
+        <th rowspan="2" >Def</th>
+    </tr>
+    <tr>        
+        {{#each Reports}}        
+        <th>{{shortKind this}}</th>
+        {{/each}}        
+    </tr>
+    </thead>
+    <tbody>
+    {{/if}}
+        <tr>
+            <td>
+            <input type='checkbox' class='icheckbox_flat' data-email='{{Student.Email}}'/>  
+            </td>
+            <td>
+            <a class='clickable' onclick="showInternship('{{Student.Email}}')">{{fullname Student}} ({{Student.Tel}})</a>
+            </td>
+            <td>{{Promotion}}</td>
+            <td>{{Major}}</td>
+            <td>                
+                <a href='mailto:{{Sup.Email}}' title='{{fullname Sup}}'>{{fullname Sup}} ({{Sup.Tel}})</a>
+            </td>
+            <td>                
+                {{company Cpy}}
+            </td>            
+            {{#each Reports}}
+            <td class="{{reportStatus this}} text-center" data-text="{{this.Grade}}" onclick="showReport('{{../Student.Email}}', '{{Kind}}')">            
+            {{reportGrade this}}
+            </td>            
+            {{/each}}
+            <td>-</td>
+        </tr>
+    {{/each}}
+    </tbody>
+</table>
+{{else}}
+    <h5 class="text-center">No internships to watch</h5>
+{{/if}}
