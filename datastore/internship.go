@@ -16,19 +16,19 @@ func rollback(e error, tx *sql.Tx) error {
 	}
 	return e
 }
-func (srv *Service) NewInternship(c internship.Convention) error {
+func (srv *Service) NewInternship(c internship.Convention) ([]byte, error) {
 	if c.Begin.After(c.End) {
-		return internship.ErrInvalidPeriod
+		return []byte{}, internship.ErrInvalidPeriod
 	}
 	tx, err := srv.DB.Begin()
 	if err != nil {
-		return err
+		return []byte{}, err
 	}
 	//Create the student account
 	sql := "insert into users(email, firstname, lastname, tel, password, role) values ($1,$2,$3,$4,$5,$6)"
-	_, err = tx.Exec(sql, c.Student.Email, c.Student.Firstname, c.Student.Lastname, c.Student.Tel, randomBytes(64), internship.STUDENT)
+	_, err = tx.Exec(sql, c.Student.Email, c.Student.Firstname, c.Student.Lastname, c.Student.Tel, randomBytes(64), internship.NONE)
 	if err != nil {
-		return rollback(internship.ErrUserExists, tx)
+		return []byte{}, rollback(internship.ErrUserExists, tx)
 	}
 	srv.ResetPassword(c.Student.Email)
 	//Create the internship
@@ -36,36 +36,44 @@ func (srv *Service) NewInternship(c internship.Convention) error {
 	_, err = tx.Exec(sql, c.Student.Email, c.Promotion, c.Tutor.Email, c.Begin, c.End, c.Title, c.Supervisor.Firstname, c.Supervisor.Lastname, c.Supervisor.Tel, c.Supervisor.Email, c.Cpy.Name, c.Cpy.WWW)
 	if err != nil {
 		if err = tx.Rollback(); err != nil {
-			return err
+			return []byte{}, err
 		}
 		if e, ok := err.(*pq.Error); ok {
 			if e.Constraint == "internships_tutor_fkey" {
-				return internship.ErrUnknownUser
+				return []byte{}, internship.ErrUnknownUser
 			}
 			if e.Constraint == "internships_pkey" {
-				return internship.ErrInternshipExists
+				return []byte{}, internship.ErrInternshipExists
 			}
 		}
-		return err
+		return []byte{}, err
 	}
 	//Plan the reports
 	for _, def := range srv.ReportDefs() {
 		hdr, err := def.Instantiate(c.Begin)
 		if err != nil {
-			return rollback(err, tx)
+			return []byte{}, rollback(err, tx)
 		}
 		sql = "insert into reports(student, kind, deadline) values($1,$2,$3)"
 		_, err = tx.Exec(sql, c.Student.Email, hdr.Kind, hdr.Deadline)
 		if err != nil {
-			return rollback(err, tx)
+			return []byte{}, rollback(err, tx)
 		}
 	}
 	//Delete the old convetion if needed
 	_, err = tx.Exec("delete from conventions where studentEmail=$1", c.Student.Email)
 	if err != nil {
-		return rollback(err, tx)
+		return []byte{}, rollback(err, tx)
 	}
-	return tx.Commit()
+
+	token := randomBytes(32)
+	d, _ := time.ParseDuration("48h")
+	_, err = tx.Exec("insert into password_renewal(email,token,deadline) values($1,$2,$3)", c.Student.Email, token, time.Now().Add(d))
+	if err != nil {
+		err = rollback(internship.ErrUnknownUser, tx)
+		return []byte{}, err
+	}
+	return token, tx.Commit()
 }
 
 func (srv *Service) SetSupervisor(stu string, t internship.Person) error {
@@ -131,7 +139,7 @@ func scanInternship(r *sql.Rows) (internship.Internship, error) {
 		log.Println(err.Error())
 		return internship.Internship{}, err
 	}
-	stu := internship.User{Firstname: stuFn, Lastname: stuLn, Email: stuEmail, Tel: stuTel, Role: internship.STUDENT}
+	stu := internship.User{Firstname: stuFn, Lastname: stuLn, Email: stuEmail, Tel: stuTel, Role: internship.NONE}
 	tut := internship.User{Firstname: tutFn, Lastname: tutLn, Email: tutEmail, Tel: tutTel, Role: tutRole}
 	c := internship.Company{Name: company, WWW: companyWWW}
 	sup := internship.Person{Firstname: supFn, Lastname: supLn, Email: supEmail, Tel: supTel}

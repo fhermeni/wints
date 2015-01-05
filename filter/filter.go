@@ -8,7 +8,7 @@ import (
 
 //ownByStudent checks if the current user is a student and the target of the operation
 func (v *Service) ownByStudent(email string) bool {
-	return v.my.Role == internship.STUDENT && v.my.Email == email
+	return v.my.Role == internship.NONE && v.my.Email == email
 }
 
 //isTutoring checks if the current user tutors the student in parameters
@@ -26,11 +26,11 @@ func NewService(srv internship.Service, u internship.User) (*Service, error) {
 	return &Service{my: u, srv: srv}, nil
 }
 
-func (v *Service) NewInternship(c internship.Convention) error {
+func (v *Service) NewInternship(c internship.Convention) ([]byte, error) {
 	if v.my.Role >= internship.ADMIN {
 		return v.srv.NewInternship(c)
 	}
-	return ErrPermission
+	return []byte{}, ErrPermission
 }
 
 func (v *Service) NewConvention(c internship.Convention) error {
@@ -101,7 +101,7 @@ func (v *Service) SetCompany(stu string, c internship.Company) error {
 
 func (v *Service) Internships() ([]internship.Internship, error) {
 	//Student get his own, others get everything
-	if v.my.Role == internship.STUDENT {
+	if v.my.Role == internship.NONE {
 		i, err := v.srv.Internship(v.my.Email)
 		if err != nil {
 			return []internship.Internship{}, err
@@ -128,9 +128,9 @@ func (v *Service) Registered(email string, password []byte) (internship.User, er
 	return v.srv.Registered(email, password)
 }
 
-func (v *Service) NewUser(p internship.User) ([]byte, error) {
+func (v *Service) NewTutor(p internship.User) ([]byte, error) {
 	if v.my.Role == internship.ROOT {
-		return v.srv.NewUser(p)
+		return v.srv.NewTutor(p)
 	}
 	return []byte{}, ErrPermission
 }

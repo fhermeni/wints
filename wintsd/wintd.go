@@ -36,7 +36,7 @@ func confirm(msg string) bool {
  --test-mailer
  --test-feeder
 */
-func setup() (config.Config, mail.SMTP, *datastore.Service, bool, bool) {
+func setup() (config.Config, mail.Mailer, *datastore.Service, bool, bool) {
 	cfgPath := flag.String("conf", "./wints.conf", "daemon configuration file")
 	reset := flag.Bool("reset", false, "Reset the root account")
 	install := flag.Bool("install", false, "/!\\ Create database tables")
@@ -48,10 +48,11 @@ func setup() (config.Config, mail.SMTP, *datastore.Service, bool, bool) {
 	}
 	log.Println("Parsing " + *cfgPath + ": OK")
 
-	mailer := mail.NewSMTP(cfg.Mailer.Server, cfg.Mailer.Login, cfg.Mailer.Password, cfg.Mailer.Sender)
+	/*mailer := mail.NewSMTP(cfg.Mailer.Server, cfg.Mailer.Login, cfg.Mailer.Password, cfg.Mailer.Sender)
 	if err != nil {
 		log.Fatalln("Unable to setup the mailer: " + err.Error())
-	}
+	}*/
+	mailer := mail.NewMock()
 
 	DB, err := sql.Open("postgres", cfg.DB.URL)
 	if err != nil {
@@ -94,7 +95,7 @@ func rootAccount(ds *datastore.Service) {
 	os.Exit(0)
 }
 func main() {
-	cfg, _, ds, reset, install := setup()
+	cfg, mailer, ds, reset, install := setup()
 	defer ds.DB.Close()
 
 	if install && confirm("This will erase any data in the database. Confirm ?") {
@@ -115,7 +116,7 @@ func main() {
 	}
 	startFeederDaemon(puller, ds, period)
 
-	www := handler.NewService(ds)
+	www := handler.NewService(ds, mailer)
 	log.Println("Listening on " + cfg.HTTP.Host)
 	www.Listen(cfg.HTTP.Host, cfg.HTTP.Certificate, cfg.HTTP.PrivateKey)
 

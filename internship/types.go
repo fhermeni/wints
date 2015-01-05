@@ -10,7 +10,8 @@ type Privilege int
 
 //The different level of privileges
 const (
-	STUDENT Privilege = iota
+	NONE Privilege = iota
+	TUTOR
 	MAJOR
 	ADMIN
 	ROOT
@@ -34,7 +35,7 @@ type User struct {
 }
 
 //Privileges denotes the string value associated to each level of privilege
-var Privileges = [...]string{"student", "major", "admin", "root"}
+var Privileges = [...]string{"none", "tutor", "major", "admin", "root"}
 
 func (p Privilege) String() string {
 	return Privileges[p]

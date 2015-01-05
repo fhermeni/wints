@@ -7,6 +7,7 @@ import (
 
 	"github.com/fhermeni/wints/filter"
 	"github.com/fhermeni/wints/internship"
+	"github.com/fhermeni/wints/mail"
 )
 
 func jsonRequest(w http.ResponseWriter, r *http.Request, j interface{}) error {
@@ -27,7 +28,7 @@ func writeJSONIfOk(e error, w http.ResponseWriter, j interface{}) error {
 	return enc.Encode(j)
 }
 
-func serviceHandler(cb func(internship.Service, http.ResponseWriter, *http.Request) error, srv Service) http.HandlerFunc {
+func serviceHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *http.Request) error, srv Service, mailer mail.Mailer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println(r.Method + " " + r.URL.String())
 		var err error
@@ -46,7 +47,7 @@ func serviceHandler(cb func(internship.Service, http.ResponseWriter, *http.Reque
 			return
 		}
 		wrapper, _ := filter.NewService(srv.backend, u)
-		e := cb(wrapper, w, r)
+		e := cb(wrapper, mailer, w, r)
 		//Error management
 		if e != nil {
 			log.Println("Reply with error " + e.Error())
@@ -55,7 +56,7 @@ func serviceHandler(cb func(internship.Service, http.ResponseWriter, *http.Reque
 		case internship.ErrUnknownUser, internship.ErrUnknownReport, internship.ErrUnknownInternship:
 			http.Error(w, e.Error(), http.StatusNotFound)
 			return
-		case internship.ErrReportExists, internship.ErrUserExists, internship.ErrInternshipExists, internship.ErrCredentials:
+		case internship.ErrReportExists, internship.ErrUserExists, internship.ErrInternshipExists, internship.ErrCredentials, internship.ErrUserTutoring:
 			http.Error(w, e.Error(), http.StatusConflict)
 			return
 		case filter.ErrPermission:

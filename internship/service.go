@@ -9,7 +9,7 @@ type Service interface {
 	//Internship management
 
 	//New internship
-	NewInternship(c Convention) error
+	NewInternship(c Convention) ([]byte, error)
 
 	//Get the internship associated to a given student
 	Internship(stu string) (Internship, error)
@@ -37,7 +37,7 @@ type Service interface {
 
 	//Create a new user
 	//Returns the resulting password
-	NewUser(p User) ([]byte, error)
+	NewTutor(p User) ([]byte, error)
 
 	//Delete the user if it is not tutoring anyone
 	RmUser(email string) error

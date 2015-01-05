@@ -24,17 +24,25 @@ func (s *Service) Registered(email string, password []byte) (internship.User, er
 	return internship.User{Firstname: fn, Lastname: ln, Email: email, Tel: tel, Role: r}, nil
 }
 
-func (s *Service) NewUser(p internship.User) ([]byte, error) {
-	newPassword := randomBytes(64) //Hard to guess
-	hashedPassword, err := hash(newPassword)
+func (s *Service) NewTutor(p internship.User) ([]byte, error) {
+	tx, err := s.DB.Begin()
 	if err != nil {
 		return []byte{}, err
 	}
-	_, err = s.DB.Exec("insert into users(email, firstname, lastname, tel, password, role) values ($1,$2,$3,$4,$5,$6)", p.Email, p.Firstname, p.Lastname, p.Tel, hashedPassword, p.Role)
+	_, err = tx.Exec("insert into users(email, firstname, lastname, tel, password, role) values ($1,$2,$3,$4,$5,$6)", p.Email, p.Firstname, p.Lastname, p.Tel, randomBytes(32), p.Role)
 	if err != nil {
 		return []byte{}, internship.ErrUserExists
 	}
-	return newPassword, nil
+
+	token := randomBytes(32)
+	d, _ := time.ParseDuration("48h")
+	_, err = tx.Exec("insert into password_renewal(email,token,deadline) values($1,$2,$3)", p.Email, token, time.Now().Add(d))
+	if err != nil {
+		err = rollback(internship.ErrUnknownUser, tx)
+		return []byte{}, err
+	}
+	err = tx.Commit()
+	return token, err
 }
 
 func (s *Service) User(email string) (internship.User, error) {

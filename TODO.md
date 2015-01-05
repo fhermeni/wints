@@ -4,14 +4,15 @@
 
 ### Backend
 
-- [ ] mailing system
+- [x] frontend mailing system
+- [ ] backend mailing system
 - [x] convention pulling
 - [x] convention to internships
 - [ ] defenses
 - [ ] distribution
 - [ ] cross-compilation
 - [x] comments for grades
-- [x	] presence indicator for reports
+- [x] presence indicator for reports
 
 ### Daemon
 
@@ -41,11 +42,13 @@
 - [x] set user privileges
 - [x] import conventions with charset conversion
 - [x] list all internships
-- [ ] profile editor
+- [x] profile editor
 - [x] show service
 - [ ] grade/comment report
 - [ ] get report
-- [ ] change report deadline
+- [x] change report deadline
+- [x] change tutor
+- [x] change major
 
 #### student
 - [ ] profile update

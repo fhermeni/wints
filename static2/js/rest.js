@@ -183,5 +183,4 @@ function majors(ok, no) {
         method: "GET",
         url: ROOT_API + "/majors/",        
     }).done(noCb(ok)).fail(restError(no));    
-
 }

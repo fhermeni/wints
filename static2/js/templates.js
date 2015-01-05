@@ -95,12 +95,10 @@ Handlebars.registerHelper('userSelecter', function(users) {
     return new Handlebars.SafeString(b);
 });
 
-
 Handlebars.registerHelper('roleOptions', function(m) {
-    var opts = ["none","major","admin","root"];
-    var b = '';
-    var i = 0;
-    opts.forEach(function (k) {
+    var b = "";
+    var i = 1;
+    ["tutor","major","admin","root"].forEach(function (k) {
         var selected = i == m ? " selected " : "";
         b += "<option value='" + (i++) + "' " + selected + " >" + k + "</option>";
     });
