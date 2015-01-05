@@ -1,8 +1,0 @@
-Subject:[Wints] Authentication token to reset your password
-
-A request has been sent to reset your account.
-Click the following link to generate a new password if needed:
-
-{{.WWW}}/static/new_password.html?token={{.Token}}
-
-If you do not want to generate a new password, simply ignore this mail

@@ -1,0 +1,6 @@
+Subject:[Wints] {{.Student.Firstname}} {{.Student.Lastname}} graded your {{.Kind}} report
+
+Log on your dashboard to access the grade: {{.WWW}}
+
+Regards,
+Fabien Hermenier

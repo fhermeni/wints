@@ -1,0 +1,6 @@
+Subject:[Wints] Role changed to {{.Role}}
+
+Your role changed. You now have the {{.Role}} rights. Log on your dashboard to check your new capabilities: {{.WWW}}
+
+Regards
+Fabien Hermenier

@@ -1,0 +1,4 @@
+Subject:[Wints] Report {{.Kind}} is now {{.Status}}
+
+Regards,
+Fabien Hermenier

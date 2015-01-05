@@ -17,17 +17,17 @@ type SMTP struct {
 	sender   string
 }
 
-func NewSMTP(srv, login, passwd, emitter string) SMTP {
+func NewSMTP(srv, login, passwd, emitter string) *SMTP {
 	m := SMTP{
 		server:   srv,
 		username: login,
 		password: passwd,
 		sender:   emitter,
 	}
-	return m
+	return &m
 }
 
-func (m *SMTP) Mail(to []string, input string, data interface{}) error {
+func mail(to []string, input string, data interface{}) error {
 
 	var out []byte
 

@@ -1,7 +1,7 @@
 Subject:[Wints] New academic tutor for your internship
 
 Your academic tutor has changed.
-Now {.Firstname} {.Lastname} (.Email} will now supervise your internship
+Now {.Firstname} {.Lastname} {.Email} will now supervise your internship
 
 Regards,
 Fabien Hermenier

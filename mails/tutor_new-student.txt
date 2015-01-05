@@ -1,9 +1,0 @@
-Subject:[Wints] {{.C.Stu.P.Firstname}} {{.C.Stu.P.Lastname}} declared you as its academic tutor
-
-The convention of {{.C.Stu.P.Firstname}} {{.C.Stu.P.Lastname}} declared you as the academic tutor.
-You can now follow the internship from your dashboard:
-
-{{.WWW}}/
-
-Regards,
-Fabien Hermenier

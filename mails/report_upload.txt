@@ -1,7 +1,0 @@
-Subject:[Wints] {{.C.Stu.P.Firstname}} {{.C.Stu.P.Lastname}} uploaded the "{{.ReportKind}}" report
-
-You can access and grade this report from your dashboard.
-Your grade is due by the {{GradeDeadline}}.
-
-BR,
-Fabien Hermenier

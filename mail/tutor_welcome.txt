@@ -1,0 +1,12 @@
+Subject:[Wints] Account created
+
+Wints is the web application used to follow internships.
+This webapp allows you to:
+- follow your students
+- access student reports for grading
+
+Visit the following link to terminate the account creation:
+{{.WWW}}/resetPassword?token={{.Token}}
+
+Regards,
+Fabien Hermenier

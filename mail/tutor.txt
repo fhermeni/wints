@@ -1,0 +1,7 @@
+Subject:[Wints] Student {{.C.Student.Fullname}} declared you as a tutor
+
+You can now acces his/her internship data from your dashboard at {{.WWW}}.
+If you are not the student tutor, contact fabien.hermenier@unice.fr
+
+Regards
+Fabien Hermenier

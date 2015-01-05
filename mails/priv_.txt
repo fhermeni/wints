@@ -1,7 +1,0 @@
-Subject:[Wints] Privilege updated to "default"
-
-From your dashboard, you can now:
-- manage the student you are supervising
-
-Regards,
-Fabien Hermenier
