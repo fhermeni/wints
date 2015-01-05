@@ -92,7 +92,6 @@ func rootAccount(ds *datastore.Service) {
 		log.Fatalln("Unable to reset the root account: " + err.Error())
 	}
 	log.Println("Root account reset. Don't forgot to delete it once logged")
-	os.Exit(0)
 }
 func main() {
 	cfg, mailer, ds, reset, install := setup()
