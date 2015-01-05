@@ -7,8 +7,8 @@ import (
 )
 
 //ownByStudent checks if the current user is a student and the target of the operation
-func (v *Service) ownByStudent(email string) bool {
-	return v.my.Role == internship.NONE && v.my.Email == email
+func (v *Service) mine(email string) bool {
+	return v.my.Email == email
 }
 
 //isTutoring checks if the current user tutors the student in parameters
@@ -48,7 +48,7 @@ func (v *Service) Conventions() ([]internship.Convention, error) {
 }
 
 func (v *Service) Internship(stu string) (internship.Internship, error) {
-	if v.ownByStudent(stu) || v.my.Role >= internship.ADMIN {
+	if v.mine(stu) || v.my.Role >= internship.MAJOR {
 		return v.srv.Internship(stu)
 	}
 	i, err := v.srv.Internship(stu)
@@ -62,7 +62,7 @@ func (v *Service) Internship(stu string) (internship.Internship, error) {
 }
 
 func (v *Service) SetSupervisor(stu string, sup internship.Person) error {
-	if v.ownByStudent(stu) || v.isTutoring(stu) || v.my.Role >= internship.ADMIN {
+	if v.mine(stu) || v.isTutoring(stu) || v.my.Role >= internship.ADMIN {
 		return v.srv.SetSupervisor(stu, sup)
 	}
 	return ErrPermission
@@ -76,7 +76,7 @@ func (v *Service) SetTutor(stu string, t string) error {
 }
 
 func (v *Service) SetMajor(stu, m string) error {
-	if v.ownByStudent(stu) || v.isTutoring(stu) || v.my.Role >= internship.ADMIN {
+	if v.mine(stu) || v.isTutoring(stu) || v.my.Role >= internship.ADMIN {
 		return v.srv.SetMajor(stu, m)
 	}
 	return ErrPermission
@@ -86,14 +86,14 @@ func (v *Service) Majors() []string {
 	return v.srv.Majors()
 }
 func (v *Service) SetPromotion(stu, p string) error {
-	if v.ownByStudent(stu) || v.isTutoring(stu) || v.my.Role >= internship.ADMIN {
+	if v.mine(stu) || v.isTutoring(stu) || v.my.Role >= internship.ADMIN {
 		return v.srv.SetPromotion(stu, p)
 	}
 	return ErrPermission
 }
 
 func (v *Service) SetCompany(stu string, c internship.Company) error {
-	if v.ownByStudent(stu) || v.isTutoring(stu) || v.my.Role >= internship.ADMIN {
+	if v.mine(stu) || v.isTutoring(stu) || v.my.Role >= internship.ADMIN {
 		return v.srv.SetCompany(stu, c)
 	}
 	return ErrPermission
@@ -107,7 +107,7 @@ func (v *Service) Internships() ([]internship.Internship, error) {
 			return []internship.Internship{}, err
 		}
 		return []internship.Internship{i}, err
-	} else if v.my.Role >= internship.ADMIN {
+	} else if v.my.Role >= internship.MAJOR {
 		return v.srv.Internships()
 	}
 	//filter out internship I don't handle
@@ -143,7 +143,7 @@ func (v *Service) RmUser(email string) error {
 }
 
 func (v *Service) User(email string) (internship.User, error) {
-	if v.ownByStudent(email) || v.my.Role >= internship.ADMIN {
+	if v.mine(email) || v.my.Role >= internship.ADMIN {
 		return v.srv.User(email)
 	}
 	return internship.User{}, ErrPermission
@@ -200,21 +200,21 @@ func (v *Service) ReportDefs() []internship.ReportDef {
 }
 
 func (v *Service) Report(kind, email string) (internship.ReportHeader, error) {
-	if v.ownByStudent(email) || v.my.Role >= internship.ADMIN {
+	if v.mine(email) || v.isTutoring(email) || v.my.Role >= internship.ADMIN {
 		return v.srv.Report(kind, email)
 	}
 	return internship.ReportHeader{}, ErrPermission
 }
 
 func (v *Service) ReportContent(kind, email string) ([]byte, error) {
-	if v.ownByStudent(email) || v.my.Role >= internship.ADMIN || v.isTutoring(email) {
+	if v.mine(email) || v.my.Role >= internship.ADMIN || v.isTutoring(email) {
 		return v.srv.ReportContent(kind, email)
 	}
 	return []byte{}, ErrPermission
 }
 
 func (v *Service) SetReportContent(kind, email string, cnt []byte) error {
-	if v.ownByStudent(email) {
+	if v.mine(email) {
 		return v.srv.SetReportContent(kind, email, cnt)
 	}
 	return ErrPermission

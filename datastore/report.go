@@ -19,7 +19,6 @@ func (srv *Service) Report(k, email string) (internship.ReportHeader, error) {
 	q := "select deadline, grade from reports where student=$1 and kind=$2"
 	var d time.Time
 	var g int
-
 	if err := srv.DB.QueryRow(q, email, k).Scan(&d, &g); err != nil {
 		return internship.ReportHeader{}, internship.ErrUnknownReport
 	}

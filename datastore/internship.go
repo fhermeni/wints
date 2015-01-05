@@ -54,7 +54,7 @@ func (srv *Service) NewInternship(c internship.Convention) ([]byte, error) {
 		if err != nil {
 			return []byte{}, rollback(err, tx)
 		}
-		sql = "insert into reports(student, kind, deadline) values($1,$2,$3)"
+		sql = "insert into reports(student, kind, deadline, grade) values($1,$2,$3,-2)"
 		_, err = tx.Exec(sql, c.Student.Email, hdr.Kind, hdr.Deadline)
 		if err != nil {
 			return []byte{}, rollback(err, tx)

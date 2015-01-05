@@ -15,7 +15,7 @@ waitingBlock = $("#cnt").clone().html();
         myself = u;
         $("#fullname").html(u.Firstname + " " + u.Lastname);
         showMyServices(u.Role);
-    if (myself.Role >= 1) {
+    if (myself.Role >= 2) {
         showPage(undefined, "conventions");
     } else {
         showPage(undefined, "myStudents");
