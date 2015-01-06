@@ -200,6 +200,14 @@ function setCompany(e, n, w, ok, no) {
     }).done(noCb(ok)).fail(restError(no));    
 }
 
+function setSupervisor(e, fn, ln, email, tel, ok, no) {
+    return $.ajax({
+        method: "POST",
+        url: ROOT_API + "/internships/" + e + "/supervisor",
+        data: JSON.stringify({Firstname: fn, Lastname: ln, Email: email, Tel: tel})
+    }).done(noCb(ok)).fail(restError(no));    
+}
+
 function setTitle(e, t, ok, no) {
     return $.ajax({
         method: "POST",

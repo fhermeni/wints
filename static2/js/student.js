@@ -29,6 +29,12 @@ function showCompanyEditor() {
     root.html(html).modal("show");
 }
 
+function showSupervisorEditor() {
+    var html = Handlebars.getTemplate("supervisor-editor")(mine);
+    var root = $("#modal");
+    root.html(html).modal("show");
+}
+
 function sendCompany() {
     if (missing("lbl-name") || missing("lbl-title")) {
         return
@@ -40,4 +46,15 @@ function sendCompany() {
             reportSuccess("Operation succeeded");
         })
     })
+}
+
+function sendSupervisor() {
+    if (missing("lbl-fn") || missing("lbl-ln") || missing("lbl-email") || missing("lbl-tel")) {
+        return
+    }
+    setSupervisor(myself.Email, $("#lbl-fn").val(), $("#lbl-ln").val(), $("#lbl-email").val(), $("#lbl-tel").val(), function() {
+        showDashboard();
+        $("#modal").modal('hide');
+        reportSuccess("Operation succeeded");        
+    });
 }

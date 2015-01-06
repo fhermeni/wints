@@ -60,7 +60,7 @@
 - [x] password update
 - [x] logout
 - [x] view internship
-- [ ] update supervisor
+- [x] update supervisor
 - [x] update title
 - [x] update company
 - [ ] see reports
