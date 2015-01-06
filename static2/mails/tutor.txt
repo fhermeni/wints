@@ -1,4 +1,4 @@
-Subject:[Wints] {{.Student.Firstname}} {{.Student.Lastname}} declared you as a tutor
+Subject:[Wints] New tutored student: '{{.Student.Firstname}} {{.Student.Lastname}}'
 
 You can access the internship data from your dashboard at {{.WWW}}.
 Contact me if you received this email by mistake
