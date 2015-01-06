@@ -29,11 +29,6 @@ func confirm(msg string) bool {
 	return ret
 }
 
-/*
- --test-db
- --invitation XXX
- --test-feeder
-*/
 func newServices(cfg config.Config) (mail.Mailer, *datastore.Service) {
 
 	mailer, err := mail.NewSMTP(cfg.Mailer.Server, cfg.Mailer.Login, cfg.Mailer.Password, cfg.Mailer.Sender, cfg.HTTP.WWW, cfg.Mailer.Path)
