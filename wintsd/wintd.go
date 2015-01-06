@@ -120,6 +120,8 @@ func main() {
 
 	www := handler.NewService(ds, mailer, cfg.HTTP.Path)
 	log.Println("Listening on " + cfg.HTTP.Host)
-	www.Listen(cfg.HTTP.Host, cfg.HTTP.Certificate, cfg.HTTP.PrivateKey)
-
+	err = www.Listen(cfg.HTTP.Host, cfg.HTTP.Certificate, cfg.HTTP.PrivateKey)
+	if err != nil {
+		log.Fatalln("Server exited:" + err.Error())
+	}
 }
