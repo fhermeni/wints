@@ -34,7 +34,8 @@ type DbConfig struct {
 
 //HTTPConfig allows to configure the Http endpoint
 type HTTPConfig struct {
-	Host        string
+	WWW         string
+	Listen      string
 	Certificate string
 	PrivateKey  string
 	Path        string

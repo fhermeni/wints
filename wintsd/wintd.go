@@ -36,7 +36,7 @@ func confirm(msg string) bool {
 */
 func newServices(cfg config.Config) (mail.Mailer, *datastore.Service) {
 
-	mailer, err := mail.NewSMTP(cfg.Mailer.Server, cfg.Mailer.Login, cfg.Mailer.Password, cfg.Mailer.Sender, cfg.HTTP.Host, cfg.Mailer.Path)
+	mailer, err := mail.NewSMTP(cfg.Mailer.Server, cfg.Mailer.Login, cfg.Mailer.Password, cfg.Mailer.Sender, cfg.HTTP.WWW, cfg.Mailer.Path)
 	if err != nil {
 		log.Fatalln("Unable to setup the mailer: " + err.Error())
 	}
@@ -119,8 +119,8 @@ func main() {
 	startFeederDaemon(puller, ds, period)
 
 	www := handler.NewService(ds, mailer, cfg.HTTP.Path)
-	log.Println("Listening on " + cfg.HTTP.Host)
-	err = www.Listen(cfg.HTTP.Host, cfg.HTTP.Certificate, cfg.HTTP.PrivateKey)
+	log.Println("Listening on " + cfg.HTTP.Listen)
+	err = www.Listen(cfg.HTTP.Listen, cfg.HTTP.Certificate, cfg.HTTP.PrivateKey)
 	if err != nil {
 		log.Fatalln("Server exited:" + err.Error())
 	}

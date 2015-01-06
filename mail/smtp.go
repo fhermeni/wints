@@ -109,12 +109,7 @@ func join(mails ...string) []string {
 	}
 	return res
 }
-func one(s string) []string {
-	return []string{s}
-}
-func none() []string {
-	return []string{}
-}
+
 func (m *SMTP) SendAdminInvitation(u internship.User, token []byte) {
 	d := InvitationData{WWW: m.www, Token: string(token)}
 	if err := m.mail(join(u.Email), join(), m.path+"/tutor_welcome.txt", d); err != nil {
