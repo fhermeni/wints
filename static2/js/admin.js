@@ -11,7 +11,7 @@ waitingBlock = $("#cnt").clone().html();
     majors(function(m) {
         allMajors = m;
     })
-	user(document.cookie.split("=")[1], function(u) {
+	user(getCookie("session"), function(u) {
         myself = u;
         $("#fullname").html(u.Firstname + " " + u.Lastname);
         showMyServices(u.Role);

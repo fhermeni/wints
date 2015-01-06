@@ -3,6 +3,12 @@
  */
 //Collect rest queries
 
+function getCookie(name) {
+  var value = "; " + document.cookie;
+  var parts = value.split("; " + name + "=");
+  if (parts.length == 2) return parts.pop().split(";").shift();
+}
+
 function noCb(no) {
     if (no != undefined) {
         return no;
@@ -94,7 +100,7 @@ function setUserRole(email, r, ok, no) {
 }
 
 function setUser(fn, ln, tel, ok, no) {
-    var email = document.cookie.split("=")[1]
+    var email = getCookie("session")
         return $.ajax({
         method: "PUT",
         url: ROOT_API + "/users/" + email + "/profile",
@@ -103,7 +109,7 @@ function setUser(fn, ln, tel, ok, no) {
 }
 
 function setPassword(old, n, ok, no) {
-    var email = document.cookie.split("=")[1]
+    var email = getCookie("session")
     return $.ajax({
         method: "PUT",
         url: ROOT_API + "/users/" + email + "/password",
