@@ -58,15 +58,7 @@ func (m *SMTP) mail(to []string, cc []string, input string, data interface{}) er
 	if err != nil {
 		return err
 	}
-	go func() {
-		err := m.sendMail(m.server,
-			m.sender, to, cc,
-			body)
-		if err != nil {
-			log.Printf("Unable to send a mail: %s\n", err.Error())
-		}
-	}()
-	return err
+	return m.sendMail(m.server, m.sender, to, cc, body)
 }
 
 func (m *SMTP) sendMail(addr string, from string, to []string, cc []string, msg []byte) error {

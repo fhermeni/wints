@@ -192,9 +192,11 @@ func resetPassword(srv internship.Service, mailer mail.Mailer) http.HandlerFunc 
 			log.Println("Unable to get the reset token for " + e + ": " + err.Error())
 			return
 		}
-		if u, err := srv.User(e); err == nil {
-			mailer.SendPasswordResetLink(u, token)
-		}
+		go func() {
+			if u, err := srv.User(e); err == nil {
+				mailer.SendPasswordResetLink(u, token)
+			}
+		}()
 	}
 }
 
@@ -206,7 +208,7 @@ func newTutor(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter,
 	}
 	t, err := srv.NewTutor(u)
 	if err == nil {
-		mailer.SendAdminInvitation(u, t)
+		go mailer.SendAdminInvitation(u, t)
 	}
 	return err
 }
@@ -222,9 +224,11 @@ func setUserRole(srv internship.Service, mailer mail.Mailer, w http.ResponseWrit
 	if err != nil {
 		return err
 	}
-	if u, err := srv.User(em); err == nil {
-		mailer.SendRoleUpdate(u)
-	}
+	go func() {
+		if u, err := srv.User(em); err == nil {
+			mailer.SendRoleUpdate(u)
+		}
+	}()
 	return nil
 }
 
@@ -255,7 +259,7 @@ func rmUser(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r
 	}
 	err = srv.RmUser(u.Email)
 	if err == nil {
-		mailer.SendAccountRemoval(u)
+		go mailer.SendAccountRemoval(u)
 	}
 	return err
 }
@@ -290,11 +294,13 @@ func setReportContent(srv internship.Service, mailer mail.Mailer, w http.Respons
 		return err
 	}
 	err = srv.SetReportContent(mux.Vars(r)["kind"], mux.Vars(r)["email"], cnt)
-	if err == nil {
-		if i, err := srv.Internship(mux.Vars(r)["email"]); err == nil {
-			mailer.SendReportUploaded(i.Student, i.Tutor, mux.Vars(r)["kind"])
+	go func() {
+		if err == nil {
+			if i, err := srv.Internship(mux.Vars(r)["email"]); err == nil {
+				mailer.SendReportUploaded(i.Student, i.Tutor, mux.Vars(r)["kind"])
+			}
 		}
-	}
+	}()
 	return err
 }
 
@@ -313,11 +319,13 @@ func setReportGrade(srv internship.Service, mailer mail.Mailer, w http.ResponseW
 	em := mux.Vars(r)["email"]
 	err = srv.SetReportGrade(k, em, n.Grade, n.Comment)
 
-	if err == nil {
-		if i, err := srv.Internship(em); err == nil {
-			mailer.SendGradeUploaded(i.Student, i.Tutor, k)
+	go func() {
+		if err == nil {
+			if i, err := srv.Internship(em); err == nil {
+				mailer.SendGradeUploaded(i.Student, i.Tutor, k)
+			}
 		}
-	}
+	}()
 	return err
 }
 
@@ -328,11 +336,13 @@ func setReportDeadline(srv internship.Service, mailer mail.Mailer, w http.Respon
 		return err
 	}
 	err = srv.SetReportDeadline(mux.Vars(r)["kind"], mux.Vars(r)["email"], t)
-	if err == nil {
-		if i, err := srv.Internship(mux.Vars(r)["email"]); err != nil {
-			mailer.SendReportDeadline(i.Student, i.Tutor, mux.Vars(r)["kind"], t)
+	go func() {
+		if err == nil {
+			if i, err := srv.Internship(mux.Vars(r)["email"]); err != nil {
+				mailer.SendReportDeadline(i.Student, i.Tutor, mux.Vars(r)["kind"], t)
+			}
 		}
-	}
+	}()
 	return err
 }
 
@@ -343,11 +353,13 @@ func setReportPrivate(srv internship.Service, mailer mail.Mailer, w http.Respons
 		return err
 	}
 	err = srv.SetReportPrivate(mux.Vars(r)["kind"], mux.Vars(r)["email"], b)
-	if err == nil {
-		if i, err := srv.Internship(mux.Vars(r)["email"]); err != nil {
-			mailer.SendReportPrivate(i.Student, i.Tutor, mux.Vars(r)["kind"], b)
+	go func() {
+		if err == nil {
+			if i, err := srv.Internship(mux.Vars(r)["email"]); err != nil {
+				mailer.SendReportPrivate(i.Student, i.Tutor, mux.Vars(r)["kind"], b)
+			}
 		}
-	}
+	}()
 	return err
 }
 
@@ -392,10 +404,12 @@ func newInternship(srv internship.Service, mailer mail.Mailer, w http.ResponseWr
 	if err != nil {
 		return err
 	}
-	token, err := srv.NewInternship(c)
-	if err == nil {
-		mailer.SendStudentInvitation(internship.User{Firstname: c.Student.Firstname, Lastname: c.Student.Lastname, Email: c.Student.Email}, token)
-	}
+	go func() {
+		token, err := srv.NewInternship(c)
+		if err == nil {
+			mailer.SendStudentInvitation(internship.User{Firstname: c.Student.Firstname, Lastname: c.Student.Lastname, Email: c.Student.Email}, token)
+		}
+	}()
 	return err
 }
 
@@ -457,10 +471,12 @@ func setTutor(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter,
 		return err
 	}
 	err = srv.SetTutor(em, s)
-	if err == nil {
-		if u, err := srv.User(s); err == nil {
-			mailer.SendTutorUpdate(i.Student, i.Tutor, u)
+	go func() {
+		if err == nil {
+			if u, err := srv.User(s); err == nil {
+				mailer.SendTutorUpdate(i.Student, i.Tutor, u)
+			}
 		}
-	}
+	}()
 	return err
 }
