@@ -36,18 +36,7 @@ func confirm(msg string) bool {
  --test-mailer
  --test-feeder
 */
-func setup() (config.Config, mail.Mailer, *datastore.Service, bool, bool, string) {
-	cfgPath := flag.String("conf", "./wints.conf", "daemon configuration file")
-	reset := flag.Bool("reset", false, "Reset the root account")
-	install := flag.Bool("install", false, "/!\\ Create database tables")
-	testMail := flag.String("test-mailer", "", "Test the mailer by sending a mail to the argument")
-	flag.Parse()
-
-	cfg, err := config.Load(*cfgPath)
-	if err != nil {
-		log.Fatalln("Error while parsing " + *cfgPath + ": " + err.Error())
-	}
-	log.Println("Parsing " + *cfgPath + ": OK")
+func newServices(cfg config.Config) (mail.Mailer, *datastore.Service) {
 
 	mailer, err := mail.NewSMTP(cfg.Mailer.Server, cfg.Mailer.Login, cfg.Mailer.Password, cfg.Mailer.Sender, cfg.HTTP.Host, cfg.Mailer.Path)
 	if err != nil {
@@ -64,7 +53,7 @@ func setup() (config.Config, mail.Mailer, *datastore.Service, bool, bool, string
 	}
 	log.Println("Database connection: OK")
 
-	return cfg, mailer, ds, *reset, *install, *testMail
+	return mailer, ds
 }
 
 func startFeederDaemon(f feeder.Feeder, srv internship.Service, frequency time.Duration) {
@@ -94,20 +83,33 @@ func rootAccount(ds *datastore.Service) {
 	log.Println("Root account reset. Don't forgot to delete it once logged")
 }
 func main() {
-	cfg, mailer, ds, reset, install, testMailer := setup()
+	cfgPath := flag.String("conf", "./wints.conf", "daemon configuration file")
+	reset := flag.Bool("reset", false, "Reset the root account")
+	install := flag.Bool("install", false, "/!\\ Create database tables")
+	testMail := flag.String("test-mailer", "", "Test the mailer by sending a mail to the argument")
+	flag.Parse()
+
+	cfg, err := config.Load(*cfgPath)
+	if err != nil {
+		log.Fatalln("Error while parsing " + *cfgPath + ": " + err.Error())
+	}
+	log.Println("Parsing " + *cfgPath + ": OK")
+
+	mailer, ds := newServices(cfg)
 	defer ds.DB.Close()
 
-	if install && confirm("This will erase any data in the database. Confirm ?") {
+	if *install && confirm("This will erase any data in the database. Confirm ?") {
 		err := ds.Install()
 		if err != nil {
 			log.Fatalln("Unable to create the tables: " + err.Error())
 		}
 		log.Println("Tables created")
 		rootAccount(ds)
-	} else if reset {
+	} else if *reset {
 		rootAccount(ds)
-	} else if len(testMailer) > 0 {
-		mailer.SendTest(testMailer)
+	} else if len(*testMail) > 0 {
+		log.Println("Sending a test mail to " + *testMail)
+		mailer.SendTest(*testMail)
 		os.Exit(0)
 	}
 

@@ -20,7 +20,7 @@
 
 - [x] install mode
 - [ ] test-db mode
-- [ ] test-mailer mode
+- [x] test-mailer mode
 - [ ] test-feeder mode
 
 ### frontend
