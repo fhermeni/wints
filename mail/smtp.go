@@ -118,28 +118,28 @@ func none() []string {
 func (m *SMTP) SendAdminInvitation(u internship.User, token []byte) {
 	d := InvitationData{WWW: m.www, Token: string(token)}
 	if err := m.mail(join(u.Email), join(), m.path+"/tutor_welcome.txt", d); err != nil {
-		log.Println("Unable to send invitation to '%s': %s\n", u.Fullname(), err.Error())
+		log.Printf("Unable to send invitation to '%s': %s\n", u.Fullname(), err.Error())
 	}
 }
 
 func (m *SMTP) SendStudentInvitation(u internship.User, token []byte) {
 	d := InvitationData{WWW: m.www, Token: string(token)}
 	if err := m.mail(join(u.Email), join(), m.path+"/student_welcome.txt", d); err != nil {
-		log.Println("Unable to send invitation to '%s': %s\n", u.Fullname(), err.Error())
+		log.Printf("Unable to send invitation to '%s': %s\n", u.Fullname(), err.Error())
 	}
 }
 
 func (m *SMTP) SendPasswordResetLink(u internship.User, token []byte) {
 	d := InvitationData{WWW: m.www, Token: string(token)}
 	if err := m.mail(join(u.Email), join(), m.path+"/reset.txt", d); err != nil {
-		log.Println("Unable to send the reset link to '%s': %s\n", u.Fullname(), err.Error())
+		log.Printf("Unable to send the reset link to '%s': %s\n", u.Fullname(), err.Error())
 	}
 }
 
 func (m *SMTP) SendAccountRemoval(u internship.User) {
 	empty := struct{}{}
 	if err := m.mail(join(u.Email), join(), m.path+"/delete.txt", empty); err != nil {
-		log.Println("Unable to send the account removal mail to '%s': %s\n", u.Fullname(), err.Error())
+		log.Printf("Unable to send the account removal mail to '%s': %s\n", u.Fullname(), err.Error())
 	}
 }
 
@@ -152,7 +152,7 @@ func (m *SMTP) SendRoleUpdate(u internship.User) {
 		u.Role.String(),
 	}
 	if err := m.mail(join(u.Email), join(), m.path+"/privileges.txt", d); err != nil {
-		log.Println("Unable to send the role update mail to '%s': %s\n", u.Fullname(), err.Error())
+		log.Printf("Unable to send the role update mail to '%s': %s\n", u.Fullname(), err.Error())
 	}
 }
 
@@ -165,7 +165,7 @@ func (m *SMTP) SendTutorUpdate(s internship.User, old internship.User, now inter
 		now,
 	}
 	if err := m.mail(join(s.Email, now.Email), join(old.Email), m.path+"/tutor_switch.txt", d); err != nil {
-		log.Println("Unable to send the role update mail to '%s': %s\n", now.Fullname(), err.Error())
+		log.Printf("Unable to send the role update mail to '%s': %s\n", now.Fullname(), err.Error())
 	}
 }
 
@@ -182,7 +182,7 @@ func (m *SMTP) SendReportUploaded(s internship.User, t internship.User, kind str
 		kind,
 	}
 	if err := m.mail(join(t.Email), join(s.Email), m.path+"/report_uploaded.txt", d); err != nil {
-		log.Println("Unable to send the report uploaded notificationl to '%s': %s\n", t.Fullname(), err.Error())
+		log.Printf("Unable to send the report uploaded notificationl to '%s': %s\n", t.Fullname(), err.Error())
 	}
 
 }
@@ -202,7 +202,7 @@ func (m *SMTP) SendReportDeadline(s internship.User, t internship.User, kind str
 		deadline,
 	}
 	if err := m.mail(join(s.Email), join(t.Email), m.path+"/report_deadline.txt", d); err != nil {
-		log.Println("Unable to send the report deadline notification to '%s': %s\n", s.Fullname(), err.Error())
+		log.Printf("Unable to send the report deadline notification to '%s': %s\n", s.Fullname(), err.Error())
 	}
 }
 
@@ -219,7 +219,7 @@ func (m *SMTP) SendGradeUploaded(s internship.User, t internship.User, kind stri
 		kind,
 	}
 	if err := m.mail(join(s.Email), join(t.Email), m.path+"/report_graded.txt", d); err != nil {
-		log.Println("Unable to send the report graded notification to '%s': %s\n", s.Fullname(), err.Error())
+		log.Printf("Unable to send the report graded notification to '%s': %s\n", s.Fullname(), err.Error())
 	}
 }
 
@@ -235,12 +235,12 @@ func (m *SMTP) SendReportPrivate(s internship.User, t internship.User, kind stri
 		d.Status = "private"
 	}
 	if err := m.mail(join(s.Email), join(t.Email), m.path+"/report_status.txt", d); err != nil {
-		log.Println("Unable to send the report status update to '%s': %s\n", s.Fullname(), err.Error())
+		log.Printf("Unable to send the report status update to '%s': %s\n", s.Fullname(), err.Error())
 	}
 }
 
 func (m *SMTP) SendTest(s string) {
 	if err := m.mail(join(s), join(), m.path+"/test.txt", struct{}{}); err != nil {
-		log.Fatalln("Unable to send the test mail: %s\n", err.Error())
+		log.Fatalf("Unable to send the test mail: %s\n", err.Error())
 	}
 }

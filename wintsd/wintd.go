@@ -32,8 +32,6 @@ func confirm(msg string) bool {
 /*
  --test-db
  --invitation XXX
- --install
- --test-mailer
  --test-feeder
 */
 func newServices(cfg config.Config) (mail.Mailer, *datastore.Service) {
