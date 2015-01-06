@@ -106,6 +106,13 @@ func (v *Service) SetCompany(stu string, c internship.Company) error {
 	return ErrPermission
 }
 
+func (v *Service) SetTitle(stu string, title string) error {
+	if v.mine(stu) || v.my.Role >= internship.ADMIN {
+		return v.srv.SetTitle(stu, title)
+	}
+	return ErrPermission
+}
+
 func (v *Service) Internships() ([]internship.Internship, error) {
 	//Student get his own, others get everything
 	if v.my.Role == internship.NONE {

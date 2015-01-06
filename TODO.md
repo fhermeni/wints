@@ -10,12 +10,11 @@
 - [x] convention pulling
 - [x] convention to internships
 - [ ] defenses
-- [ ] distribution
-- [ ] cross-compilation
 - [x] comments for grades
 - [x] presence indicator for reports
 - [x] report private/public status
 - [x] skipeable conventions
+- [ ] ungradeable reports
 
 ### Daemon
 
@@ -23,7 +22,7 @@
 - [ ] test-db mode
 - [x] test-mailer mode
 - [ ] test-feeder mode
-
+- [ ] deadline reminders
 ### frontend
 
 #### login page
@@ -57,12 +56,13 @@
 - [x] skipeable conventions
 
 #### student
-- [ ] profile update
-- [ ] password update
-- [ ] logout
-- [ ] view internship
+- [x] profile update
+- [x] password update
+- [x] logout
+- [x] view internship
 - [ ] update supervisor
-- [ ] update title
+- [x] update title
+- [x] update company
 - [ ] see reports
 - [ ] upload report
 - [ ] see grade, comments

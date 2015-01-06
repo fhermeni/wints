@@ -389,6 +389,7 @@ func internshipsMngt(s Service, mailer mail.Mailer) {
 	s.r.HandleFunc("/api/v1/internships/{email}/supervisor", serviceHandler(setSupervisor, s, mailer)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/tutor", serviceHandler(setTutor, s, mailer)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/company", serviceHandler(setCompany, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/title", serviceHandler(setTitle, s, mailer)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/major", serviceHandler(setMajor, s, mailer)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/promotion", serviceHandler(setPromotion, s, mailer)).Methods("POST")
 	s.r.HandleFunc("/api/v1/majors/", serviceHandler(majors, s, mailer)).Methods("GET")
@@ -441,6 +442,15 @@ func setMajor(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter,
 		return err
 	}
 	return srv.SetMajor(mux.Vars(r)["email"], c)
+}
+
+func setTitle(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+	var c string
+	err := jsonRequest(w, r, &c)
+	if err != nil {
+		return err
+	}
+	return srv.SetTitle(mux.Vars(r)["email"], c)
 }
 
 func setPromotion(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {

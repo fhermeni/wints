@@ -22,6 +22,7 @@ type Service interface {
 
 	//Set the company for the internship of a given student
 	SetCompany(stu string, c Company) error
+	SetTitle(stu string, title string) error
 
 	SetMajor(stu string, m string) error
 	Majors() []string

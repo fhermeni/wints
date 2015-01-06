@@ -90,6 +90,11 @@ func (srv *Service) SetCompany(stu string, c internship.Company) error {
 	return SingleUpdate(srv.DB, internship.ErrUnknownInternship, sql, c.WWW, c.Name, stu)
 }
 
+func (srv *Service) SetTitle(stu string, title string) error {
+	sql := "update internships set title=$1 where student=$2"
+	return SingleUpdate(srv.DB, internship.ErrUnknownInternship, sql, title, stu)
+}
+
 func (srv *Service) SetMajor(stu, m string) error {
 	for _, x := range srv.majors {
 		if x == m {

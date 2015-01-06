@@ -1,0 +1,34 @@
+<div class="row">
+<div class="col-md-6">
+	<h3>The company <small onclick=""><a><i class="glyphicon glyphicon-pencil" onclick="showCompanyEditor()"></i></a></small></h3>	
+	<dl class="dl-horizontal">
+		<dt>Period</dt>
+		<dd>From {{date Begin}} to {{date End}}</dd>
+		<dt>Name</dt>
+		<dd>{{company Cpy}}
+		<dt>Subject</dt>
+		<dd>{{Title}}</dd>
+	</dl>			
+</div>
+
+<div class="col-md-6">
+	<h3>Contacts</h3>
+
+	<h4>Supervisor <i class="glyphicon glyphicon-pencil"></i></h4>	
+	<dl class="dl-horizontal">
+		<dt>Fullname</dt>
+		<dd><a href="mailto:{{Sup.Email}}">{{Sup.Firstname}} {{Sup.Lastname}}</a></dd>
+		<dt>Tel</dt>
+		<dd>{{Sup.Tel}}</dd>
+	</dl>	
+
+	<h4>Academic tutor</h4>	
+	<dl class="dl-horizontal">
+		<dt>Fullname</dt>
+		<dd><a href="mailto:{{Tutor.Email}}">{{Tutor.Firstname}} {{Tutor.Lastname}}</a></dd>
+		<dt>Tel</dt>
+		<dd>{{Tutor.Tel}}</dd>
+	</dl>	
+
+</div>
+</div>
