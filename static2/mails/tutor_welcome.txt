@@ -1,9 +1,7 @@
 Subject:[Wints] Account created
 
 Wints is the web application used to follow internships.
-This webapp allows you to:
-- follow your students
-- access student reports for grading
+This webapp allows you to follow the students you are tutoring, access their reports and grade them
 
 Visit the following link to terminate the account creation:
 {{.WWW}}/resetPassword?token={{.Token}}

@@ -81,6 +81,7 @@ func rootAccount(ds *datastore.Service) {
 	log.Println("Root account reset. Don't forgot to delete it once logged")
 }
 func main() {
+	fakeMailer := flag.Bool("fakeMailer", false, "Use a fake mailer that print mail on stdout")
 	cfgPath := flag.String("conf", "./wints.conf", "daemon configuration file")
 	reset := flag.Bool("reset", false, "Reset the root account")
 	install := flag.Bool("install", false, "/!\\ Create database tables")
@@ -96,6 +97,7 @@ func main() {
 	mailer, ds := newServices(cfg)
 	defer ds.DB.Close()
 
+	mailer.Fake(*fakeMailer)
 	if *install && confirm("This will erase any data in the database. Confirm ?") {
 		err := ds.Install()
 		if err != nil {

@@ -13,14 +13,13 @@ import (
 )
 
 type SMTP struct {
-	server   string
-	username string
-	password string
-	sender   string
-	path     string
-	www      string
-	auth     smtp.Auth
-	tls      tls.Config
+	server string
+	sender string
+	path   string
+	www    string
+	auth   smtp.Auth
+	tls    tls.Config
+	fake   bool
 }
 
 func NewSMTP(srv, login, passwd, emitter, www, path string) (*SMTP, error) {
@@ -29,14 +28,12 @@ func NewSMTP(srv, login, passwd, emitter, www, path string) (*SMTP, error) {
 		return &SMTP{}, err
 	}
 	m := SMTP{
-		server:   srv,
-		username: login,
-		password: passwd,
-		sender:   emitter,
-		path:     path,
-		www:      www,
-		auth:     smtp.PlainAuth("", login, passwd, hostname),
-		tls:      tls.Config{ServerName: hostname, InsecureSkipVerify: true},
+		server: srv,
+		sender: emitter,
+		path:   path,
+		www:    www,
+		auth:   smtp.PlainAuth("", login, passwd, hostname),
+		tls:    tls.Config{ServerName: hostname, InsecureSkipVerify: true},
 	}
 	return &m, err
 }
@@ -58,7 +55,13 @@ func (m *SMTP) mail(to []string, cc []string, input string, data interface{}) er
 	if err != nil {
 		return err
 	}
-	return m.sendMail(m.server, m.sender, to, cc, body)
+	if m.fake {
+		log.Println(string(body))
+		return nil
+	} else {
+		return m.sendMail(m.server, m.sender, to, cc, body)
+	}
+
 }
 
 func (m *SMTP) sendMail(addr string, from string, to []string, cc []string, msg []byte) error {
@@ -151,12 +154,30 @@ func (m *SMTP) SendRoleUpdate(u internship.User) {
 	}
 }
 
+func (m *SMTP) SendTutorNotification(s internship.Person, t internship.Person) {
+	d := struct {
+		Student internship.Person
+		Tutor   internship.Person
+		WWW     string
+	}{
+		s,
+		t,
+		m.www,
+	}
+	if err := m.mail(join(t.Email), join(), m.path+"/tutor.txt", d); err != nil {
+		log.Printf("Unable to notify tutor '%s' about its new student '%s': %s\n", t.Fullname(), s.Fullname(), err.Error())
+	}
+
+}
+
 func (m *SMTP) SendTutorUpdate(s internship.User, old internship.User, now internship.User) {
 	d := struct {
-		WWW   string
-		Tutor internship.User
+		WWW string
+		Old internship.User
+		New internship.User
 	}{
 		m.www,
+		old,
 		now,
 	}
 	if err := m.mail(join(s.Email, now.Email), join(old.Email), m.path+"/tutor_switch.txt", d); err != nil {
@@ -238,4 +259,8 @@ func (m *SMTP) SendTest(s string) {
 	if err := m.mail(join(s), join(), m.path+"/test.txt", struct{}{}); err != nil {
 		log.Fatalf("Unable to send the test mail: %s\n", err.Error())
 	}
+}
+
+func (m *SMTP) Fake(b bool) {
+	m.fake = b
 }

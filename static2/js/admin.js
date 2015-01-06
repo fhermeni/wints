@@ -196,7 +196,7 @@ function removeUser(email, div) {
 function pickBestMatching(tutor, users) {    
     var res = undefined;
     users.forEach(function (t) {
-        var known_ln  = t.Lastname;
+        var known_ln = t.Lastname;
         if (tutor.Lastname.indexOf(known_ln) > -1 || known_ln.indexOf(tutor.Lastname) > -1) {
             res = t;
             return false;
@@ -210,6 +210,9 @@ function pickBestMatching(tutor, users) {
                 res =  t;
             }
         });
+    }
+    if (!res) {
+        res = users[0]
     }
     return res;
 }

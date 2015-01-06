@@ -9,6 +9,7 @@ import (
 type Mailer interface {
 	SendAdminInvitation(u internship.User, token []byte)
 	SendStudentInvitation(u internship.User, token []byte)
+	SendTutorNotification(s internship.Person, t internship.Person)
 	SendPasswordResetLink(u internship.User, token []byte)
 	SendAccountRemoval(u internship.User)
 	SendRoleUpdate(u internship.User)
@@ -18,4 +19,5 @@ type Mailer interface {
 	SendReportDeadline(s internship.User, t internship.User, kind string, d time.Time)
 	SendReportPrivate(s internship.User, t internship.User, kind string, b bool)
 	SendTest(dst string)
+	Fake(bool)
 }

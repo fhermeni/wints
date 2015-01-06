@@ -217,17 +217,17 @@ Handlebars.registerHelper('shortKind', function(r) {
 
 Handlebars.registerHelper('reportStatus', function(r) {
     var passed = new Date(Date.parse(r.Deadline)) < new Date()    
-    var style = "active"    
+    var style = "btn-link"    
     if (passed) {
         if (r.Grade == -2) {
-            style = "warning"
+            style = "btn-warning"
         } else {
             if (r.Grade < 0) {
-                style = "primary"
+                style = "btn-primary"
             } else if (r.Grade < 10) {
-                style = "danger"
+                style = "btn-danger"
             } else {
-                style = "success"
+                style = "btn-success"
             }
         } 
     } 

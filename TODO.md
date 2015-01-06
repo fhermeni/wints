@@ -6,7 +6,7 @@
 ### Backend
 
 - [x] frontend mailing system
-- [ ] backend mailing system
+- [x] backend mailing system
 - [x] convention pulling
 - [x] convention to internships
 - [ ] defenses

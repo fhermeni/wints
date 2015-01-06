@@ -406,8 +406,10 @@ func newInternship(srv internship.Service, mailer mail.Mailer, w http.ResponseWr
 	}
 	go func() {
 		token, err := srv.NewInternship(c)
+		s := internship.User{Firstname: c.Student.Firstname, Lastname: c.Student.Lastname, Email: c.Student.Email}
 		if err == nil {
-			mailer.SendStudentInvitation(internship.User{Firstname: c.Student.Firstname, Lastname: c.Student.Lastname, Email: c.Student.Email}, token)
+			mailer.SendStudentInvitation(s, token)
+			mailer.SendTutorNotification(c.Student, c.Tutor)
 		}
 	}()
 	return err
