@@ -70,14 +70,14 @@ function refresh() {
 }
 
 function displayMyStudents() {
-internships(function(data) {  
-    mine = data.filter(function (i) {
+internships(function(data) {      
+    interns = data.filter(function (i) {
         return i.Tutor.Email == myself.Email
     });        
-    var html = Handlebars.getTemplate("tutoring")(mine);
+    var html = Handlebars.getTemplate("tutoring")(interns);
     var root = $("#cnt");
     root.html(html);
-    if (mine.length == 0) {
+    if (interns.length == 0) {
         return true
     }       
     $("#table-conventions").tablesorter({            
@@ -421,7 +421,7 @@ function showInternship(s) {
             uss = uss.filter(function (u) {
                 return u.Role != 0; //get rid of students
             });             
-            buf = Handlebars.getTemplate("student")({I: i, Admin: myself.Role >= 3, Tutors: uss})
+            buf = Handlebars.getTemplate("student")({I: i, Admin: myself.Role >= 3, Major: myself.Role >= 2, Tutors: uss})
             $("#modal").html(buf).modal('show');            
             var c = $("#modal").find("select.select-tutor");            
             c.val(i.Tutor.Email)
