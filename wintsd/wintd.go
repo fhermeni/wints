@@ -15,6 +15,8 @@ import (
 	"github.com/fhermeni/wints/internship"
 	"github.com/fhermeni/wints/mail"
 
+	_ "net/http/pprof"
+
 	_ "github.com/lib/pq"
 )
 
