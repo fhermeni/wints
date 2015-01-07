@@ -14,7 +14,7 @@
 - [x] presence indicator for reports
 - [x] report private/public status
 - [x] skipeable conventions
-- [ ] ungradeable reports
+- [x] ungradeable reports
 
 ### Daemon
 

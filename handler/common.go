@@ -65,7 +65,7 @@ func serviceHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter
 		case nil:
 			return
 		default:
-			http.Error(w, e.Error(), http.StatusInternalServerError)
+			http.Error(w, "", http.StatusInternalServerError)
 			log.Printf("Unsupported error: %s\n", e.Error())
 		}
 	}

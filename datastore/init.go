@@ -68,6 +68,7 @@ create table reports(student text REFERENCES users(email) on delete cascade,
                         comment text,
                         private boolean,
                         cnt bytea,
+                        toGrade bool,
                         constraint pk_reports PRIMARY KEY(student, kind)
                         );
 

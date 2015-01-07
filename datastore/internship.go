@@ -29,23 +29,19 @@ func (srv *Service) NewInternship(c internship.Convention) ([]byte, error) {
 	if err != nil {
 		return []byte{}, rollback(internship.ErrUserExists, tx)
 	}
-	srv.ResetPassword(c.Student.Email)
 	//Create the internship
 	sql = "insert into internships(student, promotion, tutor, startTime, endTime, title, supervisorFn, supervisorLn, supervisorTel, supervisorEmail, company, companyWWW) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)"
 	_, err = tx.Exec(sql, c.Student.Email, c.Promotion, c.Tutor.Email, c.Begin, c.End, c.Title, c.Supervisor.Firstname, c.Supervisor.Lastname, c.Supervisor.Tel, c.Supervisor.Email, c.Cpy.Name, c.Cpy.WWW)
 	if err != nil {
-		if err = tx.Rollback(); err != nil {
-			return []byte{}, err
-		}
 		if e, ok := err.(*pq.Error); ok {
 			if e.Constraint == "internships_tutor_fkey" {
-				return []byte{}, internship.ErrUnknownUser
+				return []byte{}, rollback(internship.ErrUnknownUser, tx)
 			}
 			if e.Constraint == "internships_pkey" {
-				return []byte{}, internship.ErrInternshipExists
+				return []byte{}, rollback(internship.ErrInternshipExists, tx)
 			}
 		}
-		return []byte{}, err
+		return []byte{}, rollback(err, tx)
 	}
 	//Plan the reports
 	for _, def := range srv.ReportDefs() {
@@ -53,8 +49,8 @@ func (srv *Service) NewInternship(c internship.Convention) ([]byte, error) {
 		if err != nil {
 			return []byte{}, rollback(err, tx)
 		}
-		sql = "insert into reports(student, kind, deadline, grade, private) values($1,$2,$3,-2, false)"
-		_, err = tx.Exec(sql, c.Student.Email, hdr.Kind, hdr.Deadline)
+		sql = "insert into reports(student, kind, deadline, grade, private, toGrade) values($1,$2,$3,-2, false, $4)"
+		_, err = tx.Exec(sql, c.Student.Email, hdr.Kind, hdr.Deadline, hdr.ToGrade)
 		if err != nil {
 			return []byte{}, rollback(err, tx)
 		}
@@ -154,7 +150,7 @@ func scanInternship(r *sql.Rows) (internship.Internship, error) {
 }
 
 func (srv *Service) appendReports(i *internship.Internship) error {
-	s := "select kind, grade, deadline, comment, private from reports where student=$1 order by deadline"
+	s := "select kind, grade, deadline, comment, private, toGrade from reports where student=$1 order by deadline"
 	rows, err := srv.DB.Query(s, i.Student.Email)
 	if err != nil {
 		return err
@@ -165,9 +161,9 @@ func (srv *Service) appendReports(i *internship.Internship) error {
 		var comment sql.NullString
 		var grade sql.NullInt64
 		var deadline time.Time
-		var priv bool
-		rows.Scan(&kind, &grade, &deadline, &comment, &priv)
-		hdr := internship.ReportHeader{Kind: kind, Deadline: deadline, Grade: -1, Private: priv}
+		var priv, toGrade bool
+		rows.Scan(&kind, &grade, &deadline, &comment, &priv, &toGrade)
+		hdr := internship.ReportHeader{Kind: kind, Deadline: deadline, Grade: -1, Private: priv, ToGrade: toGrade}
 		if comment.Valid {
 			hdr.Comment = comment.String
 		}

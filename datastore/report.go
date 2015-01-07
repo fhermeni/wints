@@ -17,15 +17,15 @@ func (s *Service) ReportDefs() []internship.ReportDef {
 	return s.reportDefs
 }
 func (srv *Service) Report(k, email string) (internship.ReportHeader, error) {
-	q := "select deadline, grade, comment, private from reports where student=$1 and kind=$2"
+	q := "select deadline, grade, comment, private, toGrade from reports where student=$1 and kind=$2"
 	var d time.Time
 	var g int
-	var priv bool
+	var priv, toGrade bool
 	var comment sql.NullString
-	if err := srv.DB.QueryRow(q, email, k).Scan(&d, &g, &comment, &priv); err != nil {
+	if err := srv.DB.QueryRow(q, email, k).Scan(&d, &g, &comment, &priv, &toGrade); err != nil {
 		return internship.ReportHeader{}, internship.ErrUnknownReport
 	}
-	hdr := internship.ReportHeader{Kind: k, Deadline: d, Grade: g, Private: priv}
+	hdr := internship.ReportHeader{Kind: k, Deadline: d, Grade: g, Private: priv, ToGrade: toGrade}
 	if comment.Valid {
 		hdr.Comment = comment.String
 	}

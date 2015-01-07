@@ -62,6 +62,7 @@ type ReportHeader struct {
 	//The tutor comment
 	Comment string
 	Private bool
+	ToGrade bool
 }
 
 //ReportsDef allows to define internship reports
@@ -69,6 +70,7 @@ type ReportDef struct {
 	Name     string
 	Deadline string
 	Value    string
+	ToGrade  bool
 }
 
 //Graded indicates if a report has been graded by its tutor or not
@@ -89,13 +91,13 @@ func (def *ReportDef) Instantiate(from time.Time) (ReportHeader, error) {
 		if err != nil {
 			return ReportHeader{}, err
 		}
-		return ReportHeader{Kind: def.Name, Deadline: from.Add(shift)}, nil
+		return ReportHeader{Kind: def.Name, Deadline: from.Add(shift), ToGrade: def.ToGrade}, nil
 	case "absolute":
 		at, err := time.Parse(DateLayout, def.Value)
 		if err != nil {
 			return ReportHeader{}, err
 		}
-		return ReportHeader{Kind: def.Name, Deadline: at}, nil
+		return ReportHeader{Kind: def.Name, Deadline: at, ToGrade: def.ToGrade}, nil
 	}
 	return ReportHeader{}, errors.New("Unsupported time definition '" + def.Deadline + "'")
 }

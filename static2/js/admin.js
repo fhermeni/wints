@@ -290,14 +290,14 @@ function pickTheory() {
         currentConvention.Tutor = {Firstname: fn, Lastname: ln, Tel: tel, Email: email, Role: 1} //tutor     
         reportSuccess("Tutor account created")
         newInternship(currentConvention, function() {
-            reportSuccess("internship added");       
+            reportSuccess("Internship added");       
             refresh()            
             })
     }, function(o) {        
         if (o.status == 409) {
-            reportSuccess("Tutor account already exists.")
+            reportSuccess("Tutor account already exists")
             newInternship(currentConvention, function() {
-                reportSuccess("internship added");       
+                reportSuccess("Internship added");       
                 refresh()            
             })
         } else {            
@@ -310,7 +310,7 @@ function pickKnown() {
     user($("#known-tutor-selector").val(), function(us) {        
         currentConvention.Tutor = us
         newInternship(currentConvention, function() {
-            reportSuccess("internship added");       
+            reportSuccess("Internship added");       
             refresh()            
         })
     });    
