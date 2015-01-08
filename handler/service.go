@@ -10,6 +10,8 @@ import (
 	"github.com/fhermeni/wints/internship"
 	"github.com/fhermeni/wints/mail"
 	"github.com/gorilla/mux"
+
+	"github.com/daaku/go.httpgzip"
 )
 
 var path string
@@ -35,7 +37,7 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string) Servic
 	conventionMgnt(s, mailer)
 	fs := http.Dir(path + "/")
 	fileHandler := http.FileServer(fs)
-	r.PathPrefix("/" + path + "/").Handler(http.StripPrefix("/"+path, fileHandler))
+	r.PathPrefix("/" + path + "/").Handler(httpgzip.NewHandler(http.StripPrefix("/"+path, fileHandler)))
 	http.Handle("/", s.r)
 	s.r.HandleFunc("/", home(backend)).Methods("GET")
 	return s
