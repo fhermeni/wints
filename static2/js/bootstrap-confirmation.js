@@ -1,4 +1,4 @@
-+function ($) {
+function ($) {
 	'use strict';
 
 	//var for check event at body can have only one.
