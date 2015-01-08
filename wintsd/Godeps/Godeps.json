@@ -23,6 +23,10 @@
 			"Rev": "7aa593ce8ceaf0199504fff27455bbb60eedabc7"
 		},
 		{
+			"ImportPath": "github.com/daaku/go.httpgzip",
+			"Rev": "3f59977b58c61991f5ed3670bbd141937d808b06"
+		},
+		{
 			"ImportPath": "github.com/gorilla/context",
 			"Rev": "1be7a086a5fd6440ef16fe96baeda0c78282b980"
 		},
