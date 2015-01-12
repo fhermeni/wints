@@ -251,7 +251,7 @@ func setUserProfile(srv internship.Service, mailer mail.Mailer, w http.ResponseW
 
 func user(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	us, err := srv.User(mux.Vars(r)["email"])
-	return writeJSONIfOk(err, w, us)
+	return writeJSONIfOk(err, w, r, us)
 }
 
 func rmUser(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
@@ -268,7 +268,7 @@ func rmUser(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r
 
 func users(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	us, err := srv.Users()
-	return writeJSONIfOk(err, w, us)
+	return writeJSONIfOk(err, w, r, us)
 }
 
 func reportMngt(s Service, mailer mail.Mailer) {
@@ -282,7 +282,7 @@ func reportMngt(s Service, mailer mail.Mailer) {
 
 func report(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	h, err := srv.Report(mux.Vars(r)["kind"], mux.Vars(r)["email"])
-	return writeJSONIfOk(err, w, h)
+	return writeJSONIfOk(err, w, r, h)
 }
 
 func reportContent(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
@@ -381,7 +381,7 @@ func skipConvention(srv internship.Service, mailer mail.Mailer, w http.ResponseW
 
 func conventions(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	c, err := srv.Conventions()
-	return writeJSONIfOk(err, w, c)
+	return writeJSONIfOk(err, w, r, c)
 }
 
 func internshipsMngt(s Service, mailer mail.Mailer) {
@@ -399,7 +399,7 @@ func internshipsMngt(s Service, mailer mail.Mailer) {
 
 func majors(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	m := srv.Majors()
-	return writeJSONIfOk(nil, w, m)
+	return writeJSONIfOk(nil, w, r, m)
 }
 func newInternship(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	var c internship.Convention
@@ -420,12 +420,12 @@ func newInternship(srv internship.Service, mailer mail.Mailer, w http.ResponseWr
 
 func getInternship(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	i, err := srv.Internship(mux.Vars(r)["email"])
-	return writeJSONIfOk(err, w, i)
+	return writeJSONIfOk(err, w, r, i)
 }
 
 func internships(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	i, err := srv.Internships()
-	return writeJSONIfOk(err, w, i)
+	return writeJSONIfOk(err, w, r, i)
 }
 
 func setCompany(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {

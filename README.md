@@ -47,3 +47,17 @@ filtered by majors|promotion & stuff.
 Export as a CSV
 
 
+## Surveys
+
+#### Next step
+(by student)
+What do you do next year:
+
+- keep studying (Phd ?)
+- got a position
+  - CDD or CDI
+  - in company or not
+- looking for a position
+- chilling
+
+

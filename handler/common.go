@@ -1,9 +1,12 @@
 package handler
 
 import (
+	"compress/gzip"
 	"encoding/json"
 	"log"
 	"net/http"
+	"reflect"
+	"strings"
 
 	"github.com/fhermeni/wints/filter"
 	"github.com/fhermeni/wints/internship"
@@ -19,11 +22,24 @@ func jsonRequest(w http.ResponseWriter, r *http.Request, j interface{}) error {
 	return err
 }
 
-func writeJSONIfOk(e error, w http.ResponseWriter, j interface{}) error {
+func writeJSONIfOk(e error, w http.ResponseWriter, r *http.Request, j interface{}) error {
 	if e != nil {
 		return e
 	}
 	w.Header().Set("Content-type", "application/json; charset=utf-8")
+	//gzip if it is a slice
+	switch reflect.TypeOf(j).Kind() {
+	case reflect.Slice:
+		w.Header().Add("Vary", "Accept-Encoding")
+		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
+			break
+		}
+		w.Header().Set("Content-Encoding", "gzip")
+		gz := gzip.NewWriter(w)
+		defer gz.Close()
+		enc := json.NewEncoder(gz)
+		return enc.Encode(j)
+	}
 	enc := json.NewEncoder(w)
 	return enc.Encode(j)
 }

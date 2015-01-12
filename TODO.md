@@ -15,6 +15,11 @@
 - [x] report private/public status
 - [x] skipeable conventions
 - [x] ungradeable reports
+- [x] minimify every resource
+- [x] gzip json lists
+- [ ] session ID for security
+- [ ] concatenate every static resource
+- [ ] online survey for supervisor
 
 ### Daemon
 
@@ -23,6 +28,7 @@
 - [x] test-mailer mode
 - [ ] test-feeder mode
 - [ ] deadline reminders
+
 ### frontend
 
 #### login page
@@ -54,6 +60,7 @@
 - [x] tutor internships
 - [x] report private/public status
 - [x] skipeable conventions
+- [ ] access surveys
 
 #### student
 - [x] profile update
@@ -66,3 +73,7 @@
 - [ ] see reports
 - [ ] upload report
 - [ ] see grade, comments
+
+#### supervisor
+- [ ] access survey
+- [ ] annotate survey
