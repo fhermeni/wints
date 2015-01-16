@@ -304,12 +304,18 @@ func setReportContent(srv internship.Service, mailer mail.Mailer, w http.Respons
 		http.Error(w, "The report must be a PDF", http.StatusBadRequest)
 		return errors.New("The report must be a PDF")
 	}
-	err = srv.SetReportContent(mux.Vars(r)["kind"], mux.Vars(r)["email"], cnt)
+	em := mux.Vars(r)["email"]
+	k := mux.Vars(r)["kind"]
+	err = srv.SetReportContent(k, em, cnt)
 	go func() {
 		if err == nil {
-			if i, err := srv.Internship(mux.Vars(r)["email"]); err == nil {
-				mailer.SendReportUploaded(i.Student, i.Tutor, mux.Vars(r)["kind"])
+			if i, err := srv.Internship(em); err == nil {
+				mailer.SendReportUploaded(i.Student, i.Tutor, k)
+			} else {
+				log.Println("Bwa: " + err.Error() + em)
 			}
+		} else {
+			log.Println("No mail since: " + err.Error())
 		}
 	}()
 	return err

@@ -46,12 +46,16 @@ func (s *Service) ReportContent(kind, email string) ([]byte, error) {
 
 func (srv *Service) SetReportContent(kind, email string, cnt []byte) error {
 	var deadline time.Time
-	err := srv.DB.QueryRow("select deadline from reports where student=$1 and kind=$2", email, kind).Scan(&deadline)
+	var grade int
+	err := srv.DB.QueryRow("select deadline,grade from reports where student=$1 and kind=$2", email, kind).Scan(&deadline, &grade)
 	if err != nil {
 		return internship.ErrUnknownReport
 	}
 	if time.Now().After(deadline) {
 		return internship.ErrDeadlinePassed
+	}
+	if grade >= 0 {
+		return internship.ErrGradedReport
 	}
 	sql := "update reports set grade=-1, cnt=$3 where student=$1 and kind=$2"
 	enc := base64.StdEncoding

@@ -2,6 +2,7 @@ package internship
 
 import (
 	"errors"
+	"strings"
 	"time"
 )
 
@@ -48,7 +49,7 @@ func (p User) String() string {
 
 //Fullname provides the user fullname, starting with its firstname
 func (p User) Fullname() string {
-	return p.Firstname + " " + p.Lastname
+	return strings.Title(p.Firstname) + " " + strings.Title(p.Lastname)
 }
 
 //ReportHeader provides the metadata associated to a student report
@@ -120,7 +121,7 @@ type Person struct {
 
 //Fullname provides the user fullname, starting with its firstname
 func (p Person) Fullname() string {
-	return p.Firstname + " " + p.Lastname
+	return strings.Title(p.Firstname) + " " + strings.Title(p.Lastname)
 }
 
 //Internship is the core type to specify required data related to an internship
@@ -177,4 +178,5 @@ var (
 	ErrConventionExists  = errors.New("convention already scanned")
 	ErrInvalidMajor      = errors.New("Invalid major")
 	ErrDeadlinePassed    = errors.New("Deadline passed")
+	ErrGradedReport      = errors.New("Report already graded")
 )

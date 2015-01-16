@@ -227,7 +227,7 @@ Handlebars.registerHelper('reportStatus', function(r) {
         style = "btn-primary"
     } else if (r.Grade >= 0 && r.Grade < 10) {
         style = "btn-danger";
-    } else if (r.Grade > 10){
+    } else if (r.Grade >= 10){
         style = "btn-success";
     }
     return style;

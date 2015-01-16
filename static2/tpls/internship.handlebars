@@ -48,10 +48,10 @@
 <td>{{studentGrade this}}</td>
 <td class="text-right">
 <form method="post" enctype="multipart/form-data" action="/api/v1/internships/{{../Student.Email}}/reports/{{Kind}}/content">
-		<a href="api/v1/internships/{{../Student.Email}}/reports/{{Kind}}/content" class="btn btn-primary" title="download"><i class="glyphicon glyphicon-cloud-download"></i> download</a>	
 		{{#unless Passed}}		
 			<input type="file" data-kind="{{Kind}}" accept="application/pdf"  title="upload"/>						
 		{{/unless}}
+		<a href="api/v1/internships/{{../Student.Email}}/reports/{{Kind}}/content" class="btn btn-primary" title="download"><i class="glyphicon glyphicon-cloud-download"></i> download</a>	
 		<button onclick="showReportComment('{{Kind}}')" type="button" class="btn btn-info" title="tutor review"
 		{{#unless Comment}}
 			disabled="disabled"

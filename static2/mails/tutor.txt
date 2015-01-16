@@ -1,4 +1,4 @@
-Subject:[Wints] New tutored student: '{{.Student.Firstname}} {{.Student.Lastname}}'
+Subject:[Wints] New tutored student: {{.Student.Fullname}}
 
 You can access the internship data from your dashboard at {{.WWW}}.
 Contact me if you received this email by mistake

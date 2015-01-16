@@ -1,7 +1,7 @@
 Subject:[Wints] New academic tutor for your internship
 
 Your academic tutor has changed.
-Now {{.New.Firstname}} {{.New.Lastname}} ({{.New.Email}}) supervises your internship
+Now {{.New.Fullname}} ({{.New.Email}}) supervises your internship
 
 Regards,
 Fabien Hermenier

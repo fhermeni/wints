@@ -61,6 +61,7 @@
 - [x] report private/public status
 - [x] skipeable conventions
 - [ ] access surveys
+- [ ] help
 
 #### student
 - [x] profile update
@@ -73,6 +74,7 @@
 - [x] see reports
 - [x] upload report
 - [x] see grade, comments
+- [ ] help
 
 #### supervisor
 - [ ] access survey
