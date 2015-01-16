@@ -291,9 +291,18 @@ func reportContent(srv internship.Service, mailer mail.Mailer, w http.ResponseWr
 }
 
 func setReportContent(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
-	cnt, err := ioutil.ReadAll(r.Body)
+	fi, fh, err := r.FormFile("report")
 	if err != nil {
 		return err
+	}
+	cnt, err := ioutil.ReadAll(fi)
+	if err != nil {
+		return err
+	}
+	mime := fh.Header.Get("content-type")
+	if mime != "application/pdf" {
+		http.Error(w, "The report must be a PDF", http.StatusBadRequest)
+		return errors.New("The report must be a PDF")
 	}
 	err = srv.SetReportContent(mux.Vars(r)["kind"], mux.Vars(r)["email"], cnt)
 	go func() {

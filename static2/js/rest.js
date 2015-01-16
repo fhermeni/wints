@@ -176,6 +176,17 @@ function setReportDeadline(email, kind, d, ok, no) {
     }).done(noCb(ok)).fail(restError(no));    
 }
 
+function setReportContent(email, kind, d, ok, no) {
+    return $.ajax({
+        method: "POST",
+        url: ROOT_API + "/internships/" + email + "/reports/" + kind + "/content",
+        data: d,
+        processData: false,
+        contentType: false,
+    }).done(noCb(ok)).fail(restError(no));    
+
+}
+
 function setTutor(e, t, ok, no) {
     return $.ajax({
         method: "POST",
@@ -221,6 +232,14 @@ function setReportPrivate(e, k, b, ok, no) {
         method: "POST",
         url: ROOT_API + "/internships/" + e + "/reports/" + k + "/private",
         data: JSON.stringify(b)
+    }).done(noCb(ok)).fail(restError(no));    
+}
+
+function setReportGrade(e, k, g, c, ok, no) {
+    return $.ajax({
+        method: "POST",
+        url: ROOT_API + "/internships/" + e + "/reports/" + k + "/grade",
+        data: JSON.stringify({Grade: g, Comment: c})
     }).done(noCb(ok)).fail(restError(no));    
 }
 

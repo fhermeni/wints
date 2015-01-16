@@ -176,4 +176,5 @@ var (
 	ErrInvalidPeriod     = errors.New("invalid internship period")
 	ErrConventionExists  = errors.New("convention already scanned")
 	ErrInvalidMajor      = errors.New("Invalid major")
+	ErrDeadlinePassed    = errors.New("Deadline passed")
 )

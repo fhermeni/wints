@@ -217,25 +217,52 @@ Handlebars.registerHelper('shortKind', function(r) {
 Handlebars.registerHelper('reportStatus', function(r) {
     var passed = new Date(Date.parse(r.Deadline)) < new Date()    
     var style = "btn-link"    
-    if (passed) {
-        if (r.Grade == -2) {
-            style = "btn-warning"
+    if (passed && r.Grade == -2) {
+        if (r.Comment) {
+            style = "btn-danger" //nothing uploaded, not gradeable so only commented to complain
         } else {
-            if (r.Grade < 0) {
-                style = "btn-primary"
-            } else if (r.Grade < 10) {
-                style = "btn-danger"
-            } else {
-                style = "btn-success"
-            }
-        } 
-    } 
+            style="btn-warning"    
+        }        
+    }  else if (passed && r.Grade == -1) {
+        style = "btn-primary"
+    } else if (r.Grade >= 0 && r.Grade < 10) {
+        style = "btn-danger";
+    } else if (r.Grade > 10){
+        style = "btn-success";
+    }
     return style;
 });
 
 Handlebars.registerHelper('reportGrade', function(r) {
+    if (!r.ToGrade) {
+        return "";
+    }
     if (r.Grade == -2) {
         return "-";
+    } else if (r.Grade == -1) {
+        return "?";
+    }
+    return r.Grade;    
+});
+
+Handlebars.registerHelper('gradeInput', function(r) {
+    if (!r.ToGrade || r.Grade < 0) {
+        return "";
+    }    
+    return r.Grade;    
+});
+
+Handlebars.registerHelper('studentGrade', function(r) {
+    var passed = new Date(Date.parse(r.Deadline)) < new Date()    
+    if (!r.ToGrade) {
+        return "-";
+    }
+    if (r.Grade == -2) {
+        if (passed) {
+            return "0 (deadline passed)";
+        } else {
+            return ""
+        }
     } else if (r.Grade == -1) {
         return "?";
     }

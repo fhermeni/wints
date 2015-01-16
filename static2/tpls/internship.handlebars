@@ -29,6 +29,37 @@
 		<dt>Tel</dt>
 		<dd>{{Tutor.Tel}}</dd>
 	</dl>	
+</div>
+</div>
 
-</div>
-</div>
+<h3>Reports</h3>
+<p>Reports must be uploaded before the deadline, as PDF documents, with a maximum file size of 10 MB. You can upload as many versions as you want until the deadline is met. Click the question mark to get the expectations for each document.</p>
+<table class="table table-hover table-condensed">
+<thead>
+<tr>
+	<td></td><td>Deadline</td><td>Grade</td><td></td>
+</tr>
+</thead>
+<tbody>
+{{#each Reports}}
+<tr>
+<td><i class="glyphicon glyphicon-question-sign"></i> {{Kind}}</td>
+<td>{{date Deadline}}</td>
+<td>{{studentGrade this}}</td>
+<td class="text-right">
+<form method="post" enctype="multipart/form-data" action="/api/v1/internships/{{../Student.Email}}/reports/{{Kind}}/content">
+		<a href="api/v1/internships/{{../Student.Email}}/reports/{{Kind}}/content" class="btn btn-primary" title="download"><i class="glyphicon glyphicon-cloud-download"></i> download</a>	
+		{{#unless Passed}}		
+			<input type="file" data-kind="{{Kind}}" accept="application/pdf"  title="upload"/>						
+		{{/unless}}
+		<button onclick="showReportComment('{{Kind}}')" type="button" class="btn btn-info" title="tutor review"
+		{{#unless Comment}}
+			disabled="disabled"
+		{{/unless}}
+		><i class="glyphicon glyphicon-comment"></i> tutor review</button>
+		</form>
+</td>
+</tr>
+{{/each}}
+</tbody>
+</table>

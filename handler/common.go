@@ -75,6 +75,9 @@ func serviceHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter
 		case internship.ErrReportExists, internship.ErrUserExists, internship.ErrInternshipExists, internship.ErrCredentials, internship.ErrUserTutoring:
 			http.Error(w, e.Error(), http.StatusConflict)
 			return
+		case internship.ErrDeadlinePassed, internship.ErrInvalidGrade, internship.ErrInvalidMajor, internship.ErrInvalidPeriod:
+			http.Error(w, e.Error(), http.StatusBadRequest)
+			return
 		case filter.ErrPermission:
 			http.Error(w, e.Error(), http.StatusForbidden)
 			return

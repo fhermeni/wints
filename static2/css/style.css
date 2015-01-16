@@ -6,3 +6,7 @@
 .click {
 	cursor: pointer;
 }
+
+.bootstrap-filestyle {
+	display: inline;
+}

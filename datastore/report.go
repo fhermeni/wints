@@ -38,11 +38,22 @@ func (s *Service) ReportContent(kind, email string) ([]byte, error) {
 	if err := s.DB.QueryRow(sql, email, kind).Scan(&cnt); err != nil {
 		return []byte{}, internship.ErrUnknownReport
 	}
+	if len(cnt) == 0 {
+		return cnt, internship.ErrUnknownReport
+	}
 	return base64.StdEncoding.DecodeString(string(cnt))
 }
 
 func (srv *Service) SetReportContent(kind, email string, cnt []byte) error {
-	sql := "update reports set grade=-1 and cnt=$3 where student=$1 and kind=$2"
+	var deadline time.Time
+	err := srv.DB.QueryRow("select deadline from reports where student=$1 and kind=$2", email, kind).Scan(&deadline)
+	if err != nil {
+		return internship.ErrUnknownReport
+	}
+	if time.Now().After(deadline) {
+		return internship.ErrDeadlinePassed
+	}
+	sql := "update reports set grade=-1, cnt=$3 where student=$1 and kind=$2"
 	enc := base64.StdEncoding
 	return SingleUpdate(srv.DB, internship.ErrUnknownReport, sql, email, kind, enc.EncodeToString(cnt))
 
@@ -52,7 +63,7 @@ func (s *Service) SetReportGrade(kind, email string, g int, comment string) erro
 	if g < 0 || g > 20 {
 		return internship.ErrInvalidGrade
 	}
-	sql := "update reports set grade=$3 comment=$4 where student=$1 and kind=$2"
+	sql := "update reports set grade=$3, comment=$4 where student=$1 and kind=$2"
 	return SingleUpdate(s.DB, internship.ErrUnknownReport, sql, email, kind, g, comment)
 }
 

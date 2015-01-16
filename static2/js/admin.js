@@ -1,18 +1,3 @@
-//@import url('jquery-2.1.3.js'); 
-//@import url('bootstrap.js'); 
-//@import url('jquery.fs.selecter.js'); 
-//@import url('jquery.fs.stepper.js'); 
-//@import url('jquery.tablesorter.js'); 
-//@import url('jquery.tablesorter.widgets.js'); 
-//@import url('icheck.js'); 
-//@import url('notify.js'); 
-//@import url('moment.js'); 
-//@import url('bootstrap-datepicker.js'); 
-//@import url('handlebars.js'); 
-//@import url('bootstrap-confirmation.js'); 
-//@import url('template.js'); 
-//@import url('rest.js'); 
-//@import url('profile.js'); 
 var interns;
 var currentPage;
 var waitingBlock;
@@ -321,6 +306,22 @@ function pickTheory() {
     })    
 }
 
+function gradeReport(toGrade, email, kind) {
+    if ((toGrade && missing("grade")) || missing("comment")) {
+        return
+    }    
+    var grade = $("#grade").val();
+    var comment = $("#comment").val();
+    if (comment.length < 3) {
+        $("#comment").notify("required", {className : "danger"});
+        return
+    }
+    setReportGrade(email, kind, parseInt(grade), comment, function() {
+        reportSuccess("Operation successfull")
+        $("#modal").modal('hide');
+        refresh();
+    })
+}
 function pickKnown() {         
     user($("#known-tutor-selector").val(), function(us) {        
         currentConvention.Tutor = us
@@ -448,8 +449,12 @@ function showInternship(s) {
 
 function showReport(email, kind) {    
     reportHeader(email, kind, function(r) {            
-            r.Reviewable = r.Grade != -2
+            r.Passed = new Date(r.Deadline).getTime() < new Date();
+            r.In = r.Grade != -2
+            r.Reviewable = r.Grade != -2 || r.Passed
+            r.Gradeable = r.ToGrade && (r.Grade != -2 || r.Passed)
             r.Email = email
+            r.Reviewed = r.Comment.length > 0 || r.Grade >= 0            
             buf = Handlebars.getTemplate("reportEditor")(r)
             $("#modal").html(buf).modal('show');      
             $(':checkbox').iCheck()

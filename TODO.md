@@ -52,8 +52,8 @@
 - [x] list all internships
 - [x] profile editor
 - [x] show service
-- [ ] grade/comment report
-- [ ] get report
+- [x] grade/comment report
+- [x] get report
 - [x] change report deadline
 - [x] change tutor
 - [x] change major
@@ -70,9 +70,9 @@
 - [x] update supervisor
 - [x] update title
 - [x] update company
-- [ ] see reports
-- [ ] upload report
-- [ ] see grade, comments
+- [x] see reports
+- [x] upload report
+- [x] see grade, comments
 
 #### supervisor
 - [ ] access survey
