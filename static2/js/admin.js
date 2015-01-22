@@ -301,7 +301,7 @@ function pickTheory() {
                 refresh()            
             })
         } else {            
-            reportError(jqr.responseText);
+            reportError(o.responseText);
         }
     })    
 }
