@@ -31,7 +31,8 @@
 
 ### frontend
 
-- [ ] session timeout management at rest level
+- [x] session timeout management at rest level
+
 #### login page
 
 - [x] login

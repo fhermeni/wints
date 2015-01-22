@@ -18,13 +18,18 @@ function noCb(no) {
     };
 }
 
-function restError(no) {    
-    if (no != undefined) {
-        return no;
-    }
+function restError(no) { 
     return function(jqr) {        
-        reportError(jqr.responseText);
-    }
+        if (jqr.status == 408) {
+            window.location.href = "/?#sessionExpired"        
+        } else {
+            if (no != undefined) {
+                no(jqr)
+            } else {
+                $.notify(msg, {autoHideDelay: 2000, className: "error", globalPosition: "top center"})            
+            }        
+        }        
+    }          
 }
 
 function missing(id) {
@@ -54,35 +59,39 @@ function reportSuccess(msg) {
     $.notify(msg, {autoHideDelay: 1000, className: "success", globalPosition: "top center"})
 }
 
-function reportError(msg) {
-    console.log("here")
+function reportError(msg) {    
     $.notify(msg, {autoHideDelay: 2000, className: "error", globalPosition: "top center"})
 }
 
 var ROOT_API = "/api/v1";
 
 //Profile management
-function user(email, ok, no) {    
+
+function post(URL, data, ok, no) {
     return $.ajax({
-        method: "GET",
-        url: ROOT_API + "/users/" + email,
-        async: false
-    }).done(noCb(ok)).fail(restError(no));
+        method: "POST",
+        data: JSON.stringify(data),        
+        url: ROOT_API + URL,        
+    }).done(noCb(ok)).fail(restError(no));        
 }
 
-function users(ok, no) {    
+function get(URL, ok, no) {
     return $.ajax({
         method: "GET",
-        url: ROOT_API + "/users/",        
-    }).done(noCb(ok)).fail(restError(no));
+        url: ROOT_API + URL,        
+    }).done(noCb(ok)).fail(restError(no));            
+}
+
+function user(email, ok, no) {    
+    return get("/users/" + email, ok, no);
+}
+
+function users(ok, no) {  
+    return get("/users/", ok, no);  
 }
 
 function newUser(fn, ln, tel, email, role, ok, no) {
-    return $.ajax({
-        method: "POST",
-        url: ROOT_API + "/users/",
-        data: JSON.stringify({Firstname: fn, Lastname:ln, Tel: tel, Role: role,Email: email})
-    }).done(noCb(ok)).fail(restError(no));        
+    return post(ROOT_API + "/users/",{Firstname: fn, Lastname:ln, Tel: tel, Role: role,Email: email}, ok, no);    
 }
 
 function rmUser(email, ok, no) {
@@ -126,58 +135,34 @@ function resetPassword(email, ok, no) {
 }
 
 function internships(ok, no) { 
-    return $.ajax({
-        method: "GET",
-        url: ROOT_API + "/internships/"        
-    }).done(noCb(ok)).fail(restError(no));   
+    return get("/internships/", ok, no);  
 }
 
 function internship(email, ok, no) { 
-    return $.ajax({
-        method: "GET",
-        url: ROOT_API + "/internships/" + email       
-    }).done(noCb(ok)).fail(restError(no));   
+    return get("/internships/" + email, ok, no);  
 }
 
 function newInternship(c, ok, no) {
-    return $.ajax({
-        method: "POST",
-        url: ROOT_API + "/internships/",
-        data: JSON.stringify(c)
-    }).done(noCb(ok)).fail(restError(no));    
+    return post("/internships/", c, ok, no);
 }
 
 function conventions(ok, no) {
-    return $.ajax({
-        method: "GET",
-        url: ROOT_API + "/conventions/"        
-    }).done(noCb(ok)).fail(restError(no));   
+    return get("/conventions/", ok, no);  
 }
 
-function skipConvention(email, skip, ok, no) {
-    return $.ajax({
-        method: "POST",
-        url: ROOT_API + "/conventions/" + email + "/skip",
-        data: JSON.stringify(skip)        
-    }).done(noCb(ok)).fail(restError(no));       
+function skipConvention(email, skip, ok, no) {    
+    return post("/conventions/" + email + "/skip", skip, ok, no)
 }
 
 function reportHeader(email, kind, ok, no) {
-    return $.ajax({
-        method: "GET",
-        url: ROOT_API + "/internships/" + email + "/reports/" + kind
-    }).done(noCb(ok)).fail(restError(no));   
+    return get("/internships/" + email +"/reports" + kind, ok, no);  
 }
 
 function setReportDeadline(email, kind, d, ok, no) {        
-    return $.ajax({
-        method: "POST",
-        url: ROOT_API + "/internships/" + email + "/reports/" + kind + "/deadline",
-        data: JSON.stringify(d)
-    }).done(noCb(ok)).fail(restError(no));    
+    return post("/internships/" + email + "/reports/" + kind + "/deadline", d, ok, no)
 }
 
-function setReportContent(email, kind, d, ok, no) {
+function setReportContent(email, kind, d, ok, no) { 
     return $.ajax({
         method: "POST",
         url: ROOT_API + "/internships/" + email + "/reports/" + kind + "/content",
@@ -189,65 +174,33 @@ function setReportContent(email, kind, d, ok, no) {
 }
 
 function setTutor(e, t, ok, no) {
-    return $.ajax({
-        method: "POST",
-        url: ROOT_API + "/internships/" + e + "/tutor",
-        data: JSON.stringify(t)
-    }).done(noCb(ok)).fail(restError(no));    
+    return post("/internships/" + e + "/tutor", t, ok, no)
 }
 
 function setMajor(e, m, ok, no) {
-    return $.ajax({
-        method: "POST",
-        url: ROOT_API + "/internships/" + e + "/major",
-        data: JSON.stringify(m)
-    }).done(noCb(ok)).fail(restError(no));    
+    return post("/internships/" + e + "/major", m, ok, no)
 }
 
 function setCompany(e, n, w, ok, no) {
-    return $.ajax({
-        method: "POST",
-        url: ROOT_API + "/internships/" + e + "/company",
-        data: JSON.stringify({Name: n, WWW: w})
-    }).done(noCb(ok)).fail(restError(no));    
+    return post("/internships/" + e + "/company", {Name: n, WWW: w}, ok, no)
 }
 
 function setSupervisor(e, fn, ln, email, tel, ok, no) {
-    return $.ajax({
-        method: "POST",
-        url: ROOT_API + "/internships/" + e + "/supervisor",
-        data: JSON.stringify({Firstname: fn, Lastname: ln, Email: email, Tel: tel})
-    }).done(noCb(ok)).fail(restError(no));    
+    return post("/internships/" + e + "/supervisor", {Firstname: fn, Lastname: ln, Email: email, Tel: tel}, ok, no)   
 }
 
 function setTitle(e, t, ok, no) {
-    return $.ajax({
-        method: "POST",
-        url: ROOT_API + "/internships/" + e + "/title",
-        data: JSON.stringify(t)
-    }).done(noCb(ok)).fail(restError(no));    
+    return post("/internships/" + e + "/title", t, ok, no)
 }
 
 function setReportPrivate(e, k, b, ok, no) {
-    return $.ajax({
-        method: "POST",
-        url: ROOT_API + "/internships/" + e + "/reports/" + k + "/private",
-        data: JSON.stringify(b)
-    }).done(noCb(ok)).fail(restError(no));    
+    return post("/internships/" + e + "/reports/" + k + "/private", b, ok, no)
 }
 
 function setReportGrade(e, k, g, c, ok, no) {
-    return $.ajax({
-        method: "POST",
-        url: ROOT_API + "/internships/" + e + "/reports/" + k + "/grade",
-        data: JSON.stringify({Grade: g, Comment: c})
-    }).done(noCb(ok)).fail(restError(no));    
+    return post("/internships/" + e + "/reports/" + k + "/grade", {Grade: g, Comment: c}, ok, no)
 }
 
-
 function majors(ok, no) {
-    return $.ajax({
-        method: "GET",
-        url: ROOT_API + "/majors/",        
-    }).done(noCb(ok)).fail(restError(no));    
+    return get("/majors/", ok, no);  
 }
