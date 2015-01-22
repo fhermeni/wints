@@ -132,7 +132,7 @@ func (f *HTTPFeeder) scan(year int, prom string) ([]internship.Convention, error
 	return conventions, err
 }
 
-func (f *HTTPFeeder) injectOnePromotion(s internship.Service, y int, p string) (int, error) {
+func (f *HTTPFeeder) InjectOnePromotion(s internship.Service, y int, p string) (int, error) {
 	nb := 0
 	conventions, err := f.scan(y, p)
 	if err != nil {
@@ -163,7 +163,7 @@ func (f *HTTPFeeder) InjectConventions(s internship.Service) {
 
 	for i, prom := range f.promotions {
 		go func(i int, p string) {
-			nb, err := f.injectOnePromotion(s, year, p)
+			nb, err := f.InjectOnePromotion(s, year, p)
 			res[i] = nb
 			errors[i] = err
 			sem <- empty{}
@@ -173,4 +173,15 @@ func (f *HTTPFeeder) InjectConventions(s internship.Service) {
 	for i := 0; i < len(f.promotions); i++ {
 		<-sem
 	}
+}
+
+func (f *HTTPFeeder) Test() error {
+	client := &http.Client{}
+	req, err := http.NewRequest("GET", f.url, nil)
+	if err != nil {
+		return err
+	}
+	req.SetBasicAuth(f.login, f.password)
+	_, err = client.Do(req)
+	return err
 }

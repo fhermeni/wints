@@ -24,9 +24,9 @@
 ### Daemon
 
 - [x] install mode
-- [ ] test-db mode
+- [x] test-db mode
 - [x] test-mailer mode
-- [ ] test-feeder mode
+- [x] test-feeder mode
 - [ ] deadline reminders
 
 ### frontend

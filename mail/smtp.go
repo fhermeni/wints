@@ -93,6 +93,11 @@ func (m *SMTP) sendMail(addr string, from string, to []string, cc []string, msg 
 	if err != nil {
 		return err
 	}
+	for _, em := range cc {
+		w.Write([]byte("Cc: "))
+		w.Write([]byte(em))
+		w.Write([]byte("\n"))
+	}
 	if _, err = w.Write(msg); err != nil {
 		return err
 	}
@@ -257,10 +262,8 @@ func (m *SMTP) SendReportPrivate(s internship.User, t internship.User, kind stri
 	}
 }
 
-func (m *SMTP) SendTest(s string) {
-	if err := m.mail(join(s), join(), m.path+"/test.txt", struct{}{}); err != nil {
-		log.Fatalf("Unable to send the test mail: %s\n", err.Error())
-	}
+func (m *SMTP) SendTest(s string) error {
+	return m.mail(join(s), join(s), m.path+"/test.txt", struct{}{})
 }
 
 func (m *SMTP) Fake(b bool) {

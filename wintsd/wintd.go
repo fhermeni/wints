@@ -44,11 +44,18 @@ func newServices(cfg config.Config) (mail.Mailer, *datastore.Service) {
 	}
 	ds, err := datastore.NewService(DB, cfg.Reports, cfg.Majors)
 	if err != nil {
-		log.Fatalln("Unable to test the connection: " + err.Error())
+		log.Fatalln("Unable connect to the database: " + err.Error())
 	}
-	log.Println("Database connection: OK")
-
 	return mailer, ds
+}
+
+func test(msg string, err error) bool {
+	if err != nil {
+		log.Println(msg + ": [FAIL]\n\t" + err.Error())
+	} else {
+		log.Println(msg + ": [OK]")
+	}
+	return err == nil
 }
 
 func startFeederDaemon(f feeder.Feeder, srv internship.Service, frequency time.Duration) {
@@ -82,7 +89,9 @@ func main() {
 	cfgPath := flag.String("conf", "./wints.conf", "daemon configuration file")
 	reset := flag.Bool("reset", false, "Reset the root account")
 	install := flag.Bool("install", false, "/!\\ Create database tables")
-	testMail := flag.String("test-mailer", "", "Test the mailer by sending a mail to the argument")
+	testMail := flag.Bool("test-mailer", false, "Test the mailer by sending a mail to the administrator")
+	testFeeder := flag.Bool("test-feeder", false, "Test the convention feeder")
+	testAll := flag.Bool("test", false, "equivalent to --testMail --testDB --testFeeder")
 	flag.Parse()
 
 	cfg, err := config.Load(*cfgPath)
@@ -95,6 +104,28 @@ func main() {
 	defer ds.DB.Close()
 
 	mailer.Fake(*fakeMailer)
+	puller := feeder.NewHTTPFeeder(cfg.Puller.URL, cfg.Puller.Login, cfg.Puller.Password, cfg.Puller.Promotions, cfg.Puller.Encoding)
+
+	//Test connection anyway
+	_, e := ds.Internships()
+	ok := test("Database connection", e)
+
+	if *testAll {
+		*testFeeder = true
+		*testMail = true
+	}
+	if *testMail {
+		k := test("Mailing system", mailer.SendTest(cfg.Mailer.Sender))
+		ok = ok && k
+	}
+	if *testFeeder {
+		k := test("Convention feeder", puller.Test())
+		ok = ok && k
+	}
+	if !ok {
+		os.Exit(1)
+	}
+
 	if *install && confirm("This will erase any data in the database. Confirm ?") {
 		err := ds.Install()
 		if err != nil {
@@ -104,13 +135,8 @@ func main() {
 		rootAccount(ds)
 	} else if *reset {
 		rootAccount(ds)
-	} else if len(*testMail) > 0 {
-		log.Println("Sending a test mail to " + *testMail)
-		mailer.SendTest(*testMail)
-		os.Exit(0)
 	}
 
-	puller := feeder.NewHTTPFeeder(cfg.Puller.URL, cfg.Puller.Login, cfg.Puller.Password, cfg.Puller.Promotions, cfg.Puller.Encoding)
 	period, err := time.ParseDuration(cfg.Puller.Period)
 	if err != nil {
 		log.Fatalln("Unable to start the convention feeder: " + err.Error())

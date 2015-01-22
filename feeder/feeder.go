@@ -4,4 +4,5 @@ import "github.com/fhermeni/wints/internship"
 
 type Feeder interface {
 	InjectConventions(s internship.Service)
+	Test() error
 }

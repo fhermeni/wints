@@ -57,6 +57,7 @@ func (m *Mock) SendReportPrivate(s internship.User, t internship.User, kind stri
 	}
 }
 
-func (m *Mock) SendTest(e string) {
+func (m *Mock) SendTest(e string) error {
 	log.Println("Test mail to %s\n", e)
+	return nil
 }
