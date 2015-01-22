@@ -33,8 +33,12 @@ type Service interface {
 	Internships() ([]Internship, error)
 
 	//User management
-	//Test if the credentials match a user
-	Registered(email string, password []byte) (User, error)
+	//Test if the credentials match a user, return a token
+	Registered(email string, password []byte) ([]byte, error)
+
+	OpenedSession(email, token string) error
+
+	Logout(email, token string) error
 
 	//Create a new user
 	//Returns the resulting password

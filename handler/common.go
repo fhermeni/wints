@@ -13,6 +13,21 @@ import (
 	"github.com/fhermeni/wints/mail"
 )
 
+func authenticated(backend internship.Service, w http.ResponseWriter, r *http.Request) (string, error) {
+	var err error
+	cookie, err := r.Cookie("session")
+	if err != nil || len(cookie.Value) == 0 {
+		return "", ErrMissingCookies
+	}
+	token, err := r.Cookie("token")
+	if err != nil || len(token.Value) == 0 {
+		return "", ErrMissingCookies
+	}
+
+	err = backend.OpenedSession(cookie.Value, token.Value)
+	return cookie.Value, err
+}
+
 func jsonRequest(w http.ResponseWriter, r *http.Request, j interface{}) error {
 	dec := json.NewDecoder(r.Body)
 	err := dec.Decode(&j)
@@ -44,22 +59,25 @@ func writeJSONIfOk(e error, w http.ResponseWriter, r *http.Request, j interface{
 	return enc.Encode(j)
 }
 
-func serviceHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *http.Request) error, srv Service, mailer mail.Mailer) http.HandlerFunc {
+func restHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *http.Request) error, srv Service, mailer mail.Mailer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println(r.Method + " " + r.URL.String())
-		var err error
-		cookie, err := r.Cookie("session")
-		if err != nil || len(cookie.Value) == 0 {
-			http.Redirect(w, r, "/", 302)
+
+		email, err := authenticated(srv.backend, w, r)
+		if err == ErrMissingCookies || err == internship.ErrSessionExpired {
+			http.Error(w, "Session expired. Reload the page to re-authenticate", http.StatusRequestTimeout)
 			return
-		}
-		u, err := srv.backend.User(cookie.Value)
-		if err == internship.ErrUnknownUser {
+		} else if err == internship.ErrCredentials {
 			http.Error(w, err.Error(), http.StatusForbidden)
 			return
 		} else if err != nil {
-			log.Println("Unable to get the user behind the cookie: " + err.Error())
 			http.Error(w, "", http.StatusInternalServerError)
+			log.Printf("Unsupported error: %s\n", err.Error())
+			return
+		}
+		u, err := srv.backend.User(email)
+		if err == internship.ErrUnknownUser {
+			http.Error(w, err.Error(), http.StatusForbidden)
 			return
 		}
 		wrapper, _ := filter.NewService(srv.backend, u)
@@ -69,6 +87,8 @@ func serviceHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter
 			log.Println("Reply with error " + e.Error())
 		}
 		switch e {
+		case internship.ErrInvalidToken, internship.ErrSessionExpired:
+			return
 		case internship.ErrUnknownUser, internship.ErrUnknownReport, internship.ErrUnknownInternship:
 			http.Error(w, e.Error(), http.StatusNotFound)
 			return

@@ -23,7 +23,8 @@ type Service struct {
 }
 
 var (
-	ErrJSONWriting = errors.New("Unable to serialize the JSON response")
+	ErrJSONWriting    = errors.New("Unable to serialize the JSON response")
+	ErrMissingCookies = errors.New("Cookies 'session' or 'token' are missing or empty")
 )
 
 func NewService(backend internship.Service, mailer mail.Mailer, p string) Service {
@@ -45,26 +46,20 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string) Servic
 
 func home(backend internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var err error
-		cookie, err := r.Cookie("session")
-		if err != nil || len(cookie.Value) == 0 {
+		email, err := authenticated(backend, w, r)
+		if err != nil {
 			http.ServeFile(w, r, path+"/login.html")
 			return
 		}
-		u, err := backend.User(cookie.Value)
-		if err == internship.ErrUnknownUser {
+		u, err := backend.User(email)
+		if err != nil {
 			http.ServeFile(w, r, path+"/login.html")
 			return
-		} else if err != nil {
-			log.Println("Unable to get the user behind the cookie: " + err.Error())
-			http.Error(w, "", http.StatusInternalServerError)
-			return
 		}
-
 		if u.Role == internship.NONE {
-			http.Redirect(w, r, "student", 302)
+			http.ServeFile(w, r, path+"/student.html")
 		} else {
-			http.Redirect(w, r, "admin", 302)
+			http.ServeFile(w, r, path+"/admin.html")
 		}
 	}
 }
@@ -75,30 +70,18 @@ func (s *Service) Listen(host string, cert, pk string) error {
 
 func userMngt(s Service, mailer mail.Mailer) {
 
-	s.r.HandleFunc("/api/v1/users/{email}", serviceHandler(user, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/users/", serviceHandler(users, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/users/{email}", serviceHandler(rmUser, s, mailer)).Methods("DELETE")
-	s.r.HandleFunc("/api/v1/users/{email}/profile", serviceHandler(setUserProfile, s, mailer)).Methods("PUT")
-	s.r.HandleFunc("/api/v1/users/{email}/role", serviceHandler(setUserRole, s, mailer)).Methods("PUT")
-	s.r.HandleFunc("/api/v1/users/", serviceHandler(newTutor, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/users/{email}", restHandler(user, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/users/", restHandler(users, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/users/{email}", restHandler(rmUser, s, mailer)).Methods("DELETE")
+	s.r.HandleFunc("/api/v1/users/{email}/profile", restHandler(setUserProfile, s, mailer)).Methods("PUT")
+	s.r.HandleFunc("/api/v1/users/{email}/role", restHandler(setUserRole, s, mailer)).Methods("PUT")
+	s.r.HandleFunc("/api/v1/users/", restHandler(newTutor, s, mailer)).Methods("POST")
 	s.r.HandleFunc("/api/v1/users/{email}/password", resetPassword(s.backend, mailer)).Methods("DELETE")
-	s.r.HandleFunc("/api/v1/users/{email}/password", serviceHandler(setPassword, s, mailer)).Methods("PUT")
+	s.r.HandleFunc("/api/v1/users/{email}/password", restHandler(setPassword, s, mailer)).Methods("PUT")
 	s.r.HandleFunc("/api/v1/newPassword", newPassword(s.backend, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/login", login(s.backend)).Methods("POST")  //FAIL
-	s.r.HandleFunc("/api/v1/logout", logout(s.backend)).Methods("GET") //FAIL
-	s.r.HandleFunc("/admin", serviceHandler(admin, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/student", serviceHandler(student, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/login", login(s.backend)).Methods("POST")
+	s.r.HandleFunc("/api/v1/logout", logout(s.backend)).Methods("GET")
 	s.r.HandleFunc("/resetPassword", password).Methods("GET")
-}
-
-func admin(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
-	http.ServeFile(w, r, path+"/admin.html")
-	return nil
-}
-
-func student(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
-	http.ServeFile(w, r, path+"/student.html")
-	return nil
 }
 
 func password(w http.ResponseWriter, r *http.Request) {
@@ -119,7 +102,7 @@ func login(srv internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		login := r.PostFormValue("login")
 		password := r.PostFormValue("password")
-		_, err := srv.Registered(login, []byte(password))
+		t, err := srv.Registered(login, []byte(password))
 		if err != nil {
 			http.Redirect(w, r, "/#badLogin", 302)
 			return
@@ -129,20 +112,35 @@ func login(srv internship.Service) http.HandlerFunc {
 			Value: login,
 			Path:  "/",
 		}
+		token := &http.Cookie{
+			Name:  "token",
+			Value: string(t),
+			Path:  "/",
+		}
+
 		http.SetCookie(w, cookie)
+		http.SetCookie(w, token)
 		http.Redirect(w, r, "/", 302)
 	}
 }
 
 func logout(srv internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		cookie := &http.Cookie{
+		email := &http.Cookie{
 			Name:   "session",
 			Value:  "",
 			Path:   "/",
 			MaxAge: -1,
 		}
-		http.SetCookie(w, cookie)
+
+		token := &http.Cookie{
+			Name:   "token",
+			Value:  "",
+			Path:   "/",
+			MaxAge: -1,
+		}
+		http.SetCookie(w, email)
+		http.SetCookie(w, token)
 		http.Redirect(w, r, "/", 302)
 	}
 }
@@ -272,12 +270,12 @@ func users(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r 
 }
 
 func reportMngt(s Service, mailer mail.Mailer) {
-	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}", serviceHandler(report, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/content", serviceHandler(reportContent, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/content", serviceHandler(setReportContent, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/grade", serviceHandler(setReportGrade, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/deadline", serviceHandler(setReportDeadline, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/private", serviceHandler(setReportPrivate, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}", restHandler(report, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/content", restHandler(reportContent, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/content", restHandler(setReportContent, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/grade", restHandler(setReportGrade, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/deadline", restHandler(setReportDeadline, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/private", restHandler(setReportPrivate, s, mailer)).Methods("POST")
 }
 
 func report(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
@@ -381,8 +379,8 @@ func setReportPrivate(srv internship.Service, mailer mail.Mailer, w http.Respons
 }
 
 func conventionMgnt(s Service, mailer mail.Mailer) {
-	s.r.HandleFunc("/api/v1/conventions/", serviceHandler(conventions, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/conventions/{email}/skip", serviceHandler(skipConvention, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/conventions/", restHandler(conventions, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/conventions/{email}/skip", restHandler(skipConvention, s, mailer)).Methods("POST")
 }
 
 func skipConvention(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
@@ -400,16 +398,16 @@ func conventions(srv internship.Service, mailer mail.Mailer, w http.ResponseWrit
 }
 
 func internshipsMngt(s Service, mailer mail.Mailer) {
-	s.r.HandleFunc("/api/v1/internships/{email}", serviceHandler(getInternship, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/internships/", serviceHandler(internships, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/internships/", serviceHandler(newInternship, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/supervisor", serviceHandler(setSupervisor, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/tutor", serviceHandler(setTutor, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/company", serviceHandler(setCompany, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/title", serviceHandler(setTitle, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/major", serviceHandler(setMajor, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/promotion", serviceHandler(setPromotion, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/majors/", serviceHandler(majors, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/{email}", restHandler(getInternship, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/", restHandler(internships, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/", restHandler(newInternship, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/supervisor", restHandler(setSupervisor, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/tutor", restHandler(setTutor, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/company", restHandler(setCompany, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/title", restHandler(setTitle, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/major", restHandler(setMajor, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/promotion", restHandler(setPromotion, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/majors/", restHandler(majors, s, mailer)).Methods("GET")
 }
 
 func majors(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {

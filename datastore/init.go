@@ -21,7 +21,7 @@ drop table if exists users;
 -- sessions
 create table sessions(email text REFERENCES users(email) on delete cascade,
 		      token text,
-		      last timestamp,
+		      last timestamp with time zone,
 		      constraint pk_uid PRIMARY KEY(email)
 		      );
 

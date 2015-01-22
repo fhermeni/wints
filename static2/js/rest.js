@@ -55,6 +55,7 @@ function reportSuccess(msg) {
 }
 
 function reportError(msg) {
+    console.log("here")
     $.notify(msg, {autoHideDelay: 2000, className: "error", globalPosition: "top center"})
 }
 

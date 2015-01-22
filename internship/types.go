@@ -179,4 +179,6 @@ var (
 	ErrInvalidMajor      = errors.New("Invalid major")
 	ErrDeadlinePassed    = errors.New("Deadline passed")
 	ErrGradedReport      = errors.New("Report already graded")
+	ErrSessionExpired    = errors.New("Session expired")
+	ErrInvalidToken      = errors.New("Invalid session")
 )

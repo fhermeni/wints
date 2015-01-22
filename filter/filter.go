@@ -138,8 +138,16 @@ func (v *Service) Internships() ([]internship.Internship, error) {
 	return mine, nil
 }
 
-func (v *Service) Registered(email string, password []byte) (internship.User, error) {
+func (v *Service) Registered(email string, password []byte) ([]byte, error) {
 	return v.srv.Registered(email, password)
+}
+
+func (v *Service) OpenedSession(email, token string) error {
+	return v.srv.OpenedSession(email, token)
+}
+
+func (v *Service) Logout(email, token string) error {
+	return v.srv.Logout(email, token)
 }
 
 func (v *Service) NewTutor(p internship.User) ([]byte, error) {

@@ -1,6 +1,7 @@
 package datastore
 
 import (
+	"log"
 	"time"
 
 	"github.com/fhermeni/wints/internship"
@@ -11,17 +12,45 @@ import (
 
 //Prepared requests
 
-func (s *Service) Registered(email string, password []byte) (internship.User, error) {
+func (s *Service) Registered(email string, password []byte) ([]byte, error) {
 	var fn, ln, tel string
 	var p []byte
 	var r internship.Privilege
 	if err := s.DB.QueryRow("select firstname, lastname, tel, password, role from users where email=$1", email).Scan(&fn, &ln, &tel, &p, &r); err != nil {
-		return internship.User{}, internship.ErrCredentials
+		return []byte{}, internship.ErrCredentials
 	}
 	if err := bcrypt.CompareHashAndPassword(p, password); err != nil {
-		return internship.User{}, internship.ErrCredentials
+		return []byte{}, internship.ErrCredentials
 	}
-	return internship.User{Firstname: fn, Lastname: ln, Email: email, Tel: tel, Role: r}, nil
+	_, err := s.DB.Exec("delete from sessions where email=$1", email)
+	if err != nil {
+		return []byte{}, err
+	}
+	//token
+	token := randomBytes(32)
+	err = SingleUpdate(s.DB, internship.ErrUnknownUser, "insert into sessions(email, token, last) values ($1,$2,$3)", email, token, time.Now().Add(time.Second*30)) //2 day
+	if err != nil {
+		return []byte{}, err
+	}
+	return token, err
+}
+
+func (s *Service) OpenedSession(email, token string) error {
+	var last time.Time
+	err := s.DB.QueryRow("select last from sessions where email=$1 and token=$2", email, token).Scan(&last)
+	if err != nil {
+		log.Println("Got tokens & so. But they are incorrect: " + err.Error())
+		return internship.ErrCredentials
+	}
+	if time.Now().After(last) {
+		return internship.ErrSessionExpired
+	}
+	return err
+}
+
+func (s *Service) Logout(email, token string) error {
+	_, err := s.DB.Exec("delete from sessions where email=$1 and token=$2", email, token)
+	return err
 }
 
 func (s *Service) NewTutor(p internship.User) ([]byte, error) {

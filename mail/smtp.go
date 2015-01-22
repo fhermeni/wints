@@ -57,7 +57,9 @@ func (m *SMTP) mail(to []string, cc []string, input string, data interface{}) er
 	}
 	if m.fake {
 		log.Printf("To: %s\n", to)
-		log.Printf("Cc: %s\n", cc)
+		for _, m := range cc {
+			log.Printf("Cc: %s\n", m)
+		}
 		log.Println(string(body))
 		return nil
 	} else {

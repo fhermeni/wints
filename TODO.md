@@ -17,7 +17,7 @@
 - [x] ungradeable reports
 - [x] minimify every resource
 - [x] gzip json lists
-- [ ] session ID for security
+- [x] session ID for security
 - [ ] concatenate every static resource
 - [ ] online survey for supervisor
 
@@ -31,6 +31,7 @@
 
 ### frontend
 
+- [ ] session timeout management at rest level
 #### login page
 
 - [x] login

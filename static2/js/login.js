@@ -18,7 +18,3 @@ function passwordLost() {
         $.notify(msg, {autoHide: false, className: "success", globalPosition: "top center"})        
     })
 }
-
-function foo() {
-    console.log(arguments);
-}
