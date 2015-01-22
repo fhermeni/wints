@@ -106,7 +106,7 @@ function users(ok, no) {
 }
 
 function newUser(fn, ln, tel, email, role, ok, no) {
-    return post(ROOT_API + "/users/",{Firstname: fn, Lastname:ln, Tel: tel, Role: role,Email: email}, ok, no);    
+    return post("/users/",{Firstname: fn, Lastname:ln, Tel: tel, Role: role,Email: email}, ok, no);    
 }
 
 function rmUser(email, ok, no) {
