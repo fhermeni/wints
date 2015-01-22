@@ -75,9 +75,24 @@ function post(URL, data, ok, no) {
     }).done(noCb(ok)).fail(restError(no));        
 }
 
+function put(URL, data, ok, no) {
+    return $.ajax({
+        method: "PUT",
+        data: JSON.stringify(data),        
+        url: ROOT_API + URL,        
+    }).done(noCb(ok)).fail(restError(no));        
+}
+
 function get(URL, ok, no) {
     return $.ajax({
         method: "GET",
+        url: ROOT_API + URL,        
+    }).done(noCb(ok)).fail(restError(no));            
+}
+
+function del(URL, ok, no) {
+    return $.ajax({
+        method: "DELETE",
         url: ROOT_API + URL,        
     }).done(noCb(ok)).fail(restError(no));            
 }
@@ -95,43 +110,25 @@ function newUser(fn, ln, tel, email, role, ok, no) {
 }
 
 function rmUser(email, ok, no) {
-    return $.ajax({
-        method: "DELETE",
-        url: ROOT_API + "/users/" + email,        
-    }).done(noCb(ok)).fail(restError(no));        
+    return del("/users/" + email, ok, no)
 }
 
 function setUserRole(email, r, ok, no) {    
-    return $.ajax({
-        method: "PUT",
-        url: ROOT_API + "/users/" + email + "/role",
-        data: JSON.stringify(r)
-    }).done(noCb(ok)).fail(restError(no));    
+    return put("/users/" + email + "/role", r, ok, no);
 }
 
 function setUser(fn, ln, tel, ok, no) {
     var email = getCookie("session")
-        return $.ajax({
-        method: "PUT",
-        url: ROOT_API + "/users/" + email + "/profile",
-        data: JSON.stringify({Firstname: fn, Lastname:ln, Tel: tel})
-    }).done(noCb(ok)).fail(restError(no));    
+    return put("/users/" + email + "/profile", {Firstname: fn, Lastname:ln, Tel: tel}, ok, no);
 }
 
 function setPassword(old, n, ok, no) {
     var email = getCookie("session")
-    return $.ajax({
-        method: "PUT",
-        url: ROOT_API + "/users/" + email + "/password",
-        data: JSON.stringify({Old: old, New:n})
-    }).done(noCb(ok)).fail(restError(no));    
+    return put("/users/" + email + "/password", {Old: old, New:n}, ok, no);
 }
 
 function resetPassword(email, ok, no) {
-    return $.ajax({
-        method: "DELETE",
-        url: ROOT_API + "/users/" + email + "/password"        
-    }).done(noCb(ok)).fail(restError(no));        
+    return del("/users/" + email + "/password", ok, no)
 }
 
 function internships(ok, no) { 

@@ -28,7 +28,7 @@ func (s *Service) Registered(email string, password []byte) ([]byte, error) {
 	}
 	//token
 	token := randomBytes(32)
-	err = SingleUpdate(s.DB, internship.ErrUnknownUser, "insert into sessions(email, token, last) values ($1,$2,$3)", email, token, time.Now().Add(time.Second*30)) //2 day
+	err = SingleUpdate(s.DB, internship.ErrUnknownUser, "insert into sessions(email, token, last) values ($1,$2,$3)", email, token, time.Now().Add(time.Hour*72)) //3 days
 	if err != nil {
 		return []byte{}, err
 	}
