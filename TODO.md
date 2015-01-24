@@ -64,6 +64,8 @@
 - [x] skipeable conventions
 - [ ] access surveys
 - [ ] help
+- [ ] report expectations
+- [ ] graduation template
 
 #### student
 - [x] profile update
