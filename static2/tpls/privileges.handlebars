@@ -11,7 +11,7 @@
     <div class='form-group'>
         <label for='lbl-{{Email}}' class='col-md-7 control-label'>
             <a data-user="{{Email}}" class="btn btn-xs btn-danger glyphicon glyphicon-remove" data-toggle="deluser-confirmation"> </a>
-            <a href="mailto:{{Email}}">{{fullname this}}</a>
+            <a class="fn" href="mailto:{{Email}}">{{fullname this}}</a>
         </label>
         <span class='col-md-3'>
             <select onchange="setUserRole('{{Email}}', parseInt($(this).val()))">

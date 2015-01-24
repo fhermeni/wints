@@ -1,7 +1,7 @@
 <div class="modal-dialog">
     <div class="modal-content">
     <div class="modal-header">
-            <h3 class="modal-title"><a href="mailto:{{I.Student.Email}}">{{fullname I.Student}}</a></h3>
+            <h3 class="modal-title fn"><a href="mailto:{{I.Student.Email}}">{{fullname I.Student}}</a></h3>
     </div>    
     <div class="modal-body form-horizontal">
             <dl class="dl-horizontal">
@@ -20,7 +20,7 @@
                     {{/if}}
                 </dd>                
                 <dt>academic tutor</dt>                
-                <dd>
+                <dd class="fn">
                     {{#if Admin}}
                         <select class="select-tutor">{{userSelecter Tutors}}</select>                    
                     {{else}}
@@ -35,7 +35,7 @@
                 <dd>{{date I.Begin}} to {{date I.End}}</dd>
                 <dt>supervisor</dt>
                 <dd>
-                    <a href="mailto:{{I.Sup.Email}}">{{fullname I.Sup}}</a>
+                    <a class="fn" href="mailto:{{I.Sup.Email}}">{{fullname I.Sup}}</a>
                     ({{I.Sup.Tel}})
                 </dd>
             </dl>

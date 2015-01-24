@@ -152,7 +152,7 @@ function skipConvention(email, skip, ok, no) {
 }
 
 function reportHeader(email, kind, ok, no) {
-    return get("/internships/" + email +"/reports" + kind, ok, no);  
+    return get("/internships/" + email +"/reports/" + kind, ok, no);  
 }
 
 function setReportDeadline(email, kind, d, ok, no) {        

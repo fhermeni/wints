@@ -21,15 +21,17 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="private" class="col-sm-2 control-label">Private</label>
+                            <label for="private" class="col-sm-2 control-label">Confidential</label>
                             <div class="col-sm-9">
                                 <input type="checkbox" class="form-control" id="private" {{#if Private}}checked{{/if}}/>
+                                <small>(from the supervisor request, not the student)</small>
                             </div>
                         </div>                    
                         <div class="form-group">
                             <label for="grade" class="col-sm-2 control-label">Grade</label>
                             <div class="col-sm-9">
-                                <input type="text" class="form-control" id="grade" value="{{gradeInput this}}" {{#unless Gradeable}}disabled="disabled"{{/unless}} />
+                                <input type="number" class="form-control" id="grade" value="{{gradeInput this}}" {{#unless Gradeable}}disabled="disabled"{{/unless}} />
+                                <small><a href="#">More informations</a></small>
                             </div>
                         </div>
                         <div class="form-group">

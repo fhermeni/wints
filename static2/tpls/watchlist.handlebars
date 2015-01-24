@@ -4,11 +4,21 @@
     <i class="glyphicon glyphicon-envelope"></i>
     mail selection
 </button>
-<button type="button" class="btn" onclick="showRawFullname()">
+<!--<button type="button" class="btn" onclick="showRawFullname()">
     <i class="glyphicon glyphicon-list"></i>
     selection fullname
-</button>
+</button>-->
 </h3>
+
+<div class="legend">
+<span class="title">Reports color legend</span>
+<ul class="legend">
+<li><span class="color btn-warning"></span>Deadline passed, no reports</li>
+<li><span class="color btn-primary"></span>Deadline passed, waiting for being reviewed</li>
+<li><span class="color btn-success"></span>grade > 10</li>
+<li><span class="color btn-danger"></span>grade < 10</li>
+</ul>
+</div>
 <table class="table table-condensed table-hover tablesorter" id="table-conventions">
     {{#each this}}
         {{#if @first}}
@@ -22,7 +32,7 @@
         <th rowspan="2">Major</th>
         <th rowspan="2" class="sorter-false">Supervisor</th>
         <th rowspan="2" >Tutor</th>
-        <th class="sorter-false text-center" colspan="{{len Reports}}">Reports <i class="glyphicon glyphicon-question-sign"></i></th>
+        <th class="sorter-false text-center" colspan="{{len Reports}}">Reports</th>
         <th rowspan="2" >Def</th>
     </tr>
     <tr>        
@@ -38,15 +48,15 @@
             <input type='checkbox' class='icheckbox_flat' data-email='{{Student.Email}}'/>  
             </td>
             <td>
-            <a class='clickable' onclick="showInternship('{{Student.Email}}')">{{fullname Student}}</a>
+            <a class='click fn' onclick="showInternship('{{Student.Email}}')">{{fullname Student}}</a>
             </td>
             <td>{{Promotion}}</td>
             <td>{{Major}}</td>
             <td>                
-                <a href='mailto:{{Sup.Email}}' title='{{fullname Sup}}'>{{fullname Sup}}</a>
+                <a class="fn" href='mailto:{{Sup.Email}}' title='{{fullname Sup}}'>{{fullname Sup}}</a>
             </td>
             <td>                
-                <a href='mailto:{{Tutor.Email}}' title='{{fullname Tutor}}'>{{fullname Tutor}}</a>
+                <a class="fn" href='mailto:{{Tutor.Email}}' title='{{fullname Tutor}}'>{{fullname Tutor}}</a>
             </td>            
             {{#each Reports}}
             <td class="click {{reportStatus this}} text-center" data-text="{{this.Grade}}" onclick="showReport('{{../Student.Email}}', '{{Kind}}')">            
