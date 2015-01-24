@@ -16,8 +16,9 @@
         <span class='col-md-3'>
             <select onchange="setUserRole('{{Email}}', parseInt($(this).val()))">
                 {{roleOptions Role}}
-            </select>            
-        </span>
+            </select>                        
+        </span>        
+        <a class="btn btn-info" title="re-invit"><i class="glyphicon glyphicon-refresh" onclick="invite('{{Email}}')"></i></a>        
     </div>
 </div>
 {{/each}}

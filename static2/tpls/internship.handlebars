@@ -1,6 +1,10 @@
 <div class="row">
 <div class="col-md-6">
 	<h3>The company <small onclick=""><a><i class="glyphicon glyphicon-pencil" onclick="showCompanyEditor()"></i></a></small></h3>	
+	<p>
+	Ensure the subject is up-to-date.
+	Company name and website are usefull to assist futur students at finding internships.
+	</p>
 	<dl class="dl-horizontal">
 		<dt>Period</dt>
 		<dd>From {{date Begin}} to {{date End}}</dd>
@@ -13,11 +17,13 @@
 
 <div class="col-md-6">
 	<h3>Contacts</h3>
-
-	<h4>Supervisor <i class="glyphicon glyphicon-pencil" onclick="showSupervisorEditor()"></i></h4>	
+	<h4>Supervisor <a><i class="glyphicon glyphicon-pencil" onclick="showSupervisorEditor()"></i></a></h4>	
+	<p>It is of a primary importance to provide accurate contact details to allow your tutor to communicate
+	with your supervisor.
+	</p>
 	<dl class="dl-horizontal">
 		<dt>Fullname</dt>
-		<dd><a href="mailto:{{Sup.Email}}">{{Sup.Firstname}} {{Sup.Lastname}}</a></dd>
+		<dd><a href="mailto:{{Sup.Email}}" class="fn">{{Sup.Firstname}} {{Sup.Lastname}}</a></dd>
 		<dt>Tel</dt>
 		<dd>{{Sup.Tel}}</dd>
 	</dl>	
@@ -25,7 +31,7 @@
 	<h4>Academic tutor</h4>	
 	<dl class="dl-horizontal">
 		<dt>Fullname</dt>
-		<dd><a href="mailto:{{Tutor.Email}}">{{Tutor.Firstname}} {{Tutor.Lastname}}</a></dd>
+		<dd><a class="fn" href="mailto:{{Tutor.Email}}">{{Tutor.Firstname}} {{Tutor.Lastname}}</a></dd>
 		<dt>Tel</dt>
 		<dd>{{Tutor.Tel}}</dd>
 	</dl>	
@@ -33,7 +39,11 @@
 </div>
 
 <h3>Reports</h3>
-<p>Reports must be uploaded before the deadline, as PDF documents, with a maximum file size of 10 MB. You can upload as many versions as you want until the deadline is met. Click the question mark to get the expectations for each document.</p>
+<p>
+Documents must be PDF files, with a maximum size of 10 MB.
+You can re-upload documents until the deadline.
+Click on the question mark to get the expectations for each report.
+</p>
 <table class="table table-hover table-condensed">
 <thead>
 <tr>

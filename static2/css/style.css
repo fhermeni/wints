@@ -10,3 +10,7 @@
 .bootstrap-filestyle {
 	display: inline;
 }
+
+.fn {
+	text-transform: capitalize;
+}

@@ -76,7 +76,8 @@
 - [x] see reports
 - [x] upload report
 - [x] see grade, comments
-- [ ] help
+- [x] help
+- [ ] report expectations
 
 #### supervisor
 - [ ] access survey
