@@ -25,8 +25,8 @@ function restError(no) {
         } else {
             if (no != undefined) {
                 no(jqr)
-            } else {
-                $.notify(msg, {autoHideDelay: 2000, className: "error", globalPosition: "top center"})            
+            } else {                
+                $.notify(jqr.responseText, {autoHideDelay: 2000, className: "error", globalPosition: "top center"})            
             }        
         }        
     }          
@@ -59,7 +59,8 @@ function reportSuccess(msg) {
     $.notify(msg, {autoHideDelay: 1000, className: "success", globalPosition: "top center"})
 }
 
-function reportError(msg) {    
+function reportError(msg) {
+    console.log(arguments)    
     $.notify(msg, {autoHideDelay: 2000, className: "error", globalPosition: "top center"})
 }
 
