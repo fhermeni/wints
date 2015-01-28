@@ -5,6 +5,7 @@ var myself;
 var currentConvention;
 var shiftPressed = false;
 var allMajors;
+
 $( document ).ready(function () {
 waitingBlock = $("#cnt").clone().html();
 
@@ -90,11 +91,16 @@ internships(function(data) {
     });    
     $('#cnt').find(":checkbox").iCheck()
     $('#cnt').find(".check_all").on("ifChecked", function (e) {
-        $("#cnt").find("td .icheckbox").iCheck("check")        
+        $("#cnt").find("td .icheckbox").iCheck("check")       
     }).on("ifUnchecked", function (e) {
-        $("#cnt").find("td .icheckbox").iCheck("unCheck")        
+        $("#cnt").find("td .icheckbox").iCheck("unCheck")                
     });
-    $("#cnt").find("td .icheckbox").on("ifChecked", shiftSelect)    
+    $("#cnt").find("td .icheckbox").on("ifChecked", function(e) {        
+        shiftSelect(e);
+    });            
+    $("#cnt").find("td .icheckbox").on("ifUnchecked", function(e) {        
+    });            
+
 });
 }
 
@@ -118,7 +124,7 @@ internships(function(data) {
     //$("#cnt").find(":checkbox").iCheck("uncheck");    
     $('#cnt').find(":checkbox").iCheck()
     $('#cnt').find(".check_all").on("ifChecked", function (e) {
-        $("#cnt").find("td .icheckbox").iCheck("check")        
+        $("#cnt").find("td .icheckbox").iCheck("check")                
     }).on("ifUnchecked", function (e) {
         $("#cnt").find("td .icheckbox").iCheck("unCheck")        
     });
@@ -127,7 +133,7 @@ internships(function(data) {
 }
 
 
-function shiftSelect(e) {  
+function shiftSelect(e) {   
     if (shiftPressed) {        
         var myTd = $(e.currentTarget).closest("td")
         var tr = myTd.parent()
@@ -139,10 +145,10 @@ function shiftSelect(e) {
                 break;
             } else {
                 chk.iCheck("check")
-            }
+            }            
             p = p.prev();
         }
-    }
+    }    
 }
     
 function showPrivileges() {
@@ -332,16 +338,29 @@ function pickKnown() {
     });    
 }
 
-function mailing(inCC) {
+function mailing(t, w) {
     var to = [];
     var cc = [];
     $(".icheckbox.checked").find(":checkbox").each(function(i, c) {
-        var em = $(c).attr("data-email")                      
-        to.push(em);        
+        var em = $(c).attr("data-email")                                  
         var i = getInternship(em)
-        if (i && inCC == "tutor") {
-            cc.push(i.Tutor.Email);               
-        }                
+        if (i) {            
+            if (t == "students") {
+                to.push(i.Student.Email)
+            } else if (t == "tutors") {
+                to.push(i.Tutor.Email)
+            } else if (t == "supervisors") {
+                to.push(i.Sup.Email)
+            }
+
+            if (w == "students") {
+                cc.push(i.Student.Email)
+            } else if (w == "tutors") {
+                cc.push(i.Tutor.Email)
+            } else if (w == "supervisors") {
+                cc.push(i.Sup.Email)
+            }
+        }
     });
     if (to.length > 0) {
         window.location.href = "mailto:" + to.join(",") + (cc.length > 0 ? "?cc=" + cc.join(",") : "");
@@ -373,9 +392,9 @@ internships(function(interns) {
     $("#cnt").html(html);
     $('#cnt').find(":checkbox").iCheck()
     $('#cnt').find(".check_all").on("ifChecked", function (e) {
-        $("#cnt").find("td .icheckbox").iCheck("check")        
+        $("#cnt").find("td .icheckbox").iCheck("check")           
     }).on("ifUnchecked", function (e) {
-        $("#cnt").find("td .icheckbox").iCheck("unCheck")        
+        $("#cnt").find("td .icheckbox").iCheck("unCheck")                
     });
     $("#cnt").find("td .icheckbox").on("ifChecked", shiftSelect)    
 
@@ -391,20 +410,31 @@ internships(function(interns) {
         } else {
             service[i.Tutor.Email].Internships.push(i)
         }        
-    });
-    console.log(service)
+    });    
     var html = Handlebars.getTemplate("raw-service")(service);
     $("#modal").html(html).modal('show');
 });
 }
 
-function showRawFullname(root) {
-    var checked = $(".icheckbox.checked").find(":checkbox")
+function showRawFullname(kind) {
+    var checked = $("tbody").find(".icheckbox.checked").find(":checkbox")
         var fns = [];
         checked.each(function (i, e) {
-            var em = $(e).attr("data-email");
+            var em = $(e).attr("data-email");            
             var i = getInternship(em);
-            fns.push(i.Student.Firstname + " " + i.Student.Lastname);
+            var p = i.Student;
+            if (kind == "supervisors") {
+                p = i.Sup
+                
+            } else if (kind == "tutors") {
+                p = i.Tutor
+            }
+            var fn = p.Firstname.charAt(0).toUpperCase() + p.Firstname.slice(1);
+            var ln = p.Lastname.charAt(0).toUpperCase() + p.Lastname.slice(1);
+            var n = fn + " " + ln;
+            if (fns.indexOf(n) < 0) {
+                fns.push(fn + " " + ln)                
+            }
         });
     if (fns.length > 0) {
         var html = Handlebars.getTemplate("raw");
@@ -414,6 +444,13 @@ function showRawFullname(root) {
     }
 }
 
+function align(txt, to) {
+    var b = txt;
+    for (i = b.length; i < to; i++) {
+        b += " ";
+    }
+    return b;
+}
 function selectText(elm) {
   // for Internet Explorer
   if(document.body.createTextRange) {
