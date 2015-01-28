@@ -74,9 +74,9 @@ Handlebars.registerHelper('raw', function(p) {
 });
 
 Handlebars.registerHelper('majorOptions', function(m) {    
-    var b = "";
-    if (!m) {
-        m = "?";
+    var b = "";    
+    if (!m) {        
+        b += "<option selected>?</option>";
     }
     allMajors.forEach(function (o) {
         var selected = m == o ? " selected " : "";
