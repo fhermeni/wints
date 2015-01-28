@@ -242,7 +242,7 @@ function showPendingConventions() {
                 $("#cnt").html("<h5 class='text-center'>Nothing to import</h5>")
                 return
             }               
-            currentConvention = cc[0]     
+            currentConvention = cc[0]                 
             var html = Handlebars.getTemplate("pending")({
                 c: currentConvention, users : uss, "Ignored": ignored
             });                        
