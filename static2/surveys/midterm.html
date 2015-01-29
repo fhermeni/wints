@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Survey</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" media="screen">
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/bootflat.css">
+    <link rel="stylesheet" href="/static/css/theme.bootstrap.min.css">    
+    <link rel="stylesheet" href="/static/css/datepicker3.min.css">
+    <style>
+.fn {
+    text-transform: capitalize;
+}
+small {
+    color: rgb(67, 74, 84)
+}
+
+body {
+    background-color: rgb(241, 242, 246);
+}
+</style>    
+</head>
+<body>
+<div class="container">
+<h1 class="text-center">
+    <span class="tr" id="title"></span>
+</h1>
+
+<div class="text-center">
+        <a onclick="tr('fr')"><img src="/static/img/fr.gif" /></a>
+        <a onclick="tr('en')"><img src="/static/img/en.gif" /></a>
+</div>
+<h4><span id="stu" class="tr">:</span> <small class="fn" id="student"></small></h4>
+<h4><span id="tut" class="tr">:</span> <small class="fn" id="tutor"></small></h4>
+
+<h3></h3>
+<div class="form-group">
+<label class="q tr" id="q1"></label>
+<input type="radio" name="q1" value="1"/><span class="yes"></span>
+<input type="radio" name="q1" value="0"/><span class="no"></span>
+</div>
+<label class="c"></label><br/>
+<textarea id="q2" cols="80"></textarea>
+
+<h3></h3>
+<div class="form-group">
+<label class="q" id="q3"></label>
+<input type="radio" name="q3" value="1"/><span class="yes"></span>
+<input type="radio" name="q3" value="0"/><span class="no"></span>
+</div>
+<div class="form-group">
+<label class="q" id="q4"></label>
+<input type="radio" name="q4" value="1"/><span class="yes"></span>
+<input type="radio" name="q4" value="0"/><span class="no"></span>
+</div>
+<label class="c"></label><br/>
+<textarea id="q5" cols="80"></textarea>
+
+<h3></h3>
+<div class="form-group">
+<label class="q" id="q6"></label>
+<input type="radio" name="q6" value="1"/><span class="yes"></span>
+<input type="radio" name="q6" value="0"/><span class="no"></span>
+</div>
+
+<div class="form-group">
+<label class="q" id="q7"></label>
+<input type="radio" name="q7" value="1"/><span class="yes"></span>
+<input type="radio" name="q7" value="0"/><span class="no"></span>
+</div>
+
+<div class="form-group">
+<label class="q" id="q8"></label>
+<input type="radio" name="q8" value="1"/><span class="yes"></span>
+<input type="radio" name="q8" value="0"/><span class="no"></span>
+</div>
+<div class="form-group">
+<label class="q" id="q9"></label>
+<input type="radio" name="q9" value="1"/><span class="yes"></span>
+<input type="radio" name="q9" value="0"/><span class="no"></span>
+</div>
+<label class="c"></label><br/>
+<textarea id="q10" cols="80"></textarea>
+
+<h3></h3>
+<div class="form-group">
+<label class="q" id="q11"></label>
+<input type="radio" name="q11" value="1"/><span class="yes"></span>
+<input type="radio" name="q11" value="0"/><span class="no"></span>
+<br/><label class="q"></label><br/>
+<textarea cols="80" id="q12"></textarea>
+</div>
+<div class="form-group">
+<label class="q" id="q13"></label>
+<input type="radio" name="q13" value="1"/><span class="yes"></span>
+<input type="radio" name="q13" value="0"/><span class="no"></span>
+<br/><label class="q"></label><br/>
+<textarea cols="80" id="q14"></textarea>
+</div>
+<div class="form-group">
+<label class="q" id="q15"></label>
+<input type="radio" name="q15" value="1"/><span class="yes"></span>
+<input type="radio" name="q15" value="0"/><span class="no"></span>
+</div>
+<div class="form-group">
+<label class="q" id="q16"></label>
+<input type="radio" name="q16" value="1"/><span class="yes"></span>
+<input type="radio" name="q16" value="0"/><span class="no"></span>
+</div>
+<div class="form-group">
+<label class="q" id="q17"></label>
+<input type="radio" name="q17" value="1"/><span class="yes"></span>
+<input type="radio" name="q17" value="0"/><span class="no"></span>
+</div>
+<label class="c"></label><br/>
+<textarea id="q18" cols="80"></textarea>
+
+<h3></h3>
+<div class="form-group">
+<label class="q" id="q19"></label>
+<input type="radio" name="q19" value="1"/><span class="yes"></span>
+<input type="radio" name="q19" value="0"/><span class="no"></span>
+</div>
+
+<label class="q"></label><br/>
+<textarea id="q20" cols="80"></textarea>
+
+<br/><label class="q"></label><br/>
+<textarea id="q21" cols="80"></textarea>
+
+<div class="text-center">
+    <button type="button" class="btn btn-lg btn-success" id="submit" onclick="submit()"></button>    
+</div>
+</div>
+<footer>
+    <div class="container">
+        <p>© University Nice Sophia Antipolis 2013-2014</p>
+    </div>
+</footer>
+            <!-- Bootstrap -->
+            <script src="/static/js/jquery-2.1.3.min.js"></script>
+            <script src="/static/js/bootstrap.min.js"></script>                    
+
+            <!-- Bootflat's JS files.-->
+            <script src="/static/js/icheck.min.js"></script>
+            <script src="/static/js/jquery.fs.selecter.min.js"></script>
+            <script src="/static/js/jquery.fs.stepper.min.js"></script>
+            
+            <script src="/static/js/notify.min.js"></script>
+
+            <script src="/static/js/handlebars.min.js"></script>
+        
+            <script src="/static/js/bootstrap-confirmation.min.js"></script>                        
+            <script src="/static/js/rest.js"></script>
+            <script src="/static/js/midterm.js"></script>
+</body>
+</html>

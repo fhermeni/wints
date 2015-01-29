@@ -269,3 +269,21 @@ func (v *Service) ResetRootAccount() error {
 	}
 	return ErrPermission
 }
+
+func (v *Service) SurveyToken(kind string) (string, string, error) {
+	return v.srv.SurveyToken(kind)
+}
+
+func (v *Service) Survey(student, kind string) (internship.SurveyHeader, error) {
+	if v.my.Role >= internship.ADMIN || v.isTutoring(student) {
+		return v.srv.Survey(student, kind)
+	}
+	return internship.SurveyHeader{}, ErrPermission
+}
+
+func (v *Service) SurveyContent(student, kind string) (map[string]string, error) {
+	if v.my.Role >= internship.ADMIN || v.isTutoring(student) {
+		return v.SurveyContent(student, kind)
+	}
+	return make(map[string]string), ErrPermission
+}

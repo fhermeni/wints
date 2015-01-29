@@ -82,7 +82,9 @@ type Service interface {
 	ResetRootAccount() error
 
 	//Survey management
-	Survey(kind string) (SurveyHeader, error)
+	SurveyToken(kind string) (string, string, error)
+	Survey(student, kind string) (SurveyHeader, error)
+	SurveyContent(student, kind string) (map[string]string, error)
 
 	NewConvention(c Convention) error
 	Conventions() ([]Convention, error)

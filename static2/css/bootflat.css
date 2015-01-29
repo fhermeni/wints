@@ -1101,17 +1101,17 @@ blockquote {
   background-position: -66px 0;
 }
 
-.iradio_flat {
+.iradio {
   background-position: -88px 0;
 }
-.iradio_flat.checked {
+.iradio.checked {
   background-position: -110px 0;
 }
-.iradio_flat.disabled {
+.iradio.disabled {
   cursor: default;
   background-position: -132px 0;
 }
-.iradio_flat.checked.disabled {
+.iradio.checked.disabled {
   background-position: -154px 0;
 }
 

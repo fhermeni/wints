@@ -161,42 +161,18 @@ type Convention struct {
 	Skip bool
 }
 
-//SurveyDef defines a survey
-type SurveyDef struct {
-	//The survey identifier
-	Kind string
-	//The deadline type for the survey, 'relative' or 'absolute'
-	Deadline string
-	//The deadline value
-	Value string
-}
-
 //SurveyHeader provides the metadata associated to a student survey
 type SurveyHeader struct {
 	//The survey type
 	Kind string
+	//
+	Student Person
+	//
+	Tutor Person
 	//The deadline to submit
 	Deadline time.Time
-	//Survey content
-	Content string
-}
-
-func (def *SurveyDef) Instantiate(from time.Time) (SurveyHeader, error) {
-	switch def.Deadline {
-	case "relative":
-		shift, err := time.ParseDuration(def.Value)
-		if err != nil {
-			return SurveyHeader{}, err
-		}
-		return SurveyHeader{Kind: def.Kind, Deadline: from.Add(shift)}, nil
-	case "absolute":
-		at, err := time.Parse(DateLayout, def.Value)
-		if err != nil {
-			return SurveyHeader{}, err
-		}
-		return SurveyHeader{Kind: def.Kind, Deadline: at}, nil
-	}
-	return SurveyHeader{}, errors.New("Unsupported time definition '" + def.Deadline + "'")
+	//The moment the survey was committed
+	Timestamp time.Time
 }
 
 //Predefined errors

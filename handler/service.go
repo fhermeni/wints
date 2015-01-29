@@ -36,6 +36,7 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string) Servic
 	internshipsMngt(s, mailer)
 	reportMngt(s, mailer)
 	conventionMgnt(s, mailer)
+	surveyMngt(s, mailer)
 	fs := http.Dir(path + "/")
 	fileHandler := http.FileServer(fs)
 	r.PathPrefix("/" + path + "/").Handler(httpgzip.NewHandler(http.StripPrefix("/"+path, fileHandler)))
@@ -506,4 +507,40 @@ func setTutor(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter,
 		}
 	}()
 	return err
+}
+
+func surveyMngt(s Service, mailer mail.Mailer) {
+	s.r.HandleFunc("/surveys/{kind}", surveyForm).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/{student}/surveys/{kind}", restHandler(survey, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/surveys/{token}", restHandler(surveyFromToken, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/surveys/{token}/content", restHandler(surveyContent, s, mailer)).Methods("GET")
+}
+
+func surveyForm(w http.ResponseWriter, r *http.Request) {
+	k := mux.Vars(r)["kind"]
+	http.ServeFile(w, r, path+"/surveys/"+k+".html")
+}
+
+func survey(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+	student := mux.Vars(r)["student"]
+	kind := mux.Vars(r)["kind"]
+	s, err := srv.Survey(student, kind)
+	return writeJSONIfOk(err, w, r, s)
+}
+
+func surveyContent(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+	student := mux.Vars(r)["student"]
+	kind := mux.Vars(r)["kind"]
+	s, err := srv.SurveyContent(student, kind)
+	return writeJSONIfOk(err, w, r, s)
+}
+
+func surveyFromToken(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+	tok := mux.Vars(r)["token"]
+	student, kind, err := srv.SurveyToken(tok)
+	if err != nil {
+		return err
+	}
+	s, err := srv.Survey(student, kind)
+	return writeJSONIfOk(err, w, r, s)
 }
