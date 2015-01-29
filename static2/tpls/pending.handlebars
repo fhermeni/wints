@@ -1,7 +1,7 @@
 <div id="alignment-box">
     {{#if c}}
     <div class="text-center">
-        <h3>{{c.Student.Firstname}} {{c.Student.Lastname}}</h3>
+        <h3 class="fn">{{c.Student.Firstname}} {{c.Student.Lastname}}</h3>
         {{date c.Begin}} to {{date c.End}}: <a href="{{c.Cpy.WWW}}">{{c.Cpy.Name}}</a>
     </div>
     
@@ -12,14 +12,14 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="th-tutor-fn">Firstname</label>
                     <div class="col-sm-6">
-                        <input type="text" class="input-sm form-control" id="th-tutor-fn" value="{{c.Tutor.Firstname}}">
+                        <input type="text" class="input-sm form-control fn" id="th-tutor-fn" value="{{c.Tutor.Firstname}}">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-2 control-label" for="th-tutor-ln">Lastname</label>
 
                     <div class="col-sm-6">
-                        <input type="text" class="input-sm form-control" id="th-tutor-ln" value="{{c.Tutor.Lastname}}">
+                        <input type="text" class="input-sm form-control fn" id="th-tutor-ln" value="{{c.Tutor.Lastname}}">
                     </div>
                 </div>
                 <div class="form-group">
