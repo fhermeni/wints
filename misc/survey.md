@@ -2,6 +2,26 @@
 ## Possible surveys
 
 ### Midterm evaluation
+Survey
+#id, file
+
+StudentSurvey
+#id, #token
+
+Questions
+#(survey,q), type
+
+Answer
+#(survey,q,student), value(json)
+
+
+Authentication
+admin token.
+
+CloseSurvey()
+
+
+A: id A, value
 
 ### Final evaluation
 

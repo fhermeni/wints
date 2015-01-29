@@ -81,6 +81,9 @@ type Service interface {
 	SetReportPrivate(kind, email string, p bool) error
 	ResetRootAccount() error
 
+	//Survey management
+	Survey(kind string) (SurveyHeader, error)
+
 	NewConvention(c Convention) error
 	Conventions() ([]Convention, error)
 	SkipConvention(student string, skip bool) error

@@ -1,0 +1,13 @@
+{
+	"q": [
+		"Le stagiaire s’est-il informé de lui-même des horaires à respecter?",
+		"Foo bar"],
+	"type" : "bool"
+}
+
+{
+	"q": [
+		"Est-il ponctuel?",
+		"bazbaz"],
+	"type" : "bool"
+}
