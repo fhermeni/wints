@@ -25,12 +25,20 @@
 </h3>
 
 <div class="legend">
-<span class="title">Reports color legend</span>
+<span class="title">Reports color legend: </span>
 <ul class="legend">
 <li><span class="color btn-warning"></span>Deadline passed, no report</li>
 <li><span class="color btn-primary"></span>Deadline passed, waiting for being reviewed</li>
 <li><span class="color btn-success"></span>grade > 10</li>
 <li><span class="color btn-danger"></span>grade < 10</li>
+</ul>
+</div>
+<div class="legend">
+<span class="title">Survey color legend: </span>
+<ul class="legend">
+<li><span class="color badge-info"></span>Answers are missing</li>
+<li><span class="color badge-success"></span>Answers available</li>
+<li><span class="color badge-danger"></span>Answers are missing, deadline passed</li>
 </ul>
 </div>
 <table class="table table-condensed table-hover tablesorter" id="table-conventions">
@@ -47,13 +55,14 @@
         <th rowspan="2" class="sorter-false">Supervisor</th>
         <th rowspan="2" >Tutor</th>
         <th class="sorter-false text-center" colspan="{{len Reports}}">Reports</th>
-        <th rowspan="2" >Def</th>
+        <th rowspan="2" class="sorter-false text-center">Surveys</th>
+        <th rowspan="2" >Def</th>        
     </tr>
     <tr>        
         {{#each Reports}}        
         <th>{{shortKind this}}</th>
         {{/each}}        
-    </tr>
+    </tr>    
     </thead>
     <tbody>
     {{/if}}
@@ -75,8 +84,13 @@
             {{#each Reports}}
             <td class="click {{reportStatus this}} text-center" data-text="{{this.Grade}}" onclick="showReport('{{../Student.Email}}', '{{Kind}}')">            
             {{reportGrade this}}
-            </td>            
+            </td>  
             {{/each}}
+            <td>                      
+            {{#each Surveys}}
+            <a href="/surveys/{{Kind}}?student={{../Student.Email}}&kind={{Kind}}" target='_blank' class="badge {{surveyStatus this}}">{{Kind}}</a>
+            {{/each}}
+            </td>
             <td>-</td>
         </tr>
     {{/each}}

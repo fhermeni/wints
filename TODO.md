@@ -18,8 +18,12 @@
 - [x] minimify every resource
 - [x] gzip json lists
 - [x] session ID for security
+- [x] store and expose surveys
+- [x] midterm survey
+- [ ] final survey
+- [ ] future survey
+- [ ] mailing for missing surveys
 - [ ] concatenate every static resource
-- [ ] online survey for supervisor
 
 ### Daemon
 
@@ -62,7 +66,7 @@
 - [x] tutor internships
 - [x] report private/public status
 - [x] skipeable conventions
-- [ ] access surveys
+- [x] access surveys
 - [ ] help
 - [ ] report expectations
 - [ ] graduation template
@@ -82,5 +86,4 @@
 - [ ] report expectations
 
 #### supervisor
-- [ ] access survey
-- [ ] annotate survey
+- [x] access survey

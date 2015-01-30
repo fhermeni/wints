@@ -1,6 +1,8 @@
 package datastore
 
 import (
+	"encoding/json"
+	"log"
 	"time"
 
 	"github.com/fhermeni/wints/internship"
@@ -9,43 +11,46 @@ import (
 
 func (s *Service) SurveyToken(token string) (string, string, error) {
 	var student, kind string
-	err := s.DB.QueryRow("select student, kind from survey where token=$1", token).Scan(&student, &kind)
+	err := s.DB.QueryRow("select student, kind from surveys where token=$1", token).Scan(&student, &kind)
 	if err != nil {
 		return "", "", internship.ErrUnknownSurvey
 	}
 	return student, kind, err
 }
 
-func (s *Service) Survey(student, kind string) (internship.SurveyHeader, error) {
-	var stuFn, stuLn, stuMail, stuTel string
-	var tutFn, tutLn, tutMail, tutTel string
+func (s *Service) Survey(student, kind string) (internship.Survey, error) {
 	var deadline time.Time
 	var timeStamp pq.NullTime
-	r := s.DB.QueryRow("select s.Firstname, s.Lastname, s.Email, s.Tel, t.Firstname, t.Lastname, t.Email, t.Tel, kind, deadline, timestamp from user as s, user as t, internships, survey where student=$1 and kind=$2 and internships.student=s.email and internships.tutor=t.email and student=internships.student", student, kind)
-	err := r.Scan(&stuFn, &stuLn, &stuMail, &stuTel, &tutFn, &tutLn, &tutMail, &tutTel, &kind, &deadline, &timeStamp)
+	var buf []byte
+	r := s.DB.QueryRow("select kind, deadline, timestamp, answers from surveys where student=$1 and kind=$2", student, kind)
+	err := r.Scan(&kind, &deadline, &timeStamp, &buf)
 	if err != nil {
-		return internship.SurveyHeader{}, err
+		return internship.Survey{}, err
 	}
-	stu := internship.Person{Firstname: stuFn, Lastname: stuLn, Email: stuMail, Tel: stuTel}
-	tut := internship.Person{Firstname: tutFn, Lastname: tutLn, Email: tutMail, Tel: tutTel}
-	hdr := internship.SurveyHeader{Student: stu, Tutor: tut, Kind: kind, Deadline: deadline}
+	hdr := internship.Survey{Kind: kind, Deadline: deadline, Answers: make(map[string]string)}
 	if timeStamp.Valid {
+		log.Println("Timestamp valid")
 		hdr.Timestamp = timeStamp.Time
+		err = json.Unmarshal(buf, &hdr.Answers)
+		if err != nil {
+			return internship.Survey{}, err
+		}
 	}
 	return hdr, nil
 }
 
-func (s *Service) SurveyContent(student, kind string) (map[string]string, error) {
-	rows, err := s.DB.Query("select id, value from survey_questions where student=$1 and kind=$2", student, kind)
+func (s *Service) SetSurveyContent(student, kind string, cnt map[string]string) error {
+	now := time.Now()
+	if len(cnt) > 1000 {
+		return internship.ErrInvalidSurvey
+	}
+	buf, err := json.Marshal(cnt)
 	if err != nil {
-		return make(map[string]string), err
+		return internship.ErrInvalidSurvey
 	}
-	defer rows.Close()
-	res := make(map[string]string)
-	for rows.Next() {
-		var id, value string
-		rows.Scan(&id, &value)
-		res[id] = value
-	}
-	return res, nil
+	return SingleUpdate(s.DB, internship.ErrUnknownSurvey, "update surveys set answers=$1, timestamp=$2 where student=$3 and kind=$4", buf, now, student, kind)
+}
+
+func (s *Service) SurveyDefs() []internship.SurveyDef {
+	return s.surveyDefs
 }

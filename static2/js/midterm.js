@@ -1,32 +1,3 @@
-var internship = {
-	Begin: "2015-03-16T01:00:00+01:00",
-	Cpy: {
-		Name: "air france",
-		WWW: "http://www.airfrance.fr/cgi-bin/af/fr/fr/common/home/vols/billet-avion.do?wt.srch=1&wt.mc_id=c_fr_sea_google_brandname_null_null_null&gclid=cnhfuopmkmmcfu6wtaodaxsada"
-	},
-	End: "2015-09-11T02:00:00+02:00",
-	Major: "caspar",
-	Promotion: "master imafa",
-	Student: {
-		Email: "mohamedalibenayed1@gmail.com",
-		Firstname: "mohamed ali",
-		Lastname: "ben ayed",
-		Tel: "0779497651",
-	},
-	Sup: {
-		Email: "naelmazouzi@airfrance.fr",
-		Firstname: "nadia",
-		Lastname: "el mazouzi",
-		Tel: "04 97 28 38 82"
-	},
-	Title: "(ingénieur développement j2ee et analyse de données",
-	Tutor: {
-		Email: "cedric.boulbe@unice.fr",
-		Firstname: "cédric",
-		Lastname: "boulbe",
-		Tel: "04 92 07 64 93"
-	}
-}
 var hdrFr = [
 	"Ponctualité",
 	"Intégration dans l'entreprise",
@@ -120,17 +91,72 @@ function submit() {
 			ok = false;
 		}
 	});
-	return ok;
+	if (!ok) {
+		return
+	}
+	//Extract the content and format it
+	//input fields are binary, textarea contains string
+	cnt = {}
+	$("input:checked").each(function (idx, i) {
+		cnt[i.name] = i.value;
+	});
+	$("textarea").each(function (idx, i) {
+		cnt[i.id] = i.value;		
+	});	
+	setSurveyAnswers($.urlParam("token"), cnt);
 }
 
 function fn(p) {
 	return "<a href='mailto:" + p.Email + "'>" + p.Firstname + " " + p.Lastname + "</a>"
 } 
+
+function fill(answers, readOnly) {
+	Object.keys(answers).forEach(function (k) {
+		var v = answers[k];
+		if (v) {
+		var q = $("[name=" + k + "][value=" + v + "]").iCheck("check")
+		if (q.length > 0) {
+			console.log("input " + k);
+			q.iCheck("check")		
+		}else {
+			console.log("textarea")
+			//textarea
+			$("#" + k).val(v);
+		}					
+		}		
+	})
+	if (readOnly) {
+		$("#submit").prop('disabled',true)
+		$("input").prop('disabled', true)
+		$("textarea").prop('disabled', true)
+	}
+}
 $( document ).ready(function () {
 	tr("fr");
 
 	var token = $.urlParam("token")
-	console.log(token)
-	$("#student").html(fn(internship.Student))
-	$("#tutor").html(fn(internship.Tutor))
+	if (token) {
+		longSurvey(token, function(s) {
+			survey = s
+			$("#student").html(fn(s.Student))
+			$("#tutor").html(fn(s.Tutor))
+			fill(s.Answers)
+		}, function(jqr) {
+			$("#errorMessage").html(jqr.responseText)
+			$("#modal").modal('show')
+		})
+	} else {
+		var email = $.urlParam("student")
+		var kind = $.urlParam("kind")
+		internship(email, function(i) {
+			$("#student").html(fn(i.Student))
+			$("#tutor").html(fn(i.Tutor))
+			i.Surveys.forEach(function (s) {
+				if (s.Kind == kind) {
+					fill(s.Answers, true)
+				}
+				return false
+			})
+		})
+	}
 });

@@ -29,12 +29,20 @@ In some situations, it might be justified to extend the deadline.
 If you want to do so, please notify the internships manager.
 </p>
 <div class="legend">
-<span class="title">Reports color legend</span>
+<span class="title">Reports color legend: </span>
 <ul class="legend">
 <li><span class="color btn-warning"></span>Deadline passed, no report</li>
 <li><span class="color btn-primary"></span>Deadline passed, waiting for being reviewed</li>
 <li><span class="color btn-success"></span>grade > 10</li>
 <li><span class="color btn-danger"></span>grade < 10</li>
+</ul>
+</div>
+<div class="legend">
+<span class="title">Survey color legend: </span>
+<ul class="legend">
+<li><span class="color badge-info"></span>Answers are missing</li>
+<li><span class="color badge-success"></span>Answers available</li>
+<li><span class="color badge-danger"></span>Answers are missing, deadline passed</li>
 </ul>
 </div>
 <table class="table table-hover tablesorter" id="table-conventions">
@@ -51,6 +59,7 @@ If you want to do so, please notify the internships manager.
         <th rowspan="2" class="sorter-false">Supervisor</th>
         <th rowspan="2" class="sorter-false">Company</th>
         <th class="sorter-false text-center" colspan="{{len Reports}}">Reports</th>
+        <th rowspan="2" class="sorter-false text-center">Surveys</th>
         <th rowspan="2" >Def</th>
     </tr>
     <tr>        
@@ -81,6 +90,12 @@ If you want to do so, please notify the internships manager.
             {{reportGrade this}}
             </td>            
             {{/each}}
+            <td>                      
+            {{#each Surveys}}
+            <a 
+            href="/surveys/{{Kind}}?student={{../Student.Email}}&kind={{Kind}}" target='_blank' class="badge {{surveyStatus this}}">{{Kind}}</a>
+            {{/each}}
+            </td>
             <td>-</td>
         </tr>
     {{/each}}

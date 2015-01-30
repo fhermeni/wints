@@ -233,6 +233,17 @@ Handlebars.registerHelper('reportStatus', function(r) {
     return style;
 });
 
+Handlebars.registerHelper('surveyStatus', function(s) {
+    var passed = new Date(Date.parse(s.Deadline)) < new Date()    
+    var style = "badge-info"    
+    if (passed && s.Answers == {}) {
+            style = "badge-danger"
+    } else if (Object.keys(s.Answers).length > 0) {
+            style = "badge-success"
+    }
+    return style;
+});
+
 Handlebars.registerHelper('reportGrade', function(r) {
     if (!r.ToGrade) {
         return "";

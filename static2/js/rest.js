@@ -212,3 +212,11 @@ function setReportGrade(e, k, g, c, ok, no) {
 function majors(ok, no) {
     return get("/majors/", ok, no);  
 }
+
+function longSurvey(token, ok, no) {
+    return get("/surveys/" + token, ok, no)
+}
+
+function setSurveyAnswers(token, cnt, ok, no) {
+    return post("/surveys/" + token, cnt, ok, no)
+}

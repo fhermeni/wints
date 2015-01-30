@@ -42,6 +42,8 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string) Servic
 	r.PathPrefix("/" + path + "/").Handler(httpgzip.NewHandler(http.StripPrefix("/"+path, fileHandler)))
 	http.Handle("/", s.r)
 	s.r.HandleFunc("/", home(backend)).Methods("GET")
+	s.r.HandleFunc("/api/v1/surveys/{token}", surveyFromToken(backend)).Methods("GET")
+	s.r.HandleFunc("/api/v1/surveys/{token}", setSurveyAnswers(backend)).Methods("POST")
 	return s
 }
 
@@ -512,8 +514,6 @@ func setTutor(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter,
 func surveyMngt(s Service, mailer mail.Mailer) {
 	s.r.HandleFunc("/surveys/{kind}", surveyForm).Methods("GET")
 	s.r.HandleFunc("/api/v1/internships/{student}/surveys/{kind}", restHandler(survey, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/surveys/{token}", restHandler(surveyFromToken, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/surveys/{token}/content", restHandler(surveyContent, s, mailer)).Methods("GET")
 }
 
 func surveyForm(w http.ResponseWriter, r *http.Request) {
@@ -528,19 +528,64 @@ func survey(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r
 	return writeJSONIfOk(err, w, r, s)
 }
 
-func surveyContent(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
-	student := mux.Vars(r)["student"]
-	kind := mux.Vars(r)["kind"]
-	s, err := srv.SurveyContent(student, kind)
-	return writeJSONIfOk(err, w, r, s)
+type LongSurvey struct {
+	Student   internship.Person
+	Tutor     internship.Person
+	Kind      string
+	Deadline  time.Time
+	Timestamp time.Time
+	Answers   map[string]string
 }
 
-func surveyFromToken(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
-	tok := mux.Vars(r)["token"]
-	student, kind, err := srv.SurveyToken(tok)
-	if err != nil {
-		return err
+func surveyFromToken(backend internship.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		tok := mux.Vars(r)["token"]
+		student, kind, err := backend.SurveyToken(tok)
+		if err != nil {
+			if err == internship.ErrUnknownSurvey {
+				http.Error(w, "No survey associated to that token. Maybe a broken link", http.StatusNotFound)
+			} else {
+				http.Error(w, "A possible bug to report", http.StatusInternalServerError)
+			}
+			return
+		}
+		s, err := backend.Survey(student, kind)
+		if err != nil {
+			log.Printf("Unable to send the survey ", err.Error())
+			http.Error(w, "A possible bug to report", http.StatusInternalServerError)
+			return
+		}
+		i, err := backend.Internship(student)
+		if err != nil {
+			log.Printf("Unable to send the survey ", err.Error())
+			http.Error(w, "A possible bug to report", http.StatusInternalServerError)
+			return
+		}
+		lv := LongSurvey{Student: i.Student.ToPerson(), Tutor: i.Tutor.ToPerson(), Kind: kind, Deadline: s.Deadline, Timestamp: s.Timestamp, Answers: s.Answers}
+		//TODO: long version of the survey
+		err = writeJSONIfOk(err, w, r, lv)
 	}
-	s, err := srv.Survey(student, kind)
-	return writeJSONIfOk(err, w, r, s)
+}
+
+func setSurveyAnswers(backend internship.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		tok := mux.Vars(r)["token"]
+		student, kind, err := backend.SurveyToken(tok)
+		if err != nil {
+			if err == internship.ErrUnknownSurvey {
+				http.Error(w, "No survey associated to that token. Maybe a broken link", http.StatusNotFound)
+			} else {
+				http.Error(w, "A possible bug to report", http.StatusInternalServerError)
+			}
+			return
+		}
+		//Check for suspicious content (too long for example)
+		var cnt map[string]string
+		err = jsonRequest(w, r, &cnt)
+		if err != nil {
+			http.Error(w, "Bad content", http.StatusBadRequest)
+			return
+		}
+		backend.SetSurveyContent(student, kind, cnt)
+	}
 }

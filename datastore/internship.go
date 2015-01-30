@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"database/sql"
+	"encoding/json"
 	"time"
 
 	"github.com/fhermeni/wints/internship"
@@ -55,7 +56,21 @@ func (srv *Service) NewInternship(c internship.Convention) ([]byte, error) {
 			return []byte{}, rollback(err, tx)
 		}
 	}
-	//Delete the old convetion if needed
+
+	//Plan the surveys
+	for _, sr := range srv.SurveyDefs() {
+		tok := randomBytes(16)
+		deadline, err := sr.Instantiate(c.Begin)
+		if err != nil {
+			return []byte{}, rollback(err, tx)
+		}
+		sql = "insert into surveys(student, kind, token, deadline, answers) values($1,$2,$3,$4,$5)"
+		_, err = tx.Exec(sql, c.Student.Email, sr.Name, tok, deadline, "{}")
+		if err != nil {
+			return []byte{}, rollback(err, tx)
+		}
+	}
+	//Delete the old convention if needed
 	_, err = tx.Exec("delete from conventions where studentEmail=$1", c.Student.Email)
 	if err != nil {
 		return []byte{}, rollback(err, tx)
@@ -122,6 +137,14 @@ func (srv *Service) Internship(stu string) (internship.Internship, error) {
 		return internship.Internship{}, err
 	}
 	err = srv.appendReports(&i)
+	if err != nil {
+		return internship.Internship{}, err
+	}
+
+	err = srv.appendSurveys(&i)
+	if err != nil {
+		return internship.Internship{}, err
+	}
 	return i, err
 }
 
@@ -149,6 +172,36 @@ func scanInternship(r *sql.Rows) (internship.Internship, error) {
 	return i, err
 }
 
+func (srv *Service) appendSurveys(i *internship.Internship) error {
+	s := "select kind, answers, deadline, timestamp from surveys where student=$1"
+	rows, err := srv.DB.Query(s, i.Student.Email)
+	if err != nil {
+		return err
+	}
+	i.Surveys = make([]internship.Survey, 0, 0)
+	defer rows.Close()
+	for rows.Next() {
+		var kind string
+		var buf []byte
+		var deadline time.Time
+		var timestamp pq.NullTime
+		var answers map[string]string
+		err = rows.Scan(&kind, &buf, &deadline, &timestamp)
+		if err != nil {
+			return err
+		}
+		err = json.Unmarshal(buf, &answers)
+		if err != nil {
+			return err
+		}
+		survey := internship.Survey{Kind: kind, Deadline: deadline, Answers: answers}
+		if timestamp.Valid {
+			survey.Timestamp = timestamp.Time
+		}
+		i.Surveys = append(i.Surveys, survey)
+	}
+	return err
+}
 func (srv *Service) appendReports(i *internship.Internship) error {
 	s := "select kind, grade, deadline, comment, private, toGrade from reports where student=$1 order by deadline"
 	rows, err := srv.DB.Query(s, i.Student.Email)
@@ -156,6 +209,7 @@ func (srv *Service) appendReports(i *internship.Internship) error {
 		return err
 	}
 	i.Reports = make([]internship.ReportHeader, 0, 0)
+	defer rows.Close()
 	for rows.Next() {
 		var kind string
 		var comment sql.NullString
@@ -172,7 +226,6 @@ func (srv *Service) appendReports(i *internship.Internship) error {
 		}
 		i.Reports = append(i.Reports, hdr)
 	}
-	defer rows.Close()
 	return err
 }
 
@@ -190,6 +243,10 @@ func (srv *Service) Internships() ([]internship.Internship, error) {
 			return internships, err
 		}
 		err = srv.appendReports(&i)
+		if err != nil {
+			return internships, err
+		}
+		err = srv.appendSurveys(&i)
 		if err != nil {
 			return internships, err
 		}

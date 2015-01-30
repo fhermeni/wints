@@ -52,6 +52,10 @@ func (p User) Fullname() string {
 	return strings.Title(p.Firstname) + " " + strings.Title(p.Lastname)
 }
 
+func (p User) ToPerson() Person {
+	return Person{Firstname: p.Firstname, Lastname: p.Lastname, Email: p.Email, Tel: p.Tel}
+}
+
 //ReportHeader provides the metadata associated to a student report
 type ReportHeader struct {
 	//The report identifier
@@ -142,6 +146,8 @@ type Internship struct {
 	Title string
 	//The headers for each
 	Reports []ReportHeader
+	//The surveys
+	Surveys []Survey
 	//The student promotion
 	Promotion string
 	//The student major
@@ -161,18 +167,42 @@ type Convention struct {
 	Skip bool
 }
 
+//SurveyDef allows to define internship reports
+type SurveyDef struct {
+	Name     string
+	Deadline string
+	Value    string
+}
+
+//ReportHeader allows to instantiate a report definition to a header
+func (def *SurveyDef) Instantiate(from time.Time) (time.Time, error) {
+	switch def.Deadline {
+	case "relative":
+		shift, err := time.ParseDuration(def.Value)
+		if err != nil {
+			return time.Now(), err
+		}
+		return from.Add(shift), nil
+	case "absolute":
+		at, err := time.Parse(DateLayout, def.Value)
+		if err != nil {
+			return time.Now(), err
+		}
+		return at, nil
+	}
+	return time.Now(), errors.New("Unsupported time definition '" + def.Deadline + "'")
+}
+
 //SurveyHeader provides the metadata associated to a student survey
-type SurveyHeader struct {
+type Survey struct {
 	//The survey type
 	Kind string
-	//
-	Student Person
-	//
-	Tutor Person
 	//The deadline to submit
 	Deadline time.Time
 	//The moment the survey was committed
 	Timestamp time.Time
+	//
+	Answers map[string]string
 }
 
 //Predefined errors
@@ -196,4 +226,5 @@ var (
 	ErrSessionExpired    = errors.New("Session expired")
 	ErrInvalidToken      = errors.New("Invalid session")
 	ErrUnknownSurvey     = errors.New("Unknown survey")
+	ErrInvalidSurvey     = errors.New("Invalid answers")
 )

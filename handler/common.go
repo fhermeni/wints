@@ -89,13 +89,13 @@ func restHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *
 		switch e {
 		case internship.ErrInvalidToken, internship.ErrSessionExpired:
 			return
-		case internship.ErrUnknownUser, internship.ErrUnknownReport, internship.ErrUnknownInternship:
+		case internship.ErrUnknownSurvey, internship.ErrUnknownUser, internship.ErrUnknownReport, internship.ErrUnknownInternship:
 			http.Error(w, e.Error(), http.StatusNotFound)
 			return
 		case internship.ErrReportExists, internship.ErrUserExists, internship.ErrInternshipExists, internship.ErrCredentials, internship.ErrUserTutoring:
 			http.Error(w, e.Error(), http.StatusConflict)
 			return
-		case internship.ErrDeadlinePassed, internship.ErrInvalidGrade, internship.ErrInvalidMajor, internship.ErrInvalidPeriod, internship.ErrGradedReport:
+		case internship.ErrInvalidSurvey, internship.ErrDeadlinePassed, internship.ErrInvalidGrade, internship.ErrInvalidMajor, internship.ErrInvalidPeriod, internship.ErrGradedReport:
 			http.Error(w, e.Error(), http.StatusBadRequest)
 			return
 		case filter.ErrPermission:
@@ -104,7 +104,7 @@ func restHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *
 		case nil:
 			return
 		default:
-			http.Error(w, "", http.StatusInternalServerError)
+			http.Error(w, "Internal error. A possible bug to report.", http.StatusInternalServerError)
 			log.Printf("Unsupported error: %s\n", e.Error())
 		}
 	}

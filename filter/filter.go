@@ -274,16 +274,20 @@ func (v *Service) SurveyToken(kind string) (string, string, error) {
 	return v.srv.SurveyToken(kind)
 }
 
-func (v *Service) Survey(student, kind string) (internship.SurveyHeader, error) {
+func (v *Service) Survey(student, kind string) (internship.Survey, error) {
 	if v.my.Role >= internship.ADMIN || v.isTutoring(student) {
 		return v.srv.Survey(student, kind)
 	}
-	return internship.SurveyHeader{}, ErrPermission
+	return internship.Survey{}, ErrPermission
 }
 
-func (v *Service) SurveyContent(student, kind string) (map[string]string, error) {
+func (v *Service) SetSurveyContent(student, kind string, cnt map[string]string) error {
 	if v.my.Role >= internship.ADMIN || v.isTutoring(student) {
-		return v.SurveyContent(student, kind)
+		return v.SetSurveyContent(student, kind, cnt)
 	}
-	return make(map[string]string), ErrPermission
+	return ErrPermission
+}
+
+func (v *Service) SurveyDefs() []internship.SurveyDef {
+	return v.srv.SurveyDefs()
 }

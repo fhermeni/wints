@@ -3,6 +3,7 @@ package datastore
 const (
 	create = `
 drop table if exists reports;
+drop table if exists surveys;
 drop table if exists internships;
 drop table if exists conventions;
 drop table if exists sessions;
@@ -63,13 +64,22 @@ create table conventions(studentEmail text PRIMARY KEY,
 
 create table reports(student text REFERENCES users(email) on delete cascade,
                         kind text,
-                        deadline timestamp,
+                        deadline timestamp with time zone,
                         grade integer,
                         comment text,
                         private boolean,
                         cnt bytea,
                         toGrade bool,
                         constraint pk_reports PRIMARY KEY(student, kind)
+                        );
+
+create table surveys(student text REFERENCES users(email) on delete cascade,
+                        kind text,
+                        deadline timestamp with time zone,
+                        timestamp timestamp with time zone,
+                        answers json,
+                        token text UNIQUE,
+                        constraint pk_surveys PRIMARY KEY(student, kind)
                         );
 
 create table defenses(id text,

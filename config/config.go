@@ -45,6 +45,7 @@ type HTTPConfig struct {
 type Config struct {
 	Puller  PullerConfig
 	Reports []internship.ReportDef
+	Surveys []internship.SurveyDef
 	DB      DbConfig
 	Mailer  MailerConfig
 	HTTP    HTTPConfig

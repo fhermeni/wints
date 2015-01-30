@@ -42,7 +42,7 @@ func newServices(cfg config.Config) (mail.Mailer, *datastore.Service) {
 	if err != nil {
 		log.Fatalln("Unable to connect to the Database: " + err.Error())
 	}
-	ds, err := datastore.NewService(DB, cfg.Reports, cfg.Majors)
+	ds, err := datastore.NewService(DB, cfg.Reports, cfg.Surveys, cfg.Majors)
 	if err != nil {
 		log.Fatalln("Unable connect to the database: " + err.Error())
 	}
