@@ -281,11 +281,8 @@ func (v *Service) Survey(student, kind string) (internship.Survey, error) {
 	return internship.Survey{}, ErrPermission
 }
 
-func (v *Service) SetSurveyContent(student, kind string, cnt map[string]string) error {
-	if v.my.Role >= internship.ADMIN || v.isTutoring(student) {
-		return v.SetSurveyContent(student, kind, cnt)
-	}
-	return ErrPermission
+func (v *Service) SetSurveyContent(token string, cnt map[string]string) error {
+	return v.SetSurveyContent(token, cnt)
 }
 
 func (v *Service) SurveyDefs() []internship.SurveyDef {

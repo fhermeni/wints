@@ -173,7 +173,7 @@ func scanInternship(r *sql.Rows) (internship.Internship, error) {
 }
 
 func (srv *Service) appendSurveys(i *internship.Internship) error {
-	s := "select kind, answers, deadline, timestamp from surveys where student=$1"
+	s := "select kind, answers, deadline, timestamp, token from surveys where student=$1"
 	rows, err := srv.DB.Query(s, i.Student.Email)
 	if err != nil {
 		return err
@@ -181,12 +181,12 @@ func (srv *Service) appendSurveys(i *internship.Internship) error {
 	i.Surveys = make([]internship.Survey, 0, 0)
 	defer rows.Close()
 	for rows.Next() {
-		var kind string
+		var kind, token string
 		var buf []byte
 		var deadline time.Time
 		var timestamp pq.NullTime
 		var answers map[string]string
-		err = rows.Scan(&kind, &buf, &deadline, &timestamp)
+		err = rows.Scan(&kind, &buf, &deadline, &timestamp, &token)
 		if err != nil {
 			return err
 		}
@@ -194,7 +194,7 @@ func (srv *Service) appendSurveys(i *internship.Internship) error {
 		if err != nil {
 			return err
 		}
-		survey := internship.Survey{Kind: kind, Deadline: deadline, Answers: answers}
+		survey := internship.Survey{Kind: kind, Deadline: deadline, Answers: answers, Token: token}
 		if timestamp.Valid {
 			survey.Timestamp = timestamp.Time
 		}

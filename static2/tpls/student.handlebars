@@ -37,7 +37,15 @@
                 <dd>
                     <a class="fn" href="mailto:{{I.Sup.Email}}">{{fullname I.Sup}}</a>
                     ({{I.Sup.Tel}})
-                </dd>
+                </dd>                
+            </dl>
+            <h4 class="text-center">Links for the surveys</h4>
+            <p>These links allow the supervisor to provide feedbacks over the time</p>
+            <dl class="dl-horizontal">
+                {{#each I.Surveys}}
+                <dt>{{Kind}}</dt>
+                <dd>{{../URL}}{{Token}}</dd>
+                {{/each}}
             </dl>
     </div>
     <div class="modal-footer"></div>

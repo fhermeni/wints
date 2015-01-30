@@ -201,7 +201,9 @@ type Survey struct {
 	Deadline time.Time
 	//The moment the survey was committed
 	Timestamp time.Time
-	//
+	//The token to access in write mode
+	Token string
+	//Supervisor answers
 	Answers map[string]string
 }
 

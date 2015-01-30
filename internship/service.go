@@ -84,7 +84,7 @@ type Service interface {
 	//Survey management
 	SurveyToken(kind string) (string, string, error)
 	Survey(student, kind string) (Survey, error)
-	SetSurveyContent(student, kind string, cnt map[string]string) error
+	SetSurveyContent(token string, cnt map[string]string) error
 	SurveyDefs() []SurveyDef
 
 	NewConvention(c Convention) error

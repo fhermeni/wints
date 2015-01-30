@@ -43,7 +43,7 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string) Servic
 	http.Handle("/", s.r)
 	s.r.HandleFunc("/", home(backend)).Methods("GET")
 	s.r.HandleFunc("/api/v1/surveys/{token}", surveyFromToken(backend)).Methods("GET")
-	s.r.HandleFunc("/api/v1/surveys/{token}", setSurveyAnswers(backend)).Methods("POST")
+	s.r.HandleFunc("/api/v1/surveys/{token}", setSurveyContent(backend)).Methods("POST")
 	return s
 }
 
@@ -567,25 +567,20 @@ func surveyFromToken(backend internship.Service) http.HandlerFunc {
 	}
 }
 
-func setSurveyAnswers(backend internship.Service) http.HandlerFunc {
+func setSurveyContent(backend internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tok := mux.Vars(r)["token"]
-		student, kind, err := backend.SurveyToken(tok)
-		if err != nil {
-			if err == internship.ErrUnknownSurvey {
-				http.Error(w, "No survey associated to that token. Maybe a broken link", http.StatusNotFound)
-			} else {
-				http.Error(w, "A possible bug to report", http.StatusInternalServerError)
-			}
-			return
-		}
 		//Check for suspicious content (too long for example)
 		var cnt map[string]string
-		err = jsonRequest(w, r, &cnt)
+		err := jsonRequest(w, r, &cnt)
 		if err != nil {
 			http.Error(w, "Bad content", http.StatusBadRequest)
 			return
 		}
-		backend.SetSurveyContent(student, kind, cnt)
+		err = backend.SetSurveyContent(tok, cnt)
+		if err != nil {
+			log.Println("Unable to store the survey: " + err.Error())
+			http.Error(w, "Bad content", http.StatusBadRequest)
+		}
 	}
 }
