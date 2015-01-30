@@ -2,7 +2,6 @@ package datastore
 
 import (
 	"encoding/json"
-	"log"
 	"time"
 
 	"github.com/fhermeni/wints/internship"
@@ -30,7 +29,6 @@ func (s *Service) Survey(student, kind string) (internship.Survey, error) {
 	}
 	hdr := internship.Survey{Kind: kind, Deadline: deadline, Answers: make(map[string]string), Token: token}
 	if timeStamp.Valid {
-		log.Println("Timestamp valid")
 		hdr.Timestamp = timeStamp.Time
 		err = json.Unmarshal(buf, &hdr.Answers)
 		if err != nil {

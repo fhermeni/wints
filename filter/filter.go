@@ -275,7 +275,7 @@ func (v *Service) SurveyToken(kind string) (string, string, error) {
 }
 
 func (v *Service) Survey(student, kind string) (internship.Survey, error) {
-	if v.my.Role >= internship.ADMIN || v.isTutoring(student) {
+	if v.my.Role >= internship.MAJOR || v.isTutoring(student) {
 		return v.srv.Survey(student, kind)
 	}
 	return internship.Survey{}, ErrPermission

@@ -518,7 +518,7 @@ func surveyMngt(s Service, mailer mail.Mailer) {
 
 func surveyForm(w http.ResponseWriter, r *http.Request) {
 	k := mux.Vars(r)["kind"]
-	http.ServeFile(w, r, path+"/surveys/"+k+".html")
+	http.ServeFile(w, r, path+"/"+k+".html")
 }
 
 func survey(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
