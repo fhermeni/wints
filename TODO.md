@@ -9,7 +9,6 @@
 - [x] backend mailing system
 - [x] convention pulling
 - [x] convention to internships
-- [ ] defenses
 - [x] comments for grades
 - [x] presence indicator for reports
 - [x] report private/public status
@@ -18,6 +17,9 @@
 - [x] minimify every resource
 - [x] gzip json lists
 - [x] session ID for security
+- [x] request monitoring
+- [x] alumni status support
+- [ ] defenses
 - [ ] concatenate every static resource
 - [ ] online survey for supervisor
 
@@ -28,6 +30,7 @@
 - [x] test-mailer mode
 - [x] test-feeder mode
 - [ ] deadline reminders
+- [ ] safe root invitation
 
 ### frontend
 
@@ -66,6 +69,7 @@
 - [ ] help
 - [ ] report expectations
 - [ ] graduation template
+- [x] access alumni
 
 #### student
 - [x] profile update
@@ -80,6 +84,7 @@
 - [x] see grade, comments
 - [x] help
 - [ ] report expectations
+- [x] set alumni
 
 #### supervisor
 - [ ] access survey

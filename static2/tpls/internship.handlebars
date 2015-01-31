@@ -1,6 +1,6 @@
 <div class="row">
-<div class="col-md-6">
-	<h3>The company <small onclick=""><a><i class="glyphicon glyphicon-pencil" onclick="showCompanyEditor()"></i></a></small></h3>	
+<div class="col-md-6">	
+	<h3 class="page-header">The company <small onclick=""><a><i class="glyphicon glyphicon-pencil" onclick="showCompanyEditor()"></i></a></small></h3>		
 	<p>
 	Ensure the subject is up-to-date.
 	Company name and website are usefull to assist futur students at finding internships.
@@ -15,8 +15,8 @@
 	</dl>			
 </div>
 
-<div class="col-md-6">
-	<h3>Contacts</h3>
+<div class="col-md-6">	
+	<h3 class="page-header">Contacts</h3>	
 	<h4>Supervisor <a><i class="glyphicon glyphicon-pencil" onclick="showSupervisorEditor()"></i></a></h4>	
 	<p>It is of a primary importance to provide accurate contact details to allow your tutor to communicate
 	with your supervisor.
@@ -38,7 +38,9 @@
 </div>
 </div>
 
-<h3>Reports</h3>
+<div class="row">
+<div class="col-md-6">	
+<h3 class="page-header">Reports</h3>
 <p>
 Documents must be PDF files, with a maximum size of 10 MB.
 You can re-upload documents until the deadline.
@@ -61,8 +63,8 @@ Click on the question mark to get the expectations for each report.
 		{{#unless Passed}}		
 			<input type="file" data-kind="{{Kind}}" accept="application/pdf"  title="upload"/>						
 		{{/unless}}
-		<a href="api/v1/internships/{{../Student.Email}}/reports/{{Kind}}/content" class="btn btn-primary" title="download"><i class="glyphicon glyphicon-cloud-download"></i> download</a>	
-		<button onclick="showReportComment('{{Kind}}')" type="button" class="btn btn-info" title="tutor review"
+		<a href="api/v1/internships/{{../Student.Email}}/reports/{{Kind}}/content" class="btn btn-primary btn-sm" title="download"><i class="glyphicon glyphicon-cloud-download"></i></a>	
+		<button onclick="showReportComment('{{Kind}}')" type="button" class="btn-sm btn btn-info" title="tutor review"
 		{{#unless Comment}}
 			disabled="disabled"
 		{{/unless}}
@@ -73,3 +75,24 @@ Click on the question mark to get the expectations for each report.
 {{/each}}
 </tbody>
 </table>
+</div>
+<div class="col-md-6">
+<h3 class="page-header">Your future</h3>
+<p>
+It is important for us to know what you will become after your internship.
+Please indicate what will be your profesional status after the internship
+and an email address to contact you as an alumni.
+</p>
+<div class="form-group">
+<label class="col-md-4">Future position</label>
+<select class='select-position'>
+{{positionSelector Future.Position}}
+</select>
+</div>
+<div class="form-group">
+<label class="col-md-4">Contact email</label>
+<input type="email" id='next-email' value='{{Future.Contact}}'/>
+<button type="button" class="btn btn-success btn-sm" onclick='sendAlumni()'>Update</button>
+</div>
+</div>
+</div>

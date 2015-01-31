@@ -59,8 +59,7 @@ function reportSuccess(msg) {
     $.notify(msg, {autoHideDelay: 1000, className: "success", globalPosition: "top center"})
 }
 
-function reportError(msg) {
-    console.log(arguments)    
+function reportError(msg) {    
     $.notify(msg, {autoHideDelay: 2000, className: "error", globalPosition: "top center"})
 }
 
@@ -201,4 +200,12 @@ function setReportGrade(e, k, g, c, ok, no) {
 
 function majors(ok, no) {
     return get("/majors/", ok, no);  
+}
+
+function alumni(student, ok, no) {
+    return get("/internships/" + student + "/alumni", ok, no)
+}
+
+function setAlumni(student, position, email, ok, no) {
+    return post("/internships/" + student + "/alumni", {Contact: email, Position: position}, ok, no)
 }

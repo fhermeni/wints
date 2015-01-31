@@ -3,13 +3,13 @@ package datastore
 const (
 	create = `
 drop table if exists reports;
+drop table if exists surveys;
 drop table if exists internships;
 drop table if exists conventions;
 drop table if exists sessions;
 drop table if exists password_renewal;
 drop table if exists defenses;
 drop table if exists users;
-
     create table users(email text PRIMARY KEY,
 				  firstname text,
 				  lastname text,
@@ -18,7 +18,6 @@ drop table if exists users;
 				  role integer
 				  );
 
--- sessions
 create table sessions(email text REFERENCES users(email) on delete cascade,
 		      token text,
 		      last timestamp with time zone,
@@ -37,7 +36,9 @@ create table internships(student text PRIMARY KEY REFERENCES users(email) on del
                         supervisorLn text,
                         supervisorEmail text,
                         supervisorTel text,
-                        title text
+                        title text,
+                        nextPosition integer,
+                        nextContact text
 );
 
 create table conventions(studentEmail text PRIMARY KEY,

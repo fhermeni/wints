@@ -470,16 +470,17 @@ function selectText(elm) {
 
 function showInternship(s) {
     internship(s, function (i) {
-        users(function (uss) {
-            uss = uss.filter(function (u) {
-                return u.Role != 0; //get rid of students
-            });             
-            buf = Handlebars.getTemplate("student")({I: i, Admin: myself.Role >= 3, Major: myself.Role >= 2, Tutors: uss})
-            $("#modal").html(buf).modal('show');            
-            var c = $("#modal").find("select.select-tutor");            
-            c.val(i.Tutor.Email)
-            $("#modal").find("select.select-major").selecter({callback: function(v) {sendMajor(i.Student.Email, v)}});
-            $("#modal").find("select.select-tutor").selecter({callback: function(v) {sendTutor(i.Student.Email, v)}});
+        users(function (uss) {            
+                uss = uss.filter(function (u) {
+                    return u.Role != 0; //get rid of students
+                });             
+                buf = Handlebars.getTemplate("student")({I: i, Admin: myself.Role >= 3, Major: myself.Role >= 2, Tutors: uss})
+                $("#modal").html(buf).modal('show');            
+                var c = $("#modal").find("select.select-tutor");            
+                c.val(i.Tutor.Email)
+                $("#modal").find("select").selecter();                
+                $("#modal").find("select.select-major").selecter({callback: function(v) {sendMajor(i.Student.Email, v)}});
+                $("#modal").find("select.select-tutor").selecter({callback: function(v) {sendTutor(i.Student.Email, v)}});            
         });        
     });
 }

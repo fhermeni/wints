@@ -106,6 +106,16 @@ func main() {
 	mailer.Fake(*fakeMailer)
 	puller := feeder.NewHTTPFeeder(cfg.Puller.URL, cfg.Puller.Login, cfg.Puller.Password, cfg.Puller.Promotions, cfg.Puller.Encoding)
 
+	if *install && confirm("This will erase any data in the database. Confirm ?") {
+		err := ds.Install()
+		if err != nil {
+			log.Fatalln("Unable to create the tables: " + err.Error())
+		}
+		log.Println("Tables created")
+		rootAccount(ds)
+		os.Exit(0)
+	}
+
 	//Test connection anyway
 	_, e := ds.Internships()
 	ok := test("Database connection", e)
@@ -126,14 +136,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	if *install && confirm("This will erase any data in the database. Confirm ?") {
-		err := ds.Install()
-		if err != nil {
-			log.Fatalln("Unable to create the tables: " + err.Error())
-		}
-		log.Println("Tables created")
-		rootAccount(ds)
-	} else if *reset {
+	if *reset {
 		rootAccount(ds)
 	}
 
