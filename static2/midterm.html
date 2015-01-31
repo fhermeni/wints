@@ -25,114 +25,78 @@ body {
 </head>
 <body>
 <div class="container">
-<h1 class="text-center">
-    <span class="tr" id="title"></span>
-</h1>
+<h1 class="text-center tr"></h1>
 
 <div class="text-center">
-        <a onclick="tr('fr')"><img src="/static/img/fr.gif" /></a>
-        <a onclick="tr('en')"><img src="/static/img/en.gif" /></a>
+        <a onclick="setLang('fr')"><img src="/static/img/fr.gif" /></a>
+        <a onclick="setLang('en')"><img src="/static/img/en.gif" /></a>
 </div>
-<h4><span id="stu" class="tr">:</span> <small class="fn" id="student"></small></h4>
-<h4><span id="tut" class="tr">:</span> <small class="fn" id="tutor"></small></h4>
+<h4><span class="stu">:</span> <small class="fn" id="student"></small></h4>
+<h4><span class="tut">:</span> <small class="fn" id="tutor"></small></h4>
 
-<h3></h3>
+<h3 class="tr"></h3>
 <div class="form-group">
-<label class="q tr" id="q1"></label>
-<input type="radio" name="q1" value="true"/><span class="yes"></span>
-<input type="radio" name="q1" value="false"/><span class="no"></span>
+<label class="tr r yesno" id="bin-1"></label>
 </div>
-<label class="c"></label><br/>
-<textarea id="q2" cols="80"></textarea>
+<label class="c textarea" id="q2"></label>
 
-<h3></h3>
+<h3 class="tr"></h3>
 <div class="form-group">
-<label class="q" id="q3"></label>
-<input type="radio" name="q3" value="true"/><span class="yes"></span>
-<input type="radio" name="q3" value="false"/><span class="no"></span>
+<label class="tr r yesno" id="bin-3"></label>
 </div>
 <div class="form-group">
-<label class="q" id="q4"></label>
-<input type="radio" name="q4" value="true"/><span class="yes"></span>
-<input type="radio" name="q4" value="false"/><span class="no"></span>
+<label class="tr r yesno" id="bin-4"></label>
 </div>
-<label class="c"></label><br/>
-<textarea id="q5" cols="80"></textarea>
+<label class="c textarea" id="q5"></label>
 
-<h3></h3>
+<h3 class="tr"></h3>
 <div class="form-group">
-<label class="q" id="q6"></label>
-<input type="radio" name="q6" value="true"/><span class="yes"></span>
-<input type="radio" name="q6" value="false"/><span class="no"></span>
+<label class="tr r yesno" id="bin-6"></label>
 </div>
 
 <div class="form-group">
-<label class="q" id="q7"></label>
-<input type="radio" name="q7" value="true"/><span class="yes"></span>
-<input type="radio" name="q7" value="false"/><span class="no"></span>
+<label class="tr r yesno" id="bin-7"></label>
 </div>
 
 <div class="form-group">
-<label class="q" id="q8"></label>
-<input type="radio" name="q8" value="true"/><span class="yes"></span>
-<input type="radio" name="q8" value="false"/><span class="no"></span>
+<label class="tr r yesno" id="bin-8"></label>
 </div>
 <div class="form-group">
-<label class="q" id="q9"></label>
-<input type="radio" name="q9" value="true"/><span class="yes"></span>
-<input type="radio" name="q9" value="false"/><span class="no"></span>
+<label class="tr r yesno" id="bin-9"></label>
 </div>
-<label class="c"></label><br/>
-<textarea id="q10" cols="80"></textarea>
+<label class="c textarea" id="q10"></label>
 
-<h3></h3>
+<h3 class="tr"></h3>
 <div class="form-group">
-<label class="q" id="q11"></label>
-<input type="radio" name="q11" value="true"/><span class="yes"></span>
-<input type="radio" name="q11" value="false"/><span class="no"></span>
-<br/><label class="q"></label><br/>
-<textarea cols="80" id="q12"></textarea>
+<label class="tr r yesno" id="bin-11"></label>
+<br/><label class="tr textarea" id="q12"></label>
 </div>
 <div class="form-group">
-<label class="q" id="q13"></label>
-<input type="radio" name="q13" value="true"/><span class="yes"></span>
-<input type="radio" name="q13" value="false"/><span class="no"></span>
-<br/><label class="q"></label><br/>
-<textarea cols="80" id="q14"></textarea>
+<label class="tr r yesno" id="bin-13"></label>
+<br/><label class="tr textarea" id="q14"></label>
 </div>
 <div class="form-group">
-<label class="q" id="q15"></label>
-<input type="radio" name="q15" value="true"/><span class="yes"></span>
-<input type="radio" name="q15" value="false"/><span class="no"></span>
+<label class="tr r yesno" id="bin-15"></label>
 </div>
 <div class="form-group">
-<label class="q" id="q16"></label>
-<input type="radio" name="q16" value="true"/><span class="yes"></span>
-<input type="radio" name="q16" value="false"/><span class="no"></span>
+<label class="tr r yesno" id="bin-16"></label>
 </div>
 <div class="form-group">
-<label class="q" id="q17"></label>
-<input type="radio" name="q17" value="true"/><span class="yes"></span>
-<input type="radio" name="q17" value="false"/><span class="no"></span>
+<label class="tr r yesno" id="bin-17"></label>
 </div>
-<label class="c"></label><br/>
-<textarea id="q18" cols="80"></textarea>
+<label class="c textarea" id="q18"></label>
 
-<h3></h3>
+<h3 class="tr"></h3>
 <div class="form-group">
-<label class="q" id="q19"></label>
-<input type="radio" name="q19" value="true"/><span class="yes"></span>
-<input type="radio" name="q19" value="false"/><span class="no"></span>
+<label class="tr r yesno" id="bin-19"></label>
 </div>
 
-<label class="q"></label><br/>
-<textarea id="q20" cols="80"></textarea>
+<label class="tr textarea" id="q21"></label>
 
-<br/><label class="q"></label><br/>
-<textarea id="q21" cols="80"></textarea>
+<br/><label class="tr textarea" id="q22"></label>
 
 <div class="text-center">
-    <button type="button" class="btn btn-lg btn-success" id="submit" onclick="submit()"></button>    
+    <button type="button" class="btn btn-lg btn-success submit" id="submit" onclick="submit()"></button>    
 </div>
 </div>
 <div id="modal" class="modal fade">
@@ -167,6 +131,7 @@ body {
         
             <script src="/static/js/bootstrap-confirmation.min.js"></script>                        
             <script src="/static/js/rest.js"></script>
+            <script src="/static/js/survey.js"></script>
             <script src="/static/js/midterm.js"></script>
 </body>
 </html>
