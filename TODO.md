@@ -70,6 +70,7 @@
 - [ ] report expectations
 - [ ] graduation template
 - [x] access alumni
+- [x] re-invite admins
 
 #### student
 - [x] profile update

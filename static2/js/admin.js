@@ -164,6 +164,10 @@ function showPrivileges() {
             var j = $(a);
             j.confirmation({onConfirm: function() {removeUser(j.attr("data-user"), j.parent().parent().parent())}});
         });
+        $('[data-toggle="reset-password-confirmation"]').each(function (i, a) {
+            var j = $(a);
+            j.confirmation({onConfirm: function() {reInvite(j.attr("data-user"))}, btnOkLabel: '<i class="icon-ok-sign icon-white"></i> Confirm'});
+        });
     });
 }
 

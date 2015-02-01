@@ -131,6 +131,11 @@ function resetPassword(email, ok, no) {
     return del("/users/" + email + "/password", ok, no)
 }
 
+function reInvite(email, ok, no) {
+    return del("/users/" + email + "/password?invite=true", ok, no)
+}
+
+
 function internships(ok, no) { 
     return get("/internships/", ok, no);  
 }

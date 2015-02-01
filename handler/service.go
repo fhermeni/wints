@@ -192,9 +192,16 @@ func resetPassword(srv internship.Service, mailer mail.Mailer) http.HandlerFunc 
 			log.Println("Unable to get the reset token for " + e + ": " + err.Error())
 			return
 		}
+		b := r.URL.Query().Get("invite")
 		go func() {
-			if u, err := srv.User(e); err == nil {
-				mailer.SendPasswordResetLink(u, token)
+			if b == "true" {
+				if u, err := srv.User(e); err == nil {
+					mailer.SendAdminInvitation(u, token)
+				}
+			} else {
+				if u, err := srv.User(e); err == nil {
+					mailer.SendPasswordResetLink(u, token)
+				}
 			}
 		}()
 	}

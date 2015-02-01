@@ -18,7 +18,9 @@
                 {{roleOptions Role}}
             </select>                        
         </span>        
-        <a class="btn btn-info" title="re-invit"><i class="glyphicon glyphicon-refresh" onclick="invite('{{Email}}')"></i></a>        
+        <a data-toggle="reset-password-confirmation" data-user="{{Email}}" class="btn btn-info" title="re-invite ?">
+            <i class="glyphicon glyphicon-refresh"></i>
+        </a>        
     </div>
 </div>
 {{/each}}
