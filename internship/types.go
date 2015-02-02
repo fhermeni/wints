@@ -52,6 +52,11 @@ func (p User) Fullname() string {
 	return strings.Title(p.Firstname) + " " + strings.Title(p.Lastname)
 }
 
+//Fullname provides the user fullname, starting with its firstname
+func (p User) ToPerson() Person {
+	return Person{Firstname: p.Firstname, Lastname: p.Lastname, Tel: p.Tel, Email: p.Email}
+}
+
 //ReportHeader provides the metadata associated to a student report
 type ReportHeader struct {
 	//The report identifier

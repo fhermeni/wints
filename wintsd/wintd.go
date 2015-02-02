@@ -77,18 +77,24 @@ func startFeederDaemon(f feeder.Feeder, srv internship.Service, frequency time.D
 	}()
 }
 
-func rootAccount(ds *datastore.Service) {
-	err := ds.ResetRootAccount()
+func newRoot(em string, ds *datastore.Service, m mail.Mailer) {
+	u := internship.User{Firstname: "Root", Lastname: em, Email: em, Tel: "666"}
+	tok, err := ds.NewTutor(u)
 	if err != nil {
-		log.Fatalln("Unable to reset the root account: " + err.Error())
+		log.Fatalf("Unable to create an account for '%s': %s\n", em, err.Error())
 	}
-	log.Println("Root account reset. Don't forgot to delete it once logged")
+	if err := ds.SetUserRole(em, internship.ROOT); err != nil {
+		ds.RmUser(em)
+		log.Fatalf("Unable to grant root privileges for '%s': %s\n", em, err.Error())
+	}
+	m.SendAdminInvitation(u, tok)
 }
+
 func main() {
 	fakeMailer := flag.Bool("fakeMailer", false, "Use a fake mailer that print mail on stdout")
 	cfgPath := flag.String("conf", "./wints.conf", "daemon configuration file")
-	reset := flag.Bool("reset", false, "Reset the root account")
 	install := flag.Bool("install", false, "/!\\ Create database tables")
+	makeRoot := flag.String("invite-root", "", "Invite a root user")
 	testMail := flag.Bool("test-mailer", false, "Test the mailer by sending a mail to the administrator")
 	testFeeder := flag.Bool("test-feeder", false, "Test the convention feeder")
 	testAll := flag.Bool("test", false, "equivalent to --testMail --testDB --testFeeder")
@@ -112,10 +118,13 @@ func main() {
 			log.Fatalln("Unable to create the tables: " + err.Error())
 		}
 		log.Println("Tables created")
-		rootAccount(ds)
 		os.Exit(0)
 	}
 
+	if len(*makeRoot) > 0 {
+		newRoot(*makeRoot, ds, mailer)
+		os.Exit(0)
+	}
 	//Test connection anyway
 	_, e := ds.Internships()
 	ok := test("Database connection", e)
@@ -134,10 +143,6 @@ func main() {
 	}
 	if !ok {
 		os.Exit(1)
-	}
-
-	if *reset {
-		rootAccount(ds)
 	}
 
 	period, err := time.ParseDuration(cfg.Puller.Period)
