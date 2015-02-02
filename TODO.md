@@ -65,12 +65,12 @@
 - [x] tutor internships
 - [x] report private/public status
 - [x] skipeable conventions
+- [x] access alumni
+- [x] re-invite teachers or students
 - [ ] access surveys
 - [ ] help
 - [ ] report expectations
 - [ ] graduation template
-- [x] access alumni
-- [x] re-invite admins
 
 #### student
 - [x] profile update
