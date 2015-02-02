@@ -22,6 +22,8 @@
 - [ ] defenses
 - [ ] concatenate every static resource
 - [ ] online survey for supervisor
+- [x] gmail friendly
+- [x] invitation-based only root account creation
 
 ### Daemon
 
