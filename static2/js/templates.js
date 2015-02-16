@@ -94,6 +94,39 @@ Handlebars.registerHelper('userSelecter', function(users) {
     return new Handlebars.SafeString(b);
 });
 
+var possiblePositions = [
+        "not available",
+        "sabbatical leave",
+        "looking for a job",        
+        "pursuit of higher education",
+        "fixed term contract in the internship company",
+        "fixed term contract in another company",
+        "permanent contract in the internship company",
+        "permanent contract in another company",
+        "entrepreneurship"
+    ];
+
+Handlebars.registerHelper('nextPosition', function(pos) {  
+    console.log(pos);  
+    return new Handlebars.SafeString("<i>" + possiblePositions[pos] + "</i>");
+});
+
+Handlebars.registerHelper('nextContact', function(c) {  
+    console.log(c);
+    if (!c || c.length == 0) {        
+        return new Handlebars.SafeString("<i>not available</i>");    
+    }  
+    return c;    
+});
+
+Handlebars.registerHelper('positionSelector', function(pos) {    
+    var b = "";        
+    possiblePositions.forEach(function (o, i) {                
+        b += "<option value='" + i + "' " + (i == pos ? " selected " : "" ) + ">" + o + "</option>";
+    });
+    return new Handlebars.SafeString(b);
+});
+
 Handlebars.registerHelper('roleOptions', function(m) {
     var b = "";
     var i = 1;

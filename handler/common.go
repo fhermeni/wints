@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/fhermeni/wints/filter"
 	"github.com/fhermeni/wints/internship"
@@ -59,9 +60,19 @@ func writeJSONIfOk(e error, w http.ResponseWriter, r *http.Request, j interface{
 	return enc.Encode(j)
 }
 
-func restHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *http.Request) error, srv Service, mailer mail.Mailer) http.HandlerFunc {
+func mon(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println(r.Method + " " + r.URL.String())
+		start := time.Now()
+		defer func() {
+			log.Printf("%dms %s %s\n", time.Since(start).Nanoseconds()/1000000, r.Method, r.URL.String())
+		}()
+		h(w, r)
+	}
+}
+
+func restHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *http.Request) error, srv Service, mailer mail.Mailer) http.HandlerFunc {
+
+	return mon(func(w http.ResponseWriter, r *http.Request) {
 
 		email, err := authenticated(srv.backend, w, r)
 		if err == ErrMissingCookies || err == internship.ErrSessionExpired {
@@ -96,6 +107,7 @@ func restHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *
 			http.Error(w, e.Error(), http.StatusConflict)
 			return
 		case internship.ErrInvalidSurvey, internship.ErrDeadlinePassed, internship.ErrInvalidGrade, internship.ErrInvalidMajor, internship.ErrInvalidPeriod, internship.ErrGradedReport:
+		case internship.ErrInvalidSurvey, internship.ErrInvalidAlumniEmail, internship.ErrDeadlinePassed, internship.ErrInvalidGrade, internship.ErrInvalidMajor, internship.ErrInvalidPeriod, internship.ErrGradedReport:
 			http.Error(w, e.Error(), http.StatusBadRequest)
 			return
 		case filter.ErrPermission:
@@ -104,10 +116,10 @@ func restHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *
 		case nil:
 			return
 		default:
-			http.Error(w, "Internal error. A possible bug to report.", http.StatusInternalServerError)
+			http.Error(w, "Internal server error. A possible bug to report", http.StatusInternalServerError)
 			log.Printf("Unsupported error: %s\n", e.Error())
 		}
-	}
+	})
 }
 
 func fileReplyIfOk(e error, w http.ResponseWriter, mime, filename string, cnt []byte) error {

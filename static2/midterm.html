@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Survey</title>
+    <title>Midterm Survey</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="/static/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <link rel="stylesheet" href="/static/css/bootstrap.min.css">
@@ -34,67 +34,79 @@ body {
 <h4><span class="stu">:</span> <small class="fn" id="student"></small></h4>
 <h4><span class="tut">:</span> <small class="fn" id="tutor"></small></h4>
 
+<div class="row">
+<div class="alert alert-success text-center col-md-6 col-md-offset-3" style="visible: none">
+    <p id="committed"></p>
+</div>
+</div>
+
+
 <h3 class="tr"></h3>
 <div class="form-group">
-<label class="tr r yesno" id="bin-1"></label>
+<label class="tr r yesno" id="q1"></label>
 </div>
 <label class="c textarea" id="q2"></label>
 
 <h3 class="tr"></h3>
 <div class="form-group">
-<label class="tr r yesno" id="bin-3"></label>
+<label class="tr r yesno" id="q3"></label>
 </div>
 <div class="form-group">
-<label class="tr r yesno" id="bin-4"></label>
+<label class="tr r yesno" id="q4"></label>
 </div>
 <label class="c textarea" id="q5"></label>
 
 <h3 class="tr"></h3>
 <div class="form-group">
-<label class="tr r yesno" id="bin-6"></label>
+<label class="tr r yesno" id="q6"></label>
 </div>
 
 <div class="form-group">
-<label class="tr r yesno" id="bin-7"></label>
+<label class="tr r yesno" id="q7"></label>
 </div>
 
 <div class="form-group">
-<label class="tr r yesno" id="bin-8"></label>
+<label class="tr r yesno" id="q8"></label>
 </div>
 <div class="form-group">
-<label class="tr r yesno" id="bin-9"></label>
+<label class="tr r yesno" id="q9"></label>
 </div>
 <label class="c textarea" id="q10"></label>
 
 <h3 class="tr"></h3>
 <div class="form-group">
-<label class="tr r yesno" id="bin-11"></label>
+<label class="tr r yesno" id="q11"></label>
 <br/><label class="tr textarea" id="q12"></label>
 </div>
 <div class="form-group">
-<label class="tr r yesno" id="bin-13"></label>
+<label class="tr r yesno" id="q13"></label>
 <br/><label class="tr textarea" id="q14"></label>
 </div>
 <div class="form-group">
-<label class="tr r yesno" id="bin-15"></label>
+<label class="tr r yesno" id="q15"></label>
 </div>
 <div class="form-group">
-<label class="tr r yesno" id="bin-16"></label>
+<label class="tr r yesno" id="q16"></label>
 </div>
 <div class="form-group">
-<label class="tr r yesno" id="bin-17"></label>
+<label class="tr r yesno" id="q17"></label>
 </div>
 <label class="c textarea" id="q18"></label>
 
 <h3 class="tr"></h3>
 <div class="form-group">
-<label class="tr r yesno" id="bin-19"></label>
+<label class="tr r yesno" id="19"></label>
 </div>
 
-<label class="tr textarea" id="q21"></label>
+<label class="tr textarea" id="q20"></label>
 
-<br/><label class="tr textarea" id="q22"></label>
+<br/><label class="tr textarea" id="q21"></label>
 
+<div class="row">
+<div class="alert alert-danger text-center col-md-6 col-md-offset-3" style="visible: none">
+    <p id="missing-fields"></p>
+</div>
+</div>
 <div class="text-center">
     <button type="button" class="btn btn-lg btn-success submit" id="submit" onclick="submit()"></button>    
 </div>

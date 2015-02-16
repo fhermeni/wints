@@ -9,7 +9,6 @@
 - [x] backend mailing system
 - [x] convention pulling
 - [x] convention to internships
-- [ ] defenses
 - [x] comments for grades
 - [x] presence indicator for reports
 - [x] report private/public status
@@ -18,12 +17,22 @@
 - [x] minimify every resource
 - [x] gzip json lists
 - [x] session ID for security
+<<<<<<< HEAD
 - [x] store and expose surveys
 - [x] midterm survey
 - [ ] final survey
 - [ ] future survey
 - [ ] mailing for missing surveys
 - [ ] concatenate every static resource
+=======
+- [x] request monitoring
+- [x] alumni status support
+- [ ] defenses
+- [ ] concatenate every static resource
+- [ ] online survey for supervisor
+- [x] gmail friendly
+- [x] invitation-based only root account creation
+>>>>>>> next
 
 ### Daemon
 
@@ -32,6 +41,7 @@
 - [x] test-mailer mode
 - [x] test-feeder mode
 - [ ] deadline reminders
+- [ ] safe root invitation
 
 ### frontend
 
@@ -66,7 +76,13 @@
 - [x] tutor internships
 - [x] report private/public status
 - [x] skipeable conventions
+<<<<<<< HEAD
 - [x] access surveys
+=======
+- [x] access alumni
+- [x] re-invite teachers or students
+- [ ] access surveys
+>>>>>>> next
 - [ ] help
 - [ ] report expectations
 - [ ] graduation template
@@ -84,6 +100,7 @@
 - [x] see grade, comments
 - [x] help
 - [ ] report expectations
+- [x] set alumni
 
 #### supervisor
 - [x] access survey

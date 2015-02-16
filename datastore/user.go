@@ -1,7 +1,6 @@
 package datastore
 
 import (
-	"log"
 	"time"
 
 	"github.com/fhermeni/wints/internship"
@@ -39,7 +38,6 @@ func (s *Service) OpenedSession(email, token string) error {
 	var last time.Time
 	err := s.DB.QueryRow("select last from sessions where email=$1 and token=$2", email, token).Scan(&last)
 	if err != nil {
-		log.Println("Got tokens & so. But they are incorrect: " + err.Error())
 		return internship.ErrCredentials
 	}
 	if time.Now().After(last) {

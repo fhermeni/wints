@@ -24,7 +24,8 @@ function showDashboard() {
         var html = Handlebars.getTemplate("internship")(i);
         var root = $("#cnt");
         root.html(html);
-        $('input[type=file]').filestyle({input:false, buttonText:"upload", buttonName:"btn-success", iconName:"glyphicon-cloud-upload", badge: false})
+        $("select").selecter();
+        $('input[type=file]').filestyle({input:false, buttonText:"", buttonName:"btn-success btn-sm", iconName:"glyphicon-cloud-upload", badge: false})
         $(':file').change(function() {            
             var file = this.files[0];
             var name = file.name;
@@ -91,4 +92,15 @@ function sendSupervisor() {
         $("#modal").modal('hide');
         reportSuccess("Operation succeeded");        
     });
+}
+
+function sendAlumni() {
+    if (missing("next-email") || missing("select-position")) {
+        return
+    }
+    setAlumni(mine.Student.Email, $("#select-position").val(), $("#next-email").val(),undefined, function(jqr) {
+        $("#select-position").val(mine.Future.Position);
+        $("#next-email").val(mine.Future.Contact);
+        reportError(jqr.responseText)
+    })
 }

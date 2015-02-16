@@ -41,7 +41,7 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string) Servic
 	fileHandler := http.FileServer(fs)
 	r.PathPrefix("/" + path + "/").Handler(httpgzip.NewHandler(http.StripPrefix("/"+path, fileHandler)))
 	http.Handle("/", s.r)
-	s.r.HandleFunc("/", home(backend)).Methods("GET")
+	s.r.HandleFunc("/", mon(home(backend))).Methods("GET")
 	s.r.HandleFunc("/api/v1/surveys/{token}", surveyFromToken(backend)).Methods("GET")
 	s.r.HandleFunc("/api/v1/surveys/{token}", setSurveyContent(backend)).Methods("POST")
 	return s
@@ -79,12 +79,12 @@ func userMngt(s Service, mailer mail.Mailer) {
 	s.r.HandleFunc("/api/v1/users/{email}/profile", restHandler(setUserProfile, s, mailer)).Methods("PUT")
 	s.r.HandleFunc("/api/v1/users/{email}/role", restHandler(setUserRole, s, mailer)).Methods("PUT")
 	s.r.HandleFunc("/api/v1/users/", restHandler(newTutor, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/users/{email}/password", resetPassword(s.backend, mailer)).Methods("DELETE")
+	s.r.HandleFunc("/api/v1/users/{email}/password", mon(resetPassword(s.backend, mailer))).Methods("DELETE")
 	s.r.HandleFunc("/api/v1/users/{email}/password", restHandler(setPassword, s, mailer)).Methods("PUT")
-	s.r.HandleFunc("/api/v1/newPassword", newPassword(s.backend, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/login", login(s.backend)).Methods("POST")
-	s.r.HandleFunc("/api/v1/logout", logout(s.backend)).Methods("GET")
-	s.r.HandleFunc("/resetPassword", password).Methods("GET")
+	s.r.HandleFunc("/api/v1/newPassword", mon(newPassword(s.backend, mailer))).Methods("POST")
+	s.r.HandleFunc("/api/v1/login", mon(login(s.backend))).Methods("POST")
+	s.r.HandleFunc("/api/v1/logout", mon(logout(s.backend))).Methods("GET")
+	s.r.HandleFunc("/resetPassword", mon(password)).Methods("GET")
 }
 
 func password(w http.ResponseWriter, r *http.Request) {
@@ -195,9 +195,16 @@ func resetPassword(srv internship.Service, mailer mail.Mailer) http.HandlerFunc 
 			log.Println("Unable to get the reset token for " + e + ": " + err.Error())
 			return
 		}
+		b := r.URL.Query().Get("invite")
 		go func() {
-			if u, err := srv.User(e); err == nil {
-				mailer.SendPasswordResetLink(u, token)
+			if b == "true" {
+				if u, err := srv.User(e); err == nil {
+					mailer.SendAdminInvitation(u, token)
+				}
+			} else {
+				if u, err := srv.User(e); err == nil {
+					mailer.SendPasswordResetLink(u, token)
+				}
 			}
 		}()
 	}
@@ -410,7 +417,17 @@ func internshipsMngt(s Service, mailer mail.Mailer) {
 	s.r.HandleFunc("/api/v1/internships/{email}/title", restHandler(setTitle, s, mailer)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/major", restHandler(setMajor, s, mailer)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/promotion", restHandler(setPromotion, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/alumni", restHandler(setAlumni, s, mailer)).Methods("POST")
 	s.r.HandleFunc("/api/v1/majors/", restHandler(majors, s, mailer)).Methods("GET")
+}
+
+func setAlumni(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+	var c internship.Alumni
+	err := jsonRequest(w, r, &c)
+	if err != nil {
+		return err
+	}
+	return srv.SetAlumni(mux.Vars(r)["email"], c)
 }
 
 func majors(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {

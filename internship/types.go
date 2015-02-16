@@ -52,8 +52,9 @@ func (p User) Fullname() string {
 	return strings.Title(p.Firstname) + " " + strings.Title(p.Lastname)
 }
 
+//Fullname provides the user fullname, starting with its firstname
 func (p User) ToPerson() Person {
-	return Person{Firstname: p.Firstname, Lastname: p.Lastname, Email: p.Email, Tel: p.Tel}
+	return Person{Firstname: p.Firstname, Lastname: p.Lastname, Tel: p.Tel, Email: p.Email}
 }
 
 //ReportHeader provides the metadata associated to a student report
@@ -152,6 +153,8 @@ type Internship struct {
 	Promotion string
 	//The student major
 	Major string
+	//Student future
+	Future Alumni
 }
 
 type Convention struct {
@@ -206,27 +209,33 @@ type Survey struct {
 	//Supervisor answers
 	Answers map[string]string
 }
+type Alumni struct {
+	Contact  string
+	Position int
+}
 
 //Predefined errors
 var (
-	ErrReportExists      = errors.New("Report already exists")
-	ErrUnknownReport     = errors.New("Unknown report or user")
-	ErrInvalidGrade      = errors.New("The grade must be between 0 and 20 (inclusive)")
-	ErrReportConflict    = errors.New("The report has not been uploaded")
-	ErrInternshipExists  = errors.New("Internship already exists")
-	ErrUnknownInternship = errors.New("Unknown internship")
-	ErrUserExists        = errors.New("User already exists")
-	ErrUnknownUser       = errors.New("User not found")
-	ErrUserTutoring      = errors.New("The user is tutoring students")
-	ErrCredentials       = errors.New("Incorrect credentials")
-	ErrNoPendingRequests = errors.New("No password renewable request pending")
-	ErrInvalidPeriod     = errors.New("invalid internship period")
-	ErrConventionExists  = errors.New("convention already scanned")
-	ErrInvalidMajor      = errors.New("Invalid major")
-	ErrDeadlinePassed    = errors.New("Deadline passed")
-	ErrGradedReport      = errors.New("Report already graded")
-	ErrSessionExpired    = errors.New("Session expired")
-	ErrInvalidToken      = errors.New("Invalid session")
-	ErrUnknownSurvey     = errors.New("Unknown survey")
-	ErrInvalidSurvey     = errors.New("Invalid answers")
+	ErrReportExists       = errors.New("Report already exists")
+	ErrUnknownReport      = errors.New("Unknown report or user")
+	ErrInvalidGrade       = errors.New("The grade must be between 0 and 20 (inclusive)")
+	ErrReportConflict     = errors.New("The report has not been uploaded")
+	ErrInternshipExists   = errors.New("Internship already exists")
+	ErrUnknownInternship  = errors.New("Unknown internship")
+	ErrUserExists         = errors.New("User already exists")
+	ErrUnknownUser        = errors.New("User not found")
+	ErrUserTutoring       = errors.New("The user is tutoring students")
+	ErrCredentials        = errors.New("Incorrect credentials")
+	ErrNoPendingRequests  = errors.New("No password renewable request pending")
+	ErrInvalidPeriod      = errors.New("invalid internship period")
+	ErrConventionExists   = errors.New("convention already scanned")
+	ErrInvalidMajor       = errors.New("Invalid major")
+	ErrDeadlinePassed     = errors.New("Deadline passed")
+	ErrGradedReport       = errors.New("Report already graded")
+	ErrSessionExpired     = errors.New("Session expired")
+	ErrInvalidToken       = errors.New("Invalid session")
+	ErrUnknownSurvey      = errors.New("Unknown survey")
+	ErrInvalidSurvey      = errors.New("Invalid answers")
+	ErrUnknownAlumni      = errors.New("No informations for future alumni")
+	ErrInvalidAlumniEmail = errors.New("Invalid email. It must not be served by polytech' or unice")
 )

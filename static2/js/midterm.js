@@ -64,6 +64,7 @@ function lang() {
 }
 
 $( document ).ready(function () {
+	$(".alert").hide();
 	yesno();
 	textarea();
 	$(":radio").iCheck();

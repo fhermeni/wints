@@ -153,17 +153,38 @@ function shiftSelect(e) {
     
 function showPrivileges() {
     users(function(data) {
-        var others = data.filter(function (u) {
-            return u.Email != myself.Email && u.Role != 0;
-        });
+        var teachers = [];
+        var students = []
+        data.filter(function (u) {
+            if (u.Role == 0 && myself.Email != u.Email) {
+                students.push(u)
+            } else if (myself.Email != u.Email) {
+                teachers.push(u);
+            }
+        })
+        console.log(teachers);
+        console.log(students);
         //The base
-        var html = Handlebars.getTemplate("privileges")(others);
+        var html = Handlebars.getTemplate("privileges")({Students: students, Teachers: teachers});
         $("#cnt").html(html);
         $("#cnt").find("select").selecter();
-        $('[data-toggle="deluser-confirmation"]').each(function (i, a) {
+        $('[data-toggle="delteacher-confirmation"]').each(function (i, a) {
             var j = $(a);
             j.confirmation({onConfirm: function() {removeUser(j.attr("data-user"), j.parent().parent().parent())}});
         });
+        $('[data-toggle="teacher-reinvite"]').each(function (i, a) {
+            var j = $(a);
+            j.confirmation({onConfirm: function() {reInvite(j.attr("data-user"))}, btnOkLabel: '<i class="icon-ok-sign icon-white"></i> Confirm'});
+        });
+        $('[data-toggle="student-reinvite"]').each(function (i, a) {
+            var j = $(a);
+            j.confirmation({onConfirm: function() {resetPassword(j.attr("data-user"))}, btnOkLabel: '<i class="icon-ok-sign icon-white"></i> Confirm'});
+        });
+        $('[data-toggle="delstudent-confirmation"]').each(function (i, a) {
+            var j = $(a);
+            j.confirmation({onConfirm: function() {removeUser(j.attr("data-user"), j.parent().parent())}});
+        });
+
     });
 }
 
@@ -239,8 +260,6 @@ function showPendingConventions() {
             $("#pending-counter").html(" <span class='badge'>" + cc.length + (ignored.length > 0 ? "/" + ignored.length : "") + "</span>");
             if (cc.length == 0 && ignored.length == 0) {
                 $("#pending-counter").html("");
-                $("#cnt").html("<h5 class='text-center'>Nothing to import</h5>")
-                return
             }               
             currentConvention = cc[0]                 
             var html = Handlebars.getTemplate("pending")({
@@ -474,7 +493,7 @@ function showInternship(s) {
             uss = uss.filter(function (u) {
                 return u.Role != 0; //get rid of students
             });             
-            buf = Handlebars.getTemplate("student")({I: i, Admin: myself.Role >= 3, Major: myself.Role >= 2, Tutors: uss, URL: window.location.href + "/surveys/"})
+            buf = Handlebars.getTemplate("student")({I: i, Admin: myself.Role >= 3, Major: myself.Role >= 2, Tutors: uss, URL: window.location.protocol + "//" + window.location.host + "/surveys/"})
             $("#modal").html(buf).modal('show');            
             var c = $("#modal").find("select.select-tutor");            
             c.val(i.Tutor.Email)

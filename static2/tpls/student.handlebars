@@ -1,4 +1,4 @@
-<div class="modal-dialog">
+<div class="modal-dialog modal-lg">
     <div class="modal-content">
     <div class="modal-header">
             <h3 class="modal-title fn"><a href="mailto:{{I.Student.Email}}">{{fullname I.Student}}</a></h3>
@@ -40,12 +40,20 @@
                 </dd>                
             </dl>
             <h4 class="text-center">Links for the surveys</h4>
-            <p>These links allow the supervisor to provide feedbacks over the time</p>
+            <p>These links must be send to the supervisors to provide feedbacks</p>            
             <dl class="dl-horizontal">
                 {{#each I.Surveys}}
                 <dt>{{Kind}}</dt>
-                <dd>{{../URL}}{{Token}}</dd>
+                <dd>{{../URL}}{{Kind}}?token={{Token}}</dd>
                 {{/each}}
+            </dl>
+
+            <h4 class="text-center">Future position</h4>
+            <dl class="dl-horizontal">        
+                <dt>Next position</dt>
+                <dd>{{nextPosition I.Future.Position}}</dd>
+                <dt>Contact email</dt>
+                <dd>{{nextContact I.Future.Contact}}</dd>
             </dl>
     </div>
     <div class="modal-footer"></div>

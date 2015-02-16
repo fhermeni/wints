@@ -263,9 +263,9 @@ func (v *Service) SetReportPrivate(kind, email string, p bool) error {
 	return ErrPermission
 }
 
-func (v *Service) ResetRootAccount() error {
-	if v.my.Role == internship.ROOT {
-		return v.srv.ResetRootAccount()
+func (v *Service) SetAlumni(student string, a internship.Alumni) error {
+	if v.my.Email == student || v.my.Role >= internship.ADMIN || v.isTutoring(student) {
+		return v.srv.SetAlumni(student, a)
 	}
 	return ErrPermission
 }

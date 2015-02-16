@@ -3,6 +3,7 @@ package datastore
 import (
 	"database/sql"
 	"encoding/json"
+	"strings"
 	"time"
 
 	"github.com/fhermeni/wints/internship"
@@ -56,7 +57,6 @@ func (srv *Service) NewInternship(c internship.Convention) ([]byte, error) {
 			return []byte{}, rollback(err, tx)
 		}
 	}
-
 	//Plan the surveys
 	for _, sr := range srv.SurveyDefs() {
 		tok := randomBytes(16)
@@ -126,7 +126,7 @@ func (srv *Service) SetPromotion(stu, p string) error {
 }
 
 func (srv *Service) Internship(stu string) (internship.Internship, error) {
-	sql := "select stu.firstname, stu.lastname, stu.email, stu.tel, promotion, major, tut.firstname, tut.lastname, tut.email, tut.tel, tut.role, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, startTime, endTime, company, companyWWW from internships, users as stu, users as tut where internships.tutor=tut.email and internships.student = stu.email and stu.email = $1"
+	sql := "select stu.firstname, stu.lastname, stu.email, stu.tel, promotion, major, tut.firstname, tut.lastname, tut.email, tut.tel, tut.role, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, startTime, endTime, company, companyWWW, nextPosition, nextContact from internships, users as stu, users as tut where internships.tutor=tut.email and internships.student = stu.email and stu.email = $1"
 	rows, err := srv.DB.Query(sql, stu)
 	if err != nil || !rows.Next() {
 		return internship.Internship{}, internship.ErrUnknownInternship
@@ -156,8 +156,10 @@ func scanInternship(r *sql.Rows) (internship.Internship, error) {
 	var supFn, supLn, supEmail, supTel string
 	var company, companyWWW string
 	var title string
+	var nextPosition sql.NullInt64
+	var nextContact sql.NullString
 	var start, end time.Time
-	err := r.Scan(&stuFn, &stuLn, &stuEmail, &stuTel, &prom, &major, &tutFn, &tutLn, &tutEmail, &tutTel, &tutRole, &supFn, &supLn, &supEmail, &supTel, &title, &start, &end, &company, &companyWWW)
+	err := r.Scan(&stuFn, &stuLn, &stuEmail, &stuTel, &prom, &major, &tutFn, &tutLn, &tutEmail, &tutTel, &tutRole, &supFn, &supLn, &supEmail, &supTel, &title, &start, &end, &company, &companyWWW, &nextPosition, &nextContact)
 	if err != nil {
 		return internship.Internship{}, err
 	}
@@ -169,6 +171,14 @@ func scanInternship(r *sql.Rows) (internship.Internship, error) {
 	if major.Valid {
 		i.Major = major.String
 	}
+	fut := internship.Alumni{}
+	if nextContact.Valid {
+		fut.Contact = nextContact.String
+	}
+	if nextPosition.Valid {
+		fut.Position = int(nextPosition.Int64)
+	}
+	i.Future = fut
 	return i, err
 }
 
@@ -230,7 +240,7 @@ func (srv *Service) appendReports(i *internship.Internship) error {
 }
 
 func (srv *Service) Internships() ([]internship.Internship, error) {
-	sql := "select stu.firstname, stu.lastname, stu.email, stu.tel, promotion, major, tut.firstname, tut.lastname, tut.email, tut.tel, tut.role, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, startTime, endTime, company, companyWWW from internships, users as stu, users as tut where internships.tutor=tut.email and internships.student = stu.email"
+	sql := "select stu.firstname, stu.lastname, stu.email, stu.tel, promotion, major, tut.firstname, tut.lastname, tut.email, tut.tel, tut.role, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, startTime, endTime, company, companyWWW, nextPosition, nextContact from internships, users as stu, users as tut where internships.tutor=tut.email and internships.student = stu.email"
 	internships := make([]internship.Internship, 0, 0)
 	rows, err := srv.DB.Query(sql)
 	if err != nil {
@@ -253,4 +263,13 @@ func (srv *Service) Internships() ([]internship.Internship, error) {
 		internships = append(internships, i)
 	}
 	return internships, err
+}
+
+func (v *Service) SetAlumni(student string, a internship.Alumni) error {
+	//check email
+	if !strings.Contains(a.Contact, "@") || strings.Contains(a.Contact, "@unice.fr") || strings.Contains(a.Contact, "polytech") {
+		return internship.ErrInvalidAlumniEmail
+	}
+	sql := "update internships set nextPosition=$1, nextContact=$2 where student=$3"
+	return SingleUpdate(v.DB, internship.ErrUnknownInternship, sql, a.Position, a.Contact, student)
 }

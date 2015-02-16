@@ -69,8 +69,7 @@ function reportSuccess(msg) {
     $.notify(msg, {autoHideDelay: 1000, className: "success", globalPosition: "top center"})
 }
 
-function reportError(msg) {
-    console.log(arguments)    
+function reportError(msg) {    
     $.notify(msg, {autoHideDelay: 2000, className: "error", globalPosition: "top center"})
 }
 
@@ -141,6 +140,11 @@ function setPassword(old, n, ok, no) {
 function resetPassword(email, ok, no) {
     return del("/users/" + email + "/password", ok, no)
 }
+
+function reInvite(email, ok, no) {
+    return del("/users/" + email + "/password?invite=true", ok, no)
+}
+
 
 function internships(ok, no) { 
     return get("/internships/", ok, no);  
@@ -219,4 +223,11 @@ function longSurvey(token, ok, no) {
 
 function setSurveyAnswers(token, cnt, ok, no) {
     return post("/surveys/" + token, cnt, ok, no)
+}
+function alumni(student, ok, no) {
+    return get("/internships/" + student + "/alumni", ok, no)
+}
+
+function setAlumni(student, position, email, ok, no) {
+    return post("/internships/" + student + "/alumni", {Contact: email, Position: position}, ok, no)
 }
