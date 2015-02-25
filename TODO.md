@@ -17,22 +17,19 @@
 - [x] minimify every resource
 - [x] gzip json lists
 - [x] session ID for security
-<<<<<<< HEAD
 - [x] store and expose surveys
 - [x] midterm survey
-- [ ] final survey
-- [ ] future survey
+- [x] final survey
+- [x] future survey
 - [ ] mailing for missing surveys
 - [ ] concatenate every static resource
-=======
 - [x] request monitoring
 - [x] alumni status support
 - [ ] defenses
 - [ ] concatenate every static resource
-- [ ] online survey for supervisor
+- [x] online survey for supervisor
 - [x] gmail friendly
 - [x] invitation-based only root account creation
->>>>>>> next
 
 ### Daemon
 
@@ -76,14 +73,10 @@
 - [x] tutor internships
 - [x] report private/public status
 - [x] skipeable conventions
-<<<<<<< HEAD
-- [x] access surveys
-=======
 - [x] access alumni
 - [x] re-invite teachers or students
-- [ ] access surveys
->>>>>>> next
-- [ ] help
+- [x] access surveys
+- [x] help
 - [x] report expectations
 - [x] graduation template
 
