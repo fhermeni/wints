@@ -391,6 +391,7 @@ func setReportPrivate(srv internship.Service, mailer mail.Mailer, w http.Respons
 func conventionMgnt(s Service, mailer mail.Mailer) {
 	s.r.HandleFunc("/api/v1/conventions/", restHandler(conventions, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/conventions/{email}/skip", restHandler(skipConvention, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/conventions/{email}", restHandler(deleteConvention, s, mailer)).Methods("DELETE")
 }
 
 func skipConvention(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
@@ -400,6 +401,10 @@ func skipConvention(srv internship.Service, mailer mail.Mailer, w http.ResponseW
 		return err
 	}
 	return srv.SkipConvention(mux.Vars(r)["email"], b)
+}
+
+func deleteConvention(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+	return srv.DeleteConvention(mux.Vars(r)["email"])
 }
 
 func conventions(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {

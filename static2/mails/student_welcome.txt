@@ -8,5 +8,7 @@ This webapp allows you to:
 Visit the following link to terminate the account creation:
 {{.WWW}}/resetPassword?token={{.Token}}
 
+The email to use to log in is the one I used to contact you.
+
 Regards,
 Fabien Hermenier

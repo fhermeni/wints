@@ -54,6 +54,13 @@ func (v *Service) SkipConvention(student string, skip bool) error {
 	return ErrPermission
 }
 
+func (v *Service) DeleteConvention(student string) error {
+	if v.my.Role >= internship.ADMIN {
+		return v.srv.DeleteConvention(student)
+	}
+	return ErrPermission
+}
+
 func (v *Service) Internship(stu string) (internship.Internship, error) {
 	if v.mine(stu) || v.my.Role >= internship.MAJOR {
 		return v.srv.Internship(stu)

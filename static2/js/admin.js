@@ -303,6 +303,13 @@ function sendSkipConvention(email, s) {
         refresh()
     })
 }
+
+function sendDeleteConvention(email) {
+    deleteConvention(email, function() {
+        reportSuccess("Convention deleted")    
+        refresh()
+    })
+}
 function pickTheory() {
      if (missing("th-tutor-fn") || missing("th-tutor-ln") || missing("th-tutor-email")  || missing("th-tutor-tel")) {
         return false;

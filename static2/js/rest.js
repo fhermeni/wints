@@ -166,6 +166,10 @@ function skipConvention(email, skip, ok, no) {
     return post("/conventions/" + email + "/skip", skip, ok, no)
 }
 
+function deleteConvention(email, ok, no) {
+    return del("/conventions/" + email, ok, no)
+}
+
 function reportHeader(email, kind, ok, no) {
     return get("/internships/" + email +"/reports/" + kind, ok, no);  
 }

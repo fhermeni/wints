@@ -53,3 +53,8 @@ func (srv *Service) SkipConvention(student string, skip bool) error {
 	sql := "update conventions set skip=$1 where studentEmail=$2"
 	return SingleUpdate(srv.DB, internship.ErrUnknownUser, sql, skip, student)
 }
+
+func (srv *Service) DeleteConvention(student string) error {
+	sql := "delete from conventions where studentEmail=$1"
+	return SingleUpdate(srv.DB, internship.ErrUnknownUser, sql, student)
+}
