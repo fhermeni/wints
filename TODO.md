@@ -71,8 +71,8 @@
 - [x] re-invite teachers or students
 - [ ] access surveys
 - [ ] help
-- [ ] report expectations
-- [ ] graduation template
+- [x] report expectations
+- [x] graduation template
 
 #### student
 - [x] profile update
@@ -86,7 +86,7 @@
 - [x] upload report
 - [x] see grade, comments
 - [x] help
-- [ ] report expectations
+- [x] report expectations
 - [x] set alumni
 
 #### supervisor
