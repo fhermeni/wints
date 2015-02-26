@@ -86,6 +86,23 @@ func (srv *Service) NewInternship(c internship.Convention) ([]byte, error) {
 	return token, tx.Commit()
 }
 
+func (srv *Service) InstallSurveys(i internship.Internship) error {
+	//Plan the surveys
+	for _, sr := range srv.SurveyDefs() {
+		tok := randomBytes(16)
+		deadline, err := sr.Instantiate(i.Begin)
+		if err != nil {
+			return err
+		}
+		req := "insert into surveys(student, kind, token, deadline, answers) values($1,$2,$3,$4,$5)"
+		_, err = srv.DB.Exec(req, i.Student.Email, sr.Name, tok, deadline, "{}")
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (srv *Service) SetSupervisor(stu string, t internship.Person) error {
 	sql := "update internships set supervisorFn=$1, supervisorLn=$2, supervisorTel=$3, supervisorEmail=$4 where student=$5"
 	return SingleUpdate(srv.DB, internship.ErrUnknownInternship, sql, t.Firstname, t.Lastname, t.Tel, t.Email, stu)
