@@ -40,13 +40,13 @@ function showDashboard() {
                 var formData = new FormData();
                 formData.append('report', file);                
                 var html = Handlebars.getTemplate("upload-progress")(mine);
-                var root = $("#modal");
+                var root = $("#modal-hard");
                 root.html(html).modal({backdrop: 'static', keyboard: false, show:true}); 
                 setReportContent(mine.Student.Email, $(this).attr("data-kind"), formData, showProgress, function() {
-                    $("#modal").modal("hide");
+                    $("#modal-hard").modal("hide");
                     reportSuccess("Report uploaded");
                 }, function(o) {                    
-                    $("#modal").modal("hide");
+                    $("#modal-hard").modal("hide");
                     reportError(o.responseText);
                 })
             }
@@ -69,13 +69,13 @@ function showProgress(evt) {
 function showCompanyEditor() {
     var html = Handlebars.getTemplate("company-editor")(mine);
     var root = $("#modal");
-    root.html(html).modal({backdrop: true, keyboard: true, show:true});
+    root.html(html).modal("show");
 }
 
 function showSupervisorEditor() {
     var html = Handlebars.getTemplate("supervisor-editor")(mine);
     var root = $("#modal");
-    root.html(html).modal({backdrop: true, keyboard: true, show:true});
+    root.html(html).modal("show");
 }
 
 function sendCompany() {
@@ -96,7 +96,7 @@ function showReportComment(kind) {
         if (r.Kind == kind) {
             if (r.Comment.length > 0) {
                     var html = Handlebars.getTemplate("raw");
-                    $("#modal").html(html).modal({backdrop: true, keyboard: true, show:true});                    
+                    $("#modal").html(html).modal("show");                    
                     $("#rawContent").html(r.Comment);
                     
             }
