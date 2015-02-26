@@ -254,21 +254,22 @@ Handlebars.registerHelper('shortKind', function(r) {
 });
 
 Handlebars.registerHelper('reportStatus', function(r) {
-    var passed = new Date(Date.parse(r.Deadline)) < new Date()    
-    var style = "btn-link"    
+    var passed = new Date(Date.parse(r.Deadline)) < new Date() 
+
+    var style = "btn-link";
+
+    //Deadline passed, nothing
     if (passed && r.Grade == -2) {
-        if (r.Comment) {
-            style = "btn-danger" //nothing uploaded, not gradeable so only commented to complain
-        } else {
-            style="btn-warning"    
-        }        
-    }  else if (r.Grade == -1) {
+        style = "btn-warning";
+    } else if (r.Grade == -1) {
+        //waiting for beging reviewed
         style = "btn-primary";
-    } else if (r.Grade >= 0 && r.Grade < 10) {
+    } else if (r.ToGrade && r.Grade < 10) {
         style = "btn-danger";
-    } else if (r.Grade >= 10){
+    } else if (!r.ToGrade || r.Grade >= 10) {
         style = "btn-success";
     }
+    
     return style;
 });
 
