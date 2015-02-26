@@ -23,12 +23,18 @@ Handlebars.registerHelper('fullname', function(p) {
 });
 
 Handlebars.registerHelper('shortFullname', function(p) {    
-    name = p.Lastname + " " + p.Firstname;
-    if (name.length > 20) {
-        name = name.substring(0, 17) + "...";
+    var fn = p.Firstname + " " + p.Lastname;
+    if (fn.length > 20) {
+        fn = p.Firstname[0] + ". " + p.Lastname;
     }
-    return name;
+    return fn;
+});
 
+Handlebars.registerHelper('shortProm', function(p) {        
+    if (p.indexOf("master") == 0) {
+        p = "ma. " + p.substring(p.lastIndexOf(" "));
+    }
+    return p;
 });
 
 Handlebars.registerHelper('len', function(a) {
