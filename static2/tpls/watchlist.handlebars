@@ -83,10 +83,10 @@ Click on a report to watch the content, the grade, the comments.
             <td>{{shortProm Promotion}}</td>
             <td>{{Major}}</td>
             <td>                
-                <a class="fn" href='mailto:{{Sup.Email}}' title='{{fullname Sup}}'>{{fullname Sup}}</a>
+                <a class="fn" href='mailto:{{Sup.Email}}' title='{{fullname Sup}}'>{{shortFullname Sup}}</a>
             </td>
             <td>                
-                <a class="fn" href='mailto:{{Tutor.Email}}' title='{{fullname Tutor}}'>{{fullname Tutor}}</a>
+                <a class="fn" href='mailto:{{Tutor.Email}}' title='{{fullname Tutor}}'>{{shortFullname Tutor}}</a>
             </td>            
             {{#each Reports}}
             <td class="click {{reportStatus this}} text-center" data-text="{{this.Grade}}" onclick="showReport('{{../Student.Email}}', '{{Kind}}')">            
