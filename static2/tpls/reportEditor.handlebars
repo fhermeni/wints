@@ -58,13 +58,12 @@
 </small>    
                         </div>                    
                     </div>
-                </div>
-                {{#if Reviewable}}    
-                <div class="modal-footer">                                
+                                    {{#if Reviewable}}                    
                         <div class="text-right form-group">
                             <button type="button" class="btn btn-success" onclick="gradeReport({{ToGrade}},'{{Email}}','{{Kind}}')">Grade</button>
-                        </div>                
-                </div>
+                        </div>                                
                 {{/if}}
+
+                </div>
             </div>
     </div>
