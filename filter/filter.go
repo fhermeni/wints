@@ -229,7 +229,7 @@ func (v *Service) ReportDefs() []internship.ReportDef {
 }
 
 func (v *Service) Report(kind, email string) (internship.ReportHeader, error) {
-	if v.mine(email) || v.isTutoring(email) || v.my.Role >= internship.ADMIN {
+	if v.mine(email) || v.isTutoring(email) || v.my.Role >= internship.MAJOR {
 		return v.srv.Report(kind, email)
 	}
 	return internship.ReportHeader{}, ErrPermission
