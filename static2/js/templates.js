@@ -264,7 +264,7 @@ Handlebars.registerHelper('reportStatus', function(r) {
     } else if (r.Grade == -1) {
         //waiting for beging reviewed
         style = "btn-primary";
-    } else if (r.ToGrade && r.Grade < 10) {
+    } else if (r.ToGrade && r.Grade >= 0 && r.Grade < 10) {
         style = "btn-danger";
     } else if (!r.ToGrade || r.Grade >= 10) {
         style = "btn-success";
