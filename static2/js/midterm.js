@@ -66,8 +66,8 @@ function lang() {
 $( document ).ready(function () {
 	$(".alert").hide();
 	yesno();
-	textarea();
-	$(":radio").iCheck();
+	textarea();	
 	setLang('fr');
 	fill();
+	$(":radio").iCheck();
 });

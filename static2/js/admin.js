@@ -500,7 +500,7 @@ function showInternship(s) {
             uss = uss.filter(function (u) {
                 return u.Role != 0; //get rid of students
             });             
-            buf = Handlebars.getTemplate("student")({I: i, Admin: myself.Role >= 3, Major: myself.Role >= 2, Tutors: uss, URL: window.location.protocol + "//" + window.location.host + "/surveys/"})
+            buf = Handlebars.getTemplate("student")({I: i, SurveyAdmin: myself.Email == i.Tutor.Email || myself.Role >= 3, Admin: myself.Role >= 3, Major: myself.Role >= 2, Tutors: uss, URL: window.location.protocol + "//" + window.location.host + "/surveys/"})
             $("#modal").html(buf).modal('show');            
             var c = $("#modal").find("select.select-tutor");            
             c.val(i.Tutor.Email)

@@ -200,7 +200,7 @@ func scanInternship(r *sql.Rows) (internship.Internship, error) {
 }
 
 func (srv *Service) appendSurveys(i *internship.Internship) error {
-	s := "select kind, answers, deadline, timestamp, token from surveys where student=$1"
+	s := "select kind, answers, deadline, timestamp, token from surveys where student=$1 order by deadline"
 	rows, err := srv.DB.Query(s, i.Student.Email)
 	if err != nil {
 		return err

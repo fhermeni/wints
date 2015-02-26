@@ -285,7 +285,7 @@ Handlebars.registerHelper('surveyStatus', function(s) {
 
 Handlebars.registerHelper('reportGrade', function(r) {
     if (!r.ToGrade) {
-        return "";
+        return new Handlebars.SafeString("<i title='no grade needed'>n/a</i>");
     }
     if (r.Grade == -2) {
         return "-";
