@@ -30,7 +30,11 @@
                         <div class="form-group">
                             <label for="grade" class="col-sm-2 control-label">Grade</label>
                             <div class="col-sm-9">
-                                <input type="number" class="form-control" id="grade" value="{{gradeInput this}}" {{#unless Gradeable}}disabled="disabled"{{/unless}} />
+                                {{#if ToGrade}}
+                                    <input type="number" class="form-control" id="grade" value="{{gradeInput this}}" {{#unless Gradeable}}disabled="disabled"{{/unless}} />
+                                {{else}}
+                                    <i>no grade for this report</i>
+                                {{/if}}
                             </div>
                         </div>
                         <div class="form-group">
@@ -42,6 +46,7 @@
                             <button type="button" class="btn btn-success" onclick="gradeReport({{ToGrade}},'{{Email}}','{{Kind}}')">Grade</button>
                         </div>            
                         {{/if}}    
+                        {{#if ToGrade}}
                         <div class="form-group">
                             <label for="notes" class="control-label col-sm-offset-1">Notation
 <small><a href="/static/consignes-rapports.pdf">(expectations)</a></small></label>                            
@@ -61,7 +66,8 @@
     Hard to read/understand, severe lacks in terms of contents or analysis capacities</li>
 </ul>
 </small>    
-                        </div>                    
+                        </div>    
+                        {{/if}}                
                     </div>
                 </div>
             </div>
