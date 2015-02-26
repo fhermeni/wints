@@ -33,18 +33,40 @@ function showDashboard() {
             var size = file.size;
             var type = file.type;            
             if (type != "application/pdf") {
-                reportFailure("The report must be in PDF format")
+                reportError("The report must be in PDF format")
             } else if (size > 10000000) {
-                reportFailure("The report cannot exceed 10MB")
+                reportError("The report cannot exceed 10MB")
             } else {                
                 var formData = new FormData();
-                formData.append('report', file);
-                //Desactivate the upload button
-                reportSuccess("Upload in progress. Wait for a completion notification");
-                setReportContent(mine.Student.Email, $(this).attr("data-kind"), formData)
+                formData.append('report', file);                
+                var html = Handlebars.getTemplate("upload-progress")(mine);
+                var root = $("#modal");
+                root.html(html).modal("show");                
+                setReportContent(mine.Student.Email, $(this).attr("data-kind"), formData, showProgress, function() {
+                    $("#modal").modal("hide");
+                    reportSuccess("Report uploaded");
+                }, function(o) {                    
+                    $("#modal").modal("hide");
+                    reportError(o.responseText);
+                })
             }
         });        
     });
+}
+
+function showProgress(evt) {    
+    if (evt.lengthComputable) {
+            console.log(evt.loaded + " " + evt.total);
+            var pct = evt.loaded / evt.total * 100;
+            console.log(pct);
+            $("#progress-value").html(pct + "%")
+            $("#progress-value").attr("aria-valuenow", pct)            
+            $("#progress-value").css.width = pct+"%";            
+            console.log($("#progress-value").css.width)
+    } else {
+            // Unable to compute progress information since the total size is unknown
+            console.log('unable to complete');
+    }
 }
 
 function showCompanyEditor() {

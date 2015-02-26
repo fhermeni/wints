@@ -178,13 +178,20 @@ function setReportDeadline(email, kind, d, ok, no) {
     return post("/internships/" + email + "/reports/" + kind + "/deadline", d, ok, no)
 }
 
-function setReportContent(email, kind, d, ok, no) { 
+function setReportContent(email, kind, d, progressFunc, ok, no) { 
     return $.ajax({
         method: "POST",
         url: ROOT_API + "/internships/" + email + "/reports/" + kind + "/content",
         data: d,
         processData: false,
         contentType: false,
+        xhr: function() {  // custom xhr
+                myXhr = $.ajaxSettings.xhr();
+                if(myXhr.upload){ // check if upload property exists
+                    myXhr.upload.addEventListener('progress',progressFunc, false); // for handling the progress of the upload
+                }
+                return myXhr;
+            }
     }).done(noCb(ok)).fail(restError(no));    
 
 }
