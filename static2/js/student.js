@@ -69,13 +69,13 @@ function showProgress(evt) {
 function showCompanyEditor() {
     var html = Handlebars.getTemplate("company-editor")(mine);
     var root = $("#modal");
-    root.html(html).modal("show");
+    root.html(html).modal({backdrop: true, keyboard: true, show:true});
 }
 
 function showSupervisorEditor() {
     var html = Handlebars.getTemplate("supervisor-editor")(mine);
     var root = $("#modal");
-    root.html(html).modal("show");
+    root.html(html).modal({backdrop: true, keyboard: true, show:true});
 }
 
 function sendCompany() {
@@ -96,7 +96,7 @@ function showReportComment(kind) {
         if (r.Kind == kind) {
             if (r.Comment.length > 0) {
                     var html = Handlebars.getTemplate("raw");
-                    $("#modal").html(html).modal("show");                    
+                    $("#modal").html(html).modal({backdrop: true, keyboard: true, show:true});                    
                     $("#rawContent").html(r.Comment);
                     
             }
