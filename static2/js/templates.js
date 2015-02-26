@@ -266,7 +266,7 @@ Handlebars.registerHelper('reportStatus', function(r) {
         style = "btn-primary";
     } else if (r.ToGrade && r.Grade >= 0 && r.Grade < 10) {
         style = "btn-danger";
-    } else if ((passed && !r.ToGrade && r.Grade >= 0) || r.Grade >= 10) {
+    } else if ((!r.ToGrade && r.Grade >= 0) || r.Grade >= 10) {
         style = "btn-success";
     }
     
