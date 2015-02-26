@@ -57,7 +57,7 @@ function showDashboard() {
 function showProgress(evt) {    
     if (evt.lengthComputable) {            
             var pct = evt.loaded / evt.total * 100;            
-            $("#progress-value").html(Math.round(pct + "%"))
+            $("#progress-value").html(Math.round(pct) + "%")
             $("#progress-value").attr("aria-valuenow", pct)            
             $("#progress-value").css("width",pct+"%");                        
     } else {
