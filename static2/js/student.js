@@ -61,8 +61,7 @@ function showProgress(evt) {
             console.log(pct);
             $("#progress-value").html(pct + "%")
             $("#progress-value").attr("aria-valuenow", pct)            
-            $("#progress-value").css.width = pct+"%";            
-            console.log($("#progress-value").css.width)
+            $("#progress-value").css("width",pct+"%");                        
     } else {
             // Unable to compute progress information since the total size is unknown
             console.log('unable to complete');
