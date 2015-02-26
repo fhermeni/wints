@@ -39,6 +39,8 @@ function showDashboard() {
             } else {                
                 var formData = new FormData();
                 formData.append('report', file);
+                //Desactivate the upload button
+                reportSuccess("Upload in progress. Wait for a completion notification");
                 setReportContent(mine.Student.Email, $(this).attr("data-kind"), formData)
             }
         });        
