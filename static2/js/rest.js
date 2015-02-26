@@ -232,6 +232,6 @@ function alumni(student, ok, no) {
     return get("/internships/" + student + "/alumni", ok, no)
 }
 
-function setAlumni(student, position, email, ok, no) {
-    return post("/internships/" + student + "/alumni", {Contact: email, Position: position}, ok, no)
+function setAlumni(student, pos, email, ok, no) {    
+    return post("/internships/" + student + "/alumni", {Contact: email, Position: pos}, ok, no)
 }

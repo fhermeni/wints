@@ -101,7 +101,7 @@ function sendAlumni() {
     if (missing("next-email") || missing("select-position")) {
         return
     }
-    setAlumni(mine.Student.Email, $("#select-position").val(), $("#next-email").val(),undefined, function(jqr) {
+    setAlumni(mine.Student.Email, parseInt($("#select-position").val()), $("#next-email").val(),undefined, function(jqr) {
         $("#select-position").val(mine.Future.Position);
         $("#next-email").val(mine.Future.Contact);
         reportError(jqr.responseText)
