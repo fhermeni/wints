@@ -41,7 +41,7 @@ function showDashboard() {
                 formData.append('report', file);                
                 var html = Handlebars.getTemplate("upload-progress")(mine);
                 var root = $("#modal");
-                root.html(html).modal("show");                
+                root.html(html).modal({backdrop: 'static', keyboard: false, show:true}); 
                 setReportContent(mine.Student.Email, $(this).attr("data-kind"), formData, showProgress, function() {
                     $("#modal").modal("hide");
                     reportSuccess("Report uploaded");
@@ -55,11 +55,9 @@ function showDashboard() {
 }
 
 function showProgress(evt) {    
-    if (evt.lengthComputable) {
-            console.log(evt.loaded + " " + evt.total);
-            var pct = evt.loaded / evt.total * 100;
-            console.log(pct);
-            $("#progress-value").html(pct + "%")
+    if (evt.lengthComputable) {            
+            var pct = evt.loaded / evt.total * 100;            
+            $("#progress-value").html(round(pct + "%"))
             $("#progress-value").attr("aria-valuenow", pct)            
             $("#progress-value").css("width",pct+"%");                        
     } else {
