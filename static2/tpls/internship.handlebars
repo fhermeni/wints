@@ -60,7 +60,7 @@ You can re-upload documents until the deadline.
 <td>{{studentGrade this}}</td>
 <td class="text-right">
 <form method="post" enctype="multipart/form-data" action="/api/v1/internships/{{../Student.Email}}/reports/{{Kind}}/content">
-		{{#unless Passed}}		
+		{{#unless Locked}}		
 			<input type="file" data-kind="{{Kind}}" accept="application/pdf"  title="upload"/>						
 		{{/unless}}
 		<a href="api/v1/internships/{{../Student.Email}}/reports/{{Kind}}/content" class="btn btn-primary btn-sm" title="download"><i class="glyphicon glyphicon-cloud-download"></i></a>	
