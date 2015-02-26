@@ -35,8 +35,13 @@
                         </div>
                         <div class="form-group">
                             <label for="comment" class="control-label col-sm-offset-1">Comment (required)</label>
-                            <textarea id="comment" rows="10" class="col-sm-10 col-sm-offset-1">{{Comment}}</textarea>
+                            <textarea id="comment" rows="9" class="col-sm-10 col-sm-offset-1">{{Comment}}</textarea>
                         </div>    
+                        {{#if Reviewable}}
+                        <div class="text-center form-group">
+                            <button type="button" class="btn btn-success" onclick="gradeReport({{ToGrade}},'{{Email}}','{{Kind}}')">Grade</button>
+                        </div>            
+                        {{/if}}    
                         <div class="form-group">
                             <label for="notes" class="control-label col-sm-offset-1">Notation
 <small><a href="/static/consignes-rapports.pdf">(expectations)</a></small></label>                            
@@ -59,12 +64,5 @@
                         </div>                    
                     </div>
                 </div>
-                {{#if Reviewable}}    
-                <div class="modal-footer">                                
-                        <div class="text-right form-group">
-                            <button type="button" class="btn btn-success" onclick="gradeReport({{ToGrade}},'{{Email}}','{{Kind}}')">Grade</button>
-                        </div>                
-                </div>
-                {{/if}}
             </div>
     </div>
