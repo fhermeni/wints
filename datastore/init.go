@@ -59,7 +59,10 @@ create table conventions(studentEmail text PRIMARY KEY,
                         supervisorEmail text,
                         supervisorTel text,
                         title text,
-                        skip boolean
+                        skip boolean,
+                        foreignCountry boolean,
+                        lab boolean,
+                        gratification real 
 );
 
 create table reports(student text REFERENCES users(email) on delete cascade,

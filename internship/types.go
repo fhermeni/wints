@@ -167,7 +167,10 @@ type Convention struct {
 	Title      string
 	Promotion  string
 	//Ignore this convention
-	Skip bool
+	Skip           bool
+	ForeignCountry bool
+	Lab            bool
+	Gratification  int
 }
 
 //SurveyDef allows to define internship reports

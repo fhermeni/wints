@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -16,6 +17,8 @@ import (
 
 const (
 	stuPromotion    = 1
+	foreignCountry  = 2
+	lab             = 3
 	stuFn           = 5
 	stuLn           = 6
 	stuEmail        = 17
@@ -24,6 +27,7 @@ const (
 	companyWWW      = 23
 	begin           = 38
 	end             = 39
+	gratification   = 47
 	titleIdx        = 50
 	supervisorFn    = 61
 	supervisorLn    = 62
@@ -70,6 +74,18 @@ func clean(str string) string {
 	return strings.ToLower(strings.TrimSpace(str))
 }
 
+func cleanInt(str string) int {
+	s := strings.Replace(str, " ", "", -1)
+	m := regexp.MustCompile(`^(\d+)`).FindSubmatch([]byte(s))
+	if m == nil || len(m) == 0 {
+		return -1
+	}
+	i, err := strconv.Atoi(string(m[0]))
+	if err != nil {
+		return -1
+	}
+	return i
+}
 func (f *HTTPFeeder) scan(year int, prom string) ([]internship.Convention, error) {
 	client := &http.Client{}
 	conventions := make([]internship.Convention, 0, 0)
@@ -108,6 +124,9 @@ func (f *HTTPFeeder) scan(year int, prom string) ([]internship.Convention, error
 		tutor := cleanPerson(record[tutorFn], record[tutorLn], record[tutorEmail], record[tutorTel])
 		cpy := cleanCompany(record[company], record[companyWWW])
 		title := clean(record[titleIdx])
+		foreign := clean(record[foreignCountry]) != "non"
+		inLab := clean(record[lab]) != "non"
+		gratif := cleanInt(record[gratification])
 		startTime, err := time.Parse("02/01/2006", clean(record[begin]))
 		if err != nil {
 			return conventions, err
@@ -117,15 +136,18 @@ func (f *HTTPFeeder) scan(year int, prom string) ([]internship.Convention, error
 			return conventions, err
 		}
 		c := internship.Convention{
-			Student:    student,
-			Supervisor: supervisor,
-			Tutor:      tutor,
-			Promotion:  prom,
-			Cpy:        cpy,
-			Begin:      startTime,
-			End:        endTime,
-			Title:      title,
-			Skip:       false,
+			Student:        student,
+			Supervisor:     supervisor,
+			Tutor:          tutor,
+			Promotion:      prom,
+			Cpy:            cpy,
+			Begin:          startTime,
+			End:            endTime,
+			Title:          title,
+			Skip:           false,
+			Gratification:  gratif,
+			ForeignCountry: foreign,
+			Lab:            inLab,
 		}
 		conventions = append(conventions, c)
 	}
