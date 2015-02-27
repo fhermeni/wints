@@ -162,8 +162,6 @@ function showPrivileges() {
                 teachers.push(u);
             }
         })
-        console.log(teachers);
-        console.log(students);
         //The base
         var html = Handlebars.getTemplate("privileges")({Students: students, Teachers: teachers});
         $("#cnt").html(html);
@@ -364,12 +362,27 @@ function pickKnown() {
     });    
 }
 
+function serviceMailing() {
+    console.log(arguments);
+    var to = [];    
+    $(".icheckbox.checked").find(":checkbox").each(function(i, c) {
+        var em = $(c).attr("data-email")
+        to.push(em);                                  
+    });
+    console.log(to);
+    if (to.length > 0) {
+        window.location.href = "mailto:" + to.join(",");
+    }    
+}
+
 function mailing(t, w) {
+    console.log(arguments);
     var to = [];
     var cc = [];
     $(".icheckbox.checked").find(":checkbox").each(function(i, c) {
         var em = $(c).attr("data-email")                                  
         var i = getInternship(em)
+        console.log(i);
         if (i) {            
             if (t == "students") {
                 to.push(i.Student.Email)
@@ -388,6 +401,7 @@ function mailing(t, w) {
             }
         }
     });
+    console.log(to);
     if (to.length > 0) {
         window.location.href = "mailto:" + to.join(",") + (cc.length > 0 ? "?cc=" + cc.join(",") : "");
     }    
