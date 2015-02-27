@@ -38,10 +38,7 @@ create table internships(student text PRIMARY KEY REFERENCES users(email) on del
                         supervisorTel text,
                         title text,
                         nextPosition integer,
-                        nextContact text,
-                        researchLab boolean,
-                        foreignCountry boolean,
-                        gratification real
+                        nextContact text
 );
 
 create table conventions(studentEmail text PRIMARY KEY,
@@ -62,9 +59,6 @@ create table conventions(studentEmail text PRIMARY KEY,
                         supervisorEmail text,
                         supervisorTel text,
                         title text,
-                        researchLab boolean,
-                        foreignCountry boolean,
-                        gratification real,
                         skip boolean
 );
 
