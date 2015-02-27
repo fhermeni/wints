@@ -96,4 +96,7 @@ type Service interface {
 	SkipConvention(student string, skip bool) error
 	DeleteConvention(student string) error
 	SetAlumni(student string, a Alumni) error
+
+	//public statistics
+	Statistics() ([]Stat, error)
 }

@@ -44,7 +44,15 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string) Servic
 	s.r.HandleFunc("/", mon(home(backend))).Methods("GET")
 	s.r.HandleFunc("/api/v1/surveys/{token}", surveyFromToken(backend)).Methods("GET")
 	s.r.HandleFunc("/api/v1/surveys/{token}", setSurveyContent(backend)).Methods("POST")
+	s.r.HandleFunc("/api/v1/statistics/", mon(statistics(backend))).Methods("GET")
 	return s
+}
+
+func statistics(backend internship.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		stats, err := backend.Statistics()
+		writeJSONIfOk(err, w, r, stats)
+	}
 }
 
 func home(backend internship.Service) http.HandlerFunc {

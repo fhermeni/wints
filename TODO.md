@@ -21,6 +21,7 @@
 - [x] midterm survey
 - [x] final survey
 - [x] future survey
+- [x] statistics
 - [ ] mailing for missing surveys
 - [ ] concatenate every static resource
 - [x] request monitoring
@@ -43,7 +44,6 @@
 ### frontend
 
 - [x] session timeout management at rest level
-
 #### login page
 
 - [x] login
@@ -97,3 +97,6 @@
 
 #### supervisor
 - [x] access survey
+
+#### public
+- [ ] pretty statistics

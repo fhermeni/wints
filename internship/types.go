@@ -220,6 +220,20 @@ type Alumni struct {
 	Position int
 }
 
+//Stat gathers anonimzed statistics
+type Stat struct {
+	Major          string
+	Promotion      string
+	Future         Alumni
+	ForeignCountry bool
+	Lab            bool
+	Gratification  int
+	//Grade for each report
+	Reports map[string]int
+	//Answers for each survey
+	Surveys map[string]map[string]string
+}
+
 //Predefined errors
 var (
 	ErrReportExists       = errors.New("Report already exists")

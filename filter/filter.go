@@ -295,3 +295,7 @@ func (v *Service) SetSurveyContent(token string, cnt map[string]string) error {
 func (v *Service) SurveyDefs() []internship.SurveyDef {
 	return v.srv.SurveyDefs()
 }
+
+func (v *Service) Statistics() ([]internship.Stat, error) {
+	return v.srv.Statistics()
+}
