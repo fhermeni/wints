@@ -11,7 +11,7 @@
     <div class='form-group'>
         <label for='lbl-{{Email}}' class='col-md-7 control-label'>
             <a data-user="{{Email}}" class="btn btn-xs btn-danger glyphicon glyphicon-remove" data-toggle="delteacher-confirmation"> </a>
-            <a class="fn" href="mailto:{{Email}}">{{fullname this}}</a>
+            <a class="fn" href="mailto:{{Email}}" title="{{fullname this}}">{{shortFullname this}}</a>
         </label>
         <span class='col-md-3'>
             <select onchange="setUserRole('{{Email}}', parseInt($(this).val()))">
@@ -31,7 +31,7 @@
 <div class='col-md-3'>
     <div class="form-group">        
             <a data-user="{{Email}}" class="btn btn-xs btn-danger glyphicon glyphicon-remove" data-toggle="delstudent-confirmation"> </a>
-            <a class="fn" href="mailto:{{Email}}">{{fullname this}}</a>            
+            <a class="fn" href="mailto:{{Email}}" title="{{fullname this}}">{{shortFullname this}}</a>            
             <a data-toggle="student-reinvite" data-user="{{Email}}" class="btn btn-info btn-xs" title="reset ?">
             <i class="glyphicon glyphicon-refresh"></i>
         </a>                
