@@ -112,13 +112,11 @@ var possiblePositions = [
         "entrepreneurship"
     ];
 
-Handlebars.registerHelper('nextPosition', function(pos) {  
-    console.log(pos);  
+Handlebars.registerHelper('nextPosition', function(pos) {      
     return new Handlebars.SafeString("<i>" + possiblePositions[pos] + "</i>");
 });
 
-Handlebars.registerHelper('nextContact', function(c) {  
-    console.log(c);
+Handlebars.registerHelper('nextContact', function(c) {      
     if (!c || c.length == 0) {        
         return new Handlebars.SafeString("<i>not available</i>");    
     }  

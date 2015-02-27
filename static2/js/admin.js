@@ -362,8 +362,7 @@ function pickKnown() {
     });    
 }
 
-function serviceMailing() {
-    console.log(arguments);
+function serviceMailing() {    
     var to = [];    
     $(".icheckbox.checked").find(":checkbox").each(function(i, c) {
         var em = $(c).attr("data-email")
@@ -397,8 +396,7 @@ function mailing(t, w) {
                 cc.push(i.Sup.Email)
             }
         }
-    });
-    console.log(to);
+    });    
     if (to.length > 0) {
         window.location.href = "mailto:" + to.join(",") + (cc.length > 0 ? "?cc=" + cc.join(",") : "");
     }    
