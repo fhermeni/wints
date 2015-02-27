@@ -95,7 +95,7 @@ Handlebars.registerHelper('majorOptions', function(m) {
 Handlebars.registerHelper('userSelecter', function(users) {
     var b = "";    
     users.forEach(function (o) {        
-        b += "<option value='" + o.Email + "'>" + o.Firstname + " " + o.Lastname + "</option>";
+        b += "<option value='" + o.Email + "'>" + o.Firstname + " " + o.Lastname + " (" + o.Tel + ") </option>";
     });
     return new Handlebars.SafeString(b);
 });
