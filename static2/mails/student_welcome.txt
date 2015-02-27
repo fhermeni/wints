@@ -5,6 +5,11 @@ This webapp allows you to:
 - update if needed the details of your internship. It is expected you to provide accurate contact data.
 - upload your reports for evaluation and access your tutor feedbacks
 
+By default, the deadlines for the reports are:
+- Description of Work: 2 weeks from the beginning
+- Midterm report: 2 months from the beginning
+- Final report: September, the 1st
+
 Visit the following link to terminate the account creation:
 {{.WWW}}/resetPassword?token={{.Token}}
 
