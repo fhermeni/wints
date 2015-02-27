@@ -38,10 +38,12 @@ create table internships(student text PRIMARY KEY REFERENCES users(email) on del
                         supervisorTel text,
                         title text,
                         nextPosition integer,
-                        nextContact text
+                        nextContact text,
+                        creation timestamp with time zone
 );
 
 create table conventions(studentEmail text PRIMARY KEY,
+                        creation timestamp with time zone,
                         studentFn text,
                         studentLn text,
                         studentTel text,

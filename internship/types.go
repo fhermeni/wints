@@ -131,6 +131,7 @@ func (p Person) Fullname() string {
 
 //Internship is the core type to specify required data related to an internship
 type Internship struct {
+	Creation time.Time
 	//The student
 	Student User
 	//The academic tutor
@@ -161,6 +162,7 @@ type Internship struct {
 }
 
 type Convention struct {
+	Creation   time.Time
 	Student    Person
 	Tutor      Person
 	Supervisor Person
@@ -222,6 +224,7 @@ type Alumni struct {
 
 //Stat gathers anonimzed statistics
 type Stat struct {
+	Creation       time.Time
 	Major          string
 	Promotion      string
 	Future         Alumni
