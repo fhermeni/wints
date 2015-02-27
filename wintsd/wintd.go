@@ -6,6 +6,7 @@ import (
 	"flag"
 	"log"
 	"os"
+	"runtime"
 	"time"
 
 	"github.com/fhermeni/wints/config"
@@ -109,6 +110,7 @@ func upgradeDB(ds *datastore.Service) {
 	}
 }
 func main() {
+
 	fakeMailer := flag.Bool("fakeMailer", false, "Use a fake mailer that print mail on stdout")
 	cfgPath := flag.String("conf", "./wints.conf", "daemon configuration file")
 	install := flag.Bool("install", false, "/!\\ Create database tables")
@@ -171,6 +173,11 @@ func main() {
 	if err != nil {
 		log.Fatalln("Unable to start the convention feeder: " + err.Error())
 	}
+
+	//Set the number of procs
+	runtime.GOMAXPROCS(runtime.NumCPU())
+	log.Printf("Working over %d CPU(s)\n", runtime.NumCPU())
+
 	startFeederDaemon(puller, ds, period)
 
 	www := handler.NewService(ds, mailer, cfg.HTTP.Path)
