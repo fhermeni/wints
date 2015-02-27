@@ -368,21 +368,18 @@ function serviceMailing() {
     $(".icheckbox.checked").find(":checkbox").each(function(i, c) {
         var em = $(c).attr("data-email")
         to.push(em);                                  
-    });
-    console.log(to);
+    });    
     if (to.length > 0) {
         window.location.href = "mailto:" + to.join(",");
     }    
 }
 
-function mailing(t, w) {
-    console.log(arguments);
+function mailing(t, w) {    
     var to = [];
     var cc = [];
     $(".icheckbox.checked").find(":checkbox").each(function(i, c) {
         var em = $(c).attr("data-email")                                  
-        var i = getInternship(em)
-        console.log(i);
+        var i = getInternship(em);
         if (i) {            
             if (t == "students") {
                 to.push(i.Student.Email)
