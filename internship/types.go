@@ -154,7 +154,10 @@ type Internship struct {
 	//The student major
 	Major string
 	//Student future
-	Future Alumni
+	Future         Alumni
+	ForeignCountry bool
+	Lab            bool
+	Gratification  int
 }
 
 type Convention struct {

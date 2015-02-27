@@ -32,8 +32,8 @@ func (srv *Service) NewInternship(c internship.Convention) ([]byte, error) {
 		return []byte{}, rollback(internship.ErrUserExists, tx)
 	}
 	//Create the internship
-	sql = "insert into internships(student, promotion, tutor, startTime, endTime, title, supervisorFn, supervisorLn, supervisorTel, supervisorEmail, company, companyWWW) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)"
-	_, err = tx.Exec(sql, c.Student.Email, c.Promotion, c.Tutor.Email, c.Begin, c.End, c.Title, c.Supervisor.Firstname, c.Supervisor.Lastname, c.Supervisor.Tel, c.Supervisor.Email, c.Cpy.Name, c.Cpy.WWW)
+	sql = "insert into internships(student, promotion, tutor, startTime, endTime, title, supervisorFn, supervisorLn, supervisorTel, supervisorEmail, company, companyWWW, foreignCountry, lab, gratification) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)"
+	_, err = tx.Exec(sql, c.Student.Email, c.Promotion, c.Tutor.Email, c.Begin, c.End, c.Title, c.Supervisor.Firstname, c.Supervisor.Lastname, c.Supervisor.Tel, c.Supervisor.Email, c.Cpy.Name, c.Cpy.WWW, c.ForeignCountry, c.Lab, c.Gratification)
 	if err != nil {
 		if e, ok := err.(*pq.Error); ok {
 			if e.Constraint == "internships_tutor_fkey" {
@@ -143,7 +143,7 @@ func (srv *Service) SetPromotion(stu, p string) error {
 }
 
 func (srv *Service) Internship(stu string) (internship.Internship, error) {
-	sql := "select stu.firstname, stu.lastname, stu.email, stu.tel, promotion, major, tut.firstname, tut.lastname, tut.email, tut.tel, tut.role, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, startTime, endTime, company, companyWWW, nextPosition, nextContact from internships, users as stu, users as tut where internships.tutor=tut.email and internships.student = stu.email and stu.email = $1"
+	sql := "select stu.firstname, stu.lastname, stu.email, stu.tel, promotion, major, tut.firstname, tut.lastname, tut.email, tut.tel, tut.role, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, startTime, endTime, company, companyWWW, nextPosition, nextContact, foreignCountry, lab, gratification from internships, users as stu, users as tut where internships.tutor=tut.email and internships.student = stu.email and stu.email = $1"
 	rows, err := srv.DB.Query(sql, stu)
 	if err != nil || !rows.Next() {
 		return internship.Internship{}, internship.ErrUnknownInternship
@@ -176,7 +176,9 @@ func scanInternship(r *sql.Rows) (internship.Internship, error) {
 	var nextPosition sql.NullInt64
 	var nextContact sql.NullString
 	var start, end time.Time
-	err := r.Scan(&stuFn, &stuLn, &stuEmail, &stuTel, &prom, &major, &tutFn, &tutLn, &tutEmail, &tutTel, &tutRole, &supFn, &supLn, &supEmail, &supTel, &title, &start, &end, &company, &companyWWW, &nextPosition, &nextContact)
+	var foreign, lab bool
+	var gratif int
+	err := r.Scan(&stuFn, &stuLn, &stuEmail, &stuTel, &prom, &major, &tutFn, &tutLn, &tutEmail, &tutTel, &tutRole, &supFn, &supLn, &supEmail, &supTel, &title, &start, &end, &company, &companyWWW, &nextPosition, &nextContact, &foreign, &lab, &gratif)
 	if err != nil {
 		return internship.Internship{}, err
 	}
@@ -184,7 +186,7 @@ func scanInternship(r *sql.Rows) (internship.Internship, error) {
 	tut := internship.User{Firstname: tutFn, Lastname: tutLn, Email: tutEmail, Tel: tutTel, Role: tutRole}
 	c := internship.Company{Name: company, WWW: companyWWW}
 	sup := internship.Person{Firstname: supFn, Lastname: supLn, Email: supEmail, Tel: supTel}
-	i := internship.Internship{Student: stu, Promotion: prom, Sup: sup, Tutor: tut, Cpy: c, Begin: start, End: end, Title: title}
+	i := internship.Internship{Student: stu, Promotion: prom, Sup: sup, Tutor: tut, Cpy: c, Begin: start, End: end, Title: title, ForeignCountry: foreign, Lab: lab, Gratification: gratif}
 	if major.Valid {
 		i.Major = major.String
 	}
@@ -257,7 +259,7 @@ func (srv *Service) appendReports(i *internship.Internship) error {
 }
 
 func (srv *Service) Internships() ([]internship.Internship, error) {
-	sql := "select stu.firstname, stu.lastname, stu.email, stu.tel, promotion, major, tut.firstname, tut.lastname, tut.email, tut.tel, tut.role, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, startTime, endTime, company, companyWWW, nextPosition, nextContact from internships, users as stu, users as tut where internships.tutor=tut.email and internships.student = stu.email"
+	sql := "select stu.firstname, stu.lastname, stu.email, stu.tel, promotion, major, tut.firstname, tut.lastname, tut.email, tut.tel, tut.role, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, startTime, endTime, company, companyWWW, nextPosition, nextContact, foreignCountry, lab, gratification from internships, users as stu, users as tut where internships.tutor=tut.email and internships.student = stu.email"
 	internships := make([]internship.Internship, 0, 0)
 	rows, err := srv.DB.Query(sql)
 	if err != nil {
