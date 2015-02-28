@@ -25,7 +25,8 @@ function showDashboard() {
         var html = Handlebars.getTemplate("internship")(i);
         var root = $("#cnt");
         root.html(html);
-        $("select").selecter();
+        $("#select-position").selecter();
+        $("#major").selecter({callback: function(v) {setMajor(mine.Student.Email, v)}});
         $('input[type=file]').filestyle({input:false, buttonText:"", buttonName:"btn-success btn-sm", iconName:"glyphicon-cloud-upload", badge: false})
         $(':file').change(function() {            
             var file = this.files[0];
