@@ -20,6 +20,7 @@ const (
 	stuPromotion    = 1
 	foreignCountry  = 2
 	lab             = 3
+	gender          = 4
 	stuFn           = 5
 	stuLn           = 6
 	stuEmail        = 17
@@ -127,6 +128,7 @@ func (f *HTTPFeeder) scan(year int, prom string) ([]internship.Convention, error
 		title := clean(record[titleIdx])
 		foreign := clean(record[foreignCountry]) != "non"
 		inLab := clean(record[lab]) != "non"
+		male := clean(record[gender]) == "m."
 		gratif := cleanInt(record[gratification])
 		ts, err := time.Parse("2006-01-02 15:04", clean(record[timestamp]))
 		if err != nil {
@@ -141,6 +143,7 @@ func (f *HTTPFeeder) scan(year int, prom string) ([]internship.Convention, error
 			return conventions, err
 		}
 		c := internship.Convention{
+			Male:           male,
 			Creation:       ts,
 			Student:        student,
 			Supervisor:     supervisor,

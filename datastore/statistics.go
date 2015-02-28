@@ -19,6 +19,7 @@ func (srv *Service) Statistics() ([]internship.Stat, error) {
 
 func convert(i internship.Internship) internship.Stat {
 	s := internship.Stat{
+		Male:           i.Male,
 		Creation:       i.Creation,
 		Promotion:      i.Promotion,
 		Major:          i.Major,
