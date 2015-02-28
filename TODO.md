@@ -94,6 +94,7 @@
 - [x] help
 - [x] report expectations
 - [x] set alumni
+- [x] update major
 
 #### supervisor
 - [x] access survey

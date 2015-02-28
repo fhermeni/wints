@@ -1,19 +1,19 @@
 Subject:[Wints] Account created
 
-Wints is the web application used to follow your internship.
-This webapp allows you to:
-- update if needed the details of your internship. It is expected you to provide accurate contact data.
-- upload your reports for evaluation and access your tutor feedbacks
+Wints is the web application used to follow your internship progress.
+It allows you to upload your reports for evaluation and access your tutor feedbacks.
+
+Visit the following link to terminate the account creation:
+{{.WWW}}/resetPassword?token={{.Token}}
+
+The login is the email I used to contact you.
+Once logged, check and update if needed your profile and all the contact data.
+It is expected you to provide accurate informations.
 
 By default, the deadlines for the reports are:
 - Description of Work: 2 weeks from the beginning
 - Midterm report: 2 months from the beginning
 - Final report: September, the 1st
-
-Visit the following link to terminate the account creation:
-{{.WWW}}/resetPassword?token={{.Token}}
-
-The email to use to log in is the one I used to contact you.
 
 Regards,
 Fabien Hermenier
