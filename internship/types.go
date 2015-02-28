@@ -234,6 +234,7 @@ type Stat struct {
 	ForeignCountry bool
 	Lab            bool
 	Gratification  int
+	Cpy            Company
 	//Grade for each report
 	Reports map[string]int
 	//Answers for each survey

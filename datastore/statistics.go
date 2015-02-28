@@ -29,6 +29,7 @@ func convert(i internship.Internship) internship.Stat {
 		Gratification:  i.Gratification,
 		Reports:        make(map[string]int),
 		Surveys:        make(map[string]map[string]string),
+		Cpy: i.Cpy
 	}
 	for _, r := range i.Reports {
 		if r.ToGrade {
