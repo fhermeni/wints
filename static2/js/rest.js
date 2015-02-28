@@ -242,3 +242,7 @@ function alumni(student, ok, no) {
 function setAlumni(student, pos, email, ok, no) {    
     return post("/internships/" + student + "/alumni", {Contact: email, Position: pos}, ok, no)
 }
+
+function statistics(ok, no) {
+    return get("/statistics/", ok, no)
+}

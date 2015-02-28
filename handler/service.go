@@ -42,6 +42,7 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string) Servic
 	r.PathPrefix("/" + path + "/").Handler(httpgzip.NewHandler(http.StripPrefix("/"+path, fileHandler)))
 	http.Handle("/", s.r)
 	s.r.HandleFunc("/", mon(home(backend))).Methods("GET")
+	s.r.HandleFunc("/statistics", mon(stats())).Methods("GET")
 	s.r.HandleFunc("/api/v1/surveys/{token}", surveyFromToken(backend)).Methods("GET")
 	s.r.HandleFunc("/api/v1/surveys/{token}", setSurveyContent(backend)).Methods("POST")
 	s.r.HandleFunc("/api/v1/statistics/", mon(statistics(backend))).Methods("GET")
@@ -52,6 +53,11 @@ func statistics(backend internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		stats, err := backend.Statistics()
 		writeJSONIfOk(err, w, r, stats)
+	}
+}
+func stats() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, path+"/statistics.html")
 	}
 }
 
