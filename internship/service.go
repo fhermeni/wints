@@ -45,6 +45,8 @@ type Service interface {
 	//Destroy a session
 	Logout(email, token string) error
 
+	Sessions() (map[string]time.Time, error)
+
 	//Create a new user
 	//Returns the resulting password
 	NewTutor(p User) ([]byte, error)

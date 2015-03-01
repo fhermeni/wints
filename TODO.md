@@ -32,6 +32,7 @@
 - [x] online survey for supervisor
 - [x] gmail friendly
 - [x] invitation-based only root account creation
+- [x] access last opened sessions
 - [ ] mailing for missing surveys
 - [ ] concatenate every static resource
 - [ ] defenses

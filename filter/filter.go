@@ -157,6 +157,12 @@ func (v *Service) Logout(email, token string) error {
 	return v.srv.Logout(email, token)
 }
 
+func (v *Service) Sessions() (map[string]time.Time, error) {
+	if v.my.Role == internship.ROOT {
+		return v.srv.Sessions()
+	}
+	return nil, ErrPermission
+}
 func (v *Service) NewTutor(p internship.User) ([]byte, error) {
 	if v.my.Role == internship.ROOT {
 		return v.srv.NewTutor(p)
