@@ -25,6 +25,7 @@ create table sessions(email text REFERENCES users(email) on delete cascade,
 		      );
 
 create table internships(student text PRIMARY KEY REFERENCES users(email) on delete cascade,
+                        male boolean,
                         startTime timestamp with time zone,
                         endTime timeStamp with time zone,
                         tutor text REFERENCES users(email), --prevent to delete the tutor if he is tutoring someone
@@ -43,6 +44,7 @@ create table internships(student text PRIMARY KEY REFERENCES users(email) on del
 );
 
 create table conventions(studentEmail text PRIMARY KEY,
+                        male boolean,
                         creation timestamp with time zone,
                         studentFn text,
                         studentLn text,
