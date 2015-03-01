@@ -21,16 +21,22 @@
 - [x] midterm survey
 - [x] final survey
 - [x] future survey
+<<<<<<< HEAD
 - [x] statistics
 - [ ] mailing for missing surveys
 - [ ] concatenate every static resource
+=======
+>>>>>>> master
 - [x] request monitoring
 - [x] alumni status support
-- [ ] defenses
-- [ ] concatenate every static resource
 - [x] online survey for supervisor
 - [x] gmail friendly
 - [x] invitation-based only root account creation
+- [ ] mailing for missing surveys
+- [ ] concatenate every static resource
+- [ ] defenses
+- [ ] concatenate every static resource
+- [ ] supervisor grade (from evaluation)
 
 ### Daemon
 
@@ -38,8 +44,9 @@
 - [x] test-db mode
 - [x] test-mailer mode
 - [x] test-feeder mode
+- [x] safe root invitation
 - [ ] deadline reminders
-- [ ] safe root invitation
+
 
 ### frontend
 
@@ -79,6 +86,8 @@
 - [x] help
 - [x] report expectations
 - [x] graduation template
+- [ ] see supervisor grade
+- [ ] edit supervisor grade
 
 #### student
 - [x] profile update
@@ -98,6 +107,8 @@
 
 #### supervisor
 - [x] access survey
+- [x] note evaluations
+- [ ] final grade and comment
 
 #### public
 - [ ] pretty statistics
