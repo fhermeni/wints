@@ -81,6 +81,7 @@ func userMngt(s Service, mailer mail.Mailer) {
 	s.r.HandleFunc("/api/v1/users/", restHandler(newTutor, s, mailer)).Methods("POST")
 	s.r.HandleFunc("/api/v1/users/{email}/password", mon(resetPassword(s.backend, mailer))).Methods("DELETE")
 	s.r.HandleFunc("/api/v1/users/{email}/password", restHandler(setPassword, s, mailer)).Methods("PUT")
+	s.r.HandleFunc("/api/v1/sessions/", restHandler(sessions, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/newPassword", mon(newPassword(s.backend, mailer))).Methods("POST")
 	s.r.HandleFunc("/api/v1/login", mon(login(s.backend))).Methods("POST")
 	s.r.HandleFunc("/api/v1/logout", mon(logout(s.backend))).Methods("GET")
@@ -208,6 +209,11 @@ func resetPassword(srv internship.Service, mailer mail.Mailer) http.HandlerFunc 
 			}
 		}()
 	}
+}
+
+func sessions(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+	res, err := srv.Sessions()
+	return writeJSONIfOk(err, w, r, res)
 }
 
 func newTutor(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {

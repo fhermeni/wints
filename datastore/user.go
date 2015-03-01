@@ -27,7 +27,7 @@ func (s *Service) Registered(email string, password []byte) ([]byte, error) {
 	}
 	//token
 	token := randomBytes(32)
-	err = SingleUpdate(s.DB, internship.ErrUnknownUser, "insert into sessions(email, token, last) values ($1,$2,$3)", email, token, time.Now().Add(time.Hour*72)) //3 days
+	err = SingleUpdate(s.DB, internship.ErrUnknownUser, "insert into sessions(email, token, last) values ($1,$2,$3)", email, token, time.Now().Add(time.Hour*24)) //1 day
 	if err != nil {
 		return []byte{}, err
 	}
@@ -46,8 +46,24 @@ func (s *Service) OpenedSession(email, token string) error {
 	return err
 }
 
+func (s *Service) Sessions() (map[string]time.Time, error) {
+	r, err := s.DB.Query("select email, last from sessions")
+	if err != nil {
+		return nil, err
+	}
+	defer r.Close()
+	res := make(map[string]time.Time)
+	for r.Next() {
+		var email string
+		var last time.Time
+		r.Scan(&email, &last)
+		res[email] = last
+	}
+	return res, err
+}
 func (s *Service) Logout(email, token string) error {
-	_, err := s.DB.Exec("delete from sessions where email=$1 and token=$2", email, token)
+	err := SingleUpdate(s.DB, internship.ErrUnknownUser, "update sessions set token=$3 where email=$1 and token=$2", token, email, randomBytes(32)) //unknown token (to remind last visit)
+	//_, err := s.DB.Exec("delete from sessions where email=$1 and token=$2", email, token)
 	return err
 }
 

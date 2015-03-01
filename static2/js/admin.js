@@ -152,37 +152,39 @@ function shiftSelect(e) {
 }
     
 function showPrivileges() {
+    sessions(function (ss) {
+
     users(function(data) {
         var teachers = [];
-        var students = []
+        var students = [];
         data.filter(function (u) {
-            if (u.Role == 0 && myself.Email != u.Email) {
+            u.Last = ss[u.Email];
+            if (u.Role == 0 && myself.Email != u.Email) {                
                 students.push(u)
             } else if (myself.Email != u.Email) {
                 teachers.push(u);
             }
         })
-        //The base
-        var html = Handlebars.getTemplate("privileges")({Students: students, Teachers: teachers});
-        $("#cnt").html(html);
-        $("#cnt").find("select").selecter();
-        $('[data-toggle="delteacher-confirmation"]').each(function (i, a) {
-            var j = $(a);
-            j.confirmation({onConfirm: function() {removeUser(j.attr("data-user"), j.parent().parent().parent())}});
+            var html = Handlebars.getTemplate("privileges")({Students: students, Teachers: teachers});
+            $("#cnt").html(html);
+            $("#cnt").find("select").selecter();
+            $('[data-toggle="delteacher-confirmation"]').each(function (i, a) {
+                var j = $(a);
+                j.confirmation({onConfirm: function() {removeUser(j.attr("data-user"), j.parent().parent().parent())}});
+            });
+            $('[data-toggle="teacher-reinvite"]').each(function (i, a) {
+                var j = $(a);
+                j.confirmation({onConfirm: function() {reInvite(j.attr("data-user"))}, btnOkLabel: '<i class="icon-ok-sign icon-white"></i> Confirm'});
+            });
+            $('[data-toggle="student-reinvite"]').each(function (i, a) {
+                var j = $(a);
+                j.confirmation({onConfirm: function() {resetPassword(j.attr("data-user"))}, btnOkLabel: '<i class="icon-ok-sign icon-white"></i> Confirm'});
+            });
+            $('[data-toggle="delstudent-confirmation"]').each(function (i, a) {
+                var j = $(a);
+                j.confirmation({onConfirm: function() {removeUser(j.attr("data-user"), j.parent().parent())}});
+            });
         });
-        $('[data-toggle="teacher-reinvite"]').each(function (i, a) {
-            var j = $(a);
-            j.confirmation({onConfirm: function() {reInvite(j.attr("data-user"))}, btnOkLabel: '<i class="icon-ok-sign icon-white"></i> Confirm'});
-        });
-        $('[data-toggle="student-reinvite"]').each(function (i, a) {
-            var j = $(a);
-            j.confirmation({onConfirm: function() {resetPassword(j.attr("data-user"))}, btnOkLabel: '<i class="icon-ok-sign icon-white"></i> Confirm'});
-        });
-        $('[data-toggle="delstudent-confirmation"]').each(function (i, a) {
-            var j = $(a);
-            j.confirmation({onConfirm: function() {removeUser(j.attr("data-user"), j.parent().parent())}});
-        });
-
     });
 }
 
