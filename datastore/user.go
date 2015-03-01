@@ -57,7 +57,7 @@ func (s *Service) Sessions() (map[string]time.Time, error) {
 		var email string
 		var last time.Time
 		r.Scan(&email, &last)
-		res[email] = last
+		res[email] = last.Add(time.Hour * -24)
 	}
 	return res, err
 }
