@@ -40,7 +40,10 @@ create table internships(student text PRIMARY KEY REFERENCES users(email) on del
                         title text,
                         nextPosition integer,
                         nextContact text,
-                        creation timestamp with time zone
+                        creation timestamp with time zone,
+                        foreignCountry boolean,
+                        lab boolean,
+                        gratification real 
 );
 
 create table conventions(studentEmail text PRIMARY KEY,
