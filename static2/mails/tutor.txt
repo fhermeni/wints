@@ -1,7 +1,12 @@
 Subject:[Wints] New tutored student: {{.Student.Fullname}}
 
 You can access the internship data from your dashboard at {{.WWW}}.
-Contact me if you received this email by mistake
+Contact me if you received this email by mistake.
+
+By default, the deadlines for the reports are:
+- Description of Work: 3 weeks from the beginning
+- Midterm report: 2 months from the beginning
+- Final report: September, the 1st
 
 Regards
 Fabien Hermenier
