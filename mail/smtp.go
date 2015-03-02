@@ -112,6 +112,7 @@ func (m *SMTP) sendMail(addr string, from string, to []string, cc []string, msg 
 type InvitationData struct {
 	WWW   string
 	Token string
+	Login string
 }
 
 func join(mails ...string) []string {
@@ -123,14 +124,14 @@ func join(mails ...string) []string {
 }
 
 func (m *SMTP) SendAdminInvitation(u internship.User, token []byte) {
-	d := InvitationData{WWW: m.www, Token: string(token)}
+	d := InvitationData{WWW: m.www, Token: string(token), Login: u.Email}
 	if err := m.mail(join(u.Email), join(), m.path+"/tutor_welcome.txt", d); err != nil {
 		log.Printf("Unable to send invitation to '%s': %s\n", u.Fullname(), err.Error())
 	}
 }
 
 func (m *SMTP) SendStudentInvitation(u internship.User, token []byte) {
-	d := InvitationData{WWW: m.www, Token: string(token)}
+	d := InvitationData{WWW: m.www, Token: string(token), Login: u.Email}
 	if err := m.mail(join(u.Email), join(), m.path+"/student_welcome.txt", d); err != nil {
 		log.Printf("Unable to send invitation to '%s': %s\n", u.Fullname(), err.Error())
 	}

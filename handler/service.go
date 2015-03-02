@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/fhermeni/wints/internship"
@@ -183,7 +184,7 @@ func newPassword(srv internship.Service, mailer mail.Mailer) http.HandlerFunc {
 				Path:  "/",
 			}
 			http.SetCookie(w, cookie)
-			http.Redirect(w, r, "/?email="+email, 302)
+			http.Redirect(w, r, "/?email="+url.QueryEscape(email), 302)
 		default:
 			log.Println("Unable to reset the password for token " + token + ": " + err.Error())
 			http.Error(w, "Unable to reset the password", http.StatusInternalServerError)

@@ -3,10 +3,9 @@ Subject:[Wints] Account created
 Wints is the web application used to follow your internship progress.
 It allows you to upload your reports for evaluation and access your tutor feedbacks.
 
-Visit the following link to terminate the account creation:
-{{.WWW}}/resetPassword?token={{.Token}}
+Login: {{.Login}}
+To generate a password: {{.WWW}}/resetPassword?token={{.Token}}
 
-The login is the email I used to contact you.
 Once logged, check and update if needed your profile and all the contact data.
 It is expected you to provide accurate informations.
 

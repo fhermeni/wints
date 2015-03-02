@@ -32,7 +32,7 @@ function passwordLost() {
     
 $(document).ready(function() {
     var em = decodeURIComponent($.urlParam("email"))
-    if (em) {
+    if (em && em != "null") {
         $("#login").val(em);
     }
 });
