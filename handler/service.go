@@ -183,7 +183,7 @@ func newPassword(srv internship.Service, mailer mail.Mailer) http.HandlerFunc {
 				Path:  "/",
 			}
 			http.SetCookie(w, cookie)
-			http.Redirect(w, r, "/", 302)
+			http.Redirect(w, r, "/?email="+email, 302)
 		default:
 			log.Println("Unable to reset the password for token " + token + ": " + err.Error())
 			http.Error(w, "Unable to reset the password", http.StatusInternalServerError)
