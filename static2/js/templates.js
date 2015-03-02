@@ -306,7 +306,7 @@ Handlebars.registerHelper('gradeInput', function(r) {
 });
 
 Handlebars.registerHelper('studentGrade', function(r) {
-    var passed = new Date(Date.parse(r.Deadline)).getTime() < new Date().getTime()
+    var passed = new Date(r.Deadline).getTime() < new Date().getTime()
     if (!r.ToGrade) {
         return "-";
     }
