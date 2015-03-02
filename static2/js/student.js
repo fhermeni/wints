@@ -20,7 +20,7 @@ function showDashboard() {
         for (x in i.Reports) {            
             i.Reports[x].Uploaded = i.Reports[x].Grade != -2;
             //Locked= deadline passed || commented            
-            i.Reports[x].Locked = new Date(i.Reports[x].Deadline).getTime() < new Date().getTime() || i.Reports[x].Grade >= 0;                   
+            i.Reports[x].Locked = new Date(i.Reports[x].Deadline).getTime() > new Date().getTime() || i.Reports[x].Grade >= 0;                   
         }            
         var html = Handlebars.getTemplate("internship")(i);
         var root = $("#cnt");
