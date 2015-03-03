@@ -1,16 +1,15 @@
-<h3>Tutors and administrators
-    <small>
-        <button onclick="showNewUser()" data-toggle='modal' class="btn btn-success">
+<h3>Tutors and administrators    
+        <button onclick="showNewUser()" data-toggle='modal' class="btn btn-success btn-sm">
             <span class="glyphicon glyphicon-plus"></span> add user
-        </button>
-    </small>
+        </button>    
+        <button type="button" class="btn btn-primary btn-sm" onclick="serviceMailing()"><i class="glyphicon glyphicon-envelope"></i> mail selection</button>
 </h3>
 <div class="row">
 {{#each Teachers}}
 <div class='col-md-6'>
-    <div class='form-group'>
+    <div class='form-group'>        
         <label for='lbl-{{Email}}' class='col-md-7 control-label'>
-            <a data-user="{{Email}}" class="btn btn-xs btn-danger glyphicon glyphicon-remove" data-toggle="delteacher-confirmation"> </a>
+            <input type='checkbox' class='icheckbox_flat' data-email='{{Email}}'/>  
             <a class="fn" href="mailto:{{Email}}" title="{{fullname this}}">{{shortFullname this}}</a>
         {{#if Last}}
         <small>({{datetime Last}})</small>        
@@ -21,28 +20,28 @@
                 {{roleOptions Role}}
             </select>                        
         </span>        
-        <a data-toggle="teacher-reinvite" data-user="{{Email}}" class="btn btn-info btn-sm" title="re-invite ?">
-            <i class="glyphicon glyphicon-refresh"></i>
-        </a>        
+        <a data-toggle="teacher-reinvite" data-user="{{Email}}" class="btn btn-info btn-xs glyphicon glyphicon-refresh" title="re-invite ?"></a> 
+        <a data-user="{{Email}}" class="btn btn-xs btn-danger glyphicon glyphicon-remove" data-toggle="delteacher-confirmation"> </a>       
     </div>
 </div>
 {{/each}}
 </div>
-<h3>Students</h3>
+<h3>Students
+        <button type="button" class="btn btn-primary btn-sm" onclick="serviceMailing()"><i class="glyphicon glyphicon-envelope"></i> mail selection</button>
+</h3>
 <div class="row">
 {{#each Students}}
 <div class='col-md-4'>
     <div class="form-group">    
             <label class='col-md-10 control-label'>    
-            <a data-user="{{Email}}" class="btn btn-xs btn-danger glyphicon glyphicon-remove" data-toggle="delstudent-confirmation"> </a>
+            <input type='checkbox' class='icheckbox_flat' data-email='{{Email}}'/>  
             <a class="fn" href="mailto:{{Email}}" title="{{fullname this}}">{{shortFullname this}}</a>     
             {{#if Last}}
             <small>({{datetime Last}})</small>       
             {{/if}}
             </label>
-            <a data-toggle="student-reinvite" data-user="{{Email}}" class="btn btn-info btn-xs" title="reset ?">
-            <i class="glyphicon glyphicon-refresh"></i>
-        </a>                
+            <a data-toggle="student-reinvite" data-user="{{Email}}" class="btn btn-info btn-xs glyphicon glyphicon-refresh" title="reset ?"></a>                
+            <a data-user="{{Email}}" class="btn btn-xs btn-danger glyphicon glyphicon-remove" data-toggle="delstudent-confirmation"> </a>
     </div>
 </div>
 {{/each}}

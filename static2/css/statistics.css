@@ -1,3 +1,22 @@
 .ct-chart .ct-label.ct-vertical, .ct-chart .ct-label.ct-horizontal{
 	font-size: 14px;
+	fill: #94878a;
+	color: #94878a;
+	font-family: Oxygen,Helvetica,Arial,sans-serif;
+}
+
+body {
+	background-color: #EADBC4;
+}
+
+.ct-chart {
+	background-color: #453D3F;
+}
+
+.si {
+	
+}
+
+.ma {
+	
 }

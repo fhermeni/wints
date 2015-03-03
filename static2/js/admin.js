@@ -168,6 +168,7 @@ function showPrivileges() {
             var html = Handlebars.getTemplate("privileges")({Students: students, Teachers: teachers});
             $("#cnt").html(html);
             $("#cnt").find("select").selecter();
+            $('#cnt').find(":checkbox").iCheck()
             $('[data-toggle="delteacher-confirmation"]').each(function (i, a) {
                 var j = $(a);
                 j.confirmation({onConfirm: function() {removeUser(j.attr("data-user"), j.parent().parent().parent())}});

@@ -7,25 +7,19 @@ waitingBlock = $("#cnt").clone().html();
         stats = m;        
         majors(function(m) {
         	allMajors = m;
+        	allMajors.unshift("ALL");
         	allMajors.push("n/a");
         	local();
         	lab();
         	gratification();
 	    })
+	    for (var i = 0; i < stats.length; i++) {
+	    	if (stats[i].Major == "" || !stats[i].Major) {
+	    		stats[i].Major = "n/a";
+	    	}
+	    }
     })
 });
-
-function max() {
-	var m = arguments[0][0];
-	arguments.forEach(function (arr) {
-		arr.forEach(function (e) {
-			if (e > m) {
-				m = e;
-			}
-		})
-	});
-	return m;
-}
 
 function major_counter() {
 	var cnt = [];
@@ -38,9 +32,11 @@ function major_counter() {
 function count(ok,ko, idx,o, key) {
 	if (o[key]) {
 		ok[idx]++;
+		ok[0]++;
 	} else {
 		ko[idx]++;
-	}
+		ko[0]++;
+	}	
 }
 function master(st) {
 	return st.Promotion.indexOf("si") != 0;
@@ -63,10 +59,8 @@ function local() {
 	var foreign_ma = major_counter();
 	var local_ma = major_counter();	
 	
-	stats.forEach(function (st) {		
-		var ma = st.Major;
-		if (ma=="" || !ma) {ma="n/a";}
-		var idx = allMajors.indexOf(ma);
+	stats.forEach(function (st) {				
+		var idx = allMajors.indexOf(st.Major);
 		if (!master(st)) {	
 			count(foreign_si, local_si, idx, st, "ForeignCountry");
 		} else {
@@ -90,10 +84,8 @@ function lab() {
 	var foreign_ma = major_counter();
 	var local_ma = major_counter();	
 	
-	stats.forEach(function (st) {		
-		var ma = st.Major;
-		if (ma=="" || !ma) {ma="n/a";}
-		var idx = allMajors.indexOf(ma);
+	stats.forEach(function (st) {				
+		var idx = allMajors.indexOf(st.Major);
 		if (!master(st)) {	
 			count(foreign_si, local_si, idx, st, "Lab");
 		} else {
@@ -116,16 +108,22 @@ function gratification() {
 	var ma = major_counter();	
 	var nb_si = major_counter();
 	var nb_ma = major_counter();
+	var max = 0;
 	stats.forEach(function (st) {		
-		var ma = st.Major;
-		if (ma=="" || !ma) {ma="n/a";}
-		var idx = allMajors.indexOf(ma);
+		var idx = allMajors.indexOf(st.Major);
+		if (st.Gratification > max) {
+			max = st.Gratification;
+		}
 		if (!master(st)) {	
 			si[idx]+= st.Gratification;
+			si[0] += st.Gratification;
 			nb_si[idx]++;			
+			nb_si[0]++;			
 		} else {
 			ma[idx]+= st.Gratification;
+			ma[0] += st.Gratification;
 			nb_ma[idx]++;			
+			nb_ma[0]++;			
 		}
 	});	
 
@@ -133,15 +131,14 @@ function gratification() {
 	for (var i = 0; i < si.length; i++) {
 		si[i] /= nb_si[i];
 		ma[i] /= nb_ma[i];
-	}
+	}	
 	var dta_si = major_bars([si, ma]);	
-	var options = {seriesBarDistance: 10};
+	var options = {seriesBarDistance: 10,high: max + 100};
 	new Chartist.Bar('.gratification_si', dta_si, options).on('draw', function (dta) {
   if(dta.type === 'bar') {
     dta.element.attr({
       style: 'stroke-width: 10px'
     });
   }
-});
-    //new Chartist.Bar('.gratification_ma', dta_ma, options).on('draw', bar_width);	
+});    
 }
