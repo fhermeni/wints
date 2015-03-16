@@ -455,7 +455,7 @@ internships(function(interns) {
 }
 
 function showRawFullname(kind) {
-    var checked = $("tbody").find(".icheckbox.checked").find(":checkbox")
+    var checked = $(".icheckbox.checked").find(":checkbox")
         var fns = [];
         checked.each(function (i, e) {
             var em = $(e).attr("data-email");            

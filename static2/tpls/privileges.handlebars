@@ -27,7 +27,27 @@
 {{/each}}
 </div>
 <h3>Students
-        <button type="button" class="btn btn-primary btn-sm" onclick="serviceMailing()"><i class="glyphicon glyphicon-envelope"></i> mail selection</button>
+
+<div class="btn-group">
+  <button type="button" class="btn dropdown-toggle btn-sm" data-toggle="dropdown" aria-expanded="false"><i class="glyphicon glyphicon-envelope"></i> mail selection <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" role="menu">
+    <li><a onclick="mailing('students')">students</a></li>
+    <li><a onclick="mailing('students','tutors')">students (cc tutors)</a></li>        
+    <li><a onclick="mailing('supervisors')">supervisors</a></li>
+    <li><a onclick="mailing('tutors')">tutors</a></li>
+  </ul>
+</div>
+
+<div class="btn-group">
+  <button type="button" class="btn btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="glyphicon glyphicon-list"></i> fullnames from selection <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" role="menu">
+    <li><a onclick="showRawFullname('students')">Students</a></li>    
+    <li><a onclick="showRawFullname('supervisors')">Supervisors</a></li>
+    <li><a onclick="showRawFullname('tutors')">Tutors</a></li>    
+  </ul>
+</div>
 </h3>
 <div class="row">
 {{#each Students}}
