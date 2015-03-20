@@ -2,7 +2,10 @@
     <input type="file" accept=".csv"/>                              
 </form>
 <h3>{{Placed}}/{{len Students}} placed students
-        <button type="button" class="btn btn-primary btn-sm" onclick="serviceMailing()"><i class="glyphicon glyphicon-envelope"></i> mail selection</button>
+        <button type="button" class="btn btn-sm" onclick="serviceMailing()"><i class="glyphicon glyphicon-envelope"></i> mail selection</button>
+
+        <button type="button" id="student-fullnames" class="btn btn-sm" href="#"><i class="glyphicon glyphicon-list"></i> fullnames from selection</button>
+
 </h3>
 <div class="row">
 {{#each Students}}

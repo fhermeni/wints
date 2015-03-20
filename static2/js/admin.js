@@ -100,6 +100,11 @@ function showStatus() {
         var html = Handlebars.getTemplate("status")({Students: stus, Interns: known, Placed: placed});
         var root = $("#cnt");
         root.html(html);
+
+        $("#student-fullnames").on("click", function() {
+            showFullnames(stus);
+        });
+
         $('#cnt').find(":checkbox").iCheck();                                    
         var idx = 0;
         stus.forEach(function (stu) {
@@ -131,6 +136,30 @@ function showStatus() {
         });
     })
 })
+}
+
+function showFullnames(source) {
+    var checked = $(".icheckbox.checked").find(":checkbox")
+    var fns = [];
+    checked.each(function (i, e) {
+            var em = $(e).attr("data-email");            
+            source.forEach(function (src) {
+                if (src.Email == em) {
+                    var fn = src.Firstname.charAt(0).toUpperCase() + src.Firstname.slice(1);
+                    var ln = src.Lastname.charAt(0).toUpperCase() + src.Lastname.slice(1);
+                    var n = fn + " " + ln;
+                    if (fns.indexOf(n) < 0) {
+                        fns.push(fn + " " + ln)                
+                    }
+                }
+            })
+    });
+    if (fns.length > 0) {
+        var html = Handlebars.getTemplate("raw");
+        $("#modal").html(html);
+        $("#rawContent").html(fns.join("\n"));
+        $("#modal").modal('show');
+    }
 }
 
 function sendStudentAlignement(stu, internship) {            
