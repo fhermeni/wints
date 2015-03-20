@@ -1,5 +1,5 @@
 -- reset if needed then create the tables required to store internship stuff
-
+drop table if exists pending;
 drop table if exists reports;
 drop table if exists internships;
 drop table if exists conventions;
@@ -68,4 +68,13 @@ create table password_renewal(
     email text PRIMARY KEY REFERENCES users(email) on delete cascade,
     deadline timestamp,
     token text UNIQUE
+)
+
+create table pending(
+    firstname text,
+    lastname text,
+    email text PRIMARY KEY,
+    promotion text,
+    major text,
+    internship text
 )

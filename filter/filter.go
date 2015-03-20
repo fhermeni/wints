@@ -305,3 +305,31 @@ func (v *Service) SurveyDefs() []internship.SurveyDef {
 func (v *Service) Statistics() ([]internship.Stat, error) {
 	return v.srv.Statistics()
 }
+
+func (s *Service) Students() ([]internship.Student, error) {
+	if s.my.Role >= internship.ADMIN {
+		return s.srv.Students()
+	}
+	return []internship.Student{}, ErrPermission
+}
+
+func (s *Service) AddStudent(st internship.Student) error {
+	if s.my.Role >= internship.ADMIN {
+		return s.srv.AddStudent(st)
+	}
+	return ErrPermission
+}
+
+func (s *Service) AlignWithInternship(student string, intern string) error {
+	if s.my.Role >= internship.ADMIN {
+		return s.srv.AlignWithInternship(student, intern)
+	}
+	return ErrPermission
+}
+
+func (s *Service) InsertStudents(file string) error {
+	if s.my.Role >= internship.ADMIN {
+		return s.srv.InsertStudents(file)
+	}
+	return ErrPermission
+}

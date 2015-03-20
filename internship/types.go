@@ -241,6 +241,15 @@ type Stat struct {
 	Surveys map[string]map[string]string
 }
 
+type Student struct {
+	Firstname  string
+	Lastname   string
+	Email      string
+	Promotion  string
+	Major      string
+	Internship string
+}
+
 //Predefined errors
 var (
 	ErrReportExists       = errors.New("Report already exists")

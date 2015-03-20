@@ -28,7 +28,14 @@
                     </li>
                     <li class="role-1" style="display: none;"><a onclick="showPage(this, 'myStudents');"><i class="glyphicon glyphicon-briefcase"></i> Tutored students</a></li>
                     <li class="role-2" style="display: none;"><a onclick="showPage(this, 'conventions');"><i class="glyphicon glyphicon-eye-open"></i> Watchlist</a></li>
-                    <li class="role-3" style="display: none;"><a onclick="showPage(this, 'pending')"><i class="glyphicon glyphicon-filter"></i> Import<span id="pending-counter"></span></a></li>
+
+                    <li class="role-3" style="display: none;">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-globe"></i> Imports<b class="caret"></b></a><span class="dropdown-arrow"></span>
+                        <ul class="dropdown-menu" role="menu">
+                            <li class="role-3 " style="display: none;"><a onclick="showPage(this, 'pending')" class="glyphicon glyphicon-filter"> Conventions<span id="pending-counter"></span></a></li>                    
+                            <li class="role-3" style="display: none;"><a onclick="showPage(this, 'status')" class="glyphicon glyphicon-question-sign"> Status</a></li>
+                        </ul>
+                    </li>                  
                     <li class="role-3" style="display: none;">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="glyphicon glyphicon-picture"></i> Defenses<b class="caret"></b></a><span class="dropdown-arrow"></span>
                         <ul class="dropdown-menu" role="menu">
@@ -83,6 +90,7 @@
             <script src="static/js/bootstrap-confirmation.min.js"></script>            
             <script src="static/js/bootstrap-editable.min.js"></script>            
             
+            <script src="static/js/bootstrap-filestyle.min.js"></script>            
             <script src="static/js/templates.js"></script>
             <script src="static/js/rest.js"></script>
             <script src="static/js/profile.min.js"></script>            

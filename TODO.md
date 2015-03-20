@@ -21,12 +21,8 @@
 - [x] midterm survey
 - [x] final survey
 - [x] future survey
-<<<<<<< HEAD
+- [x] list student that should commit
 - [x] statistics
-- [ ] mailing for missing surveys
-- [ ] concatenate every static resource
-=======
->>>>>>> master
 - [x] request monitoring
 - [x] alumni status support
 - [x] online survey for supervisor

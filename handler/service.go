@@ -445,6 +445,9 @@ func internshipsMngt(s Service, mailer mail.Mailer) {
 	s.r.HandleFunc("/api/v1/internships/{email}/promotion", restHandler(setPromotion, s, mailer)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/alumni", restHandler(setAlumni, s, mailer)).Methods("POST")
 	s.r.HandleFunc("/api/v1/majors/", restHandler(majors, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/students/", restHandler(students, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/students/{email}", restHandler(alignStudentWithInternship, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/students/", restHandler(insertStudents, s, mailer)).Methods("POST")
 }
 
 func setAlumni(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
@@ -626,4 +629,27 @@ func setSurveyContent(backend internship.Service) http.HandlerFunc {
 			http.Error(w, "Bad content", http.StatusBadRequest)
 		}
 	}
+}
+
+func students(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+	st, err := srv.Students()
+	return writeJSONIfOk(err, w, r, st)
+}
+
+func alignStudentWithInternship(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+	var intern string
+	err := jsonRequest(w, r, &intern)
+	if err != nil {
+		return err
+	}
+	return srv.AlignWithInternship(mux.Vars(r)["email"], intern)
+}
+
+func insertStudents(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+	var all string
+	err := jsonRequest(w, r, &all)
+	if err != nil {
+		return err
+	}
+	return srv.InsertStudents(all)
 }

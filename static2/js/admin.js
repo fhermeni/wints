@@ -64,10 +64,118 @@ function refresh() {
         showJuryService();
     } else if (currentPage == "service") {
         showService();
+    } else if (currentPage == "status") {
+        showStatus();
     }
     else {
         console.log("Unsupported operation on '" + currentPage + "'");
     }
+}
+
+function showStatus() {
+    students(function (stus) { 
+        var placed = 0
+        var known = [];            
+        interns.filter(function (u) {
+            known.push(u.Student)
+        })               
+        conventions(function (cc) {
+            cc.forEach(function (conv) {                    
+                if (conv.Skip) {
+                    known.push(conv.Student)                        
+                }
+            }) 
+
+            stus.forEach(function (s) {
+                if (s.Internship != null && s.Internship.length > 0) {                                                            
+                    known.forEach(function (k) {                                                
+                        if (k.Email == s.Internship) {                    
+                            s.Internship = k;                            
+                            placed++;
+                        }
+                        return false;
+                    });                                                        
+                } 
+            });              
+        var html = Handlebars.getTemplate("status")({Students: stus, Interns: known, Placed: placed});
+        var root = $("#cnt");
+        root.html(html);
+        $('#cnt').find(":checkbox").iCheck();                                    
+        var idx = 0;
+        stus.forEach(function (stu) {
+            s = $("#select-" + (idx++));                
+            var best = pickBestStudentMatching(stu, known)                          
+            s.val(best).on("change",function(v) {sendStudentAlignement(stu.Email, s.val(), stus)});                                
+        })  
+
+        //CSV upload      
+        $('input[type=file]').filestyle({input:false, buttonText:"Upload student list", buttonName:"btn-success btn-sm", iconName:"glyphicon-cloud-upload", badge: false})
+        $(':file').change(function() {            
+            var file = this.files[0];
+            var name = file.name;
+            var size = file.size;
+            var type = file.type;            
+            if (type != "text/csv") {
+                reportError("Must be a CSV file")
+            } else if (size > 1000000) {
+                reportError("The file cannot exceed 1MB")
+            } else {    
+                var reader = new FileReader();
+                reader.onload = function(e) {                    
+                    sendStudents(e.target.result, function() {
+                        refresh();
+                    });
+                };
+                reader.readAsText(file);
+            }
+        });
+    })
+})
+}
+
+function sendStudentAlignement(stu, internship) {            
+    if (internship =="") {
+        alignStudentWithInternship(stu, "", function() {
+        reportSuccess("reset done");
+        refresh();
+        })
+    } else {
+        alignStudentWithInternship(stu, $("#"+internship).val(), function() {
+        reportSuccess("alignment done");
+        refresh();
+        })
+    }
+}
+
+function pickBestStudentMatching(student, students) {        
+    var best = "";    
+    students.forEach(function (s) {
+        //email match        
+        if (s.Email ==
+         student.Email) {
+            best = s.Email;
+            return false;
+        }
+    });
+    //Lastname match
+        r = student.Lastname.toLowerCase();                   
+        r = r.replace(new RegExp(/[àáâãäå]/g),"a");            
+            r = r.replace(new RegExp(/ç/g),"c");
+            r = r.replace(new RegExp(/[èéêë]/g),"e");
+            r = r.replace(new RegExp(/[ìíîï]/g),"i");            
+            r = r.replace(new RegExp(/[òóôõö]/g),"o");
+            r = r.replace(new RegExp(/œ/g),"oe");
+            r = r.replace(new RegExp(/[ùúûü]/g),"u");
+            r = r.replace(new RegExp(/[ýÿ]/g),"y");                    
+    students.forEach(function (s) {        
+        //email match
+        //console.log(i.Student.Lastname + "<->" + r)
+        if (s.Lastname == r) {            
+            best = s.Email;
+            return false;
+        }
+    });
+    return best;
 }
 
 function displayMyStudents() {
@@ -219,7 +327,6 @@ function removeUser(email, div) {
         reportSuccess("Account deleted")
     });
 }
-
 
 function pickBestMatching(tutor, users) {    
     var res = undefined;

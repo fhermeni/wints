@@ -77,7 +77,7 @@ var ROOT_API = "/api/v1";
 
 //Profile management
 
-function post(URL, data, ok, no) {
+function post(URL, data, ok, no) {    
     return $.ajax({
         method: "POST",
         data: JSON.stringify(data),        
@@ -251,3 +251,17 @@ function setAlumni(student, pos, email, ok, no) {
 function statistics(ok, no) {
     return get("/statistics/", ok, no)
 }
+
+function students(ok, no) {
+    return get("/students/", ok, no)
+}
+
+function alignStudentWithInternship(stu, internship, ok, no) {    
+    return post("/students/" + stu, internship, ok, no)
+}
+
+function sendStudents(cnt, ok, no) { 
+    return post("/students/", cnt, ok, no)
+}
+
+

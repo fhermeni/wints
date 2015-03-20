@@ -101,4 +101,10 @@ type Service interface {
 
 	//public statistics
 	Statistics() ([]Stat, error)
+
+	//Students that have to make an internship
+	Students() ([]Student, error)
+	InsertStudents(csv string) error
+	AddStudent(s Student) error
+	AlignWithInternship(student string, internship string) error
 }
