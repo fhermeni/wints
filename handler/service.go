@@ -447,7 +447,8 @@ func internshipsMngt(s Service, mailer mail.Mailer) {
 	s.r.HandleFunc("/api/v1/majors/", restHandler(majors, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/students/", restHandler(students, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/students/{email}", restHandler(alignStudentWithInternship, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/students/", restHandler(insertStudents, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/students/{email}/internship", restHandler(insertStudents, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/students/{email}/hidden", restHandler(hideStudent, s, mailer)).Methods("POST")
 }
 
 func setAlumni(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
@@ -652,4 +653,13 @@ func insertStudents(srv internship.Service, mailer mail.Mailer, w http.ResponseW
 		return err
 	}
 	return srv.InsertStudents(all)
+}
+
+func hideStudent(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+	var flag bool
+	err := jsonRequest(w, r, &flag)
+	if err != nil {
+		return err
+	}
+	return srv.HideStudent(mux.Vars(r)["email"], flag)
 }

@@ -75,14 +75,15 @@ function refresh() {
 function showStatus() {
     students(function (stus) { 
         var placed = 0
-        var known = [];            
+        var known = [];
+        var toPlace = stus.length;            
         interns.filter(function (u) {
-            known.push(u.Student)
+            known.push(u.Student)            
         })               
         conventions(function (cc) {
             cc.forEach(function (conv) {                    
                 if (conv.Skip) {
-                    known.push(conv.Student)                        
+                    known.push(conv.Student)                                            
                 }
             }) 
 
@@ -90,14 +91,16 @@ function showStatus() {
                 if (s.Internship != null && s.Internship.length > 0) {                                                            
                     known.forEach(function (k) {                                                
                         if (k.Email == s.Internship) {                    
-                            s.Internship = k;                            
+                            s.Internship = k;                                                        
                             placed++;
                         }
                         return false;
                     });                                                        
-                } 
+                } else if (s.Hidden) {
+                    toPlace--;
+                }                
             });              
-        var html = Handlebars.getTemplate("status")({Students: stus, Interns: known, Placed: placed});
+        var html = Handlebars.getTemplate("status")({Students: stus, Interns: known, Placed: placed, ToPlace: toPlace});
         var root = $("#cnt");
         root.html(html);
 
@@ -136,6 +139,13 @@ function showStatus() {
         });
     })
 })
+}
+
+function sendStudentHidden(em, flag) {
+    hideStudent(em, flag, function() {
+        reportSuccess("Status updated")
+        refresh();
+    })
 }
 
 function showFullnames(source) {

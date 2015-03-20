@@ -11,7 +11,7 @@ import (
 )
 
 func (s *Service) Students() ([]internship.Student, error) {
-	req := "select firstname, lastname, email, promotion, major, internship from pending order by lastname"
+	req := "select firstname, lastname, email, promotion, major, internship, hidden from pending order by lastname"
 	rows, err := s.DB.Query(req)
 
 	students := make([]internship.Student, 0, 0)
@@ -22,13 +22,15 @@ func (s *Service) Students() ([]internship.Student, error) {
 	for rows.Next() {
 		var fn, ln, email, promotion, major string
 		var intern sql.NullString
-		rows.Scan(&fn, &ln, &email, &promotion, &major, &intern)
+		var hidden bool
+		rows.Scan(&fn, &ln, &email, &promotion, &major, &intern, &hidden)
 		st := internship.Student{
 			Firstname: fn,
 			Lastname:  ln,
 			Email:     email,
 			Promotion: promotion,
 			Major:     major,
+			Hidden:    hidden,
 		}
 		if intern.Valid {
 			st.Internship = intern.String
@@ -45,8 +47,13 @@ func (s *Service) AlignWithInternship(student string, intern string) error {
 }
 
 func (s *Service) AddStudent(st internship.Student) error {
-	req := "insert into pending(firstname, lastname, email, promotion, major, internship) values ($1,$2,$3,$4,$5,$6)"
-	return SingleUpdate(s.DB, internship.ErrUserExists, req, st.Firstname, st.Lastname, st.Email, st.Promotion, st.Major, st.Internship)
+	req := "insert into pending(firstname, lastname, email, promotion, major, internship,hidden) values ($1,$2,$3,$4,$5,$6,$7)"
+	return SingleUpdate(s.DB, internship.ErrUserExists, req, st.Firstname, st.Lastname, st.Email, st.Promotion, st.Major, st.Internship, false)
+}
+
+func (s *Service) HideStudent(em string, st bool) error {
+	req := "update pending set hidden=$2 where email=$1"
+	return SingleUpdate(s.DB, internship.ErrUnknownUser, req, em, st)
 }
 
 func (s *Service) InsertStudents(file string) error {

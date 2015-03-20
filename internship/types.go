@@ -248,6 +248,7 @@ type Student struct {
 	Promotion  string
 	Major      string
 	Internship string
+	Hidden     bool
 }
 
 //Predefined errors

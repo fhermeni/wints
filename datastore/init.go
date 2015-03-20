@@ -108,6 +108,7 @@ create table pending(
     email text PRIMARY KEY,
     promotion text,
     major text,
-    internship text
+    internship text,
+    hidden boolean,
 );`
 )

@@ -257,7 +257,11 @@ function students(ok, no) {
 }
 
 function alignStudentWithInternship(stu, internship, ok, no) {    
-    return post("/students/" + stu, internship, ok, no)
+    return post("/students/" + stu + "/internship", internship, ok, no)
+}
+
+function hideStudent(stu, flag, ok, no) {    
+    return post("/students/" + stu + "/hidden", flag, ok, no)
 }
 
 function sendStudents(cnt, ok, no) { 

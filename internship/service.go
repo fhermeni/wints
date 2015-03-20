@@ -107,4 +107,5 @@ type Service interface {
 	InsertStudents(csv string) error
 	AddStudent(s Student) error
 	AlignWithInternship(student string, internship string) error
+	HideStudent(em string, st bool) error
 }

@@ -333,3 +333,10 @@ func (s *Service) InsertStudents(file string) error {
 	}
 	return ErrPermission
 }
+
+func (s *Service) HideStudent(em string, st bool) error {
+	if s.my.Role >= internship.ADMIN {
+		return s.srv.HideStudent(em, st)
+	}
+	return ErrPermission
+}

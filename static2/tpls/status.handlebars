@@ -1,7 +1,7 @@
 <form method="post" enctype="multipart/form-data" action="/api/v1/students/">            
     <input type="file" accept=".csv"/>                              
 </form>
-<h3>{{Placed}}/{{len Students}} placed students
+<h3>{{Placed}}/{{ToPlace}} placed students
         <button type="button" class="btn btn-sm" onclick="serviceMailing()"><i class="glyphicon glyphicon-envelope"></i> mail selection</button>
 
         <button type="button" id="student-fullnames" class="btn btn-sm" href="#"><i class="glyphicon glyphicon-list"></i> fullnames from selection</button>
@@ -13,9 +13,9 @@
     <div class='form-group'>        
         <label for='lbl-{{Email}}' class='col-md-5 control-label'>
             <input type='checkbox' class='icheckbox_flat' data-email='{{Email}}'/>  
-            <a class="fn" href="mailto:{{Email}}" title="{{fullname this}}">{{shortFullname this}}</a>
+            <a class="fn {{#if Hidden}}stroke{{/if}}" href="mailto:{{Email}}" title="{{fullname this}}">{{shortFullname this}}</a>
         </label>
-        <span class='col-md-5'>
+        <span class='col-md-4'>
         	{{#if Internship}}
         		<a class="clickable fn" onclick="showInternship('{{Internship.Email}}')">{{shortFullname Internship}}</a>
         	{{else}}        	
@@ -27,16 +27,22 @@
            	</select>           	
         	{{/if}}
         </span>
-        <span class='col-md-2'>
+        <span class='col-md-3'>
         <a class="btn btn-info btn-xs glyphicon glyphicon-ok"
         	title="align"
         	onclick="sendStudentAlignement('{{Email}}','select-{{@index}}')"
         	>
         </a> 
+        {{#if Hidden}}
+        <a class="btn btn-xs glyphicon glyphicon-eye-open"
+            onclick="sendStudentHidden('{{Email}}',false)"></a>               
+        {{else}}
+        <a class="btn btn-xs glyphicon glyphicon-eye-close"
+            onclick="sendStudentHidden('{{Email}}',true)"></a>               
+        {{/if}}   
         <a class="btn btn-xs btn-danger glyphicon glyphicon-remove"
-			onclick="sendStudentAlignement('{{Email}}','')"></a>       
+			onclick="sendStudentAlignement('{{Email}}','')"></a>               
         </span>
-
     </div>
 </div>
 {{/each}}
