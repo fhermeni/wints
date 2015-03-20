@@ -104,8 +104,8 @@ function showStatus() {
         var idx = 0;
         stus.forEach(function (stu) {
             s = $("#select-" + (idx++));                
-            var best = pickBestStudentMatching(stu, known)                          
-            s.val(best).on("change",function(v) {sendStudentAlignement(stu.Email, s.val(), stus)});                                
+            var best = pickBestStudentMatching(stu, known)                                    
+            s.val(best);                        
         })  
 
         //CSV upload      
