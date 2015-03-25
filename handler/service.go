@@ -446,8 +446,8 @@ func internshipsMngt(s Service, mailer mail.Mailer) {
 	s.r.HandleFunc("/api/v1/internships/{email}/alumni", restHandler(setAlumni, s, mailer)).Methods("POST")
 	s.r.HandleFunc("/api/v1/majors/", restHandler(majors, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/students/", restHandler(students, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/students/{email}", restHandler(alignStudentWithInternship, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/students/{email}/internship", restHandler(insertStudents, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/students/{email}", restHandler(insertStudents, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/students/{email}/internship", restHandler(alignStudentWithInternship, s, mailer)).Methods("POST")
 	s.r.HandleFunc("/api/v1/students/{email}/hidden", restHandler(hideStudent, s, mailer)).Methods("POST")
 }
 
