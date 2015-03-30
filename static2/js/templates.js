@@ -256,8 +256,8 @@ Handlebars.registerHelper('shortKind', function(r) {
 });
 
 Handlebars.registerHelper('reportStatus', function(r) {
-    var passed = new Date(Date.parse(r.Deadline)) < new Date() 
-
+    var passed = (new Date(Date.parse(r.Deadline)).getTime() + 86400 * 1000) < new Date().getTime() 
+    console.log(r.Deadline + " " + passed);
     var style = "btn-link";
 
     //Deadline passed, nothing
@@ -276,7 +276,7 @@ Handlebars.registerHelper('reportStatus', function(r) {
 });
 
 Handlebars.registerHelper('surveyStatus', function(s) {
-    var passed = new Date(Date.parse(s.Deadline)) < new Date()    
+    var passed = (new Date(Date.parse(s.Deadline)).getTime() + 86400 * 1000) < new Date().getTime()    
     var style = "badge-info"    
     if (passed && s.Answers == {}) {
             style = "badge-danger"
@@ -306,7 +306,7 @@ Handlebars.registerHelper('gradeInput', function(r) {
 });
 
 Handlebars.registerHelper('studentGrade', function(r) {
-    var passed = new Date(r.Deadline).getTime() < new Date().getTime()
+    var passed = (new Date(r.Deadline).getTime() + 86400 * 1000) < new Date().getTime()
     if (!r.ToGrade) {
         return "-";
     }
