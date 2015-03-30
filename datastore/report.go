@@ -51,7 +51,7 @@ func (srv *Service) SetReportContent(kind, email string, cnt []byte) error {
 	if err != nil {
 		return internship.ErrUnknownReport
 	}
-	if time.Now().After(deadline) {
+	if time.Now().After(deadline.Add(time.Hour * 24)) {
 		return internship.ErrDeadlinePassed
 	}
 	if grade >= 0 {
