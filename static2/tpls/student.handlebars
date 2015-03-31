@@ -1,10 +1,12 @@
 <div class="modal-dialog modal-lg">
     <div class="modal-content">
     <div class="modal-header">
-            <h3 class="modal-title fn"><a href="mailto:{{I.Student.Email}}">{{fullname I.Student}}</a></h3>
+            <h3 class="modal-title fn">{{fullname I.Student}}</h3>
     </div>    
     <div class="modal-body form-horizontal">
             <dl class="dl-horizontal">
+                <dt>email</dt>
+                <dd><a href="mailto:{{I.Student.Email}}">{{I.Student.Email}}</a></dd>
                 <dt>tel</dt>
                 <dd>{{I.Student.Tel}}</dd>
                 <dt>promotion</dt>
