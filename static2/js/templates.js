@@ -257,7 +257,6 @@ Handlebars.registerHelper('shortKind', function(r) {
 
 Handlebars.registerHelper('reportStatus', function(r) {
     var passed = (new Date(Date.parse(r.Deadline)).getTime() + 86400 * 1000) < new Date().getTime() 
-    console.log(r.Deadline + " " + passed);
     var style = "btn-link";
 
     //Deadline passed, nothing

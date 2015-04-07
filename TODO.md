@@ -29,11 +29,13 @@
 - [x] gmail friendly
 - [x] invitation-based only root account creation
 - [x] access last opened sessions
+- [ ] extract major from convention server
 - [ ] mailing for missing surveys
 - [ ] concatenate every static resource
 - [ ] defenses
 - [ ] concatenate every static resource
 - [ ] supervisor grade (from evaluation)
+- [ ] clarify account reset. Seems broken in some situations
 
 ### Daemon
 
@@ -85,6 +87,8 @@
 - [x] graduation template
 - [ ] see supervisor grade
 - [ ] edit supervisor grade
+- [ ] rewrite status page principles. It sucks
+- [ ] show deadline delay
 
 #### student
 - [x] profile update
@@ -101,6 +105,7 @@
 - [x] report expectations
 - [x] set alumni
 - [x] update major
+- [ ] allow to upload _one_ late report, flagged as is, when there was no report uploaded before
 
 #### supervisor
 - [x] access survey
