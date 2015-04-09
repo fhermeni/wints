@@ -3,7 +3,6 @@ package datastore
 import (
 	"database/sql"
 	"encoding/json"
-	"log"
 	"strings"
 	"time"
 
@@ -256,10 +255,7 @@ func (srv *Service) appendReports(i *internship.Internship) error {
 			hdr.Grade = int(grade.Int64)
 		}
 		if delivery.Valid {
-			log.Println("Valid for " + kind)
 			hdr.Delivery = delivery.Time
-		} else {
-			log.Println("Invalid for " + kind)
 		}
 		i.Reports = append(i.Reports, hdr)
 	}
