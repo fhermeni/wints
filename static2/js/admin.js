@@ -671,6 +671,7 @@ function showInternship(s) {
 function showReport(email, kind) {    
     reportHeader(email, kind, function(r) {            
             r.Passed = new Date(r.Deadline).getTime() < new Date();
+            r.Late == new Date(r.Delivery).getTime() > new Date(r.Deadline)
             r.In = r.Grade != -2
             r.Reviewable = r.Grade != -2 || r.Passed
             r.Gradeable = r.ToGrade && (r.Grade != -2 || r.Passed)
