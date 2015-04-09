@@ -36,7 +36,7 @@
 - [ ] concatenate every static resource
 - [ ] supervisor grade (from evaluation)
 - [ ] clarify account reset. Seems broken in some situations
-
+- [ ] admin cannot grade
 ### Daemon
 
 - [x] install mode
