@@ -34,3 +34,8 @@
 	display: inline-block;	
 	margin-right: 5px;
 }
+
+.alert-text {
+	color: #a94442;
+	font-weight: bold;
+}

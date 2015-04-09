@@ -305,20 +305,44 @@ Handlebars.registerHelper('gradeInput', function(r) {
 });
 
 Handlebars.registerHelper('studentGrade', function(r) {
-    var passed = (new Date(r.Deadline).getTime() + 86400 * 1000) < new Date().getTime()
-    if (!r.ToGrade) {
+    var passed = (new Date(r.Deadline).getTime() + 86400 * 1000) < new Date().getTime()    
+    console.log(r);
+    if (!r.Uploaded) {
+        if (r.Grade == 0) {
+            return r.Grade
+        } else if (passed) {
+            return "deadline passed. Hurry!";
+        } else {
+            return "";
+        }
+    } else {
+        if (r.ToGrade) {
+            if (r.Grade == -1) { //waiting for review
+                return "?";
+            } else {
+                return r.Grade;
+            }            
+        } else {
+            if (r.Grade == -1) { //waiting for review
+                return "(waiting for the review)";
+            } else {
+                return "n/a";
+            }                        
+        }
+    }
+    /*if (r.Uploaded && !r.ToGrade) {
         return "-";
     }
     if (r.Grade == -2) {
         if (passed) {
-            return "0 (deadline passed)";
+            return "deadline passed. Hurry!";
         } else {
             return ""
         }
     } else if (r.Grade == -1) {
         return "?";
     }
-    return r.Grade;    
+    return r.Grade;   */ 
 });
 
 Handlebars.registerHelper('URIemails', function(students) {

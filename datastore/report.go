@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/fhermeni/wints/internship"
+	"github.com/lib/pq"
 )
 
 func (s *Service) PlanReport(email string, r internship.ReportHeader) error {
@@ -17,17 +18,21 @@ func (s *Service) ReportDefs() []internship.ReportDef {
 	return s.reportDefs
 }
 func (srv *Service) Report(k, email string) (internship.ReportHeader, error) {
-	q := "select deadline, grade, comment, private, toGrade from reports where student=$1 and kind=$2"
+	q := "select deadline, delivery, grade, comment, private, toGrade from reports where student=$1 and kind=$2"
 	var d time.Time
 	var g int
 	var priv, toGrade bool
 	var comment sql.NullString
-	if err := srv.DB.QueryRow(q, email, k).Scan(&d, &g, &comment, &priv, &toGrade); err != nil {
+	var delivery pq.NullTime
+	if err := srv.DB.QueryRow(q, email, k).Scan(&d, &delivery, &g, &comment, &priv, &toGrade); err != nil {
 		return internship.ReportHeader{}, internship.ErrUnknownReport
 	}
 	hdr := internship.ReportHeader{Kind: k, Deadline: d, Grade: g, Private: priv, ToGrade: toGrade}
 	if comment.Valid {
 		hdr.Comment = comment.String
+	}
+	if delivery.Valid {
+		hdr.Delivery = delivery.Time
 	}
 	return hdr, nil
 }
@@ -46,20 +51,24 @@ func (s *Service) ReportContent(kind, email string) ([]byte, error) {
 
 func (srv *Service) SetReportContent(kind, email string, cnt []byte) error {
 	var deadline time.Time
+	var delivery pq.NullTime
 	var grade int
-	err := srv.DB.QueryRow("select deadline,grade from reports where student=$1 and kind=$2", email, kind).Scan(&deadline, &grade)
+	err := srv.DB.QueryRow("select deadline,grade,delivery from reports where student=$1 and kind=$2", email, kind).Scan(&deadline, &grade, &delivery)
 	if err != nil {
 		return internship.ErrUnknownReport
 	}
 	if time.Now().After(deadline.Add(time.Hour * 24)) {
-		return internship.ErrDeadlinePassed
+		if delivery.Valid {
+			//Passed and delivered. Permission denied
+			return internship.ErrDeadlinePassed
+		}
 	}
 	if grade >= 0 {
 		return internship.ErrGradedReport
 	}
-	sql := "update reports set grade=-1, cnt=$3 where student=$1 and kind=$2"
+	sql := "update reports set grade=-1, cnt=$3, delivery=$4 where student=$1 and kind=$2"
 	enc := base64.StdEncoding
-	return SingleUpdate(srv.DB, internship.ErrUnknownReport, sql, email, kind, enc.EncodeToString(cnt))
+	return SingleUpdate(srv.DB, internship.ErrUnknownReport, sql, email, kind, enc.EncodeToString(cnt), time.Now())
 
 }
 

@@ -3,6 +3,7 @@ package datastore
 import (
 	"database/sql"
 	"encoding/json"
+	"log"
 	"strings"
 	"time"
 
@@ -232,7 +233,7 @@ func (srv *Service) appendSurveys(i *internship.Internship) error {
 	return err
 }
 func (srv *Service) appendReports(i *internship.Internship) error {
-	s := "select kind, grade, deadline, comment, private, toGrade from reports where student=$1 order by deadline"
+	s := "select kind, grade, deadline, delivery, comment, private, toGrade from reports where student=$1 order by deadline"
 	rows, err := srv.DB.Query(s, i.Student.Email)
 	if err != nil {
 		return err
@@ -242,16 +243,23 @@ func (srv *Service) appendReports(i *internship.Internship) error {
 	for rows.Next() {
 		var kind string
 		var comment sql.NullString
+		var delivery pq.NullTime
 		var grade sql.NullInt64
 		var deadline time.Time
 		var priv, toGrade bool
-		rows.Scan(&kind, &grade, &deadline, &comment, &priv, &toGrade)
+		rows.Scan(&kind, &grade, &deadline, &delivery, &comment, &priv, &toGrade)
 		hdr := internship.ReportHeader{Kind: kind, Deadline: deadline, Grade: -1, Private: priv, ToGrade: toGrade}
 		if comment.Valid {
 			hdr.Comment = comment.String
 		}
 		if grade.Valid {
 			hdr.Grade = int(grade.Int64)
+		}
+		if delivery.Valid {
+			log.Println("Valid for " + kind)
+			hdr.Delivery = delivery.Time
+		} else {
+			log.Println("Invalid for " + kind)
 		}
 		i.Reports = append(i.Reports, hdr)
 	}

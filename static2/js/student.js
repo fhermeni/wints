@@ -18,10 +18,14 @@ function showDashboard() {
     internship(myself.Email, function (i) { 
         mine = i    
         for (x in i.Reports) {            
-            i.Reports[x].Uploaded = i.Reports[x].Grade != -2;
+            var delivered = new Date(i.Reports[x].Delivery).getTime() > 0            
+            i.Reports[x].Uploaded = delivered
             //Locked= deadline passed || commented            
-            i.Reports[x].Locked = (new Date(i.Reports[x].Deadline).getTime() + (86400*1000))< new Date().getTime() || i.Reports[x].Grade >= 0;                   
-            console.log(i.Reports[x].Deadline + " " + new Date());
+            //Locked: commented || (deadline passed && delivery)
+            var passed = (new Date(i.Reports[x].Deadline).getTime() + (86400*1000))< new Date().getTime()            
+            i.Reports[x].Locked = (passed && delivered) || i.Reports[x].Grade >= 0;                   
+            console.log(i.Reports[x].Kind + " " + passed + " " + delivered + " " + i.Reports[x].Grade)
+            //console.log(i.Reports[x].Deadline + " " + new Date());
         }            
         var html = Handlebars.getTemplate("internship")(i);
         var root = $("#cnt");
@@ -47,6 +51,7 @@ function showDashboard() {
                 setReportContent(mine.Student.Email, $(this).attr("data-kind"), formData, showProgress, function() {
                     $("#modal-hard").modal("hide");
                     reportSuccess("Report uploaded");
+                    showDashboard();
                 }, function(o) {                    
                     $("#modal-hard").modal("hide");
                     reportError(o.responseText);

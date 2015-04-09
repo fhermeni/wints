@@ -6,6 +6,7 @@ drop table if exists conventions;
 drop table if exists sessions;
 drop table if exists password_renewal;
 drop table if exists defenses;
+drop table if exists surveys;
 drop table if exists users;
 
 -- user
