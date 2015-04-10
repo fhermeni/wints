@@ -67,6 +67,11 @@ Handlebars.registerHelper('datetime', function(d) {
     return moment(d).format("DD/MM/YY HH:mm")
 });
 
+Handlebars.registerHelper('longdatetime', function(d) {
+    return moment(d).format("D MMM YY HH:mm")
+});
+
+
 Handlebars.registerHelper('rawFullname', function(p) {
     var fn = p.Firstname + " " + p.Lastname;
     for (i = fn.length; i < 40; i++) {

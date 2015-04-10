@@ -66,13 +66,13 @@ The upload may take time. Once completed, download the report to check for possi
 <table class="table table-hover table-condensed">
 <thead>
 <tr>
-	<td>Deadline</td><td>Grade</td><td></td>
+	<td>Deadline (FR timezone)</td><td>Grade</td><td></td>
 </tr>
 </thead>
 <tbody>
 {{#each Reports}}
 <tr>
-<td>{{date Deadline}}</td>
+<td>{{longdatetime Deadline}}</td>
 <td>{{studentGrade this}}</td>
 <td class="text-right">
 <form method="post" enctype="multipart/form-data" action="/api/v1/internships/{{../Student.Email}}/reports/{{Kind}}/content">
