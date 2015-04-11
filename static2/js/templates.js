@@ -71,7 +71,6 @@ Handlebars.registerHelper('longdatetime', function(d) {
     return moment(d).format("D MMM YY HH:mm")
 });
 
-
 Handlebars.registerHelper('rawFullname', function(p) {
     var fn = p.Firstname + " " + p.Lastname;
     for (i = fn.length; i < 40; i++) {
@@ -278,6 +277,16 @@ Handlebars.registerHelper('reportStatus', function(r) {
     
     return style;
 });
+
+Handlebars.registerHelper('gradeAnnotation', function(r) {
+    var passed = (new Date(Date.parse(r.Deadline)).getTime() + 86400 * 1000) < new Date().getTime() 
+    if (!passed) {
+        return -10; //don't care
+    } else {
+        return r.Grade;
+    }
+});
+
 
 Handlebars.registerHelper('surveyStatus', function(s) {
     var passed = (new Date(Date.parse(s.Deadline)).getTime() + 86400 * 1000) < new Date().getTime()    

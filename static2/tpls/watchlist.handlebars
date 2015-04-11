@@ -92,7 +92,7 @@ As a major leader or an administrator, you can follow the progress of every stud
                 <a class="fn" href='mailto:{{Tutor.Email}}' title='{{fullname Tutor}}'>{{shortFullname Tutor}}</a>
             </td>            
             {{#each Reports}}
-            <td class="click {{reportStatus this}} text-center" data-text="{{this.Grade}}" onclick="showReport('{{../Student.Email}}', '{{Kind}}')">            
+            <td class="click {{reportStatus this}} text-center" data-text="{{gradeAnnotation this}}" onclick="showReport('{{../Student.Email}}', '{{Kind}}')">            
             {{reportGrade this}}
             </td>  
             {{/each}}

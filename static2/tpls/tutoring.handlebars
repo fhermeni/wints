@@ -88,7 +88,7 @@ This is the students you are following as an academic tutor. Your role is to:
                 {{company Cpy}}
             </td>            
             {{#each Reports}}
-            <td class="{{reportStatus this}} text-center" data-text="{{this.Grade}}" onclick="showReport('{{../Student.Email}}', '{{Kind}}')">            
+            <td class="{{reportStatus this}} text-center" data-text="{{gradeAnnotation this}}" onclick="showReport('{{../Student.Email}}', '{{Kind}}')">            
             {{reportGrade this}}
             </td>            
             {{/each}}
