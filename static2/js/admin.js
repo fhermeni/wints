@@ -676,6 +676,9 @@ function showReport(email, kind) {
             r.Reviewable = r.Grade != -2 || r.Passed
             r.Gradeable = r.ToGrade && (r.Grade != -2 || r.Passed)
             r.Email = email
+            var i = getInternship(email);
+            r.Mine = i.Tutor.Email == myself.Email;            
+            console.log("Editable: " + r.Mine);
             r.Reviewed = r.Comment.length > 0 || r.Grade >= 0            
             buf = Handlebars.getTemplate("reportEditor")(r)            
             $("#modal").html(buf).modal('show');      

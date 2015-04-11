@@ -38,6 +38,7 @@
 - [ ] supervisor grade (from evaluation)
 - [ ] clarify account reset. Seems broken in some situations
 - [ ] admin cannot grade
+- [ ] log as ..
 ### Daemon
 
 - [x] install mode
@@ -86,10 +87,12 @@
 - [x] help
 - [x] report expectations
 - [x] graduation template
+- [x] show deadline delay
+- [ ] log as ..
 - [ ] see supervisor grade
 - [ ] edit supervisor grade
 - [ ] rewrite status page principles. It sucks
-- [x] show deadline delay
+
 
 #### student
 - [x] profile update
