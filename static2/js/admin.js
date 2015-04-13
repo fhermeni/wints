@@ -677,12 +677,11 @@ function showReport(email, kind) {
             r.Gradeable = r.ToGrade && (r.Grade != -2 || r.Passed)
             r.Email = email
             var i = getInternship(email);
-            r.Mine = i.Tutor.Email == myself.Email;            
-            console.log("Editable: " + r.Mine);
+            r.Mine = i.Tutor.Email == myself.Email;                        
             r.Reviewed = r.Comment.length > 0 || r.Grade >= 0            
             buf = Handlebars.getTemplate("reportEditor")(r)            
             $("#modal").html(buf).modal('show');      
-            $(':checkbox').iCheck()
+            $('#modal').find(':checkbox').iCheck()
                 .on('ifChecked', function(){setReportPrivate(email, kind, true)})
                 .on('ifUnchecked', function(){setReportPrivate(email, kind, false)})
             $(".date").datepicker({format:'d M yyyy', autoclose: true, minViewMode: 0, weekStart: 1}).on("changeDate", function (e) { setReportDeadline(email, kind, e.date)})             

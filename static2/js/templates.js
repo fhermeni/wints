@@ -280,7 +280,7 @@ Handlebars.registerHelper('reportStatus', function(r) {
 
 Handlebars.registerHelper('gradeAnnotation', function(r) {
     var passed = (new Date(Date.parse(r.Deadline)).getTime() + 86400 * 1000) < new Date().getTime() 
-    if (!passed) {
+    if (!passed && !r.toGrade >= -1) {
         return -10; //don't care
     } else {
         return r.Grade;
