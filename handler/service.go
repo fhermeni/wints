@@ -58,7 +58,7 @@ func statistics(backend internship.Service) http.HandlerFunc {
 }
 func stats() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, path+"/statistics.html")
+		http.ServeFile(w, r, path+"/statistics-new.html")
 	}
 }
 

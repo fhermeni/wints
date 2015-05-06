@@ -71,8 +71,8 @@ function local() {
 	var dta_si = major_bars([local_si, foreign_si]);
 	var dta_ma = major_bars([local_ma, foreign_ma]);	
 	var options = {
-  		stackBars:true,
-  		high: stats.length
+  		stackBars:true/*,
+  		high: stats.length*/
   	};
 	new Chartist.Bar('.local_si', dta_si, options).on('draw', bar_width);
     new Chartist.Bar('.local_ma', dta_ma, options).on('draw', bar_width);
@@ -96,8 +96,8 @@ function lab() {
 	var dta_si = major_bars([local_si, foreign_si]);
 	var dta_ma = major_bars([local_ma, foreign_ma]);	
 	var options = {
-  		stackBars:true,
-  		high: stats.length
+  		stackBars:true/*,
+  		high: stats.length*/
   	};
 	new Chartist.Bar('.lab_si', dta_si, options).on('draw', bar_width);
     new Chartist.Bar('.lab_ma', dta_ma, options).on('draw', bar_width);
@@ -111,10 +111,14 @@ function gratification() {
 	var max = 0;
 	stats.forEach(function (st) {		
 		var idx = allMajors.indexOf(st.Major);
+		console.log(st.Major + " " + st.Gratification);
+		if (st.Gratification > 100000) {
+			st.Gratification /= 1000;
+		}
 		if (st.Gratification > max) {
 			max = st.Gratification;
 		}
-		if (!master(st)) {	
+		if (!master(st)) {		
 			si[idx]+= st.Gratification;
 			si[0] += st.Gratification;
 			nb_si[idx]++;			
@@ -126,14 +130,20 @@ function gratification() {
 			nb_ma[0]++;			
 		}
 	});	
+	console.log(nb_si);
+	console.log(nb_ma);
+
+	console.log(si);
+	console.log(ma);
+
 
 	//Average
 	for (var i = 0; i < si.length; i++) {
-		si[i] /= nb_si[i];
-		ma[i] /= nb_ma[i];
+		si[i] = nb_si[i] == 0 ? 0 : si[i] /= nb_si[i];
+		ma[i] = nb_ma[i] == 0 ? 0 : ma[i] /= nb_ma[i];
 	}	
-	var dta_si = major_bars([si, ma]);	
-	var options = {seriesBarDistance: 10,high: max + 100};
+	var dta_si = major_bars([si, ma]);		
+	var options = {seriesBarDistance: 10/*,high: max + 100*/};
 	new Chartist.Bar('.gratification_si', dta_si, options).on('draw', function (dta) {
   if(dta.type === 'bar') {
     dta.element.attr({

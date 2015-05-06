@@ -39,6 +39,7 @@
 - [ ] clarify account reset. Seems broken in some situations
 - [ ] admin cannot grade
 - [ ] log as ..
+- [ ] align deadlines at a given moment of the day (2am the day after the official deadline)
 ### Daemon
 
 - [x] install mode
@@ -46,7 +47,7 @@
 - [x] test-mailer mode
 - [x] test-feeder mode
 - [x] safe root invitation
-- [ ] deadline reminders
+- [ ] deadline reminders for tutors, not for student ?
 
 
 ### frontend

@@ -235,6 +235,8 @@ type Stat struct {
 	ForeignCountry bool
 	Lab            bool
 	Gratification  int
+	Begin          time.Time
+	End            time.Time
 	Cpy            Company
 	//Grade for each report
 	Reports map[string]int
