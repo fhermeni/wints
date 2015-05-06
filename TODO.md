@@ -89,6 +89,7 @@
 - [x] report expectations
 - [x] graduation template
 - [x] show deadline delay
+- [x] mail templates to send evaluation links to supervisors
 - [ ] log as ..
 - [ ] see supervisor grade
 - [ ] edit supervisor grade
@@ -118,4 +119,4 @@
 - [ ] final grade and comment
 
 #### public
-- [ ] pretty statistics
+- [x] pretty statistics

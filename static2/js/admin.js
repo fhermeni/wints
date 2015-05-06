@@ -701,3 +701,14 @@ function sendTutor(e, s) {
         refresh();
     })
 }
+
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.substring(1)
+}
+function tplEvaluationMail(kind, student,url) {    
+    var i = getInternship(student);    
+    var txt = Handlebars.getTemplate("eval-" + kind)({I:i, URL:url});
+    var to=encodeURIComponent(i.Sup.Email)    
+    var s=encodeURIComponent(i.Student.Firstname.capitalize() + " " + i.Student.Lastname.capitalize() + " - Evaluation");
+    window.location.href = "mailto:" + to + "?subject=" + s + "&body=" + encodeURIComponent(txt);    
+}

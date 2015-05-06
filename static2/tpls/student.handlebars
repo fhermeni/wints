@@ -43,11 +43,11 @@
             </dl>
             {{#if SurveyAdmin}}
             <h4 class="text-center">Links for the surveys</h4>
-            <p>These links must be send to the supervisors to provide feedbacks</p>            
+            <p>These links must be send to the supervisors to provide feedbacks:</p>            
             <dl class="dl-horizontal">
                 {{#each I.Surveys}}
                 <dt>{{Kind}}</dt>
-                <dd>{{../URL}}{{Kind}}?token={{Token}}</dd>
+                <dd>{{../URL}}{{Kind}}?token={{Token}} (<a class='click' onclick="tplEvaluationMail('{{Kind}}','{{../../I.Student.Email}}','{{../URL}}{{Kind}}?token={{Token}}')"><i class='glyphicon glyphicon-envelope'> </i> premade e-mail</a>)</dd>
                 {{/each}}
             </dl>
             {{/if}}

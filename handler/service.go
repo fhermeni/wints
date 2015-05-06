@@ -47,7 +47,15 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string) Servic
 	s.r.HandleFunc("/api/v1/surveys/{token}", surveyFromToken(backend)).Methods("GET")
 	s.r.HandleFunc("/api/v1/surveys/{token}", setSurveyContent(backend)).Methods("POST")
 	s.r.HandleFunc("/api/v1/statistics/", mon(statistics(backend))).Methods("GET")
+	s.r.HandleFunc("/api/v1/majors/", mon(majors(backend))).Methods("GET")
 	return s
+}
+
+func majors(backend internship.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		m := backend.Majors()
+		writeJSONIfOk(nil, w, r, m)
+	}
 }
 
 func statistics(backend internship.Service) http.HandlerFunc {
@@ -56,6 +64,7 @@ func statistics(backend internship.Service) http.HandlerFunc {
 		writeJSONIfOk(err, w, r, stats)
 	}
 }
+
 func stats() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, path+"/statistics-new.html")
@@ -444,7 +453,6 @@ func internshipsMngt(s Service, mailer mail.Mailer) {
 	s.r.HandleFunc("/api/v1/internships/{email}/major", restHandler(setMajor, s, mailer)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/promotion", restHandler(setPromotion, s, mailer)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/alumni", restHandler(setAlumni, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/majors/", restHandler(majors, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/students/", restHandler(students, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/students/{email}", restHandler(insertStudents, s, mailer)).Methods("POST")
 	s.r.HandleFunc("/api/v1/students/{email}/internship", restHandler(alignStudentWithInternship, s, mailer)).Methods("POST")
@@ -460,10 +468,6 @@ func setAlumni(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter
 	return srv.SetAlumni(mux.Vars(r)["email"], c)
 }
 
-func majors(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
-	m := srv.Majors()
-	return writeJSONIfOk(nil, w, r, m)
-}
 func newInternship(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	var c internship.Convention
 	err := jsonRequest(w, r, &c)

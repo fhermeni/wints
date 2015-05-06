@@ -22,6 +22,12 @@ Handlebars.registerHelper('fullname', function(p) {
     return p.Firstname + " " + p.Lastname;
 });
 
+Handlebars.registerHelper('prettyFullname', function(p) {
+    var fn = p.Firstname
+    var ln = p.Lastname
+    return fn.charAt(0).toUpperCase() + fn.substring(1) + " " + ln.charAt(0).toUpperCase() + ln.substring(1)
+});
+
 Handlebars.registerHelper('shortFullname', function(p) {    
     var fn = p.Firstname + " " + p.Lastname;
     if (fn.length > 20) {
