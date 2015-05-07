@@ -32,11 +32,11 @@ function showAnswers(answers) {
 	Object.keys(answers).forEach(function (k) {		
 		var v = answers[k];		
 		if (v) {
-			var q = $(":radio[name='" + k + "''][value='" + v + "']").iCheck("check")
+			var q = $(":radio[name='" + k + "'][value='" + v + "']").iCheck("check")
 			if (q.length > 0) {				
 				q.iCheck("check")		
 			} else {				
-				$("[name='" + k + "'']").val(v);
+				$("[name='" + k + "']").val(v);
 			}					
 		}		
 	})
