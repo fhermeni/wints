@@ -12,18 +12,20 @@ body {
 	background-color: #F6BB42;
 }
 
+.pagination {
+	margin-bottom: 0px;
+}
 .page-header {
 	border-bottom: 1px solid #434A33;	
 }
 
 .thumbnail h3 {
-	margin-top: 0.5em;
-	margin-bottom: 0.5em;
+	margin-top: 0.5em;	
 }
 
 .thumbnail h1 {
 	margin-top: 0em;
-	margin-bottom: 0em;
+	margin-bottom: 0.5em;
 }
 
 canvas {

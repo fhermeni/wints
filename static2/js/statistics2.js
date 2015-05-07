@@ -31,12 +31,14 @@ waitingBlock = $("#cnt").clone().html();
 	    	stats[i].End = new Date(stats[i].End)
 	    }	    
 
-	    Chart.defaults.global.responsive = true;	    
+	    Chart.defaults.global.responsive = true;	
+	    Chart.defaults.global.pointDot = false;
+	    Chart.defaults.global.pointDotRadius = 2;	    
 	    //basics()
 	    sector()
 	    country()
 	    employers()
-	    //durations()
+	    durations()
 	    gratification()
 	    declared()
     })
@@ -103,7 +105,7 @@ function declared() {
 		labels: ddply(xx),
 		datasets : [line(count)]
 	}	
-	var atc = new Chart(atLab).Line(data, {tooltipTemplate : "<%= value %>", scaleOverride: true, scaleSteps: 6, scaleStepWidth: 20});
+	var atc = new Chart(atLab).Line(data, {pointDotRadius : 2,tooltipTemplate : "<%= value %>", scaleOverride: true, scaleSteps: 6, scaleStepWidth: 20});
 }
 
 function ddply(arr) {
@@ -125,44 +127,33 @@ function durations() {
 	var end = new Date()
 	end.setMonth(10);
 	end.setDate(31);	
-	console.log(begin)
-	console.log(end)
-	//Nb of weeks ?
-	var step = 1000 * 60 * 60 * 24 * 7 * 2;
-	var nbWeeks = (end - begin) / step;
 
 	var labels = [];
 	var cur = new Date(begin.getTime());
+	var ins = [];	
 	while (cur.getTime() < end.getTime()) {
-		labels.push(months[cur.getMonth()] + " " + (cur.getYear() - 100))
-		cur = new Date(cur.getTime())
-		cur.setDate(cur.getDate() + 15)
+		labels.push(months[cur.getMonth()])		
+		cur.setMonth(cur.getMonth() + 1);		
+		ins.push(0)
 	};
-	console.log(labels);
-	var ins = [];
-	var i = 0;
-	var now = begin;	
-	var lbls = [];
-	for (i = 0; i <= nbWeeks; i++) {
-		stats.forEach(function (s) {
-			if (s.Begin.getTime() <= now.getTime() && s.End.getTime() >= now.getTime()) {
-				if (!ins[i]) {
-					ins[i] = 1;
-				} else {
-					ins[i]++;
-				}						
+	var now = begin;		
+	stats.forEach(function (s) {
+		var i = 0;
+		var cur = new Date(begin.getTime());
+		while (cur.getTime() < end.getTime()) {
+			if (s.Begin.getTime() <= cur.getTime() && s.End.getTime() >= cur.getTime()) {		
+				ins[i]++;
 			}
-		});
-	now = new Date(now.getTime() + step);
-	lbls.push(months[now.getMonth()] + " " + (now.getYear() - 100))
-	}		
-	var labels = [];	
+			cur.setMonth(cur.getMonth() + 1);
+			i++;
+		};
+	});		
 	var atLab = $("#periods").get(0).getContext("2d");	
 	var data = {
-		labels: ddply(lbls),
+		labels: ddply(labels),
 		datasets : [line(ins)]
 	}		
-	var atc = new Chart(atLab).Line(data, {pointDot: false, tooltipFontSize: 10, tooltipTemplate : "<%= value %>", scaleOverride: true, scaleSteps: 6, scaleStepWidth: 20});
+	var atc = new Chart(atLab).Line(data, {pointDotRadius : 2, tooltipTemplate : "<%= value %>", scaleOverride: true, scaleSteps: 6, scaleStepWidth: 20});
 }
 
 function gratification(filter) {
