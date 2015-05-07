@@ -36,7 +36,7 @@ waitingBlock = $("#cnt").clone().html();
 	    sector()
 	    country()
 	    employers()
-	    durations()
+	    //durations()
 	    gratification()
 	    declared()
     })
@@ -157,7 +157,7 @@ function durations() {
 	lbls.push(months[now.getMonth()] + " " + (now.getYear() - 100))
 	}		
 	var labels = [];	
-	var atLab = $("#periods").find("canvas").get(0).getContext("2d");	
+	var atLab = $("#periods").get(0).getContext("2d");	
 	var data = {
 		labels: ddply(lbls),
 		datasets : [line(ins)]
