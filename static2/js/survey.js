@@ -32,13 +32,17 @@ function showAnswers(answers) {
 	Object.keys(answers).forEach(function (k) {		
 		var v = answers[k];		
 		if (v) {
-			var q = $(":radio[name='" + k + "'][value='" + v + "']").iCheck("check")
-			if (q.length > 0) {				
-				q.iCheck("check")		
+			if (v == "true" || v == "false") {
+				var q = $(":radio[name='" + k + "'][value='" + v + "']").iCheck("check")
+				if (q.length > 0) {				
+					q.iCheck("check")		
+				} else {				
+				$("[name='" + k + "']").val(v);
+				}					
 			} else {				
 				$("[name='" + k + "']").val(v);
-			}					
-		}		
+			}	
+		}	
 	})
 }
 
