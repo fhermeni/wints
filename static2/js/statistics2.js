@@ -30,6 +30,8 @@ waitingBlock = $("#cnt").clone().html();
 	    	stats[i].Begin = new Date(stats[i].Begin)
 	    	stats[i].End = new Date(stats[i].End)
 	    }	    
+
+	    Chart.defaults.global.responsive = true;	    
 	    //basics()
 	    sector()
 	    country()
@@ -39,6 +41,10 @@ waitingBlock = $("#cnt").clone().html();
 	    declared()
     })
 });
+
+String.prototype.endsWith = function(suffix) {
+    return this.indexOf(suffix, this.length - suffix.length) !== -1;
+};
 
 function declared() {
 	var at = [];
@@ -55,6 +61,11 @@ function declared() {
 		ms.push((d.getYear() - 100) + "-" + d.getUTCMonth() + "-" + d.getUTCDate());		
 	});	
 	ms.sort();	
+	var toShift = ms[0].endsWith("-15")
+	if (toShift) {
+		var x = ms[0].substring(0, ms[0].length-3) + "-1"
+		ms.unshift(x)
+	}		
 	var labels = [];
 	var count = [];	
 	var i = 0;
@@ -72,6 +83,11 @@ function declared() {
 			}
 		}
 	});
+	//Padding if the first convention is established by the end of the month
+	if (toShift) {
+		count.unshift(0)
+	}
+
 	//percentage
 	for (i = 0; i < count.length; i++) {
 		count[i] = Math.round(count[i] / stats.length * 100)
@@ -87,7 +103,7 @@ function declared() {
 		labels: ddply(xx),
 		datasets : [line(count)]
 	}	
-	var atc = new Chart(atLab).Line(data, {pointDot: false, showTooltips: false});
+	var atc = new Chart(atLab).Line(data, {tooltipTemplate : "<%= value %>", scaleOverride: true, scaleSteps: 6, scaleStepWidth: 20});
 }
 
 function ddply(arr) {
@@ -103,24 +119,26 @@ function ddply(arr) {
 }
 
 function durations() {
-	var begin = undefined
-	var end = undefined
-	stats.forEach(function (s) {
-		if (begin == undefined) {
-			begin = s.Begin
-			end = s.End
-		}
-		if (s.Begin.getTime() < begin.getTime()) {
-			begin = s.Begin;
-		} 
-		if (s.End.getTime() > end.getTime()) {
-			end = s.End
-		}
-	});
+	var begin = new Date()
+	begin.setMonth(1)
+	begin.setDate(1)
+	var end = new Date()
+	end.setMonth(10);
+	end.setDate(31);	
+	console.log(begin)
+	console.log(end)
 	//Nb of weeks ?
-	var step = 1000 * 60 * 60 * 24 * 7;
+	var step = 1000 * 60 * 60 * 24 * 7 * 2;
 	var nbWeeks = (end - begin) / step;
 
+	var labels = [];
+	var cur = new Date(begin.getTime());
+	while (cur.getTime() < end.getTime()) {
+		labels.push(months[cur.getMonth()] + " " + (cur.getYear() - 100))
+		cur = new Date(cur.getTime())
+		cur.setDate(cur.getDate() + 15)
+	};
+	console.log(labels);
 	var ins = [];
 	var i = 0;
 	var now = begin;	
@@ -143,8 +161,8 @@ function durations() {
 	var data = {
 		labels: ddply(lbls),
 		datasets : [line(ins)]
-	}	
-	var atc = new Chart(atLab).Line(data, {pointDot: false, showTooltips: false});
+	}		
+	var atc = new Chart(atLab).Line(data, {pointDot: false, tooltipFontSize: 10, tooltipTemplate : "<%= value %>", scaleOverride: true, scaleSteps: 6, scaleStepWidth: 20});
 }
 
 function gratification(filter) {
@@ -215,8 +233,7 @@ function employers() {
 		} else {
 			c2[s.Cpy.Name] = s.Cpy.Name			
 		}		
-	});	
-	console.log(Object.keys(c2).join("; "))
+	});		
 	var c3 = []
 	Object.keys(c2).forEach(function (k) {
 		c3.push(c2[k]);

@@ -30,6 +30,7 @@
 - [x] invitation-based only root account creation
 - [x] access last opened sessions
 - [x] allow to upload late reports
+- [ ] log response code for requests + users (+ user-agent ?)
 - [ ] extract major from convention server
 - [ ] mailing for missing surveys
 - [ ] concatenate every static resource
@@ -40,6 +41,8 @@
 - [ ] admin cannot grade
 - [ ] log as ..
 - [ ] align deadlines at a given moment of the day (2am the day after the official deadline)
+- [ ] automatise evaluation reports
+
 ### Daemon
 
 - [x] install mode
