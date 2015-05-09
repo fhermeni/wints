@@ -42,6 +42,7 @@
 - [ ] log as ..
 - [ ] align deadlines at a given moment of the day (2am the day after the official deadline)
 - [ ] automatise evaluation reports
+- [ ] clean up / simplify the code
 
 ### Daemon
 
