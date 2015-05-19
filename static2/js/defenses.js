@@ -49,7 +49,7 @@ function showDefenses() {
             root.html(html);
             $('.date').datetimepicker();
             root.find(".date").datepicker({format:'d M yyyy', autoclose: true, minViewMode: 0, weekStart: 1}).on("changeDate", function (e) { setDefenseDay(id, e.date)})       
-            root.find(".sortable").sortable(); 
+            root.find(".sortable").sortable().bind('sortupdate', updateSessionOrder); 
             load(defs)
 
             //prepare the modal
@@ -60,6 +60,23 @@ function showDefenses() {
     });
 }
 
+function updateSessionOrder(e, li) {        
+    var sid = $(li.item).closest(".session").attr("id")        
+    s = getSession(sid)   
+    //debugger 
+    s.Defenses = []
+    $(li.item).closest("ul").find("li").each(function(i, input) {
+        em = $(input).find("input").data("email")        
+        //undefined == pause
+        if (!em) {
+            s.Pause = i
+        } else {
+            s.Defenses.push(em);
+        }
+        //console.log(i + " " + em)
+    } )
+    //Get the emails
+}
 
 function addDefenseSession() {
     var r = $("#room").val();
@@ -223,7 +240,7 @@ function drawStudent(em) {
         " &nbsp; <i class='glyphicon glyphicon-remove-circle pull-right' onclick='removeStudent(this,\"" + em + "\")'></i>"+
         "</li>";
     $("#"+active).find("ul.students").append(html).find(":checkbox").iCheck()
-    $("#cnt").find("ul.students").sortable({connectWith: "sortable"});           
+    $("#cnt").find("ul.students").sortable({connectWith: "sortable"}).bind('sortupdate', updateSessionOrder);           
     
     var def = {Grade: -1, Remote : false, Private: false}    
     allDefenses[em] = def;
@@ -232,11 +249,20 @@ function drawStudent(em) {
 
 
 function addPause() {
-    var html = "<li><i>pause</i> <i onclick='rmPause(this)' class='glyphicon glyphicon-remove-circle pull-right'></i></li>";    
-    $("#"+active).find("ul.students").append(html)
+    //var html = "<li><i>pause</i> <i onclick='rmPause(this)' class='glyphicon glyphicon-remove-circle pull-right'></i></li>";    
+    //$("#"+active).find("ul.students").append(html)
     s = getSession(active)
     s.Pause = s.Defenses.length
-    $("#"+active).find("ul.students").sortable();        
+    drawPause()    
+}
+
+function drawPause() {
+    s = getSession(active)
+    var html = "<li><i>pause</i> <i onclick='rmPause(this)' class='glyphicon glyphicon-remove-circle pull-right'></i></li>";    
+    //$("#"+active).find("ul.students").append(html)    
+    $("#"+active).find("ul.students li:nth-child(" + s .Pause + ")").after(html)
+    //$("#"+active).find("ul.students:nth-child(" + (s.Pause) + ")").after(html);
+    $("#"+active).find("ul.students").sortable().bind('sortupdate', updateSessionOrder);            
 }
 
 function rmPause(p) {
@@ -366,10 +392,15 @@ function load(defs) {
             students.remove(getInternship(em))
             allDefenses[em] = {Grade: d.Grade, Remote : d.Remote, Private : d.Private}
             drawStudent(em)
+            s.Defenses.push(em)
         });   
         def.Juries.forEach(function (j) {            
             drawJury(j);
-        })                     
+        })  
+        if (s.Pause >= 0) {
+            console.log(s.Pause)
+            drawPause()            
+        }                 
     })
     if (active) {
         $('#jury-selecter').html(Handlebars.helpers.jurySelecter(availableTeachers(active)).string)                    
