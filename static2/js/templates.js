@@ -305,12 +305,26 @@ Handlebars.registerHelper('surveyStatus', function(s) {
     return style;
 });
 
+
+function nbDayLates(d1, d2) {
+    var d = moment(d1).dayOfYear() - moment(d2).dayOfYear()
+    return new Handlebars.SafeString("<i class='glyphicon glyphicon-hourglass'></i><small> " + d + " d.</small>");
+}
 Handlebars.registerHelper('reportGrade', function(r) {
+    var passed = (new Date(r.Deadline).getTime() + 86400 * 1000) < new Date().getTime()        
     if (!r.ToGrade) {
-        return new Handlebars.SafeString("<i title='no grade needed'>n/a</i>");
+        if (passed && r.Grade == -2) {
+            return nbDayLates(new Date(), r.Deadline)
+        } else {
+            return new Handlebars.SafeString("<i title='no grade needed'>n/a</i>");
+        }
     }
     if (r.Grade == -2) {
-        return "-";
+        if (passed) {
+            return nbDayLates(new Date(), r.Deadline)
+        } else {
+            return "-";
+        }
     } else if (r.Grade == -1) {
         return "?";
     }
