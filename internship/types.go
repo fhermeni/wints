@@ -254,6 +254,24 @@ type Student struct {
 	Hidden     bool
 }
 
+//Defense
+type Defense struct {
+	Student string
+	Private bool
+	Remote  bool
+	Grade   int
+	Date    time.Time
+	Room    string
+}
+
+type DefenseSession struct {
+	Date     time.Time
+	Room     string
+	Juries   []string
+	Defenses []Defense
+	Pause    int
+}
+
 //Predefined errors
 var (
 	ErrReportExists       = errors.New("Report already exists")

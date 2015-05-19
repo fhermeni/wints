@@ -268,4 +268,10 @@ function sendStudents(cnt, ok, no) {
     return post("/students/", cnt, ok, no)
 }
 
+function defenses(ok, no) {
+    return get("/defenses/", ok, no)
+}
 
+function postDefenses(cnt, ok, no) {
+    return post("/defenses/", cnt, ok, no)
+}

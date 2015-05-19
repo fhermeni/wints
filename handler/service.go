@@ -38,6 +38,7 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string) Servic
 	reportMngt(s, mailer)
 	conventionMgnt(s, mailer)
 	surveyMngt(s, mailer)
+	defenseMngt(s, mailer)
 	fs := http.Dir(path + "/")
 	fileHandler := http.FileServer(fs)
 	r.PathPrefix("/" + path + "/").Handler(httpgzip.NewHandler(http.StripPrefix("/"+path, fileHandler)))
@@ -666,4 +667,41 @@ func hideStudent(srv internship.Service, mailer mail.Mailer, w http.ResponseWrit
 		return err
 	}
 	return srv.HideStudent(mux.Vars(r)["email"], flag)
+}
+
+func defenseMngt(s Service, mailer mail.Mailer) {
+	s.r.HandleFunc("/api/v1/defenses/", restHandler(getDefenseSessions, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/defenses/", restHandler(postDefenseSessions, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/defense", restHandler(getDefense, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/defense/grade", restHandler(setDefenseGrade, s, mailer)).Methods("POST")
+}
+
+func getDefenseSessions(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+	defs, err := srv.DefenseSessions()
+	return writeJSONIfOk(err, w, r, defs)
+}
+
+func getDefense(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+	em := mux.Vars(r)["email"]
+	def, err := srv.Defense(em)
+	return writeJSONIfOk(err, w, r, def)
+}
+
+func postDefenseSessions(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+	var defs []internship.DefenseSession
+	err := jsonRequest(w, r, &defs)
+	if err != nil {
+		return err
+	}
+	return srv.SetDefenseSessions(defs)
+}
+
+func setDefenseGrade(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+	var g int
+	err := jsonRequest(w, r, &g)
+	if err != nil {
+		return err
+	}
+	em := mux.Vars(r)["email"]
+	return srv.SetDefenseGrade(em, g)
 }

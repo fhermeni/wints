@@ -39,3 +39,33 @@
 	color: #a94442;
 	font-weight: bold;
 }
+
+li.sortable-placeholder {
+	border: 1px dashed #CCC;
+	background: none;
+}
+
+
+.defense-panel .panel-heading{
+	padding: 5px 10px;
+}
+
+.defense-panel .panel-body {
+	padding: 5px 10px;
+}
+
+.defense-panel .panel-heading .where {
+	float: right;
+}
+.navbar select {
+	display: inline-block;
+	width: 200px;
+}
+
+.day {
+	margin-bottom: 1em;
+}
+
+.am {
+	margin-bottom: 0.5em;
+}

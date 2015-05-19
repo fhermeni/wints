@@ -36,6 +36,10 @@ Handlebars.registerHelper('shortFullname', function(p) {
     return fn;
 });
 
+Handlebars.registerHelper('abbrvFullname', function(p) {    
+    return p.Firstname[0].toUpperCase()+". " + p.Lastname;
+});
+
 Handlebars.registerHelper('shortProm', function(p) {        
     if (p.indexOf("master") == 0) {
         p = "ma. " + p.substring(p.lastIndexOf(" "));
@@ -113,6 +117,25 @@ Handlebars.registerHelper('userSelecter', function(users) {
     });
     return new Handlebars.SafeString(b);
 });
+
+Handlebars.registerHelper('jurySelecter', function(users) {
+    var b = "";    
+    users.forEach(function (o) {        
+        b += "<option value='" + o.Email + "'>" + o.Firstname + " " + o.Lastname + " </option>";
+    });
+    return new Handlebars.SafeString(b);
+});
+
+
+Handlebars.registerHelper('studentSelecter', function(users) {
+    var b = "";        
+    Object.keys(users).forEach(function (em) {
+        var  i = users[em];
+        b += "<option value='" + i.Student.Email + "'>" + i.Student.Firstname + " " + i.Student.Lastname + " (" + i.Major + ") </option>";
+    })
+    return new Handlebars.SafeString(b);
+});
+
 
 var possiblePositions = [
         "not available",

@@ -1,0 +1,21 @@
+<nav class="navbar">
+  <div class="container-fluid">  
+    <form class="navbar-from navbar-left">      
+        <button type="button" class="btn btn-success" onclick="save()"><i class="glyphicon glyphicon-floppy-save"></i></button>
+        <select id="jury-selecter" class="form-control available-jury">{{jurySelecter Teachers}}</select>
+        <button type="button" class="btn activable disabled" onclick='addJury(this)'><i class="glyphicon glyphicon-plus"></i> jury</button>
+        <select id="student-selecter" class="form-control available-Students">{{studentSelecter Students}}</select>    
+        <button type="button" class="btn activable disabled" onclick='addStudent(this)'><i class="glyphicon glyphicon-plus"></i> student</button>
+        <button type="button" class="btn btn-default" onclick="serviceMailing()"><i class="glyphicon glyphicon-envelope"></i> mail </button>        
+    </form>
+    <div class="navbar-right">    
+    <div class="btn-group">
+    <button type="button" title="new session" class="btn" onclick="showNewSession()"><i class="click glyphicon glyphicon-plus"></i></button>
+    <button type="button" title="edit session" class="btn activable disabled" onclick="showEditSession()"><i class="click glyphicon glyphicon-edit"></i></button>
+    <button type="button" title="add a pause" class="btn activable disabled" onclick="addPause()"><i class="click glyphicon glyphicon-pause"></i></button>    
+    <button type="button" title="delete the session" class="btn btn-danger activable disabled" onclick="rmSession()"><i class="click glyphicon glyphicon-minus"></i></button>    
+    </div>    
+    </div>      
+  </div>
+</nav>
+<div id="days"></div>

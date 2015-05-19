@@ -6,6 +6,7 @@ var currentConvention;
 var shiftPressed = false;
 var allMajors;
 
+
 $( document ).ready(function () {
 waitingBlock = $("#cnt").clone().html();
 
@@ -66,6 +67,8 @@ function refresh() {
         showService();
     } else if (currentPage == "status") {
         showStatus();
+    } else if (currentPage == "defenses") {
+        showDefenses();
     }
     else {
         console.log("Unsupported operation on '" + currentPage + "'");
@@ -216,6 +219,7 @@ function pickBestStudentMatching(student, students) {
     });
     return best;
 }
+
 
 function displayMyStudents() {
 internships(function(data) {      

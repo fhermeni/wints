@@ -340,3 +340,40 @@ func (s *Service) HideStudent(em string, st bool) error {
 	}
 	return ErrPermission
 }
+
+//Defenses
+func (s *Service) DefenseSessions() ([]internship.DefenseSession, error) {
+	if s.my.Role >= internship.ADMIN {
+		return s.srv.DefenseSessions()
+	}
+	return []internship.DefenseSession{}, ErrPermission
+}
+
+func (s *Service) Defense(student string) (internship.Defense, error) {
+	if s.my.Role >= internship.ADMIN {
+		return s.srv.Defense(student)
+	}
+	return internship.Defense{}, ErrPermission
+}
+
+func (s *Service) SetDefenseGrade(student string, g int) error {
+	//Must be allowed also by the juries member
+	if s.my.Role >= internship.ADMIN {
+		return s.srv.SetDefenseGrade(student, g)
+	}
+	return ErrPermission
+}
+
+func (s *Service) SetDefenseSessions(defs []internship.DefenseSession) error {
+	if s.my.Role >= internship.ADMIN {
+		return s.srv.SetDefenseSessions(defs)
+	}
+	return ErrPermission
+}
+
+func (s *Service) JuryDefenseSessions(jury string) ([]internship.DefenseSession, error) {
+	if s.my.Email == jury && s.my.Role >= internship.TUTOR {
+		return s.srv.JuryDefenseSessions(jury)
+	}
+	return []internship.DefenseSession{}, ErrPermission
+}

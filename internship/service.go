@@ -108,4 +108,19 @@ type Service interface {
 	AddStudent(s Student) error
 	AlignWithInternship(student string, internship string) error
 	HideStudent(em string, st bool) error
+
+	//DefenseSessions returns all the registered defense sessions
+	DefenseSessions() ([]DefenseSession, error)
+
+	//JuryDefenseSessions returns all the registered defense sessions for a given jury member
+	JuryDefenseSessions(jury string) ([]DefenseSession, error)
+
+	//SetDefenseSessions saves all the defense sessions
+	SetDefenseSessions(defs []DefenseSession) error
+
+	//Defense provide the defense for a given student if it has already been stated
+	Defense(student string) (Defense, error)
+
+	//SetDefenseGrade Set the grade for a given defense
+	SetDefenseGrade(student string, g int) error
 }

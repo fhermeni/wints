@@ -62,9 +62,6 @@ create table reports(student text REFERENCES users(email) on delete cascade,
                         constraint pk_reports PRIMARY KEY(student, kind)
                         );
 
-create table defenses(id text,
-                      content text);
-
 create table password_renewal(
     email text PRIMARY KEY REFERENCES users(email) on delete cascade,
     deadline timestamp,
@@ -79,3 +76,28 @@ create table pending(
     major text,
     internship text
 )
+
+create table defenseSessions(
+    date timestamp with time zone,
+    room text,
+    pause integer,
+    constraint pk_unique PRIMARY KEY(date, room)
+);
+
+create table defenseJuries(
+    date timestamp with time zone,
+    room text,
+    jury text REFERENCES users(email) on delete cascade,
+    constraint pk_jury PRIMARY KEY(date, room, jury),
+    constraint fk_session FOREIGN KEY(date, room) REFERENCES defenseSessions(date, room) on delete cascade    
+);
+
+create table defenses(
+    date timeStamp with time zone,
+    room text,
+    student text PRIMARY KEY REFERENCES internships(student),
+    grade integer,
+    private bool,
+    remote bool,
+    constraint fk_session FOREIGN KEY(date, room) REFERENCES defenseSessions(date, room) on delete cascade
+);
