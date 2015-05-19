@@ -66,14 +66,12 @@ function updateSessionOrder(e, li) {
     //debugger 
     s.Defenses = []
     $(li.item).closest("ul").find("li").each(function(i, input) {
-        em = $(input).find("input").data("email")        
-        //undefined == pause
+        em = $(input).find("input").data("email")                
         if (!em) {
             s.Pause = i
         } else {
             s.Defenses.push(em);
-        }
-        //console.log(i + " " + em)
+        }       
     } )
     //Get the emails
 }
@@ -397,8 +395,7 @@ function load(defs) {
         def.Juries.forEach(function (j) {            
             drawJury(j);
         })  
-        if (s.Pause >= 0) {
-            console.log(s.Pause)
+        if (s.Pause >= 0) {            
             drawPause()            
         }                 
     })

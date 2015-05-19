@@ -112,9 +112,6 @@ type Service interface {
 	//DefenseSessions returns all the registered defense sessions
 	DefenseSessions() ([]DefenseSession, error)
 
-	//JuryDefenseSessions returns all the registered defense sessions for a given jury member
-	JuryDefenseSessions(jury string) ([]DefenseSession, error)
-
 	//SetDefenseSessions saves all the defense sessions
 	SetDefenseSessions(defs []DefenseSession) error
 

@@ -370,10 +370,3 @@ func (s *Service) SetDefenseSessions(defs []internship.DefenseSession) error {
 	}
 	return ErrPermission
 }
-
-func (s *Service) JuryDefenseSessions(jury string) ([]internship.DefenseSession, error) {
-	if s.my.Email == jury && s.my.Role >= internship.TUTOR {
-		return s.srv.JuryDefenseSessions(jury)
-	}
-	return []internship.DefenseSession{}, ErrPermission
-}
