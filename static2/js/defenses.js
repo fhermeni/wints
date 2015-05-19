@@ -144,7 +144,13 @@ function showNewSession() {
         var root = $("#modal");          
         $("#room").val("TBA")
         root.find("button").attr("onclick","addDefenseSession()")
-        root.find('#date').datetimepicker({inline: true,sideBySide: true, format:"dd/mm/yyyy HH:mm"});
+        d = new Date()
+        if (sessions.length == 0) {
+            d.setMinutes(0)
+        } else {                     
+            d = sessions[sessions.length - 1].Date            
+        }
+        root.find('#date').datetimepicker({inline: true,sideBySide: true, format:"dd/mm/yyyy HH:mm"}).data("DateTimePicker").date(d);
         root.modal('show');        
 }
 
