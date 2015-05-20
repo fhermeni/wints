@@ -2,6 +2,65 @@
  * Created by fhermeni on 03/07/2014.
  */
 
+moment.locale('fr', {
+    months : "janvier_février_mars_avril_mai_juin_juillet_août_septembre_octobre_novembre_décembre".split("_"),
+    monthsShort : "janv._févr._mars_avr._mai_juin_juil._août_sept._oct._nov._déc.".split("_"),
+    weekdays : "dimanche_lundi_mardi_mercredi_jeudi_vendredi_samedi".split("_"),
+    weekdaysShort : "dim._lun._mar._mer._jeu._ven._sam.".split("_"),
+    weekdaysMin : "Di_Lu_Ma_Me_Je_Ve_Sa".split("_"),
+    longDateFormat : {
+        LT : "HH:mm",
+        LTS : "HH:mm:ss",
+        L : "DD/MM/YYYY",
+        LL : "D MMMM YYYY",
+        LLL : "D MMMM YYYY LT",
+        LLLL : "dddd D MMMM YYYY LT"
+    },
+    calendar : {
+        sameDay: "[Aujourd'hui à] LT",
+        nextDay: '[Demain à] LT',
+        nextWeek: 'dddd [à] LT',
+        lastDay: '[Hier à] LT',
+        lastWeek: 'dddd [dernier à] LT',
+        sameElse: 'L'
+    },
+    relativeTime : {
+        future : "dans %s",
+        past : "il y a %s",
+        s : "quelques secondes",
+        m : "une minute",
+        mm : "%d minutes",
+        h : "une heure",
+        hh : "%d heures",
+        d : "un jour",
+        dd : "%d jours",
+        M : "un mois",
+        MM : "%d mois",
+        y : "une année",
+        yy : "%d années"
+    },
+    ordinalParse : /\d{1,2}(er|ème)/,
+    ordinal : function (number) {
+        return number + (number === 1 ? 'er' : 'ème');
+    },
+    meridiemParse: /PD|MD/,
+    isPM: function (input) {
+        return input.charAt(0) === 'M';
+    },
+    // in case the meridiem units are not separated around 12, then implement
+    // this function (look at locale/id.js for an example)
+    // meridiemHour : function (hour, meridiem) {
+    //     return /* 0-23 hour, given meridiem token and hour 1-12 */
+    // },
+    meridiem : function (hours, minutes, isLower) {
+        return hours < 12 ? 'PD' : 'MD';
+    },
+    week : {
+        dow : 1, // Monday is the first day of the week.
+        doy : 4  // The week that contains Jan 4th is the first week of the year.
+    }
+});
+
 Handlebars.getTemplate = function(name) {
     if (Handlebars.templates === undefined || Handlebars.templates[name] === undefined) {
         $.ajax({
@@ -208,16 +267,6 @@ Handlebars.registerHelper('commission', function(emails) {
     return cnt.join(", ");
 });
 
-
-Handlebars.registerHelper('offset', function(i, date) {
-    var offset = i * 30 * 60 * 1000;
-    var m = moment(date, "HH:mm");
-    var from = new Date(m.toDate().getTime() + offset);
-    var to = new Date(from.getTime() + 30 * 60 * 1000);
-    var str = twoD(from.getHours()) + ":" + twoD(from.getMinutes()) + " - " + twoD(to.getHours()) + ":" + twoD(to.getMinutes());
-    return str;
-});
-
 function twoD(d) {
     return d <= 9 ? "0" + d : d;
 }
@@ -328,12 +377,26 @@ Handlebars.registerHelper('surveyStatus', function(s) {
     return style;
 });
 
+
+function nbDayLates(d1, d2) {
+    var d = moment(d1).dayOfYear() - moment(d2).dayOfYear()
+    return new Handlebars.SafeString("<i class='glyphicon glyphicon-hourglass'></i><small> " + d + " d.</small>");
+}
 Handlebars.registerHelper('reportGrade', function(r) {
+    var passed = (new Date(r.Deadline).getTime() + 86400 * 1000) < new Date().getTime()        
     if (!r.ToGrade) {
-        return new Handlebars.SafeString("<i title='no grade needed'>n/a</i>");
+        if (passed && r.Grade == -2) {
+            return nbDayLates(new Date(), r.Deadline)
+        } else {
+            return new Handlebars.SafeString("<i title='no grade needed'>n/a</i>");
+        }
     }
     if (r.Grade == -2) {
-        return "-";
+        if (passed) {
+            return nbDayLates(new Date(), r.Deadline)
+        } else {
+            return "-";
+        }
     } else if (r.Grade == -1) {
         return "?";
     }
@@ -418,12 +481,20 @@ Handlebars.registerHelper('student', function(g) {
 });
 
 Handlebars.registerHelper('longDate', function(d) {
-    var m = moment(d, "DD/MM/YYYY");
-    m.lang("fr");
+    var m = moment(d);    
+    m.locale("fr")
     return m.format("dddd D MMMM");
 });
 
-
+Handlebars.registerHelper("offset", function (from, index, pause) {    
+    var d = moment(from)
+    //debugger
+    if (pause != -1 && index >= pause) {
+        d = d.add(30, "m")
+    }
+    d = d.add(index * 30, "m")
+    return d.format("HH:mm") + "-" + d.add(30,"m").format("HH:mm");
+})
 function df(d, active) {
     var date = new Date(Date.parse(d));
     var str = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();

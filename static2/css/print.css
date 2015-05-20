@@ -1,0 +1,23 @@
+body {
+	width: 95%;
+	margin: 0 auto;
+	font-size: 12pt;
+}
+
+h4 {
+	margin-bottom: 0.2em;
+}
+
+.offset,.cnt {
+	display: inline-block;
+	vertical-align: text-top;
+}
+
+.offset,.header {
+	font-weight: bold;
+}
+
+.descr {
+	width: 800px;
+	text-align: justify;
+}

@@ -272,6 +272,10 @@ function defenses(ok, no) {
     return get("/defenses/", ok, no)
 }
 
+function defenseProgram(ok, no) {
+    return get("/program/", ok, no)
+}
+
 function postDefenses(cnt, ok, no) {
     return post("/defenses/", cnt, ok, no)
 }

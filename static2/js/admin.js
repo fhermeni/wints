@@ -55,10 +55,6 @@ function refresh() {
         displayTutors();
     } else if (currentPage == "privileges") {
         showPrivileges();
-    } else if (currentPage == "defenses-schedule") {
-        showDefenses("schedule");
-    } else if (currentPage == "defenses-juries") {
-        showDefenses("juries");
     } else if (currentPage == "pending") {
         showPendingConventions();
     } else if (currentPage == "juries") {
@@ -67,8 +63,10 @@ function refresh() {
         showService();
     } else if (currentPage == "status") {
         showStatus();
-    } else if (currentPage == "defenses") {
+    } else if (currentPage == "defenses-schedule") {
         showDefenses();
+    } else if (currentPage == "defense-program") {
+        showDefenseProgram()
     }
     else {
         console.log("Unsupported operation on '" + currentPage + "'");
