@@ -60,7 +60,7 @@ function showDefenses() {
     });
 }
 
-function updateSessionOrder(e, li) {        
+function updateSessionOrder(e, li) {            
     var sid = $(li.item).closest(".session").attr("id")        
     s = getSession(sid)   
     //debugger 
