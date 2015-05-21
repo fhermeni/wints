@@ -308,7 +308,7 @@ Handlebars.registerHelper('surveyStatus', function(s) {
 
 function nbDayLates(d1, d2) {
     var d = moment(d1).dayOfYear() - moment(d2).dayOfYear()
-    return new Handlebars.SafeString("<i class='glyphicon glyphicon-hourglass'></i><small> " + d + " d.</small>");
+    return new Handlebars.SafeString("<i class='glyphicon glyphicon-time'></i><small> " + d + " d.</small>");
 }
 Handlebars.registerHelper('reportGrade', function(r) {
     var passed = (new Date(r.Deadline).getTime() + 86400 * 1000) < new Date().getTime()        
