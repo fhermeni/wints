@@ -673,7 +673,7 @@ function showInternship(s) {
 function showReport(email, kind) {    
     reportHeader(email, kind, function(r) {            
             r.Passed = new Date(r.Deadline).getTime() < new Date()
-            r.Late = new Date(r.Delivery).getTime() > new Date(r.Deadline)
+            r.Late = nbDaysLate(new Date(r.Deadline), new Date(r.Delivery)) < 0
             r.In = r.Grade != -2
             r.Reviewable = r.Grade != -2 || r.Passed
             r.Gradeable = r.ToGrade && (r.Grade != -2 || r.Passed)
@@ -688,6 +688,13 @@ function showReport(email, kind) {
                 .on('ifUnchecked', function(){setReportPrivate(email, kind, false)})
             $(".date").datepicker({format:'d M yyyy', autoclose: true, minViewMode: 0, weekStart: 1}).on("changeDate", function (e) { setReportDeadline(email, kind, e.date)})             
     });
+}
+
+function nbDaysLate(deadline, now) {
+    if (!now) { now = new Date()}
+    var d1 = moment(deadline)
+    var d2 = moment(now)
+    return d1 - d2;
 }
 
 function sendMajor(e, m) {
