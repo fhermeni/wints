@@ -24,8 +24,6 @@ function showDashboard() {
             //Locked: commented || (deadline passed && delivery)
             var passed = (new Date(i.Reports[x].Deadline).getTime() + (86400*1000))< new Date().getTime()            
             i.Reports[x].Locked = (passed && delivered) || i.Reports[x].Grade >= 0;                   
-            console.log(i.Reports[x].Kind + " " + passed + " " + delivered + " " + i.Reports[x].Grade)
-            //console.log(i.Reports[x].Deadline + " " + new Date());
         }            
         var html = Handlebars.getTemplate("internship")(i);
         var root = $("#cnt");

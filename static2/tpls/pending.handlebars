@@ -2,7 +2,7 @@
     {{#if c}}
     <div class="text-center">
         <h3 class="fn">{{c.Student.Firstname}} {{c.Student.Lastname}} ({{c.Promotion}})</h3>
-        {{date c.Begin}} to {{date c.End}}: <a href="{{c.Cpy.WWW}}">{{c.Cpy.Name}}</a>
+        {{dateFmt c.Begin "D MMM YYYY"}} to {{dateFmt c.End "D MMM YYYY"}}: <a href="{{c.Cpy.WWW}}">{{c.Cpy.Name}}</a>
     </div>
     
     <div class="row">

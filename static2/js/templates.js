@@ -65,18 +65,6 @@ Handlebars.registerHelper('shortCompany', function(c) {
     return n;
 });
 
-Handlebars.registerHelper('date', function(d) {
-    return moment(d).format("D MMM YYYY")
-});
-
-Handlebars.registerHelper('datetime', function(d) {
-    return moment(d).format("DD/MM/YY HH:mm")
-});
-
-Handlebars.registerHelper('longdatetime', function(d) {
-    return moment(d).format("D MMM YY HH:mm")
-});
-
 Handlebars.registerHelper('rawFullname', function(p) {
     var fn = p.Firstname + " " + p.Lastname;
     for (i = fn.length; i < 40; i++) {
@@ -408,10 +396,8 @@ Handlebars.registerHelper('student', function(g) {
     return new Handlebars.SafeString(buf);
 });
 
-Handlebars.registerHelper('longDate', function(d) {
-    var m = moment(d, "DD/MM/YYYY");
-    m.lang("fr");
-    return m.format("dddd D MMMM");
+Handlebars.registerHelper('dateFmt', function(d, fmt) {
+    return moment(d).format(fmt)
 });
 
 
