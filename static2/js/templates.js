@@ -400,10 +400,3 @@ Handlebars.registerHelper('dateFmt', function(d, fmt) {
     return moment(d).format(fmt)
 });
 
-
-function df(d, active) {
-    var date = new Date(Date.parse(d));
-    var str = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
-    return str;
-}
-
