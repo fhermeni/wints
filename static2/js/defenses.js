@@ -7,7 +7,7 @@ Array.prototype.remove = function(val) {
 };
 
 var allDefenses = {}
-var sessions = []
+var defensedefenseSessions = []
 
 
 function hash(s) {
@@ -16,7 +16,7 @@ function hash(s) {
 
 function getSession(sid) {
     var s = undefined;
-    sessions.forEach(function (ss) {
+    defenseSessions.forEach(function (ss) {
         if (hash(ss) == sid) {
             s = ss;
             return false;
@@ -86,7 +86,7 @@ function addDefenseSession() {
         $("#room").closest(".form-group").removeClass("has-error");        
         $("#modal").modal('hide');
         drawSession(s);            
-        sessions.push(s);  
+        defenseSessions.push(s);  
         activeSession(hash(s))          
     }
 }
@@ -95,7 +95,7 @@ function rmSession() {
     s = getSession(active);
     activeSession(active)
     $("#"+hash(s)).remove()
-    sessions.remove(s)    
+    defenseSessions.remove(s)    
 }
 
 
@@ -151,7 +151,7 @@ function saveDefenseSession() {
         d.attr("id", hash(newSession))
         d.attr("onclick", "activeSession(\""+ hash(newSession) + "\")")
     }              
-    sessions.push(newSession);        
+    defenseSessions.push(newSession);        
     activeSession(hash(newSession))      
 }
 
@@ -160,10 +160,10 @@ function showNewSession() {
         $("#room").val("TBA")
         root.find("button").attr("onclick","addDefenseSession()")
         d = new Date()
-        if (sessions.length == 0) {
+        if (defenseSessions.length == 0) {
             d.setMinutes(0)
         } else {                     
-            d = sessions[sessions.length - 1].Date            
+            d = defenseSessions[defenseSessions.length - 1].Date            
         }
         root.find('#date').datetimepicker({inline: true,sideBySide: true, format:"dd/mm/yyyy HH:mm"}).data("DateTimePicker").date(d);
         root.modal('show');        
@@ -342,7 +342,7 @@ function removeJury(b, em) {
 function availableTeachers(sid) {            
     var s = getSession(sid);        
     var ok = teachers.slice();    
-    sessions.forEach(function (ss) {        
+    defenseSessions.forEach(function (ss) {        
         if (overlap(ss.Date, s.Date)) {
             ss.Juries.forEach(function (t) {                            
                 ok = removeByEmail(ok, t)                
@@ -354,7 +354,7 @@ function availableTeachers(sid) {
 
 function save() {
     var defs = [];
-    sessions.forEach(function (s) {
+    defenseSessions.forEach(function (s) {
         var def = {
             Room : s.Room,
             Date : s.Date,
@@ -379,10 +379,10 @@ function save() {
 
 function load(defs) {    
     allDefenses = {}
-    sessions = []
+    defenseSessions = []
     defs.forEach(function (def) {        
         s = {Room : def.Room, Date : moment(new Date(def.Date)), Juries : def.Juries, Defenses : [], Pause: def.Pause}
-        sessions.push(s)
+        defenseSessions.push(s)
         drawSession(s);        
         activeSession(hash(s))
         def.Defenses.forEach(function (d) {            
