@@ -1,0 +1,44 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Defense</h3>
+        </div>
+            <div class="modal-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Date</label>
+                        <div class="col-sm-9">                            
+                                <p class="form-control-static">{{date Date}}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Room</label>
+                        <div class="col-sm-9">                            
+                                <p class="form-control-static">{{Room}}</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Attributes</label>
+                        <div class="col-sm-9">                            
+                                <p class="form-control-static">Public/Private, Local/Remote</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="down" class="col-sm-3 control-label">Juries</label>                        
+                        <ul>   
+                            {{#each Juries}}
+                                <li>{{fullname this}}</li>
+                            {{/each}}
+                        </ul>
+                    </div>                    
+                    <div class="form-group">
+                        <label for="grade" class="col-sm-2 control-label">Grade</label>
+                        <div class="col-sm-9">
+                            <input type="number" class="form-control" id="grade" value="{{gradeInput this}}" {{#unless Gradeable}}disabled="disabled"{{/unless}} />                                
+                        </div>
+                    </div>
+                </div>            
+            </div>
+            <div class="modal-footer"></div>
+    </div>    
+</div>
