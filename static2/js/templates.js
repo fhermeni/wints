@@ -359,7 +359,11 @@ Handlebars.registerHelper('defenseStatus', function(g) {
 });
 
 Handlebars.registerHelper('defenseGrade', function(g) {    
-    var passed = new Date(g.Date).getTime() < new Date().getTime()         
+    d = new Date(g.Date)
+    if (d.getTime() < 0) {
+        return "n/a";
+    }
+    var passed = d.getTime() < new Date().getTime()         
     if (g.Grade == -1) {
         return passed ? "?" : "-"
     }

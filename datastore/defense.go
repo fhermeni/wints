@@ -139,7 +139,7 @@ func (srv *Service) Defense(student string) (internship.StudentDefense, error) {
 	}
 	defer rows.Close()
 	if !rows.Next() {
-		return internship.StudentDefense{}, nil
+		return internship.StudentDefense{Grade: -1}, nil
 	}
 	err = rows.Scan(&private, &remote, &date, &room, &grade)
 	if err != nil {

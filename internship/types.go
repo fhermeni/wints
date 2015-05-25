@@ -275,12 +275,30 @@ type StudentDefense struct {
 	Juries  []User
 }
 
+func (s StudentDefense) InJury(em string) bool {
+	for _, j := range s.Juries {
+		if j.Email == em {
+			return true
+		}
+	}
+	return false
+}
+
 type DefenseSession struct {
 	Date     time.Time
 	Room     string
 	Juries   []string
 	Defenses []Defense
 	Pause    int
+}
+
+func (s DefenseSession) InJury(em string) bool {
+	for _, j := range s.Juries {
+		if j == em {
+			return true
+		}
+	}
+	return false
 }
 
 //Predefined errors

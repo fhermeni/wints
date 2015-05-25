@@ -345,12 +345,24 @@ func (s *Service) HideStudent(em string, st bool) error {
 func (s *Service) DefenseSessions() ([]internship.DefenseSession, error) {
 	if s.my.Role >= internship.ADMIN {
 		return s.srv.DefenseSessions()
+	} else if s.my.Role != internship.NONE {
+		sessions, err := s.srv.DefenseSessions()
+		if err != nil {
+			return []internship.DefenseSession{}, err
+		}
+		mySessions := make([]internship.DefenseSession, 0, 0)
+		for _, session := range sessions {
+			if session.InJury(s.my.Email) {
+				mySessions = append(mySessions, session)
+			}
+		}
+		return mySessions, nil
 	}
 	return []internship.DefenseSession{}, ErrPermission
 }
 
 func (s *Service) Defense(student string) (internship.StudentDefense, error) {
-	if s.my.Role >= internship.MAJOR {
+	if s.mine(student) || s.my.Role >= internship.MAJOR {
 		return s.srv.Defense(student)
 	}
 	return internship.StudentDefense{}, ErrPermission
@@ -359,6 +371,13 @@ func (s *Service) Defense(student string) (internship.StudentDefense, error) {
 func (s *Service) SetDefenseGrade(student string, g int) error {
 	//Must be allowed also by the juries member
 	if s.my.Role >= internship.ADMIN {
+		return s.srv.SetDefenseGrade(student, g)
+	}
+	def, err := s.Defense(student)
+	if err != nil {
+		return err
+	}
+	if def.InJury(s.my.Email) {
 		return s.srv.SetDefenseGrade(student, g)
 	}
 	return ErrPermission
