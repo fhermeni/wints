@@ -211,7 +211,7 @@ function addStudent(d) {
     var def = {Grade: -1, Remote : false, Private: false}    
     allDefenses[em] = def;
     drawStudent(em)
-
+    $("#cnt").find("ul.students").sortable({connectWith: "sortable"}).bind('sortupdate', updateSessionOrder);           
     students.remove(i)        
     $('#student-selecter').html(Handlebars.helpers.studentSelecter(students).string)        
     $('#student-selecter').selecter("destroy");
@@ -237,8 +237,7 @@ function drawStudent(em) {
         " <i class='glyphicon " + glyphRemote + "' onclick='toggleRemote(this, \"" + em + "\")'></i> <i class='glyphicon " + glyphPrivate + "' onclick='togglePrivate(this,\"" + em + "\")'></i>"+
         " &nbsp; <i class='glyphicon glyphicon-remove-circle pull-right' onclick='removeStudent(this,\"" + em + "\")'></i>"+
         "</li>";
-    $("#"+active).find("ul.students").append(html).find(":checkbox").iCheck()
-    $("#cnt").find("ul.students").sortable({connectWith: "sortable"}).bind('sortupdate', updateSessionOrder);           
+    $("#"+active).find("ul.students").append(html).find(":checkbox").iCheck()    
     
     var def = {Grade: -1, Remote : false, Private: false}    
     allDefenses[em] = def;
@@ -399,6 +398,7 @@ function load(defs) {
             drawPause()            
         }                 
     })
+    $("#cnt").find("ul.students").sortable({connectWith: "sortable"}).bind('sortupdate', updateSessionOrder);
     if (active) {
         $('#jury-selecter').html(Handlebars.helpers.jurySelecter(availableTeachers(active)).string)                    
         $('#student-selecter').html(Handlebars.helpers.studentSelecter(students).string)        

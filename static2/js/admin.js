@@ -711,6 +711,14 @@ function sendTutor(e, s) {
     })
 }
 
+function showDefense(stu) {    
+        i = getInternship(stu)
+        def = i.Defense
+        def.Student = i.Student
+        buf = Handlebars.getTemplate("defense-modal")(def)            
+        $("#modal").html(buf).modal('show');   
+        $('#modal').find(":checkbox").iCheck();                                           
+}
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.substring(1)
 }

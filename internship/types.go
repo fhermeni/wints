@@ -161,6 +161,8 @@ type Internship struct {
 	ForeignCountry bool
 	Lab            bool
 	Gratification  int
+	//Defense
+	Defense StudentDefense
 }
 
 type Convention struct {
@@ -262,6 +264,15 @@ type Defense struct {
 	Grade   int
 	Date    time.Time
 	Room    string
+}
+
+type StudentDefense struct {
+	Private bool
+	Remote  bool
+	Grade   int
+	Date    time.Time
+	Room    string
+	Juries  []User
 }
 
 type DefenseSession struct {

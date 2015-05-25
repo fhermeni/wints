@@ -349,11 +349,11 @@ func (s *Service) DefenseSessions() ([]internship.DefenseSession, error) {
 	return []internship.DefenseSession{}, ErrPermission
 }
 
-func (s *Service) Defense(student string) (internship.Defense, error) {
-	if s.my.Role >= internship.ADMIN {
+func (s *Service) Defense(student string) (internship.StudentDefense, error) {
+	if s.my.Role >= internship.MAJOR {
 		return s.srv.Defense(student)
 	}
-	return internship.Defense{}, ErrPermission
+	return internship.StudentDefense{}, ErrPermission
 }
 
 func (s *Service) SetDefenseGrade(student string, g int) error {

@@ -279,3 +279,7 @@ function defenseProgram(ok, no) {
 function postDefenses(cnt, ok, no) {
     return post("/defenses/", cnt, ok, no)
 }
+
+function defense(student, ok, no) {
+    return get("/internships/" + student + "/defense", ok, no)
+}

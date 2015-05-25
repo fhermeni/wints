@@ -674,7 +674,7 @@ func defenseMngt(s Service, mailer mail.Mailer) {
 	s.r.HandleFunc("/api/v1/defenses/", restHandler(getDefenseSessions, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/program/", restHandler(getPublicSessions, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/defenses/", restHandler(postDefenseSessions, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/defense", restHandler(getDefense, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/defense", restHandler(getDefense, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/internships/{email}/defense/grade", restHandler(setDefenseGrade, s, mailer)).Methods("POST")
 }
 

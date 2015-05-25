@@ -128,18 +128,6 @@ Handlebars.registerHelper('shortCompany', function(c) {
     return n;
 });
 
-Handlebars.registerHelper('date', function(d) {
-    return moment(d).format("D MMM YYYY")
-});
-
-Handlebars.registerHelper('datetime', function(d) {
-    return moment(d).format("DD/MM/YY HH:mm")
-});
-
-Handlebars.registerHelper('longdatetime', function(d) {
-    return moment(d).format("D MMM YY HH:mm")
-});
-
 Handlebars.registerHelper('rawFullname', function(p) {
     var fn = p.Firstname + " " + p.Lastname;
     for (i = fn.length; i < 40; i++) {
@@ -356,6 +344,28 @@ Handlebars.registerHelper('reportStatus', function(r) {
     return style;
 });
 
+Handlebars.registerHelper('defenseStatus', function(g) {    
+    var passed = new Date(g.Date).getTime() < new Date().getTime() 
+    var style = "btn-link";    
+    if (!passed) {
+        return style
+    }
+    if (g.Grade >= 0 && g.Grade < 10) {
+        style = "btn-danger";
+    } else if (g.Grade >= 10) {
+        style = "btn-success";
+    }
+    return style;
+});
+
+Handlebars.registerHelper('defenseGrade', function(g) {    
+    var passed = new Date(g.Date).getTime() < new Date().getTime()         
+    if (g.Grade == -1) {
+        return passed ? "?" : "-"
+    }
+    return g.Grade
+});
+
 Handlebars.registerHelper('gradeAnnotation', function(r) {
     var passed = (new Date(Date.parse(r.Deadline)).getTime() + 86400 * 1000) < new Date().getTime() 
     if (!passed && !r.toGrade >= -1) {
@@ -480,12 +490,6 @@ Handlebars.registerHelper('student', function(g) {
     return new Handlebars.SafeString(buf);
 });
 
-Handlebars.registerHelper('longDate', function(d) {
-    var m = moment(d);    
-    m.locale("fr")
-    return m.format("dddd D MMMM");
-});
-
 Handlebars.registerHelper("offset", function (from, index, pause) {    
     var d = moment(from)
     //debugger
@@ -495,9 +499,13 @@ Handlebars.registerHelper("offset", function (from, index, pause) {
     d = d.add(index * 30, "m")
     return d.format("HH:mm") + "-" + d.add(30,"m").format("HH:mm");
 })
-function df(d, active) {
-    var date = new Date(Date.parse(d));
-    var str = date.getDate() + "/" + (date.getMonth() + 1) + "/" + date.getFullYear();
-    return str;
-}
 
+Handlebars.registerHelper('longDate', function(d) {
+    var m = moment(d);    
+    m.locale("fr")
+    return m.format("dddd D MMMM");
+});
+
+Handlebars.registerHelper('dateFmt', function(d, fmt) {
+    return moment(d).format(fmt)
+});

@@ -9,9 +9,9 @@
                         <label for="deadline" class="col-sm-3 control-label">Deadline</label>
                         <div class="col-sm-9">
                             {{#if In}}                        
-                                <p class="form-control-static">{{longdatetime Deadline}}</p>
+                                <p class="form-control-static">{{dateFmt Deadline "D MMM YYYY HH:mm"}}</p>
                             {{else}}
-                                <input type="text" class="form-control date" id="deadline" value="{{date Deadline}}"/>
+                                <input type="text" class="form-control date" id="deadline" value="{{dateFmt Deadline 'D MMM YYYY'}}"/>
                             {{/if}}                            
                         </div>
                     </div>
@@ -33,7 +33,7 @@
                         <label for="delivery" class="col-sm-3 control-label">Delivery date</label>
                         <div class="col-sm-9">
                             {{#if In}}                            
-                                <p class="form-control-static">{{longdatetime Delivery}} {{#if Late}}<span class="alert-text">Deadline missed !</span>{{/if}}</p>
+                                <p class="form-control-static">{{dateFmt Delivery "D MMM YYYY HH:mm"}} {{#if Late}}<span class="alert-text">Deadline missed !</span>{{/if}}</p>
                             {{else}}
                                 <p class="form-control-static"><i>n/a</i></p>
                             {{/if}}                            

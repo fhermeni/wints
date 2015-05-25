@@ -1,6 +1,7 @@
 package datastore
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/fhermeni/wints/internship"
@@ -101,19 +102,23 @@ func (srv *Service) JuryDefenseSessions(jury string) ([]internship.DefenseSessio
 }
 
 func (srv *Service) Defenses(date time.Time, room string) ([]internship.Defense, error) {
-	sql := "select student, private, remote, grade from defenses where date=$1 and room=$2"
+	req := "select student, private, remote, grade from defenses where date=$1 and room=$2"
 	defs := make([]internship.Defense, 0, 0)
-	rows, err := srv.DB.Query(sql, date, room)
+	rows, err := srv.DB.Query(req, date, room)
 	if err != nil {
 		return defs, err
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var grade int
+		var grade sql.NullInt64
 		var remote, private bool
 		var student string
 		rows.Scan(&student, &private, &remote, &grade)
-		defs = append(defs, internship.Defense{Student: student, Private: private, Remote: remote, Grade: grade})
+		d := internship.Defense{Student: student, Private: private, Remote: remote, Grade: -1}
+		if grade.Valid {
+			d.Grade = int(grade.Int64)
+		}
+		defs = append(defs, d)
 	}
 
 	if err != nil {
@@ -122,18 +127,40 @@ func (srv *Service) Defenses(date time.Time, room string) ([]internship.Defense,
 	return defs, nil
 }
 
-func (srv *Service) Defense(student string) (internship.Defense, error) {
-	sql := "select private, remote, grade, date, room from defenses where student=$1"
-	var grade int
+func (srv *Service) Defense(student string) (internship.StudentDefense, error) {
+	req := "select private, remote, date, room, grade from defenses where student=$1"
 	var remote, private bool
 	var room string
 	var date time.Time
-	row := srv.DB.QueryRow(sql, student)
-	err := row.Scan(&private, &remote, &grade, &date, &room)
+	var grade sql.NullInt64
+	rows, err := srv.DB.Query(req, student)
 	if err != nil {
-		return internship.Defense{}, err
+		return internship.StudentDefense{}, err
 	}
-	return internship.Defense{Student: student, Private: private, Remote: remote, Grade: grade, Room: room, Date: date}, nil
+	defer rows.Close()
+	if !rows.Next() {
+		return internship.StudentDefense{}, nil
+	}
+	err = rows.Scan(&private, &remote, &date, &room, &grade)
+	if err != nil {
+		return internship.StudentDefense{}, err
+	}
+	d := internship.StudentDefense{Private: private, Remote: remote, Room: room, Date: date, Juries: make([]internship.User, 0, 0), Grade: -1}
+	if grade.Valid {
+		d.Grade = int(grade.Int64)
+	}
+	rows, err = srv.DB.Query("select firstname, lastname, email, tel from defenseJuries,users where date=$1 and room=$2 and defenseJuries.jury=users.Email", date, room)
+	if err != nil {
+		return d, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var fn, ln, tel, email string
+		rows.Scan(&fn, &ln, &email, &tel)
+		u := internship.User{Firstname: fn, Lastname: ln, Tel: tel, Email: email}
+		d.Juries = append(d.Juries, u)
+	}
+	return d, nil
 }
 
 func (srv *Service) SetDefenseGrade(stu string, g int) error {

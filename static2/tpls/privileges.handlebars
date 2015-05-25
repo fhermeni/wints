@@ -12,7 +12,7 @@
             <input type='checkbox' class='icheckbox_flat' data-email='{{Email}}'/>  
             <a class="fn" href="mailto:{{Email}}" title="{{fullname this}}">{{shortFullname this}}</a>
         {{#if Last}}
-        <small>({{datetime Last}})</small>        
+        <small>({{dateFmt Last "DD/MM/YY HH:mm"}})</small>        
         {{/if}}
         </label>
         <span class='col-md-3'>
@@ -57,7 +57,7 @@
             <input type='checkbox' class='icheckbox_flat' data-email='{{Email}}'/>  
             <a class="fn" onclick="showInternship('{{Email}}')">{{shortFullname this}}</a>     
             {{#if Last}}
-            <small>({{datetime Last}})</small>       
+            <small>({{dateFmt Last "DD/MM/YY HH:mm"}})</small>       
             {{/if}}
             </label>
             <a data-toggle="student-reinvite" data-user="{{Email}}" class="btn btn-info btn-xs glyphicon glyphicon-refresh" title="reset ?"></a>                

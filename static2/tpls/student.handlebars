@@ -34,7 +34,7 @@
             <h4 class="text-center">{{company I.Cpy}}</h4>
             <dl class="dl-horizontal">
                 <dt>period</dt>
-                <dd>{{date I.Begin}} to {{date I.End}}</dd>
+                <dd>{{dateFmt I.Begin "D MMM YYYY"}} to {{dateFmt I.End "D MMM YYYY"}}</dd>
                 <dt>supervisor</dt>
                 <dd>
                     <a class="fn" href="mailto:{{I.Sup.Email}}">{{fullname I.Sup}}</a>

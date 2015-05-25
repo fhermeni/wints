@@ -1,39 +1,50 @@
 <div class="modal-dialog">
     <div class="modal-content">
         <div class="modal-header">
-            <h3 class="modal-title">Defense</h3>
+            <h3 class="modal-title">Defense
+            <small>
+              <button type="button" class="btn btn-sm" onclick="serviceMailing()"><i class="glyphicon glyphicon-envelope"></i> mail selection </button>
+            </small>
+            </h3>
         </div>
             <div class="modal-body">
                 <div class="form-horizontal">
                     <div class="form-group">
-                        <label class="col-sm-3 control-label">Date</label>
-                        <div class="col-sm-9">                            
-                                <p class="form-control-static">{{date Date}}</p>
-                        </div>
+                        <label class="col-sm-3 control-label">Student</label>                        
+                        <p class="form-control-static fn"><input type='checkbox' class='icheckbox_flat' data-email='{{Student.Email}}'/> {{fullname Student}}</p>                        
                     </div>
                     <div class="form-group">
-                        <label class="col-sm-3 control-label">Room</label>
-                        <div class="col-sm-9">                            
-                                <p class="form-control-static">{{Room}}</p>
-                        </div>
+                        <label class="col-sm-3 control-label">Date</label>                                        
+                        <p class="form-control-static">{{dateFmt Date "D MMM YYYY HH:mm"}}</p>                        
                     </div>
                     <div class="form-group">
-                        <label class="col-sm-3 control-label">Attributes</label>
-                        <div class="col-sm-9">                            
-                                <p class="form-control-static">Public/Private, Local/Remote</p>
-                        </div>
+                        <label class="col-sm-3 control-label">Room</label>                        
+                        <p class="form-control-static">{{Room}}</p>                        
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Presence</label>                        
+                        <p class="form-control-static">                                
+                            {{#if Remote}}Virtual{{else}}Physical{{/if}}                                
+                        </p>                        
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3 control-label">Audience</label>                        
+                        <p class="form-control-static">
+                            {{#if Private}}Private{{else}}Public{{/if}}                                
+                        </p>                        
                     </div>
                     <div class="form-group">
                         <label for="down" class="col-sm-3 control-label">Juries</label>                        
-                        <ul>   
-                            {{#each Juries}}
-                                <li>{{fullname this}}</li>
-                            {{/each}}
-                        </ul>
+                        <p class="form-control-static fn">                        
+                        {{#each Juries}}
+                        <input type='checkbox' class='icheckbox_flat' data-email='{{Email}}'/> 
+                        {{fullname this}}{{#unless @last}},{{/unless}}                        
+                        {{/each}}                        
+                        </p>
                     </div>                    
                     <div class="form-group">
-                        <label for="grade" class="col-sm-2 control-label">Grade</label>
-                        <div class="col-sm-9">
+                        <label for="grade" class="col-sm-3 control-label">Grade</label>
+                        <div class="col-sm-3">
                             <input type="number" class="form-control" id="grade" value="{{gradeInput this}}" {{#unless Gradeable}}disabled="disabled"{{/unless}} />                                
                         </div>
                     </div>

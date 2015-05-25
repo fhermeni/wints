@@ -162,6 +162,12 @@ func (srv *Service) Internship(stu string) (internship.Internship, error) {
 	if err != nil {
 		return internship.Internship{}, err
 	}
+	d, err := srv.Defense(stu)
+	if err != nil {
+		return internship.Internship{}, err
+	}
+	i.Defense = d
+
 	return i, err
 }
 
@@ -283,6 +289,11 @@ func (srv *Service) Internships() ([]internship.Internship, error) {
 		if err != nil {
 			return internships, err
 		}
+		d, err := srv.Defense(i.Student.Email)
+		if err != nil {
+			return internships, err
+		}
+		i.Defense = d
 		internships = append(internships, i)
 	}
 	return internships, err

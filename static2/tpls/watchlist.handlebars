@@ -101,7 +101,7 @@ As a major leader or an administrator, you can follow the progress of every stud
             <a href="/surveys/{{Kind}}?student={{../Student.Email}}&kind={{Kind}}" target='_blank' class="badge {{surveyStatus this}}">{{Kind}}</a>
             {{/each}}
             </td>
-            <td>-</td>
+            <td onclick="showDefense('{{Student.Email}}')" class="{{defenseStatus Defense}}">{{defenseGrade Defense}}</td>
         </tr>
     {{/each}}
     </tbody>

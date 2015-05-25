@@ -116,7 +116,7 @@ type Service interface {
 	SetDefenseSessions(defs []DefenseSession) error
 
 	//Defense provide the defense for a given student if it has already been stated
-	Defense(student string) (Defense, error)
+	Defense(student string) (StudentDefense, error)
 
 	//SetDefenseGrade Set the grade for a given defense
 	SetDefenseGrade(student string, g int) error
