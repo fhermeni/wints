@@ -21,11 +21,9 @@
                 <a href="mailto:{{P.Email}}">{{fullname P}}</a> ({{P.Tel}})
             </td>
             <td>
-            {{#if Internships}}
-                {{len Internships}} ({{majors Internships}})
-            {{else}}
-                -
-            {{/if}}
+            {{#each Internships}}
+                {{len this}} {{@key}}{{#unless @last}}; {{/unless}}
+            {{/each}}
             </td>
             <td>
                 {{#if juries}}
