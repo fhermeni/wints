@@ -347,13 +347,15 @@ Handlebars.registerHelper('reportStatus', function(r) {
 Handlebars.registerHelper('defenseStatus', function(g) {    
     var passed = new Date(g.Date).getTime() < new Date().getTime() 
     var style = "btn-link";    
-    if (!passed) {
-        return style
+    if (new Date(g.Date).getTime() < 0) {
+        return style;
     }
     if (g.Grade >= 0 && g.Grade < 10) {
         style = "btn-danger";
     } else if (g.Grade >= 10) {
         style = "btn-success";
+    } else if (passed) {
+        style = "btn-primary"
     }
     return style;
 });

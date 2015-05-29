@@ -280,6 +280,10 @@ function postDefenses(cnt, ok, no) {
     return post("/defenses/", cnt, ok, no)
 }
 
+function postDefenseGrade(stu, g, ok, no) {
+    console.log(g)
+    return post("/internships/" + stu + "/defense/grade", g, ok, no)
+}
 function defense(student, ok, no) {
     return get("/internships/" + student + "/defense", ok, no)
 }

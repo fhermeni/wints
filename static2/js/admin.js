@@ -715,9 +715,25 @@ function showDefense(stu) {
         i = getInternship(stu)
         def = i.Defense
         def.Student = i.Student
+        def.Gradeable = myself.Role >= 3
+        def.Juries.forEach(function (j) {
+            if (j.Email == myself.Email) {
+                def.Gradeable = true
+                return false
+            }
+        })
         buf = Handlebars.getTemplate("defense-modal")(def)            
         $("#modal").html(buf).modal('show');   
         $('#modal').find(":checkbox").iCheck();                                           
+}
+
+function gradeDefense(stu) {
+    var g = $("#modal").find("#grade").val()
+    postDefenseGrade(stu, parseInt(g), function() {
+        $("#modal").find("#grade").val(g).removeClass("has-error")
+        $("#modal").modal('hide')        
+        refresh();
+    })
 }
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.substring(1)

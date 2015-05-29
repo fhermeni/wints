@@ -45,7 +45,12 @@
                     <div class="form-group">
                         <label for="grade" class="col-sm-3 control-label">Grade</label>
                         <div class="col-sm-3">
+                            <div class="input-group">
                             <input type="number" class="form-control" id="grade" value="{{gradeInput this}}" {{#unless Gradeable}}disabled="disabled"{{/unless}} />                                
+                            <span class="input-group-btn">
+                            <button type="button" onclick="gradeDefense('{{Student.Email}}')" class="btn btn-danger"><i class="glyphicon glyphicon-floppy-disk"></i></button>
+                            </span>
+                            </div>
                         </div>
                     </div>
                 </div>            
