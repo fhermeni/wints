@@ -287,6 +287,17 @@ Handlebars.registerHelper('gradeAnnotation', function(r) {
     return -999
 });
 
+Handlebars.registerHelper('surveyAnnotation', function(surveys) {    
+    //-1 by missing reports
+    g = 0
+    surveys.forEach(function (s) {
+        if (Object.keys(s.Answers).length == 0) {
+            g--
+        }
+    })
+    return g;
+});
+
 
 Handlebars.registerHelper('surveyStatus', function(s) {
     var passed = (new Date(Date.parse(s.Deadline)).getTime() + 86400 * 1000) < new Date().getTime()    

@@ -65,7 +65,7 @@ As a major leader or an administrator, you can follow the progress of every stud
         <th rowspan="2" class="sorter-false">Supervisor</th>
         <th rowspan="2" >Tutor</th>
         <th class="sorter-false text-center" colspan="{{len Reports}}">Reports</th>
-        <th rowspan="2" class="sorter-false text-center">Surveys</th>
+        <th rowspan="2" class="text-center">Surveys</th>
         <th rowspan="2" >Def</th>        
     </tr>
     <tr>        
@@ -96,7 +96,7 @@ As a major leader or an administrator, you can follow the progress of every stud
             {{reportGrade this}}
             </td>  
             {{/each}}
-            <td>                      
+            <td data-text="{{surveyAnnotation Surveys}}">                      
             {{#each Surveys}}
             <a href="/surveys/{{Kind}}?student={{../Student.Email}}&kind={{Kind}}" target='_blank' class="badge {{surveyStatus this}}">{{Kind}}</a>
             {{/each}}
