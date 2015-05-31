@@ -272,13 +272,19 @@ Handlebars.registerHelper('reportStatus', function(r) {
     return style;
 });
 
-Handlebars.registerHelper('gradeAnnotation', function(r) {
+Handlebars.registerHelper('gradeAnnotation', function(r) {    
     var passed = (new Date(Date.parse(r.Deadline)).getTime() + 86400 * 1000) < new Date().getTime() 
-    if (!passed && !r.toGrade >= -1) {
-        return -10; //don't care
-    } else {
-        return r.Grade;
+    var d = 0
+    if (passed && r.Grade == -2) {
+        var d = moment(r.Deadline).dayOfYear() - moment(new Date).dayOfYear()
+        return -200 + d;
+    } else if (passed & r.Grade == -1) {
+        var d = moment(r.Delivery).dayOfYear() - moment(new Date).dayOfYear()
+        return -100 + d
+    } else if (r.Grade >= 0) {
+        return r.Grade
     }
+    return -999
 });
 
 
