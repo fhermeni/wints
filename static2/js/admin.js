@@ -569,11 +569,13 @@ internships(function(interns) {
     var service = {};   
     interns.forEach(function (i) {
         if (!service[i.Tutor.Email]) {
-            service[i.Tutor.Email] = {P : i.Tutor, Internships : [i]};
-        } else {
-            service[i.Tutor.Email].Internships.push(i)
-        }        
-    });
+            service[i.Tutor.Email] = {P : i.Tutor, Internships : {}};
+        }
+        if (!service[i.Tutor.Email].Internships[i.Promotion]) {
+            service[i.Tutor.Email].Internships[i.Promotion] = []
+        }
+        service[i.Tutor.Email].Internships[i.Promotion].push(i)                                 
+    });    
     var html = Handlebars.getTemplate("service")(service);
     $("#cnt").html(html);
     $('#cnt').find(":checkbox").iCheck()
@@ -592,10 +594,12 @@ internships(function(interns) {
     var service = {};   
     interns.forEach(function (i) {
         if (!service[i.Tutor.Email]) {
-            service[i.Tutor.Email] = {P : i.Tutor, Internships : [i], Juries: {}};
-        } else {
-            service[i.Tutor.Email].Internships.push(i)
-        }        
+            service[i.Tutor.Email] = {P : i.Tutor, Internships : {}};
+        }
+        if (!service[i.Tutor.Email].Internships[i.Promotion]) {
+            service[i.Tutor.Email].Internships[i.Promotion] = []
+        }
+        service[i.Tutor.Email].Internships[i.Promotion].push(i)                                 
     });    
     var html = Handlebars.getTemplate("raw-service")(service);
     $("#modal").html(html).modal('show');
