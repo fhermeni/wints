@@ -301,8 +301,8 @@ function nbDayLates(d1, d2) {
 Handlebars.registerHelper('reportGrade', function(r) {
     var passed = (new Date(r.Deadline).getTime() + 86400 * 1000) < new Date().getTime()        
     if (!r.ToGrade) {
-        if (passed && r.Grade == -2) {
-            return nbDayLates(new Date(), r.Deadline)
+        if (passed && r.Grade == -2 || r.Grade == -1) {
+            return nbDayLates(new Date(), r.Delivery)
         } else {
             return new Handlebars.SafeString("<i title='no grade needed'>n/a</i>");
         }
@@ -314,6 +314,7 @@ Handlebars.registerHelper('reportGrade', function(r) {
             return "-";
         }
     } else if (r.Grade == -1) {
+        return nbDayLates(new Date(), r.Delivery)
         return "?";
     }
     return r.Grade;    
