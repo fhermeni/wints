@@ -1,7 +1,7 @@
 .box {
 	width: 1em;
 	height: 1em;
-	display: inline-block;	
+	display: inline-block;
 }
 
 body {
@@ -14,6 +14,7 @@ body {
 
 .pagination {
 	margin-bottom: 0px;
+	margin-top: 0px;
 }
 .page-header {
 	border-bottom: 1px solid #434A33;	
@@ -31,3 +32,11 @@ body {
 canvas {
 	padding: 0em 1em;
 }
+
+.clickable {
+	cursor: pointer;
+}
+
+/*li.gratification {
+	padding: 5px;
+}*/
