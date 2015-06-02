@@ -25,47 +25,46 @@
 <div class="row">
     <div class="col-sm-4">        
         <div class="thumbnail text-center">
-        <h3>Location
+        <h3>Location</h3>
         <ul class="pagination pagination-sm">
-            <li class="country all active"><a onclick="country()">si + master</a></li>    
-            <li class="country SI"><a onclick="country('SI')">si only</a></li>    
-            <li class="country master"><a onclick="country('master')">master only</a></li>
-        </ul>   
-        </h3>                            
-            <canvas class="country all" id='canvas-country'></canvas>
-            <div class="country-caption">
-            <ul class='list-unstyled'><li><i class='box' style='background-color: #F7464A;'></i> France</li><li><span class='box' style='background-color: #FFC870;'></span> Foreign Country</li></ul>
-            </div>
+            <li class="country byMajor"><a onclick="toggleCountry(this)">by major</a></li>
+            <li class="country filter all active"><a onclick="country()">si + master</a></li>    
+            <li class="country filter SI"><a onclick="country('SI')">si only</a></li>    
+            <li class="country filter master"><a onclick="country('master')">master only</a></li>
+        </ul>      
+            <div id="country"><canvas></canvas></div>                                                     
+            <ul class='list-unstyled'><li><i class='box' style='background-color: #F7464A;'></i> France</li><li><span class='box' style='background-color: #FFC870;'></span> Foreign Country</li></ul>                        
         </div>
     </div>
 
     <div class="col-sm-4">
         <div class="thumbnail text-center">
-        <h3>IT Sector
+        <h3>IT Sector</h3>          
         <ul class="pagination pagination-sm">
-            <li class="sector all active"><a onclick="sector()">si + master</a></li>    
-            <li class="sector SI"><a onclick="sector('SI')">si only</a></li>    
-            <li class="sector master"><a onclick="sector('master')">master only</a></li>
-        </ul>
-        </h3>
-            <div>                        
-            <canvas class="sector master" id='canvas-sector'></canvas>        
-                <ul class='list-unstyled'><li><i class='box' style='background-color: #949FB1;'></i> Company</li><li><span class='box' style='background-color: #4D5360;'></span> Lab</li></ul>   
-            </div>            
+            <li class="sector byMajor"><a onclick="toggleSector(this)">by major</a></li>
+            <li class="sector filter all active"><a onclick="sector()">si + master</a></li>    
+            <li class="sector filter SI"><a onclick="sector('SI')">si only</a></li>    
+            <li class="sector filter master"><a onclick="sector('master')">master only</a></li>            
+        </ul>                        
+            <div id="sector"><canvas></canvas></div>                                    
+                <ul class='list-unstyled'>
+                    <li><i class='box' style='background-color: #949FB1;'></i> Company</li>
+                    <li><i class='box' style='background-color: #4D5360;'></i> Lab</li>
+                </ul>               
         </div>
     </div>
 
     <div class="col-sm-4">
         <div class="thumbnail text-center">
-            <h3>Gratification
+            <h3>Gratification</h3>
             <ul class="pagination pagination-sm">
             <li class="gratification all active"><a onclick="gratification()">all</a></li>    
             <li class="gratification promotion"><a onclick="gratification('promotion')">si / master</a></li>    
             <li class="gratification sector"><a onclick="gratification('sector')">lab / company</a></li>
-            <li class="gratification country"><a onclick="gratification('country')">fr / the world</a></li>
-            </ul>
-            </h3>
-            <h1 id="how-much"></h1>            
+            <li class="gratification country"><a onclick="gratification('country')">fr / other</a></li>
+            <li class="gratification major"><a onclick="gratification('major')">by major</a></li>
+            </ul>            
+            <h2 id="how-much"></h2>            
         </div>
     </div>
     </div>
@@ -91,6 +90,16 @@
         </div>
 
     </div>
+</div>
+<div id="modal" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header"><h3 class="modal-title">Details</h3></div>
+            <div class="modal-body">                
+                <div><canvas id="details"></canvas></div>
+            </div>
+        </div>
+    </div>        
 </div>
 <footer>    
         <p>© University Nice Sophia Antipolis 2013-2014</p>    
