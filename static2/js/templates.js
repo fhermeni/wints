@@ -284,7 +284,7 @@ Handlebars.registerHelper('gradeAnnotation', function(r) {
     } else if (r.Grade >= 0) {
         return r.Grade
     }
-    return -999
+    return -9999
 });
 
 Handlebars.registerHelper('surveyAnnotation', function(surveys) {    
