@@ -40,7 +40,6 @@ waitingBlock = $("#cnt").clone().html();
 	    	durations()
 	    	gratification()
 	    	declared()
-	    	$(":checkbox").iCheck()
 	    })
     })
 });
