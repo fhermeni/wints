@@ -343,7 +343,7 @@ Handlebars.registerHelper('reportStatus', function(r) {
     
     return style;
 });
-
+    
 Handlebars.registerHelper('defenseStatus', function(g) {    
     var passed = new Date(g.Date).getTime() < new Date().getTime() 
     var style = "btn-link";    
