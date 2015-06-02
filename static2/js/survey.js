@@ -12,7 +12,7 @@ function setLang(l) {
 	});
 	//Basic words
 	$('#missing-fields').html(l == "fr" ? "Certains champs n'ont pas été remplis" : "missing required fields");
-	$('#committed').html(l == "fr" ? "Votre avis a été remonté à son tuteur. Merci pour votre implication" : "Your feedbacks have been sent to the tutor. Thanks for your involvement.");
+	$('#committed').html(l == "fr" ? "Votre avis a été remonté à son tuteur. Merci pour votre implication" : "Your feedbacks have been sent to the tutor. Thanks for your involvement.");	
 	$('.y').html(l == "fr" ? "oui" : "yes")
 	$('.n').html(l == "fr" ? "non" : "no")
 	$('.submit').html(l == "fr" ? "Soumettre" : "Submit")
@@ -108,14 +108,25 @@ function fill() {
 	} else {
 		var email = $.urlParam("student")
 		var kind = $.urlParam("kind")
-		internship(email, function(i) {
+		internship(email, function(i) {			
 			$("#student").html(fn(i.Student))
-			$("#tutor").html(fn(i.Tutor))			
+			$("#tutor").html(fn(i.Tutor))		
+			var url = window.location.protocol + "//" + window.location.host + "/surveys/" + kind + "?token="				
 			i.Surveys.forEach(function (s) {
 				var d = new Date(s.Timestamp) 
 				if (s.Kind == kind) {
 					if (d.getTime() > 0) {						
 						$(".alert-success").show();						
+					} else {
+						d = $(".alert-danger");						
+						t = ""
+						i.Surveys.forEach(function (s) {
+							if (s.Kind == kind) {								
+								d.find(".token").html(url + s.Token)		
+								return false
+							}
+						})						
+						d.show()
 					}								
 					showAnswers(s.Answers)
 					readOnly()
