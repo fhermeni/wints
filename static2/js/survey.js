@@ -118,14 +118,9 @@ function fill() {
 					if (d.getTime() > 0) {						
 						$(".alert-success").show();						
 					} else {
-						d = $(".alert-danger");						
+						d = $(".alert-warning");						
 						t = ""
-						i.Surveys.forEach(function (s) {
-							if (s.Kind == kind) {								
-								d.find(".token").html(url + s.Token)		
-								return false
-							}
-						})						
+						d.find(".token").html(getToken(i, kind))
 						d.show()
 					}								
 					showAnswers(s.Answers)
@@ -135,6 +130,33 @@ function fill() {
 			})
 		})
 	}
+}
+
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.substring(1)
+}
+
+function getToken(i, kind) {
+	var url = window.location.protocol + "//" + window.location.host + "/surveys/" + kind + "?token="	
+	var t = undefined
+	i.Surveys.forEach(function (s) {
+		if (s.Kind == kind) {								
+			t = s.Token
+			return false;
+		}
+	});
+	return url + t;
+}
+
+function tplEvaluationMail() {        
+	var email = $.urlParam("student")
+	var kind = $.urlParam("kind")
+	internship(email, function(i) {						
+    	var txt = Handlebars.getTemplate("eval-" + kind)({I:i, URL:getToken(i, kind)});
+    	var to=encodeURIComponent(i.Sup.Email)    
+    	var s=encodeURIComponent(i.Student.Firstname.capitalize() + " " + i.Student.Lastname.capitalize() + " - Evaluation");
+    	window.location.href = "mailto:" + to + "?subject=" + s + "&body=" + encodeURIComponent(txt);    
+    });
 }
 
 function submit() {
