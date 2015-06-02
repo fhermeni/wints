@@ -50,7 +50,13 @@ function summary() {
         i.Reports.forEach(function (r) {
             if (!sum.Reports[r.Kind]) {
                 sum.Reports[r.Kind] = {Missing: 0, Pending: 0, Total: 0}
-            }            
+            }     
+            if (nbDaysLate(new Date(r.Deadline), new Date()) < 0 && new Date(r.Delivery).getTime() < 0) {
+                sum.Reports[r.Kind].Missing++;
+            }
+            if (new Date(r.Delivery).getTime() > 0 && r.Grade < 0) {
+                sum.Reports[r.Kind].Pending++;   
+            }
             sum.Reports[r.Kind].Total++
         });
         i.Surveys.forEach(function (s) {
