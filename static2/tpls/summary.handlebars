@@ -4,13 +4,13 @@
 <h6>Reports</h6>
 <ul class="list-unstyled">
 {{#each Reports}}
-<li>{{@key}} : <a class="click" onclick="selectBy('reports','{{@key}}','missing')">{{Missing}}</a>/{{Total}} missing, <a class="click" onclick="selectBy('reports','{{@key}}','pending')">{{Pending}}</a>/{{Total}} pending</li>
+<li>{{@key}} : <span class="text-danger click" onclick="selectBy('reports','{{@key}}','missing')">{{Missing}}/{{Total}} missing</span>, <span class="text-primary click" onclick="selectBy('reports','{{@key}}','pending')">{{Pending}}/{{Total}} pending</span></li>
 {{/each}}
 </ul>
 <h6>Surveys</h6>
 <ul class="list-unstyled">
 {{#each Surveys}}
-<li>{{@key}}: <a class="click" onclick="selectBy('surveys', '{{@key}}','missing')">{{Missing}}</a>/{{Total}} missing</li>
+<li>{{@key}}: <span class="text-danger click" onclick="selectBy('surveys', '{{@key}}','missing')">{{Missing}}/{{Total}} missing</a></li>
 {{/each}}
 </ul>
 </small>
