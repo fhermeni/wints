@@ -276,11 +276,11 @@ Handlebars.registerHelper('gradeAnnotation', function(r) {
     var passed = (new Date(Date.parse(r.Deadline)).getTime() + 86400 * 1000) < new Date().getTime() 
     var d = 0
     if (passed && r.Grade == -2) {
-        var d = moment(r.Deadline).dayOfYear() - moment(new Date).dayOfYear()
-        return -200 + d;
+        var d = nbDayLates(r.Deadline, new Date())//moment(r.Deadline).dayOfYear() - moment(new Date).dayOfYear()
+        return -2000 + d;
     } else if (passed & r.Grade == -1) {
-        var d = moment(r.Delivery).dayOfYear() - moment(new Date).dayOfYear()
-        return -100 + d
+        var d = nbDayLates(r.Delivery, new Date())//moment(r.Delivery).dayOfYear() - moment(new Date).dayOfYear()
+        return -1000 + d
     } else if (r.Grade >= 0) {
         return r.Grade
     }
@@ -312,29 +312,34 @@ Handlebars.registerHelper('surveyStatus', function(s) {
 
 
 function nbDayLates(d1, d2) {
-    var d = moment(d1).dayOfYear() - moment(d2).dayOfYear()
+    var m1 = Math.floor(new Date(d1)/8.64e7);
+    var m2 = Math.floor(new Date(d2)/8.64e7);
+    return m1 - m2;
+}
+
+function fmtNbDayLate(d) {    
     return new Handlebars.SafeString("<i class='glyphicon glyphicon-time'></i><small> " + d + " d.</small>");
 }
+
 Handlebars.registerHelper('reportGrade', function(r) {
     var passed = (new Date(r.Deadline).getTime() + 86400 * 1000) < new Date().getTime()        
     if (!r.ToGrade) {
         if (passed && r.Grade == -2) {
-            return nbDayLates(new Date(), r.Deadline)
+            return fmtNbDayLate(nbDayLates(new Date(), r.Deadline))
         } else if (passed && r.Grade == -1) {
-            return nbDayLates(new Date(), r.Delivery)
+            return fmtNbDayLate(nbDayLates(new Date(), r.Delivery))
         } else {
             return new Handlebars.SafeString("<i title='no grade needed'>n/a</i>");
         }
     }
     if (r.Grade == -2) {
         if (passed) {
-            return nbDayLates(new Date(), r.Deadline)
+            return fmtNbDayLate(nbDayLates(new Date(), r.Deadline))
         } else {
             return "-";
         }
     } else if (r.Grade == -1) {
-        return nbDayLates(new Date(), r.Delivery)
-        return "?";
+        return fmtNbDayLate(nbDayLates(new Date(), r.Delivery))        
     }
     return r.Grade;    
 });
@@ -371,19 +376,6 @@ Handlebars.registerHelper('studentGrade', function(r) {
             }                        
         }
     }
-    /*if (r.Uploaded && !r.ToGrade) {
-        return "-";
-    }
-    if (r.Grade == -2) {
-        if (passed) {
-            return "deadline passed. Hurry!";
-        } else {
-            return ""
-        }
-    } else if (r.Grade == -1) {
-        return "?";
-    }
-    return r.Grade;   */ 
 });
 
 Handlebars.registerHelper('URIemails', function(students) {
