@@ -44,6 +44,65 @@ function showPage(li, id) {
     refresh();
 }
 
+function summary() {
+    var sum = {Surveys: {}, Reports: {}}
+    interns.forEach(function (i) {
+        i.Reports.forEach(function (r) {
+            if (!sum.Reports[r.Kind]) {
+                sum.Reports[r.Kind] = {Missing: 0, Pending: 0, Total: 0}
+            }            
+            sum.Reports[r.Kind].Total++
+        });
+        i.Surveys.forEach(function (s) {
+            if (!sum.Surveys[s.Kind]) {
+                sum.Surveys[s.Kind] = {Missing: 0, Total: 0}
+            }                        
+            sum.Surveys[s.Kind].Total++
+            if (Object.keys(s.Answers) == 0) {
+                sum.Surveys[s.Kind].Missing++
+            }
+        })
+    });
+    return sum
+}
+
+function selectStudent(stu, ok) {
+    var ic = $("input[data-email='" + stu +"']").closest(".icheckbox")    
+    if (ok) {
+        ic.addClass("checked")
+    } else {
+        ic.removeClass("checked")
+    }
+}
+
+function selectBy(nature, kind, f) {     
+    interns.forEach(function (i) {
+        if (nature == "reports") {
+            i.Reports.forEach(function (r) {
+                if (r.Kind == kind) {
+                    if (f == "missing") {
+                        var late = nbDaysLate(new Date(r.Deadline), new Date()) < 0 && new Date(r.Delivery).getTime() < 0
+                        selectStudent(i.Student.Email, late)
+                    } else if (f == "pending") {                        
+                        var late = new Date(r.Delivery).getTime() > 0 && r.Grade < 0
+                        selectStudent(i.Student.Email, late)                        
+                    }
+                }
+                var delayWithDeadline = nbDaysLate(new Date(r.Deadline), new Date(r.Delivery))
+                r.Late = nbDaysLate(new Date(r.Deadline), new Date(r.Delivery)) < 0                
+            })
+        } else if (nature == "surveys") {
+            i.Surveys.forEach(function (s) {
+                if (s.Kind == kind) {                    
+                    if (f == "missing") {
+                        selectStudent(i.Student.Email, Object.keys(s.Answers) == 0)
+                    }
+                }
+            });
+        }
+    });
+}
+
 function refresh() {
     //reset the div
     if (currentPage == "myStudents") {
@@ -257,6 +316,11 @@ internships(function(data) {
     var html = Handlebars.getTemplate("watchlist")(interns);
     var root = $("#cnt");
     root.html(html);
+
+    if (myself.Role >= 3) {
+        var sum = summary()
+        $(".summary").html(Handlebars.getTemplate("summary")(sum))        
+    }
 	if (interns.length == 0) {
     	return true
     }       
