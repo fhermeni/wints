@@ -1,63 +1,20 @@
-#wints
+# Wints
+
+A web application to manage final internships at Polytech.
+
+## Requirements
+
+- A postgreSQL database
+- [Golang](https://golang.org/)
+
+## Installation
+
+- clone into your `src` folder
+- use godep to restore
 
 
-
-## As a student
-
-- update supervisor contact points
-- upload reports	
-	- initial planning
-	- midterm report
-	- final report
-	
-	- access grade, comments
-	
-## As a supervisor
-
-- access internships details
-- mailing students, tutors
-- update report deadline
-- grade & comment reports
-- access student evaluation
-
-## As a major admin
-
-- switch major
-- RO for all students
-
-## As an admin
-
-- which reports are confidential
+## Configuration
 
 
-## As jury members
-
-- get the reports of the students
-- get the student evaluation
-- set the student future
-
-
-## Statistics from the conventions
-Avg. gratification
-foreign|local internship
-lab|company "
-cdf starting date
-
-filtered by majors|promotion & stuff.
-Export as a CSV
-
-
-## Surveys
-
-#### Next step
-(by student)
-What do you do next year:
-
-- keep studying (Phd ?)
-- got a position
-  - CDD or CDI
-  - in company or not
-- looking for a position
-- chilling
-
+## Running
 

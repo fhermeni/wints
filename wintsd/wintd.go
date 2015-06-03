@@ -119,8 +119,13 @@ func main() {
 	testFeeder := flag.Bool("test-feeder", false, "Test the convention feeder")
 	testAll := flag.Bool("test", false, "equivalent to --testMail --testDB --testFeeder")
 	upgrade := flag.Bool("upgrade-db", false, "Upgrade the database if needed")
+	blankConf := flag.Bool("generate-config", false, "Print a default configuration file")
 	flag.Parse()
 
+	if *blankConf {
+		config.Blank()
+		os.Exit(0)
+	}
 	cfg, err := config.Load(*cfgPath)
 	if err != nil {
 		log.Fatalln("Error while parsing " + *cfgPath + ": " + err.Error())

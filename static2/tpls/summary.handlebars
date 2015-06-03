@@ -1,0 +1,18 @@
+<div class="summary panel panel-default pull-right">
+<div class="panel-body">
+<small>
+<h6>Reports</h6>
+<ul class="list-unstyled">
+{{#each Reports}}
+<li>{{@key}} : <span class="text-danger click" onclick="selectBy('reports','{{@key}}','missing')">{{Missing}}/{{Total}} missing</span>, <span class="text-primary click" onclick="selectBy('reports','{{@key}}','pending')">{{Pending}}/{{Total}} pending</span></li>
+{{/each}}
+</ul>
+<h6>Surveys</h6>
+<ul class="list-unstyled">
+{{#each Surveys}}
+<li>{{@key}}: <span class="text-danger click" onclick="selectBy('surveys', '{{@key}}','missing')">{{Missing}}/{{Total}} missing</a></li>
+{{/each}}
+</ul>
+</small>
+</div>
+</div>

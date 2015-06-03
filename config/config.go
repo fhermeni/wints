@@ -3,6 +3,7 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 
 	"github.com/fhermeni/wints/internship"
@@ -62,4 +63,52 @@ func Load(path string) (Config, error) {
 	}
 	err = json.Unmarshal(cnt, &c)
 	return c, err
+}
+
+func Blank() error {
+	puller := PullerConfig{Login: "****",
+		Password:   "******",
+		URL:        "http://conventions.polytech.unice.fr/admin/admin.cgi",
+		Promotions: []string{"Master%20IFI", "Master%20IMAFA", "MAM%205", "SI%205", "Master%202%20SSTIM-images"},
+		Period:     "1h",
+		Encoding:   "windows-1252",
+	}
+	mailer := MailerConfig{Server: "*******",
+		Login:    "******",
+		Password: "*******",
+		Sender:   "******",
+		Path:     "static/mails",
+	}
+	db := DbConfig{URL: "user=******* dbname=wints host=localhost sslmode=disable"}
+	http := HTTPConfig{Listen: ":8080",
+		WWW:         "https://localhost:8080",
+		Certificate: "cert.pem",
+		PrivateKey:  "key.pem",
+		Path:        "static",
+	}
+	reports := []internship.ReportDef{
+		internship.ReportDef{Name: "DoW", Deadline: "relative", Value: "504h", ToGrade: false},
+		internship.ReportDef{Name: "Midterm", Deadline: "relative", Value: "1440h", ToGrade: true},
+		internship.ReportDef{Name: "Final", Deadline: "absolute", Value: "01/09/2015 23:59", ToGrade: true},
+	}
+
+	surveys := []internship.SurveyDef{
+		internship.SurveyDef{Name: "midterm", Deadline: "relative", Value: "1440h"},
+		internship.SurveyDef{Name: "final", Deadline: "absolute", Value: "01/09/2015 23:59"},
+	}
+	cfg := Config{
+		Puller:  puller,
+		Reports: reports,
+		Surveys: surveys,
+		DB:      db,
+		Mailer:  mailer,
+		HTTP:    http,
+		Majors:  []string{},
+	}
+	out, err := json.MarshalIndent(cfg, "", "  ")
+	if err != nil {
+		return err
+	}
+	fmt.Printf("%s\n", out)
+	return err
 }

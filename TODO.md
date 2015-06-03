@@ -1,126 +1,18 @@
-# Wints
+# TODO
 
-## TODO
+## Features
 
-
-### Backend
-
-- [x] frontend mailing system
-- [x] backend mailing system
-- [x] convention pulling
-- [x] convention to internships
-- [x] comments for grades
-- [x] presence indicator for reports
-- [x] report private/public status
-- [x] skipeable conventions
-- [x] ungradeable reports
-- [x] minimify every resource
-- [x] gzip json lists
-- [x] session ID for security
-- [x] store and expose surveys
-- [x] midterm survey
-- [x] final survey
-- [x] future survey
-- [x] list student that should commit
-- [x] statistics
-- [x] request monitoring
-- [x] alumni status support
-- [x] online survey for supervisor
-- [x] gmail friendly
-- [x] invitation-based only root account creation
-- [x] access last opened sessions
-- [x] allow to upload late reports
-- [ ] log response code for requests + users (+ user-agent ?)
-- [ ] extract major from convention server
-- [ ] mailing for missing surveys
-- [ ] concatenate every static resource
-- [ ] defenses
-- [ ] concatenate every static resource
-- [ ] supervisor grade (from evaluation)
-- [ ] clarify account reset. Seems broken in some situations
-- [ ] admin cannot grade
-- [ ] log as ..
-- [ ] align deadlines at a given moment of the day (2am the day after the official deadline)
-- [ ] automatise evaluation reports
-- [ ] clean up / simplify the code
-
-### Daemon
-
-- [x] install mode
-- [x] test-db mode
-- [x] test-mailer mode
-- [x] test-feeder mode
-- [x] safe root invitation
-- [ ] deadline reminders for tutors, not for student ?
+- Normalise relative deadline for reports: the next day at 2am wrt. the theoretical value
+- A unique log to store login, logout and every update
+- automate surveys management:
+	1. pre-made mails are send directly at a given deadline (mail include deadline)
+	2. automatic reminder
+- rewrite status page
 
 
-### frontend
+## Development
 
-- [x] session timeout management at rest level
-#### login page
-
-- [x] login
-- [x] ask for password reset
-
-#### password reset
-
-- [x] reset password
-
-#### admin
-- [x] profile update
-- [x] password update
-- [x] logout
-- [x] display users
-- [x] new user
-- [x] rm user
-- [x] set user privileges
-- [x] import conventions with charset conversion
-- [x] list all internships
-- [x] profile editor
-- [x] show service
-- [x] grade/comment report
-- [x] get report
-- [x] change report deadline
-- [x] change tutor
-- [x] change major
-- [x] tutor internships
-- [x] report private/public status
-- [x] skipeable conventions
-- [x] access alumni
-- [x] re-invite teachers or students
-- [x] access surveys
-- [x] help
-- [x] report expectations
-- [x] graduation template
-- [x] show deadline delay
-- [x] mail templates to send evaluation links to supervisors
-- [ ] log as ..
-- [ ] see supervisor grade
-- [ ] edit supervisor grade
-- [ ] rewrite status page principles. It sucks
-
-
-#### student
-- [x] profile update
-- [x] password update
-- [x] logout
-- [x] view internship
-- [x] update supervisor
-- [x] update title
-- [x] update company
-- [x] see reports
-- [x] upload report
-- [x] see grade, comments
-- [x] help
-- [x] report expectations
-- [x] set alumni
-- [x] update major
-- [x] allow to upload _one_ late report, flagged as is, when there was no report uploaded before
-
-#### supervisor
-- [x] access survey
-- [x] note evaluations
-- [ ] final grade and comment
-
-#### public
-- [x] pretty statistics
+- clean a bit the code
+- a simple cache that invalidate everything at every update request
+- tests and comments
+- simplify DB with less fake values and more optional fields hidden in JSONs

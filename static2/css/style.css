@@ -69,3 +69,15 @@ li.sortable-placeholder {
 .students {
 	font-size: 10pt;
 }
+
+.summary .panel-body {
+	padding: 0px 15px;
+}
+
+.summary li {
+	margin-left: 1em;
+}
+
+.summary h6 {
+	margin-bottom: 0.5em;
+}

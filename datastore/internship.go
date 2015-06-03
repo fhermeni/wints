@@ -10,6 +10,9 @@ import (
 	"github.com/lib/pq"
 )
 
+var ReportSelectStmt *sql.Stmt
+var SurveySelectStmt *sql.Stmt
+
 func rollback(e error, tx *sql.Tx) error {
 	err := tx.Rollback()
 	if err != nil {
@@ -208,8 +211,16 @@ func scanInternship(r *sql.Rows) (internship.Internship, error) {
 }
 
 func (srv *Service) appendSurveys(i *internship.Internship) error {
-	s := "select kind, answers, deadline, timestamp, token from surveys where student=$1 order by deadline"
-	rows, err := srv.DB.Query(s, i.Student.Email)
+	if SurveySelectStmt == nil {
+		var err error
+		SurveySelectStmt, err = srv.DB.Prepare("select kind, answers, deadline, timestamp, token from surveys where student=$1 order by deadline")
+		if err != nil {
+			return err
+		}
+	}
+	//s := "select kind, answers, deadline, timestamp, token from surveys where student=$1 order by deadline"
+	//rows, err := srv.DB.Query(s, i.Student.Email)
+	rows, err := SurveySelectStmt.Query(i.Student.Email)
 	if err != nil {
 		return err
 	}
@@ -238,8 +249,16 @@ func (srv *Service) appendSurveys(i *internship.Internship) error {
 	return err
 }
 func (srv *Service) appendReports(i *internship.Internship) error {
-	s := "select kind, grade, deadline, delivery, comment, private, toGrade from reports where student=$1 order by deadline"
-	rows, err := srv.DB.Query(s, i.Student.Email)
+	if ReportSelectStmt == nil {
+		var err error
+		ReportSelectStmt, err = srv.DB.Prepare("select kind, grade, deadline, delivery, comment, private, toGrade from reports where student=$1 order by deadline")
+		if err != nil {
+			return err
+		}
+	}
+	/*s := "select kind, grade, deadline, delivery, comment, private, toGrade from reports where student=$1 order by deadline"
+	rows, err := srv.DB.Query(s, i.Student.Email)*/
+	rows, err := ReportSelectStmt.Query(i.Student.Email)
 	if err != nil {
 		return err
 	}
