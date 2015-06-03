@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/fhermeni/wints/cache"
 	"github.com/fhermeni/wints/config"
 	"github.com/fhermeni/wints/datastore"
 	"github.com/fhermeni/wints/feeder"
@@ -149,13 +150,19 @@ func main() {
 
 	if *upgrade {
 		upgradeDB(ds)
+		os.Exit(0)
 	}
 	if len(*makeRoot) > 0 {
 		newRoot(*makeRoot, ds, mailer)
 		os.Exit(0)
 	}
+
+	cc, err := cache.NewCache(ds)
+	if err != nil {
+		log.Fatalln("Unable to initiate the cache: " + err.Error())
+	}
 	//Test connection anyway
-	_, e := ds.Internships()
+	_, e := cc.Internships()
 	ok := test("Database connection", e)
 
 	if *testAll {
@@ -183,9 +190,9 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	log.Printf("Working over %d CPU(s)\n", runtime.NumCPU())
 
-	startFeederDaemon(puller, ds, period)
+	startFeederDaemon(puller, cc, period)
 
-	www := handler.NewService(ds, mailer, cfg.HTTP.Path)
+	www := handler.NewService(cc, mailer, cfg.HTTP.Path)
 	log.Println("Listening on " + cfg.HTTP.Listen)
 	err = www.Listen(cfg.HTTP.Listen, cfg.HTTP.Certificate, cfg.HTTP.PrivateKey)
 	if err != nil {
