@@ -260,7 +260,7 @@ function grades(kind, filter) {
 			ctx = c.get(0).getContext("2d");
 			grat= new Chart(ctx).Bar(data);
 		} else {		
-			avgs = [avg(qty[0]), avg(qty[1])]							
+			avgs = [Math.round(avg(qty[0]),2), Math.round(avg(qty[1]))]							
 			c = $("<canvas>")
 			data = {
     		labels: ["SI" , "master"],
