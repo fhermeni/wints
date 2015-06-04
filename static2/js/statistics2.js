@@ -292,7 +292,7 @@ function surveys(kind) {
 	//Hide when no data
 	if (nb) {						
 		var num = Math.round(all / nb * 100)
-		$("#surveys-" + kind).html(num + " %");
+		$("#surveys-" + kind).html(num + "%");
 		$("#surveys-" + kind).closest(".hidden").removeClass('hidden')
 	} 	
 }
