@@ -42,6 +42,7 @@ waitingBlock = $("#cnt").clone().html();
 	    	declared()
 	    	grades('Midterm')
 	    	grades('Final')
+	    	surveys("midterm")
 	    })
     })
 });
@@ -237,7 +238,7 @@ function grades(kind, filter) {
 		});			
 	//Hide when no data
 	if (nb) {		
-		$("#grades-" + kind).closest(".col-sm-4").removeClass('hidden')
+		$("#grades-" + kind).closest(".hidden").removeClass('hidden')
 	}
 	
 	if (!filter) {		
@@ -273,6 +274,27 @@ function grades(kind, filter) {
 		}		
 	}
 }
+
+function surveys(kind) {	
+	var all = 0		
+	var nb = 0
+	stats.forEach(function (s) {			
+		//console.log(s.Surveys[kind])
+		q = s.Surveys[kind]
+		if (q && Object.keys(q).length > 0) {			
+			nb++	
+			if (kind == "midterm" && q[19] == "true") {
+				all++
+			}			
+		}
+	});				
+	//Hide when no data
+	if (nb) {						
+		$("#surveys-" + kind).html(Math.round(all / nb * 100, 2) + " %");
+		$("#surveys-" + kind).closest(".hidden").removeClass('hidden')
+	} 	
+}
+
 
 function avg(values) {
 	var sum = 0
