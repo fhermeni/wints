@@ -68,6 +68,7 @@
         </div>
     </div>
     </div>
+
     <div class="row">
         <div class="col-sm-5">
         <div class="thumbnail text-center">
@@ -90,6 +91,32 @@
         </div>
 
     </div>
+<div class="row">
+
+<div class="col-sm-4 hidden">
+        <div class="thumbnail text-center">
+            <h3>Midterm report</h3>
+            <ul class="pagination pagination-sm">
+            <li class="grades-Midterm all active"><a onclick="grades('Midterm')">all</a></li>    
+            <li class="grades-Midterm promotion"><a onclick="grades('Midterm','promotion')">si / master</a></li>
+            <li class="grades-Midterm major"><a onclick="grades('Midterm','major')">by major</a></li>
+            </ul>            
+            <h2 id="grades-Midterm"></h2>            
+        </div>
+</div>
+
+<div class="col-sm-4 hidden">
+        <div class="thumbnail text-center">
+            <h3>Final report</h3>
+            <ul class="pagination pagination-sm">
+            <li class="grades-Final all active"><a onclick="grades('Final')">all</a></li>    
+            <li class="grades-Final promotion"><a onclick="grades('Final','promotion')">si / master</a></li>
+            <li class="grades-Final major"><a onclick="grades('Final','major')">by major</a></li>
+            </ul>            
+            <h2 id="grades-Final"></h2>            
+        </div>
+</div>
+
 </div>
 <div id="modal" class="modal fade">
     <div class="modal-dialog modal-lg">
@@ -101,8 +128,9 @@
         </div>
     </div>        
 </div>
+</div>
 <footer>    
-        <p>© University Nice Sophia Antipolis 2013-2014</p>    
+        <p>© University Nice Sophia Antipolis 2014-2015</p>    
 </footer>
             <!-- Bootstrap -->
             <script src="static/js/jquery-2.1.3.min.js"></script>            
