@@ -37,6 +37,10 @@ canvas {
 	cursor: pointer;
 }
 
-/*li.gratification {
-	padding: 5px;
-}*/
+h1.survey {
+	margin-top: 0.5em;
+	margin-bottom: 0em;
+}
+h4 {
+	margin-top: 0em;
+}
