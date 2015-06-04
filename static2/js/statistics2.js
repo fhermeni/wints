@@ -242,12 +242,13 @@ function grades(kind, filter) {
 	}
 	
 	if (!filter) {		
-		$("#grades-" + kind).html(Math.round(all / nb, 2) + " / 20");
+		num = all / nb
+		$("#grades-" + kind).html(num.toFixed(2) + " / 20");
 	} else {
 		if (filter == "major") {				
 			var avgs = []
 			for (var i = 0; i < byMajor.length; i++) {			
-				avgs.push(Math.round(avg(byMajor[i])))
+				avgs.push(avg(byMajor[i]).toFixed(2))
 			}				
 			c = $("<canvas>")
 			data = {
@@ -259,8 +260,8 @@ function grades(kind, filter) {
 			c = $("#grades-" + kind).html("").append(c).find("canvas")			
 			ctx = c.get(0).getContext("2d");
 			grat= new Chart(ctx).Bar(data);
-		} else {		
-			avgs = [Math.round(avg(qty[0]),2), Math.round(avg(qty[1]))]							
+		} else {					
+			avgs = [avg(qty[0]).toFixed(2), avg(qty[1]).toFixed(2)]							
 			c = $("<canvas>")
 			data = {
     		labels: ["SI" , "master"],
@@ -290,7 +291,8 @@ function surveys(kind) {
 	});				
 	//Hide when no data
 	if (nb) {						
-		$("#surveys-" + kind).html(Math.round(all / nb * 100, 2) + " %");
+		var num = Math.round(all / nb)
+		$("#surveys-" + kind).html(num + " %");
 		$("#surveys-" + kind).closest(".hidden").removeClass('hidden')
 	} 	
 }
