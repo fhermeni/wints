@@ -40,6 +40,9 @@ waitingBlock = $("#cnt").clone().html();
 	    	durations()
 	    	gratification()
 	    	declared()
+	    	grades('Midterm')
+	    	grades('Final')
+	    	surveys("midterm")
 	    })
     })
 });
@@ -205,6 +208,95 @@ function gratification(filter) {
 		}		
 	}
 }
+
+function grades(kind, filter) {	
+	$("li.grades-"+kind).removeClass("active")
+	if (!filter) {
+		$("li.grades-" + kind +".all").addClass("active")	
+	} else {
+		$("li.grades-" + kind +"." + filter).addClass("active")
+	}
+	
+	var byMajor = [];
+	var qty = [[], []];
+	for (var i = 0; i < allMajors.length; i++) {
+		byMajor.push([])
+	}		
+	var all = 0		
+	var nb = 0
+		stats.forEach(function (s) {			
+			if (s.Reports[kind] && s.Reports[kind] >= 0) {				
+				g = s.Reports[kind]				
+				nb++							
+				all += g
+				if (filter == "promotion") {
+					qty[s.Promotion == "SI" ? 0 : 1].push(g)
+				} else if (filter == "major") {								
+					byMajor[allMajors.indexOf(s.Major)].push(g);
+				}
+			} 
+		});			
+	//Hide when no data
+	if (nb) {		
+		$("#grades-" + kind).closest(".hidden").removeClass('hidden')
+	}
+	
+	if (!filter) {		
+		num = all / nb
+		$("#grades-" + kind).html(num.toFixed(2) + " / 20");
+	} else {
+		if (filter == "major") {				
+			var avgs = []
+			for (var i = 0; i < byMajor.length; i++) {			
+				avgs.push(avg(byMajor[i]).toFixed(2))
+			}				
+			c = $("<canvas>")
+			data = {
+    		labels: allMajors,
+    		datasets: [
+    			{ label: "Gratification", fillColor:"#F7464A", highlightFill: "#FF5A5E", data: avgs},    			
+    		]
+    		}       
+			c = $("#grades-" + kind).html("").append(c).find("canvas")			
+			ctx = c.get(0).getContext("2d");
+			grat= new Chart(ctx).Bar(data);
+		} else {					
+			avgs = [avg(qty[0]).toFixed(2), avg(qty[1]).toFixed(2)]							
+			c = $("<canvas>")
+			data = {
+    		labels: ["SI" , "master"],
+    		datasets: [
+    			{ label: "Gratification", fillColor:"#F7464A", highlightFill: "#FF5A5E", data: avgs},    			
+    		]
+    		}       
+			c = $("#grades-" + kind).html("").append(c).find("canvas")			
+			ctx = c.get(0).getContext("2d");
+			grat= new Chart(ctx).Bar(data);		
+		}		
+	}
+}
+
+function surveys(kind) {	
+	var all = 0		
+	var nb = 0
+	stats.forEach(function (s) {			
+		//console.log(s.Surveys[kind])
+		q = s.Surveys[kind]
+		if (q && Object.keys(q).length > 0) {			
+			nb++	
+			if (kind == "midterm" && q[19] == "true") {
+				all++
+			}			
+		}
+	});				
+	//Hide when no data
+	if (nb) {						
+		var num = Math.round(all / nb * 100)
+		$("#surveys-" + kind).html(num + "%");
+		$("#surveys-" + kind).closest(".hidden").removeClass('hidden')
+	} 	
+}
+
 
 function avg(values) {
 	var sum = 0
