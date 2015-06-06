@@ -17,8 +17,6 @@ import (
 	"github.com/fhermeni/wints/internship"
 	"github.com/fhermeni/wints/mail"
 
-	_ "net/http/pprof"
-
 	_ "github.com/lib/pq"
 )
 
@@ -92,24 +90,6 @@ func newRoot(em string, ds *datastore.Service, m mail.Mailer) {
 	m.SendAdminInvitation(u, tok)
 }
 
-func upgradeDB(ds *datastore.Service) {
-	//Check for the surveys in the database
-	log.Println("Looking for the surveys")
-	is, err := ds.Internships()
-	for _, i := range is {
-		log.Printf("Surveys for %s\n", i.Student.Fullname())
-		if len(is[0].Surveys) == 0 {
-			err = ds.InstallSurveys(i)
-			if err != nil {
-				log.Println("\tFAIL (" + err.Error() + ")")
-			} else {
-				log.Println("\tOK")
-			}
-		} else {
-			log.Println("\tSKIP")
-		}
-	}
-}
 func main() {
 
 	fakeMailer := flag.Bool("fakeMailer", false, "Use a fake mailer that print mail on stdout")
@@ -119,7 +99,6 @@ func main() {
 	testMail := flag.Bool("test-mailer", false, "Test the mailer by sending a mail to the administrator")
 	testFeeder := flag.Bool("test-feeder", false, "Test the convention feeder")
 	testAll := flag.Bool("test", false, "equivalent to --testMail --testDB --testFeeder")
-	upgrade := flag.Bool("upgrade-db", false, "Upgrade the database if needed")
 	blankConf := flag.Bool("generate-config", false, "Print a default configuration file")
 	flag.Parse()
 
@@ -148,10 +127,6 @@ func main() {
 		os.Exit(0)
 	}
 
-	if *upgrade {
-		upgradeDB(ds)
-		os.Exit(0)
-	}
 	if len(*makeRoot) > 0 {
 		newRoot(*makeRoot, ds, mailer)
 		os.Exit(0)

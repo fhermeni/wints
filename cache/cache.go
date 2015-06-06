@@ -1,7 +1,6 @@
 package cache
 
 import (
-	"log"
 	"time"
 
 	"github.com/fhermeni/wints/internship"
@@ -28,11 +27,8 @@ func (cache *Cache) Internships() ([]internship.Internship, error) {
 		if err != nil {
 			cache.hot.Set(false)
 		} else {
-			log.Println("encache")
 			cache.hot.Set(true)
 		}
-	} else {
-		log.Println("all in cache")
 	}
 	return cache.internships, err
 }
@@ -44,7 +40,6 @@ func (cache *Cache) Internship(stu string) (internship.Internship, error) {
 	if !cache.hot.Get() {
 		return cache.backend.Internship(stu)
 	}
-	log.Println("in cache")
 	for _, i := range cache.internships {
 		if i.Student.Email == stu {
 			return i, err
@@ -91,7 +86,6 @@ func (cache *Cache) SetMajor(stu string, m string) error {
 
 //Get the possible majors
 func (cache *Cache) Majors() []string {
-	//cache.hot.Set(false)
 	return cache.backend.Majors()
 }
 
@@ -103,19 +97,16 @@ func (cache *Cache) SetPromotion(stu string, p string) error {
 
 //Test if the credentials match a user, return a session token
 func (cache *Cache) Registered(email string, password []byte) ([]byte, error) {
-	//cache.hot.Set(false)
 	return cache.backend.Registered(email, password)
 }
 
 //Check if a session is opened for a given user and token
 func (cache *Cache) OpenedSession(email, token string) error {
-	//cache.hot.Set(false)
 	return cache.backend.OpenedSession(email, token)
 }
 
 //Destroy a session
 func (cache *Cache) Logout(email, token string) error {
-	//cache.hot.Set(false)
 	return cache.backend.Logout(email, token)
 }
 
@@ -139,13 +130,11 @@ func (cache *Cache) RmUser(email string) error {
 
 //Get the user
 func (cache *Cache) User(email string) (internship.User, error) {
-	//cache.hot.Set(false)
 	return cache.backend.User(email)
 }
 
 //List the users
 func (cache *Cache) Users() ([]internship.User, error) {
-	//cache.hot.Set(false)
 	return cache.backend.Users()
 }
 
@@ -185,15 +174,12 @@ func (cache *Cache) PlanReport(student string, r internship.ReportHeader) error 
 	return cache.backend.PlanReport(student, r)
 }
 func (cache *Cache) ReportDefs() []internship.ReportDef {
-	//cache.hot.Set(false)
 	return cache.backend.ReportDefs()
 }
 func (cache *Cache) Report(kind, email string) (internship.ReportHeader, error) {
-	//cache.hot.Set(false)
 	return cache.backend.Report(kind, email)
 }
 func (cache *Cache) ReportContent(kind, email string) ([]byte, error) {
-	//cache.hot.Set(false)
 	return cache.backend.ReportContent(kind, email)
 }
 func (cache *Cache) SetReportContent(kind, email string, cnt []byte) error {
@@ -215,11 +201,9 @@ func (cache *Cache) SetReportPrivate(kind, email string, p bool) error {
 
 //Survey management
 func (cache *Cache) SurveyToken(kind string) (string, string, error) {
-	//cache.hot.Set(false)
 	return cache.backend.SurveyToken(kind)
 }
 func (cache *Cache) Survey(student, kind string) (internship.Survey, error) {
-	//cache.hot.Set(false)
 	return cache.backend.Survey(student, kind)
 }
 func (cache *Cache) SetSurveyContent(token string, cnt map[string]string) error {
@@ -227,7 +211,6 @@ func (cache *Cache) SetSurveyContent(token string, cnt map[string]string) error 
 	return cache.backend.SetSurveyContent(token, cnt)
 }
 func (cache *Cache) SurveyDefs() []internship.SurveyDef {
-	//cache.hot.Set(false)
 	return cache.backend.SurveyDefs()
 }
 
@@ -236,7 +219,6 @@ func (cache *Cache) NewConvention(c internship.Convention) error {
 	return cache.backend.NewConvention(c)
 }
 func (cache *Cache) Conventions() ([]internship.Convention, error) {
-	//cache.hot.Set(false)
 	return cache.backend.Conventions()
 }
 func (cache *Cache) SkipConvention(student string, skip bool) error {
@@ -254,13 +236,11 @@ func (cache *Cache) SetAlumni(student string, a internship.Alumni) error {
 
 //public statistics
 func (cache *Cache) Statistics() ([]internship.Stat, error) {
-	//cache.hot.Set(false)
 	return cache.backend.Statistics()
 }
 
 //Students that have to make an internship
 func (cache *Cache) Students() ([]internship.Student, error) {
-	//cache.hot.Set(false)
 	return cache.backend.Students()
 
 }
