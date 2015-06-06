@@ -339,13 +339,25 @@ internships(function(data) {
         }
     });
     //$("#cnt").find(":checkbox").iCheck("uncheck");    
-    $('#cnt').find(":checkbox").icheck()
-    $('#cnt').find(".check_all").on("ifChecked", function (e) {
+    //$('#cnt').find(":checkbox").icheck()    
+    $("#cnt").find("td .icheckbox_flat").icheck({
+        callbacks: {
+          ifChecked: shiftSelect  
+        }
+    });
+    $('#cnt').find(".check_all").icheck({
+        callbacks : {
+            ifChecked: function (e) {$("#cnt").find("td .icheckbox").icheck("check")},
+            ifUnchecked: function (e) {$("#cnt").find("td .icheckbox").icheck("unCheck")}
+        }
+    });    
+    /*$('#cnt').find(".check_all").on("ifChecked", function (e) {
         $("#cnt").find("td .icheckbox").icheck("check")                
     }).on("ifUnchecked", function (e) {
         $("#cnt").find("td .icheckbox").icheck("unCheck")        
     });
     $("#cnt").find("td .icheckbox").on("ifChecked", shiftSelect)
+    });*/
 });
 }
 
