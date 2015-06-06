@@ -13,6 +13,5 @@
 ## Development
 
 - clean a bit the code
-- a simple cache that invalidate everything at every update request
 - tests and comments
 - simplify DB with less fake values and more optional fields hidden in JSONs

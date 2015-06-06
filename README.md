@@ -11,7 +11,7 @@ A web application to manage final internships at Polytech.
 
 - clone into your `src` folder
 - use godep to restore
-
+- foo
 
 ## Configuration
 
