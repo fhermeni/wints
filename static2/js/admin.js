@@ -292,7 +292,19 @@ internships(function(data) {
     root.html(html);
     if (interns.length == 0) {
         return true
-    }       
+    }     
+    
+    $("#cnt").find("td .icheckbox_flat").icheck({
+        callbacks: {
+          ifChecked: shiftSelect  
+        }
+    });
+    $('#cnt').find(".check_all").icheck({
+        callbacks : {
+            ifChecked: function (e) {$("#cnt").find("td .icheckbox_flat").icheck("checked")},
+            ifUnchecked: function (e) {$("#cnt").find("td .icheckbox_flat").icheck("unchecked")}
+        }
+    });   
     $("#table-conventions").tablesorter({            
         theme: 'bootstrap',
         widgets : ["uitheme"],
@@ -300,19 +312,7 @@ internships(function(data) {
         headers : {
             0: {sorter:false}
         }
-    });    
-    $('#cnt').find(":checkbox").iCheck()
-    $('#cnt').find(".check_all").on("ifChecked", function (e) {
-        $("#cnt").find("td .icheckbox").iCheck("check")       
-    }).on("ifUnchecked", function (e) {
-        $("#cnt").find("td .icheckbox").iCheck("unCheck")                
-    });
-    $("#cnt").find("td .icheckbox").on("ifChecked", function(e) {        
-        shiftSelect(e);
-    });            
-    $("#cnt").find("td .icheckbox").on("ifUnchecked", function(e) {        
-    });            
-
+    });        
 });
 }
 
@@ -330,16 +330,7 @@ internships(function(data) {
 	if (interns.length == 0) {
     	return true
     }       
-    $("#table-conventions").tablesorter({            
-        theme: 'bootstrap',
-        widgets : ["uitheme"],
-        headerTemplate : '{content} {icon}',
-        headers : {
-            0: {sorter:false}
-        }
-    });
-    var from = new Date()    
-    //$('#cnt').find(":checkbox").icheck()    
+
     $("#cnt").find("td .icheckbox_flat").icheck({
         callbacks: {
           ifChecked: shiftSelect  
@@ -347,18 +338,18 @@ internships(function(data) {
     });
     $('#cnt').find(".check_all").icheck({
         callbacks : {
-            ifChecked: function (e) {console.log(e); $("#cnt").find("td .icheckbox_flat").icheck("checked")},
+            ifChecked: function (e) {$("#cnt").find("td .icheckbox_flat").icheck("checked")},
             ifUnchecked: function (e) {$("#cnt").find("td .icheckbox_flat").icheck("unchecked")}
         }
     });   
-/*    $("#cnt").find(":checkbox").iCheck();     
-    $('#cnt').find(".check_all").on("ifChecked", function (e) {
-        $("#cnt").find("td .icheckbox_flat").iCheck("check")                
-    }).on("ifUnchecked", function (e) {
-        $("#cnt").find("td .icheckbox_flat").iCheck("unCheck")        
+        $("#table-conventions").tablesorter({            
+        theme: 'bootstrap',
+        widgets : ["uitheme"],
+        headerTemplate : '{content} {icon}',
+        headers : {
+            0: {sorter:false}
+        }
     });
-    $("#cnt").find("td .icheckbox_flat").on("ifChecked", shiftSelect)*/
-    console.log(new Date().getTime() - from.getTime());
     });
     
 //});
@@ -373,8 +364,7 @@ function shiftSelect(e) {
         var col = tr.children().index(myTd)        
         var p = tr.prev();
         while (p.length > 0) {
-            var chk = $(p.children().get(col)).find(".icheckbox")    
-            console.log(chk)        
+            var chk = $(p.children().get(col)).find(".icheckbox")                
             if (chk.hasClass("checked")) {
                 break;
             } else {
@@ -402,7 +392,7 @@ function showPrivileges() {
             var html = Handlebars.getTemplate("privileges")({Students: students, Teachers: teachers});
             $("#cnt").html(html);
             $("#cnt").find("select").selecter();
-            $('#cnt').find(":checkbox").iCheck()
+            $('#cnt').find(":checkbox").icheck()
             $('[data-toggle="delteacher-confirmation"]').each(function (i, a) {
                 var j = $(a);
                 j.confirmation({onConfirm: function() {removeUser(j.attr("data-user"), j.parent().parent().parent())}});
@@ -663,14 +653,26 @@ internships(function(interns) {
     });    
     var html = Handlebars.getTemplate("service")(service);
     $("#cnt").html(html);
+
+    $("#cnt").find("td .icheckbox_flat").icheck({
+        callbacks: {
+          ifChecked: shiftSelect  
+        }
+    });
+    $('#cnt').find(".check_all").icheck({
+        callbacks : {
+            ifChecked: function (e) {$("#cnt").find("td .icheckbox_flat").icheck("checked")},
+            ifUnchecked: function (e) {$("#cnt").find("td .icheckbox_flat").icheck("unchecked")}
+        }
+    });   
+    /*
     $('#cnt').find(":checkbox").iCheck()
     $('#cnt').find(".check_all").on("ifChecked", function (e) {
         $("#cnt").find("td .icheckbox").iCheck("check")           
     }).on("ifUnchecked", function (e) {
         $("#cnt").find("td .icheckbox").iCheck("unCheck")                
     });
-    $("#cnt").find("td .icheckbox").on("ifChecked", shiftSelect)    
-
+    $("#cnt").find("td .icheckbox").on("ifChecked", shiftSelect)    */
 });    
 }
 
