@@ -338,7 +338,7 @@ internships(function(data) {
             0: {sorter:false}
         }
     });
-    //$("#cnt").find(":checkbox").iCheck("uncheck");    
+    var from = new Date()    
     //$('#cnt').find(":checkbox").icheck()    
     $("#cnt").find("td .icheckbox_flat").icheck({
         callbacks: {
@@ -347,33 +347,38 @@ internships(function(data) {
     });
     $('#cnt').find(".check_all").icheck({
         callbacks : {
-            ifChecked: function (e) {$("#cnt").find("td .icheckbox").icheck("check")},
-            ifUnchecked: function (e) {$("#cnt").find("td .icheckbox").icheck("unCheck")}
+            ifChecked: function (e) {console.log(e); $("#cnt").find("td .icheckbox_flat").icheck("checked")},
+            ifUnchecked: function (e) {$("#cnt").find("td .icheckbox_flat").icheck("unchecked")}
         }
-    });    
-    /*$('#cnt').find(".check_all").on("ifChecked", function (e) {
-        $("#cnt").find("td .icheckbox").icheck("check")                
+    });   
+/*    $("#cnt").find(":checkbox").iCheck();     
+    $('#cnt').find(".check_all").on("ifChecked", function (e) {
+        $("#cnt").find("td .icheckbox_flat").iCheck("check")                
     }).on("ifUnchecked", function (e) {
-        $("#cnt").find("td .icheckbox").icheck("unCheck")        
+        $("#cnt").find("td .icheckbox_flat").iCheck("unCheck")        
     });
-    $("#cnt").find("td .icheckbox").on("ifChecked", shiftSelect)
-    });*/
-});
+    $("#cnt").find("td .icheckbox_flat").on("ifChecked", shiftSelect)*/
+    console.log(new Date().getTime() - from.getTime());
+    });
+    
+//});
 }
 
 
 function shiftSelect(e) {   
     if (shiftPressed) {        
-        var myTd = $(e.currentTarget).closest("td")
+        //debugger
+        var myTd = $(e).closest("td")
         var tr = myTd.parent()
         var col = tr.children().index(myTd)        
         var p = tr.prev();
         while (p.length > 0) {
-            var chk = $(p.children().get(col)).find(".icheckbox")            
+            var chk = $(p.children().get(col)).find(".icheckbox")    
+            console.log(chk)        
             if (chk.hasClass("checked")) {
                 break;
             } else {
-                chk.iCheck("check")
+                chk.icheck("checked")
             }            
             p = p.prev();
         }
