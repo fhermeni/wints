@@ -27,8 +27,7 @@ waitingBlock = $("#cnt").clone().html();
     $(document).keydown(function (e) {
         if (e.keyCode == 16) {shiftPressed = true;}
     });
-    $(document).keyup(function (e) {
-        
+    $(document).keyup(function (e) {        
         if (e.keyCode == 16) {shiftPressed = false;}
     });
 });
@@ -357,8 +356,10 @@ internships(function(data) {
 
 
 function shiftSelect(e) {   
+    document.getSelection().removeAllRanges();
     if (shiftPressed) {        
         //debugger
+
         var myTd = $(e).closest("td")
         var tr = myTd.parent()
         var col = tr.children().index(myTd)        
