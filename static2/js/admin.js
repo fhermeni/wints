@@ -172,7 +172,7 @@ function showStatus() {
             showFullnames(stus);
         });
 
-        $('#cnt').find(":checkbox").iCheck();                                    
+        $('#cnt').find(":checkbox").icheck();                                    
         var idx = 0;
         stus.forEach(function (stu) {
             s = $("#select-" + (idx++));                
@@ -666,14 +666,6 @@ internships(function(interns) {
             ifUnchecked: function (e) {$("#cnt").find("td .icheckbox_flat").icheck("unchecked")}
         }
     });   
-    /*
-    $('#cnt').find(":checkbox").iCheck()
-    $('#cnt').find(".check_all").on("ifChecked", function (e) {
-        $("#cnt").find("td .icheckbox").iCheck("check")           
-    }).on("ifUnchecked", function (e) {
-        $("#cnt").find("td .icheckbox").iCheck("unCheck")                
-    });
-    $("#cnt").find("td .icheckbox").on("ifChecked", shiftSelect)    */
 });    
 }
 
@@ -775,7 +767,7 @@ function showReport(email, kind) {
             r.Reviewed = r.Comment.length > 0 || r.Grade >= 0            
             buf = Handlebars.getTemplate("reportEditor")(r)            
             $("#modal").html(buf).modal('show');      
-            $('#modal').find(':checkbox').iCheck()
+            $('#modal').find(':checkbox').icheck()
                 .on('ifChecked', function(){setReportPrivate(email, kind, true)})
                 .on('ifUnchecked', function(){setReportPrivate(email, kind, false)})
             $(".date").datepicker({format:'d M yyyy', autoclose: true, minViewMode: 0, weekStart: 1}).on("changeDate", function (e) { setReportDeadline(email, kind, e.date)})             
