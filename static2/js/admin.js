@@ -339,13 +339,13 @@ internships(function(data) {
         }
     });
     //$("#cnt").find(":checkbox").iCheck("uncheck");    
-    $('#cnt').find(":checkbox").iCheck()
+    $('#cnt').find(":checkbox").icheck()
     $('#cnt').find(".check_all").on("ifChecked", function (e) {
-        $("#cnt").find("td .icheckbox").iCheck("check")                
+        $("#cnt").find("td .icheckbox").icheck("check")                
     }).on("ifUnchecked", function (e) {
-        $("#cnt").find("td .icheckbox").iCheck("unCheck")        
+        $("#cnt").find("td .icheckbox").icheck("unCheck")        
     });
-    $("#cnt").find("td .icheckbox").on("ifChecked", shiftSelect)    
+    $("#cnt").find("td .icheckbox").on("ifChecked", shiftSelect)
 });
 }
 
