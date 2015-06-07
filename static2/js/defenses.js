@@ -44,6 +44,7 @@ function showDefenses() {
         students.sort(sortByMajor);        
         defenses(function (defs) {            
             var x = {Defenses : allDefenses, Teachers: teachers, Students: students};        
+            console.log(x)
             var html = Handlebars.getTemplate("defense-editor")(x);    
             var root = $("#cnt");
             root.html(html);
@@ -232,12 +233,13 @@ function drawStudent(em) {
         glyphPrivate = "glyphicon-eye-close"
     }
     var html = "<li>"+
-        "<input type='checkbox' data-toggle='checkbox' class='icheckbox_flat check_all' data-email='" + em + "'/>"+
+        "<input type='checkbox' data-email='" + em + "'>"+
         " <a class='fn' onclick='showInternship(\"" + em + "\")'>" + Handlebars.helpers.abbrvFullname(i.Student) + " (" + i.Major + ")</a>"+
         " <i class='glyphicon " + glyphRemote + "' onclick='toggleRemote(this, \"" + em + "\")'></i> <i class='glyphicon " + glyphPrivate + "' onclick='togglePrivate(this,\"" + em + "\")'></i>"+
         " &nbsp; <i class='glyphicon glyphicon-remove-circle pull-right' onclick='removeStudent(this,\"" + em + "\")'></i>"+
         "</li>";
-    $("#"+active).find("ul.students").append(html).find(":checkbox").iCheck()    
+    console.log(html)
+    $("#"+active).find("ul.students").append(html).find(":checkbox").last().icheck()    
     
     var def = {Grade: -1, Remote : false, Private: false}    
     allDefenses[em] = def;
@@ -324,7 +326,7 @@ function drawJury(em) {
             " <a href='mailto:" + em + "'>" + Handlebars.helpers.abbrvFullname(t) + "</a>"+
             " <i class='glyphicon glyphicon-remove-circle pull-right' onclick='removeJury(this,\"" + em + "\")'></i>"+
             "</li>";
-            $("#"+active).find("ul.juries").append(html).find(":checkbox").iCheck();            
+            $("#"+active).find("ul.juries").append(html).find(":checkbox").icheck();            
             
             return false;       
         }

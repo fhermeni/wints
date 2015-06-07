@@ -28,8 +28,7 @@ waitingBlock = $("#cnt").clone().html();
     $(document).keydown(function (e) {
         if (e.keyCode == 16) {shiftPressed = true;}
     });
-    $(document).keyup(function (e) {
-        
+    $(document).keyup(function (e) {        
         if (e.keyCode == 16) {shiftPressed = false;}
     });
 });
@@ -174,7 +173,7 @@ function showStatus() {
             showFullnames(stus);
         });
 
-        $('#cnt').find(":checkbox").iCheck();                                    
+        $('#cnt').find(":checkbox").icheck();                                    
         var idx = 0;
         stus.forEach(function (stu) {
             s = $("#select-" + (idx++));                
@@ -294,7 +293,19 @@ internships(function(data) {
     root.html(html);
     if (interns.length == 0) {
         return true
-    }       
+    }     
+    
+    $("#cnt").find("td .icheckbox_flat").icheck({
+        callbacks: {
+          ifChecked: shiftSelect  
+        }
+    });
+    $('#cnt').find(".check_all").icheck({
+        callbacks : {
+            ifChecked: function (e) {$("#cnt").find("td .icheckbox_flat").icheck("checked")},
+            ifUnchecked: function (e) {$("#cnt").find("td .icheckbox_flat").icheck("unchecked")}
+        }
+    });   
     $("#table-conventions").tablesorter({            
         theme: 'bootstrap',
         widgets : ["uitheme"],
@@ -302,19 +313,7 @@ internships(function(data) {
         headers : {
             0: {sorter:false}
         }
-    });    
-    $('#cnt').find(":checkbox").iCheck()
-    $('#cnt').find(".check_all").on("ifChecked", function (e) {
-        $("#cnt").find("td .icheckbox").iCheck("check")       
-    }).on("ifUnchecked", function (e) {
-        $("#cnt").find("td .icheckbox").iCheck("unCheck")                
-    });
-    $("#cnt").find("td .icheckbox").on("ifChecked", function(e) {        
-        shiftSelect(e);
-    });            
-    $("#cnt").find("td .icheckbox").on("ifUnchecked", function(e) {        
-    });            
-
+    });        
 });
 }
 
@@ -332,7 +331,19 @@ internships(function(data) {
 	if (interns.length == 0) {
     	return true
     }       
-    $("#table-conventions").tablesorter({            
+
+    $("#cnt").find("td .icheckbox_flat").icheck({
+        callbacks: {
+          ifChecked: shiftSelect  
+        }
+    });
+    $('#cnt').find(".check_all").icheck({
+        callbacks : {
+            ifChecked: function (e) {$("#cnt").find("td .icheckbox_flat").icheck("checked")},
+            ifUnchecked: function (e) {$("#cnt").find("td .icheckbox_flat").icheck("unchecked")}
+        }
+    });   
+        $("#table-conventions").tablesorter({            
         theme: 'bootstrap',
         widgets : ["uitheme"],
         headerTemplate : '{content} {icon}',
@@ -340,30 +351,27 @@ internships(function(data) {
             0: {sorter:false}
         }
     });
-    //$("#cnt").find(":checkbox").iCheck("uncheck");    
-    $('#cnt').find(":checkbox").iCheck()
-    $('#cnt').find(".check_all").on("ifChecked", function (e) {
-        $("#cnt").find("td .icheckbox").iCheck("check")                
-    }).on("ifUnchecked", function (e) {
-        $("#cnt").find("td .icheckbox").iCheck("unCheck")        
     });
-    $("#cnt").find("td .icheckbox").on("ifChecked", shiftSelect)    
-});
+    
+//});
 }
 
 
 function shiftSelect(e) {   
+    document.getSelection().removeAllRanges();
     if (shiftPressed) {        
-        var myTd = $(e.currentTarget).closest("td")
+        //debugger
+
+        var myTd = $(e).closest("td")
         var tr = myTd.parent()
         var col = tr.children().index(myTd)        
         var p = tr.prev();
         while (p.length > 0) {
-            var chk = $(p.children().get(col)).find(".icheckbox")            
+            var chk = $(p.children().get(col)).find(".icheckbox")                
             if (chk.hasClass("checked")) {
                 break;
             } else {
-                chk.iCheck("check")
+                chk.icheck("checked")
             }            
             p = p.prev();
         }
@@ -387,7 +395,7 @@ function showPrivileges() {
             var html = Handlebars.getTemplate("privileges")({Students: students, Teachers: teachers});
             $("#cnt").html(html);
             $("#cnt").find("select").selecter();
-            $('#cnt').find(":checkbox").iCheck()
+            $('#cnt').find(":checkbox").icheck()
             $('[data-toggle="delteacher-confirmation"]').each(function (i, a) {
                 var j = $(a);
                 j.confirmation({onConfirm: function() {removeUser(j.attr("data-user"), j.parent().parent().parent())}});
@@ -648,14 +656,18 @@ internships(function(interns) {
     });    
     var html = Handlebars.getTemplate("service")(service);
     $("#cnt").html(html);
-    $('#cnt').find(":checkbox").iCheck()
-    $('#cnt').find(".check_all").on("ifChecked", function (e) {
-        $("#cnt").find("td .icheckbox").iCheck("check")           
-    }).on("ifUnchecked", function (e) {
-        $("#cnt").find("td .icheckbox").iCheck("unCheck")                
-    });
-    $("#cnt").find("td .icheckbox").on("ifChecked", shiftSelect)    
 
+    $("#cnt").find("td .icheckbox_flat").icheck({
+        callbacks: {
+          ifChecked: shiftSelect  
+        }
+    });
+    $('#cnt').find(".check_all").icheck({
+        callbacks : {
+            ifChecked: function (e) {$("#cnt").find("td .icheckbox_flat").icheck("checked")},
+            ifUnchecked: function (e) {$("#cnt").find("td .icheckbox_flat").icheck("unchecked")}
+        }
+    });   
 });    
 }
 
@@ -757,7 +769,7 @@ function showReport(email, kind) {
             r.Reviewed = r.Comment.length > 0 || r.Grade >= 0            
             buf = Handlebars.getTemplate("reportEditor")(r)            
             $("#modal").html(buf).modal('show');      
-            $('#modal').find(':checkbox').iCheck()
+            $('#modal').find(':checkbox').icheck()
                 .on('ifChecked', function(){setReportPrivate(email, kind, true)})
                 .on('ifUnchecked', function(){setReportPrivate(email, kind, false)})
             $(".date").datepicker({format:'d M yyyy', autoclose: true, minViewMode: 0, weekStart: 1}).on("changeDate", function (e) { setReportDeadline(email, kind, e.date)})             

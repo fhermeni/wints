@@ -9,14 +9,13 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/fhermeni/wints/cache"
 	"github.com/fhermeni/wints/config"
 	"github.com/fhermeni/wints/datastore"
 	"github.com/fhermeni/wints/feeder"
 	"github.com/fhermeni/wints/handler"
 	"github.com/fhermeni/wints/internship"
 	"github.com/fhermeni/wints/mail"
-
-	_ "net/http/pprof"
 
 	_ "github.com/lib/pq"
 )
@@ -91,24 +90,6 @@ func newRoot(em string, ds *datastore.Service, m mail.Mailer) {
 	m.SendAdminInvitation(u, tok)
 }
 
-func upgradeDB(ds *datastore.Service) {
-	//Check for the surveys in the database
-	log.Println("Looking for the surveys")
-	is, err := ds.Internships()
-	for _, i := range is {
-		log.Printf("Surveys for %s\n", i.Student.Fullname())
-		if len(is[0].Surveys) == 0 {
-			err = ds.InstallSurveys(i)
-			if err != nil {
-				log.Println("\tFAIL (" + err.Error() + ")")
-			} else {
-				log.Println("\tOK")
-			}
-		} else {
-			log.Println("\tSKIP")
-		}
-	}
-}
 func main() {
 
 	fakeMailer := flag.Bool("fakeMailer", false, "Use a fake mailer that print mail on stdout")
@@ -118,7 +99,6 @@ func main() {
 	testMail := flag.Bool("test-mailer", false, "Test the mailer by sending a mail to the administrator")
 	testFeeder := flag.Bool("test-feeder", false, "Test the convention feeder")
 	testAll := flag.Bool("test", false, "equivalent to --testMail --testDB --testFeeder")
-	upgrade := flag.Bool("upgrade-db", false, "Upgrade the database if needed")
 	blankConf := flag.Bool("generate-config", false, "Print a default configuration file")
 	flag.Parse()
 
@@ -147,15 +127,17 @@ func main() {
 		os.Exit(0)
 	}
 
-	if *upgrade {
-		upgradeDB(ds)
-	}
 	if len(*makeRoot) > 0 {
 		newRoot(*makeRoot, ds, mailer)
 		os.Exit(0)
 	}
+
+	cc, err := cache.NewCache(ds)
+	if err != nil {
+		log.Fatalln("Unable to initiate the cache: " + err.Error())
+	}
 	//Test connection anyway
-	_, e := ds.Internships()
+	_, e := cc.Internships()
 	ok := test("Database connection", e)
 
 	if *testAll {
@@ -183,9 +165,9 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	log.Printf("Working over %d CPU(s)\n", runtime.NumCPU())
 
-	startFeederDaemon(puller, ds, period)
+	startFeederDaemon(puller, cc, period)
 
-	www := handler.NewService(ds, mailer, cfg.HTTP.Path)
+	www := handler.NewService(cc, mailer, cfg.HTTP.Path)
 	log.Println("Listening on " + cfg.HTTP.Listen)
 	err = www.Listen(cfg.HTTP.Listen, cfg.HTTP.Certificate, cfg.HTTP.PrivateKey)
 	if err != nil {
