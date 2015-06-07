@@ -13,7 +13,7 @@ A web application to manage final internships at Polytech.
 In your `$GOPATH`:
 
 - `git clone git@scm-oasis.inria.fr:fhermeni/wints.git src/scm-oasis.inria.fr/fhermeni/wints` to get the source
-- `go restore` to restore the dependencies
+- `cd src/scm-oasis.inria.fr/fhermeni/wints/wintsd; godep restore` to restore the dependencies.
 - `go install scm-oasis.inria.fr/fhermeni/wints/wintsd` to build the executable.
 
 ## Configuration
