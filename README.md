@@ -12,12 +12,16 @@ A web application to manage final internships at Polytech.
 
 In your `$GOPATH`:
 
-- `go get github.com/fhermeni/wints` to get the source
-- `go restore to restore the dependencies
-- `go install github.com/fhermeni/wints/wintsd` to build the executable.
+- `git clone git@scm-oasis.inria.fr:fhermeni/wints.git src/scm-oasis.inria.fr/fhermeni/wints` to get the source
+- `go restore` to restore the dependencies
+- `go install scm-oasis.inria.fr/fhermeni/wints/wintsd` to build the executable.
 
 ## Configuration
-
+- `wintsd --generate-config > wints.conf` to generate a blank config
+- customize the configuration file as you need 
+- `wintsd --install` to generate the database tables
+- `wintsd --test` to check if everything is ok
 
 ## Running
+- `wintsd` launches the daemon. For test purposes, it is preferable to launch it with the `--fakeMailer` option to prevent to send mails (they will be printed on stdout instead)
 
