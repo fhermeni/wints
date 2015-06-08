@@ -342,15 +342,15 @@ func (s *Service) HideStudent(em string, st bool) error {
 }
 
 //Defenses
-func (s *Service) DefenseSessions() ([]internship.DefenseSession, error) {
+func (s *Service) Defenses() ([]internship.Defense, error) {
 	if s.my.Role >= internship.ADMIN {
-		return s.srv.DefenseSessions()
+		return s.srv.Defenses()
 	} else if s.my.Role != internship.NONE {
-		sessions, err := s.srv.DefenseSessions()
+		sessions, err := s.srv.Defenses()
 		if err != nil {
-			return []internship.DefenseSession{}, err
+			return []internship.Defense{}, err
 		}
-		mySessions := make([]internship.DefenseSession, 0, 0)
+		mySessions := make([]internship.Defense, 0, 0)
 		for _, session := range sessions {
 			if session.InJury(s.my.Email) {
 				mySessions = append(mySessions, session)
@@ -358,14 +358,14 @@ func (s *Service) DefenseSessions() ([]internship.DefenseSession, error) {
 		}
 		return mySessions, nil
 	}
-	return []internship.DefenseSession{}, ErrPermission
+	return []internship.Defense{}, ErrPermission
 }
 
-func (s *Service) Defense(student string) (internship.StudentDefense, error) {
+func (s *Service) Defense(student string) (internship.Defense, error) {
 	if s.mine(student) || s.my.Role >= internship.MAJOR {
 		return s.srv.Defense(student)
 	}
-	return internship.StudentDefense{}, ErrPermission
+	return internship.Defense{}, ErrPermission
 }
 
 func (s *Service) SetDefenseGrade(student string, g int) error {
@@ -383,9 +383,9 @@ func (s *Service) SetDefenseGrade(student string, g int) error {
 	return ErrPermission
 }
 
-func (s *Service) SetDefenseSessions(defs []internship.DefenseSession) error {
+func (s *Service) SetDefenses(defs []internship.Defense) error {
 	if s.my.Role >= internship.ADMIN {
-		return s.srv.SetDefenseSessions(defs)
+		return s.srv.SetDefenses(defs)
 	}
 	return ErrPermission
 }

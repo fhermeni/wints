@@ -14,7 +14,7 @@ drop table if exists sessions;
 drop table if exists password_renewal;
 drop table if exists defenses;
 drop table if exists users;
-    create table users(email text PRIMARY KEY,
+create table users(email text PRIMARY KEY,
 				  firstname text,
 				  lastname text,
 				  tel text,
@@ -95,21 +95,6 @@ create table surveys(student text REFERENCES users(email) on delete cascade,
                         answers json,
                         token text UNIQUE,
                         constraint pk_surveys PRIMARY KEY(student, kind)
-                        );
-
-create table defenseSessions(
-    date timestamp with time zone,
-    room text,
-    pause integer,
-    constraint pk_unique PRIMARY KEY(date, room)
-);
-
-create table defenseJuries(
-    date timestamp with time zone,
-    room text,
-    jury text REFERENCES users(email) on delete cascade,
-    constraint pk_jury PRIMARY KEY(date, room, jury),
-    constraint fk_session FOREIGN KEY(date, room) REFERENCES defenseSessions(date, room) on delete cascade    
 );
 
 create table defenses(
@@ -118,8 +103,12 @@ create table defenses(
     student text PRIMARY KEY REFERENCES internships(student),
     grade integer,
     private bool,
-    remote bool,
-    constraint fk_session FOREIGN KEY(date, room) REFERENCES defenseSessions(date, room) on delete cascade
+    remote bool    
+);
+
+create table juries(
+    student text PRIMARY KEY REFERENCES defenses(student) on delete cascade,
+    jury text REFERENCES users(email) 
 );
 
 create table password_renewal(
