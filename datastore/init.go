@@ -107,8 +107,8 @@ create table defenses(
 );
 
 create table juries(
-    student text PRIMARY KEY REFERENCES defenses(student) on delete cascade,
-    jury text REFERENCES users(email) 
+    student text REFERENCES defenses(student) on delete cascade,
+    jury text REFERENCES users(email)    
 );
 
 create table password_renewal(

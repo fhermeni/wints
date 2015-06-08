@@ -28,7 +28,7 @@ func (srv *Service) scanDefense(rows *sql.Rows) (internship.Defense, error) {
 	}
 	juries, err := srv.jury(student)
 	if err != nil {
-		return def, nil
+		return def, err
 	}
 	def.Juries = juries
 	if grade.Valid {
@@ -40,7 +40,7 @@ func (srv *Service) scanDefense(rows *sql.Rows) (internship.Defense, error) {
 //DefenseSessions returns all the registered defense sessions
 func (srv *Service) Defenses() ([]internship.Defense, error) {
 	//all the defenses
-	query := "select student, date, room, grade, private, remote from defenses"
+	query := "select student, date, room, grade, private, remote from defenses  order by date"
 	defs := make([]internship.Defense, 0, 0)
 	rows, err := srv.DB.Query(query)
 	if err != nil {
@@ -53,21 +53,11 @@ func (srv *Service) Defenses() ([]internship.Defense, error) {
 		var remote, private bool
 		var grade sql.NullInt64
 		err = rows.Scan(&student, &date, &room, &grade, &private, &remote)
-		def := internship.Defense{
-			Student: student,
-			Date:    date,
-			Room:    room,
-			Private: private,
-			Remote:  remote,
-		}
-		juries, err := srv.jury(student)
+		def, err := srv.scanDefense(rows)
 		if err != nil {
-			return defs, nil
+			return defs, err
 		}
-		def.Juries = juries
-		if grade.Valid {
-			def.Grade = int(grade.Int64)
-		}
+		defs = append(defs, def)
 	}
 	return defs, nil
 }
@@ -96,7 +86,7 @@ func (srv *Service) Defense(student string) (internship.Defense, error) {
 func (srv *Service) jury(student string) ([]internship.User, error) {
 	if JuriesStmt == nil {
 		var err error
-		JuriesStmt, err = srv.DB.Prepare("select firstname, lastname, email, tel from users, juries where student=$1 and users.email = jury.email")
+		JuriesStmt, err = srv.DB.Prepare("select firstname, lastname, users.email, tel from users, juries where juries.student=$1 and users.email = juries.jury")
 		if err != nil {
 			return []internship.User{}, err
 		}
