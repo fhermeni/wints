@@ -41,8 +41,7 @@ function showDefenses() {
         });
         students = interns.slice()
         students.sort(sortByMajor);        
-        defenses(function (defs) {    
-            console.log(defs)        
+        defenses(function (defs) {                
             var x = {Defenses : defs, Teachers: teachers, Students: students};        
             var html = Handlebars.getTemplate("defense-editor")(x);    
             var root = $("#cnt");
@@ -56,6 +55,8 @@ function showDefenses() {
             var root = $("#modal");         
             root.html(html)
             load(defs)
+            students.sort(sortByMajor);    
+            $('#student-selecter').html(Handlebars.helpers.studentSelecter(students).string)        
         })
     });
 }
@@ -64,13 +65,13 @@ function updateSessionOrder(e, li) {
     var sid = $(li.item).closest(".session").attr("id")        
     s = getSession(sid)   
     //debugger 
-    s.Defenses = []
+    s.Students = []
     $(li.item).closest("ul").find("li").each(function(i, input) {
         em = $(input).find("input").data("email")                
         if (!em) {
             s.Pause = i
         } else {
-            s.Defenses.push(em);
+            s.Students.push(em);
         }       
     } )
     //Get the emails
@@ -79,7 +80,7 @@ function updateSessionOrder(e, li) {
 function addDefenseSession() {
     var r = $("#room").val();
     var d = $("#date").data("DateTimePicker").date()
-    var s = {Pause: -1, Room : r, Date : d, Defenses : [], Juries : []};    
+    var s = {Pause: -1, Room : r, Date : d, Students : [], Juries : []};    
     if ($("#" + hash(s)).length > 0) {
         $("#room").closest(".form-group").addClass("has-error");
     } else {
@@ -94,8 +95,14 @@ function addDefenseSession() {
 function rmSession() {    
     s = getSession(active);
     activeSession(active)
+    s.Students.forEach(function (stu) {        
+           students.push(getInternship(stu)); 
+           delete allDefenses[stu]
+    });    
     $("#"+hash(s)).remove()
     defenseSessions.remove(s)    
+    students.sort(sortByMajor);    
+    $('#student-selecter').html(Handlebars.helpers.studentSelecter(students).string)
 }
 
 
@@ -117,13 +124,10 @@ function drawSession(s) {
     var period = s.Date.hour() < 12 ? "am" : "pm";
 
     var day =  $("#" + rId);        
-    if (day.length == 0) {     
-        console.log("new day: " + rId);
-        day = $("#days").append("<div id='" + rId + "' class='day'><div class='row am'></div><div class='row pm'></div></div>").children().last();
-        console.log(day)
+    if (day.length == 0) {             
+        day = $("#days").append("<div id='" + rId + "' class='day'><div class='row am'></div><div class='row pm'></div></div>").children().last();        
     }
-    var row = day.find("."+period) 
-    console.log(row)
+    var row = day.find("."+period)     
     row.append(html)    
 }
 
@@ -134,7 +138,7 @@ function saveDefenseSession() {
     var newDay = newDate.date();    
 
     var oldSession = getSession(active)
-    var newSession = {Pause: -1, Room : newRoom, Date : newDate, Juries : oldSession.Juries.slice(), Defenses : oldSession.Defenses.slice()};
+    var newSession = {Pause: -1, Room : newRoom, Date : newDate, Juries : oldSession.Juries.slice(), Students : oldSession.Defenses.slice()};
     if (hash(oldSession) != hash(newSession) && $("#" + hash(newSession)).length > 0) {
         $("#room").closest(".form-group").addClass("has-error");
         return
@@ -220,7 +224,7 @@ function addStudent(d) {
     $('#student-selecter').selecter("destroy");
     $('#student-selecter').selecter("update");    
     s = getSession(active)
-    s.Defenses.push(em)
+    s.Students.push(em)
 }
 
 function drawStudent(em) {    
@@ -252,8 +256,8 @@ function addPause() {
     //var html = "<li><i>pause</i> <i onclick='rmPause(this)' class='glyphicon glyphicon-remove-circle pull-right'></i></li>";    
     //$("#"+active).find("ul.students").append(html)
     s = getSession(active)
-    s.Defenses.push()
-    s.Pause = s.Defenses.length
+    s.Students.push()
+    s.Pause = s.Students.length
     drawPause()    
 }
 
@@ -293,7 +297,8 @@ function togglePrivate(i, em) {
 function removeStudent(b, em) {
     $(b).closest("li").remove();    
     s = getSession(active);
-    s.Defenses.remove(em);
+    delete allDefenses[em]
+    s.Students.remove(em);
     i = getInternship(em)    
     students.push(i);
     students.sort(sortByMajor);    
@@ -356,25 +361,28 @@ function availableTeachers(sid) {
 }
 
 function save() {
-    var defs = [];
-    defenseSessions.forEach(function (s) {                
-        var cur = s.Date
-        s.Defenses.forEach(function (em) {                            
-            var date = new Date(cur.add(30,"minutes").toDate())            
+    var defs = [];    
+    defenseSessions.forEach(function (s) {                                
+        var date = s.Date
+        s.Students.forEach(function (em) {                                                                
             if (em) {
-                x = allDefenses[em];            
-                def = {Student: em, Room : s.Room, Date: date, Juries: [], Private: x.Private, Remote: x.Remote, Grade: x.Grade}               
+                x = allDefenses[em];                            
+                def = {Student: em, Room : s.Room, Date: new Date(date.toDate()), Juries: [], Private: x.Private, Remote: x.Remote, Grade: x.Grade}                               
                 s.Juries.forEach(function (u) {
                     def.Juries.push({Email:u})
                 })
                 defs.push(def)
+            } else {
+                console.log("pause")
             }            
+            date = date.add(30,"minutes");
         });
     });     
     postDefenses(defs)    
 }
 
 function load(defs) {    
+    active = undefined
     allDefenses = {}
     defenseSessions = []
     defs.forEach(function (x) {
@@ -387,19 +395,19 @@ function load(defs) {
         s = {Room : x.Room, Juries: [], Date : d, Students: []}
         sId = hash(s);        
         session = getSession(sId);
-        if (!session) {
-            console.log("new: " + sId)
-            //console.log(s);
-            x.Juries.forEach(function (j) {
-                s.Juries.push(j.Email)
-            });
+        if (!session) {                        
             defenseSessions.push(s);
             session = s;              
-            drawSession(session)          
-            activeSession(hash(session))          
-        }                
+            drawSession(session)                      
+            activeSession(hash(session))                  
+            x.Juries.forEach(function (j) {
+                s.Juries.push(j.Email)
+                drawJury(j.Email)
+            });
+        }              
         def = {Date: moment(new Date(x.Date)), Remote: x.Remote, Private: x.Private, Grade: x.Grade}
-        session.Students.push(x.Student)
+        session.Students.push(x.Student)        
+        students.remove(getInternship(x.Student))
         allDefenses[x.Student] = def        
         drawStudent(x.Student)
     })
