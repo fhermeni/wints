@@ -251,7 +251,7 @@ func (srv *Service) appendSurveys(i *internship.Internship) error {
 func (srv *Service) appendReports(i *internship.Internship) error {
 	if ReportSelectStmt == nil {
 		var err error
-		ReportSelectStmt, err = srv.DB.Prepare("select kind, grade, deadline, delivery, comment, private, toGrade from reports where student=$1 order by deadline")
+		ReportSelectStmt, err = srv.DB.Prepare("select kind, grade, deadline, delivery, reviewed, comment, private, toGrade from reports where student=$1 order by deadline")
 		if err != nil {
 			return err
 		}
@@ -269,9 +269,10 @@ func (srv *Service) appendReports(i *internship.Internship) error {
 		var comment sql.NullString
 		var delivery pq.NullTime
 		var grade sql.NullInt64
+		var reviewed pq.NullTime
 		var deadline time.Time
 		var priv, toGrade bool
-		rows.Scan(&kind, &grade, &deadline, &delivery, &comment, &priv, &toGrade)
+		rows.Scan(&kind, &grade, &deadline, &delivery, &reviewed, &comment, &priv, &toGrade)
 		hdr := internship.ReportHeader{Kind: kind, Deadline: deadline, Grade: -1, Private: priv, ToGrade: toGrade}
 		if comment.Valid {
 			hdr.Comment = comment.String
@@ -281,6 +282,9 @@ func (srv *Service) appendReports(i *internship.Internship) error {
 		}
 		if delivery.Valid {
 			hdr.Delivery = delivery.Time
+		}
+		if reviewed.Valid {
+			hdr.Reviewed = &reviewed.Time
 		}
 		i.Reports = append(i.Reports, hdr)
 	}
