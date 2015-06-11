@@ -11,7 +11,7 @@ drop table if exists sessions;
 drop table if exists password_renewal;
 drop table if exists defenses;
 drop table if exists users;
-    create table users(email text PRIMARY KEY,
+create table users(email text PRIMARY KEY,
 				  firstname text,
 				  lastname text,
 				  tel text,
@@ -77,6 +77,7 @@ create table reports(student text REFERENCES users(email) on delete cascade,
                         kind text,
                         deadline timestamp with time zone,
                         delivery timestamp with time zone,
+                        reviewed timestamp with time zone,
                         grade integer,
                         comment text,
                         private boolean,
