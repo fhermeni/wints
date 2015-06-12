@@ -295,15 +295,16 @@ Handlebars.registerHelper('defenseStatus', function(g) {
 });
 
 Handlebars.registerHelper('defenseGrade', function(g) {
-	d = new Date(g.Date)
-	if (d.getTime() < 0) {
-		return "n/a";
+	d = moment(g.Date).add(30 * g.Defenses[0].Offset)
+	grade = g.Defenses[0].Grade
+	if (grade > 0) {
+		return grade
 	}
-	var passed = d.getTime() < new Date().getTime()
-	if (g.Defenses[0].Grade == -1) {
+	var passed = d.toDate().getTime() < new Date().getTime()
+	if (grade == -1) {
 		return passed ? "?" : "-"
 	}
-	return g.Grade
+	return "-"
 });
 
 Handlebars.registerHelper('gradeAnnotation', function(r) {
@@ -379,7 +380,7 @@ Handlebars.registerHelper('reportGrade', function(r) {
 });
 
 Handlebars.registerHelper('gradeInput', function(r) {
-	if (!r.ToGrade || r.Grade < 0) {
+	if (!r.Gradeable || r.Grade <= 0) {
 		return "";
 	}
 	return r.Grade;

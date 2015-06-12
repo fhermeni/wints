@@ -922,8 +922,11 @@ function showDefense(stu) {
 	def.Gradeable = myself.Role >= 3
 		//Correct date
 	if (def.Defenses) {
-		console.log(def.Date + " " + def.Defenses[0].Offset)
+        console.log(def.Date + " " + def.Defenses[0].Offset)
 		def.Date = moment(def.Date).add(def.Defenses[0].Offset * 30, "minutes")
+		def.Remote = def.Defenses[0].Remote
+		def.Private = def.Defenses[0].Private
+		def.Grade = def.Defenses[0].Grade
 	}
 	def.Juries.forEach(function(j) {
 		if (j.Email == myself.Email) {
