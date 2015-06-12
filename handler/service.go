@@ -731,15 +731,7 @@ func getPublicSessions(srv internship.Service, mailer mail.Mailer, w http.Respon
 	}
 	pubs := make([]PublicDefenseSession, 0, 0)
 	for _, s := range sessions {
-		juries := make([]internship.User, 0, 0)
-		for _, em := range s.Juries {
-			j, err := srv.User(em)
-			if err != nil {
-				return err
-			}
-			juries = append(juries, j)
-		}
-		ps := PublicDefenseSession{Room: s.Room, Date: s.Date, Juries: juries, Defenses: make([]PublicDefense, 0, 0)}
+		ps := PublicDefenseSession{Room: s.Room, Date: s.Date, Juries: s.Juries, Defenses: make([]PublicDefense, 0, 0)}
 		for _, d := range s.Defenses {
 			i, err := srv.Internship(d.Student)
 			if err != nil {

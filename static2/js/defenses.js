@@ -35,7 +35,7 @@ function showDefenses() {
 	users(function(data) {
 		teachers = [];
 		data.filter(function(u) {
-			if (myself.Email != u.Email && u.Role != 0) {
+			if (u.Role != 0) {
 				teachers.push(u);
 			}
 		});
@@ -410,8 +410,13 @@ function save() {
 			Room: session.Room,
 			Date: session.Date.toDate(),
 			Defenses: [],
-			Juries: session.Juries
+			Juries: []
 		}
+		session.Juries.forEach(function(j) {
+			s.Juries.push({
+					Email: j
+				}) //Only the email is usefull
+		})
 		session.Students.forEach(function(stu) {
 			if (stu) {
 				d = allDefenses[stu]
@@ -433,9 +438,12 @@ function load(defs) {
 		defenseSessions.push(s);
 		drawSession(s);
 		activeSession(hash(s));
+		juries = []
 		s.Juries.forEach(function(j) {
-			drawJury(j)
+			juries.push(j.Email)
+			drawJury(j.Email)
 		});
+		s.Juries = juries
 		i = 0 //rank
 		s.Students = []
 		s.Defenses.forEach(function(def) {

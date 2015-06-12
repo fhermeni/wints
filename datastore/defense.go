@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"database/sql"
+	"log"
 
 	"github.com/fhermeni/wints/internship"
 )
@@ -119,7 +120,7 @@ func (srv *Service) appendGrade(d *internship.Defense) error {
 func (srv *Service) appendJuries(s *internship.DefenseSession) error {
 	if JuriesStmt == nil {
 		var err error
-		JuriesStmt, err = srv.DB.Prepare("select jury from defenseJuries where date=$1 and room=$2")
+		JuriesStmt, err = srv.DB.Prepare("select firstname,lastname,tel,email  from users,defenseJuries where date=$1 and room=$2 and users.email = defenseJuries.jury")
 		if err != nil {
 			return err
 		}
@@ -130,13 +131,13 @@ func (srv *Service) appendJuries(s *internship.DefenseSession) error {
 		return err
 	}
 	defer rows.Close()
-	s.Juries = make([]string, 0, 0)
+	s.Juries = make([]internship.User, 0, 0)
 	for rows.Next() {
-		var em string
-		if err = rows.Scan(&em); err != nil {
+		u := internship.User{}
+		if err = rows.Scan(&u.Firstname, &u.Lastname, &u.Tel, &u.Email); err != nil {
 			return err
 		}
-		s.Juries = append(s.Juries, em)
+		s.Juries = append(s.Juries, u)
 	}
 	return nil
 }
@@ -155,7 +156,8 @@ func (srv *Service) SetDefenseSessions(sessions []internship.DefenseSession) err
 			return rollback(err, tx)
 		}
 		for _, j := range s.Juries {
-			if _, err = tx.Exec("insert into defenseJuries(date,room,jury) values($1,$2,$3)", s.Date, s.Room, j); err != nil {
+			log.Println("J: " + j.Email)
+			if _, err = tx.Exec("insert into defenseJuries(date,room,jury) values($1,$2,$3)", s.Date, s.Room, j.Email); err != nil {
 				return rollback(err, tx)
 			}
 		}
