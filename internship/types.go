@@ -163,7 +163,7 @@ type Internship struct {
 	Lab            bool
 	Gratification  int
 	//Defense
-	Defense Defense
+	Defense DefenseSession
 }
 
 type Convention struct {
@@ -263,14 +263,32 @@ type Defense struct {
 	Private bool
 	Remote  bool
 	Grade   int
-	Date    time.Time
-	Room    string
-	Juries  []User
+	Offset  int
 }
 
-func (s Defense) InJury(em string) bool {
+type DefenseSession struct {
+	Date     time.Time
+	Room     string
+	Juries   []string
+	Defenses []Defense
+}
+
+type PublicDefense struct {
+	Date      time.Time
+	Room      string
+	Student   User
+	Private   bool
+	Remote    bool
+	Major     string
+	Promotion string
+	Company   string
+	Title     string
+	Juries    []User
+}
+
+func (s DefenseSession) InJury(em string) bool {
 	for _, j := range s.Juries {
-		if j.Email == em {
+		if j == em {
 			return true
 		}
 	}

@@ -77,37 +77,44 @@ function showDefenses() {
 function updateSessionOrder(e, li) {
 	var sid = $(li.item).closest(".session").attr("id")
 	s = getSession(sid)
-		//debugger 
 	s.Students = []
+
 	$(li.item).closest("ul").find("li").each(function(i, input) {
 			em = $(input).find("input").data("email")
-			if (!em) {
-				s.Pause = i
-			} else {
-				s.Students.push(em);
+			if (em) {
+				allDefenses[em].Offset = i
 			}
+			s.Students.push(em);
 		})
 		//Get the emails
 }
 
 function addDefenseSession() {
-	var r = $("#room").val();
+	var rooms = $("#room").val().split(" ");
 	var d = $("#date").data("DateTimePicker").date()
-	var s = {
-		Pause: -1,
-		Room: r,
-		Date: d,
-		Students: [],
-		Juries: []
-	};
-	if ($("#" + hash(s)).length > 0) {
-		$("#room").closest(".form-group").addClass("has-error");
-	} else {
+	var sessions = []
+	rooms.forEach(function(r) {
+		var s = {
+			Pause: -1,
+			Room: r,
+			Date: d,
+			Students: [],
+			Juries: []
+		};
+		if ($("#" + hash(s)).length > 0) {
+			$("#room").closest(".form-group").addClass("has-error");
+		} else {
+			sessions.push(s)
+		}
+	});
+	if (rooms.length == sessions.length) {
 		$("#room").closest(".form-group").removeClass("has-error");
 		$("#modal").modal('hide');
-		drawSession(s);
-		defenseSessions.push(s);
-		activeSession(hash(s))
+		sessions.forEach(function(s) {
+			drawSession(s);
+			defenseSessions.push(s);
+			activeSession(hash(s));
+		})
 	}
 }
 
@@ -249,9 +256,9 @@ function addStudent(d) {
 	var i = getInternship(em);
 
 	var def = {
-		Grade: -1,
 		Remote: false,
-		Private: false
+		Private: false,
+		Offset: $("#" + active).find("ul.students li").length
 	}
 	allDefenses[em] = def;
 	drawStudent(em)
@@ -290,8 +297,8 @@ function drawStudent(em) {
 function addPause() {
 	s = getSession(active)
 	if (s) {
-		s.Students.push()
 		s.Pause = s.Students.length
+		s.Students.push(undefined)
 		drawPause()
 	}
 }
@@ -302,7 +309,6 @@ function drawPause() {
 		var html = "<li><i>pause</i> <i onclick='rmPause(this)' class='glyphicon glyphicon-remove-circle pull-right'></i></li>";
 		//$("#"+active).find("ul.students").append(html)    
 		$("#" + active).find("ul.students li:nth-child(" + s.Pause + ")").after(html)
-			//$("#"+active).find("ul.students:nth-child(" + (s.Pause) + ")").after(html);
 		$("#" + active).find("ul.students").sortable().bind('sortupdate', updateSessionOrder);
 	}
 }
@@ -398,89 +404,49 @@ function availableTeachers(sid) {
 }
 
 function save() {
-	var defs = [];
-	defenseSessions.forEach(function(s) {
-		var date = s.Date
-		var i = 0
-		s.Students.forEach(function(em) {
-			x = allDefenses[em];
-			def = {
-				Student: em,
-				Room: s.Room,
-				Date: new Date(date.toDate()),
-				Juries: [],
-				Private: x.Private,
-				Remote: x.Remote,
-				Grade: x.Grade
+	ss = [];
+	defenseSessions.forEach(function(session) {
+		s = {
+			Room: session.Room,
+			Date: session.Date.toDate(),
+			Defenses: [],
+			Juries: session.Jury
+		}
+		session.Students.forEach(function(stu) {
+			if (stu) {
+				d = allDefenses[stu]
+				d.Student = stu
+				s.Defenses.push(d)
 			}
-			s.Juries.forEach(function(u) {
-				def.Juries.push({
-					Email: u
-				})
-			})
-			defs.push(def)
-			date = date.add(30, "minutes");
-			i++
-			if (i == s.Pause) {
-				date = date.add(30, "minutes");
-			}
-		});
-	});
-	postDefenses(defs)
+		})
+		ss.push(s)
+	})
+	postDefenses(ss)
 }
 
 function load(defs) {
 	active = undefined
 	allDefenses = {}
 	defenseSessions = []
-	var i = 0
-	var prevEnd;
-	defs.forEach(function(x) {
-		//Which session   
-		d = moment(new Date(x.Date))
-		if (d.hour() < 13) {
-			//Session ends late but in the morning
-			d.hour(9)
-		}
-		s = {
-			Room: x.Room,
-			Juries: [],
-			Date: d,
-			Students: []
-		}
-		sId = hash(s);
-		session = getSession(sId);
-		if (!session) {
-			i = 0 //new session
-			prevEnd = undefined
-			defenseSessions.push(s);
-			session = s;
-			drawSession(session)
-			activeSession(hash(session))
-			x.Juries.forEach(function(j) {
-				s.Juries.push(j.Email)
-				drawJury(j.Email)
-			});
-		}
-		def = {
-			Date: moment(new Date(x.Date)),
-			Remote: x.Remote,
-			Private: x.Private,
-			Grade: x.Grade
-		}
-		prev = session.Students[session.Students.length - 1]
-		if (prev) {
-			prevDate = moment(allDefenses[prev].Date.toDate())
-			prevDate.add(30, "minutes")
-			if (prevDate.format("HH:mm") != def.Date.format("HH:mm")) {
-				session.Pause = i
-				drawPause()
+	defs.forEach(function(s) {
+		s.Date = moment(s.Date)
+		defenseSessions.push(s);
+		drawSession(s);
+		activeSession(hash(s));
+		s.Juries.forEach(function(j) {
+			drawJury(j.Email)
+		});
+		i = 0 //rank
+		s.Students = []
+		s.Defenses.forEach(function(def) {
+			if (def.Offset != s.Students.length) {
+				addPause()
 			}
-		}
-		session.Students.push(x.Student)
-		students.remove(getInternship(x.Student))
-		allDefenses[x.Student] = def
-		drawStudent(x.Student)
-		i++
-	})
+			s.Students.push(def.Student);
+			students.remove(getInternship(def.Student))
+			allDefenses[def.Student] = def;
+			drawStudent(def.Student)
+		});
+		delete s.Defenses
+	});
 }

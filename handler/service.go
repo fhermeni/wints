@@ -45,7 +45,7 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string) Servic
 	http.Handle("/", s.r)
 	s.r.HandleFunc("/", mon(home(backend))).Methods("GET")
 	s.r.HandleFunc("/statistics", mon(stats())).Methods("GET")
-	s.r.HandleFunc("/defense-program", mon(defenseProgram())).Methods("GET")
+	//s.r.HandleFunc("/defense-program", mon(defenseProgram())).Methods("GET")
 	s.r.HandleFunc("/api/v1/surveys/{token}", surveyFromToken(backend)).Methods("GET")
 	s.r.HandleFunc("/api/v1/surveys/{token}", setSurveyContent(backend)).Methods("POST")
 	s.r.HandleFunc("/api/v1/statistics/", mon(statistics(backend))).Methods("GET")
@@ -673,28 +673,28 @@ func hideStudent(srv internship.Service, mailer mail.Mailer, w http.ResponseWrit
 func defenseMngt(s Service, mailer mail.Mailer) {
 	s.r.HandleFunc("/api/v1/defenses/", restHandler(getDefenses, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/defenses/", restHandler(postDefenses, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/program/", restHandler(getPublicSessions, s, mailer)).Methods("GET")
+	//s.r.HandleFunc("/api/v1/program/", restHandler(getPublicSessions, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/internships/{email}/defense", restHandler(getDefense, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/internships/{email}/defense/grade", restHandler(setDefenseGrade, s, mailer)).Methods("POST")
 }
 
 func getDefenses(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
-	defs, err := srv.Defenses()
+	defs, err := srv.DefenseSessions()
 	return writeJSONIfOk(err, w, r, defs)
 }
 
 func postDefenses(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
-	var defs []internship.Defense
+	var defs []internship.DefenseSession
 	err := jsonRequest(w, r, &defs)
 	if err != nil {
 		return err
 	}
-	return srv.SetDefenses(defs)
+	return srv.SetDefenseSessions(defs)
 }
 
 func getDefense(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	em := mux.Vars(r)["email"]
-	def, err := srv.Defense(em)
+	def, err := srv.DefenseSession(em)
 	return writeJSONIfOk(err, w, r, def)
 }
 
@@ -708,7 +708,7 @@ func setDefenseGrade(srv internship.Service, mailer mail.Mailer, w http.Response
 	return srv.SetDefenseGrade(em, g)
 }
 
-type PublicDefense struct {
+/*type PublicDefense struct {
 	Student internship.User
 	Major   string
 	Private bool
@@ -757,4 +757,4 @@ func defenseProgram() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, path+"/defense-program.html")
 	}
-}
+}*/

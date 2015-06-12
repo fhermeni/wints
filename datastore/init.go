@@ -2,6 +2,7 @@ package datastore
 
 const (
 	create = `
+drop table if exists defenseGrades;
 drop table if exists defenses;
 drop table if exists defenseJuries;
 drop table if exists defenses;
@@ -12,7 +13,7 @@ drop table if exists internships;
 drop table if exists conventions;
 drop table if exists sessions;
 drop table if exists password_renewal;
-drop table if exists defenses;
+drop table if exists defenseSessions;
 drop table if exists users;
 create table users(email text PRIMARY KEY,
 				  firstname text,
@@ -98,18 +99,34 @@ create table surveys(student text REFERENCES users(email) on delete cascade,
                         constraint pk_surveys PRIMARY KEY(student, kind)
 );
 
+create table defenseSessions(
+    date timestamp with time zone,
+    room text,
+    constraint pk_defenseSessions PRIMARY KEY(date,room)
+);
+
 create table defenses(
     date timeStamp with time zone,
-    room text,
+    room text,    
     student text PRIMARY KEY REFERENCES internships(student),
+    rank integer,
     grade integer,
     private bool,
-    remote bool    
+    remote bool,
+    constraint defenses_ref_defenseSessions FOREIGN KEY (date, room) REFERENCES defenseSessions(date,room) on delete cascade
+);
+
+create table defenseGrades (
+    student text PRIMARY KEY references internships(student),
+    grade int
 );
 
 create table juries(
+    date timeStamp with time zone,
+    room text,    
     student text REFERENCES defenses(student) on delete cascade,
-    jury text REFERENCES users(email)    
+    jury text REFERENCES users(email),
+    constraint juries_ref_defenseSessions FOREIGN KEY (date, room) REFERENCES defenseSessions(date,room) on delete cascade    
 );
 
 create table password_renewal(

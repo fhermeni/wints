@@ -262,12 +262,12 @@ func (cache *Cache) HideStudent(em string, st bool) error {
 	return cache.backend.HideStudent(em, st)
 }
 
-func (cache *Cache) Defenses() ([]internship.Defense, error) {
-	return cache.backend.Defenses()
+func (cache *Cache) DefenseSessions() ([]internship.DefenseSession, error) {
+	return cache.backend.DefenseSessions()
 }
 
-func (cache *Cache) Defense(student string) (internship.Defense, error) {
-	return cache.backend.Defense(student)
+func (cache *Cache) DefenseSession(student string) (internship.DefenseSession, error) {
+	return cache.backend.DefenseSession(student)
 }
 
 func (cache *Cache) SetDefenseGrade(student string, g int) error {
@@ -275,7 +275,7 @@ func (cache *Cache) SetDefenseGrade(student string, g int) error {
 	return cache.backend.SetDefenseGrade(student, g)
 }
 
-func (cache *Cache) SetDefenses(defs []internship.Defense) error {
+func (cache *Cache) SetDefenseSessions(defs []internship.DefenseSession) error {
 	cache.hot.Set(false)
-	return cache.backend.SetDefenses(defs)
+	return cache.backend.SetDefenseSessions(defs)
 }

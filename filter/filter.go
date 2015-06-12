@@ -342,15 +342,15 @@ func (s *Service) HideStudent(em string, st bool) error {
 }
 
 //Defenses
-func (s *Service) Defenses() ([]internship.Defense, error) {
+func (s *Service) DefenseSessions() ([]internship.DefenseSession, error) {
 	if s.my.Role >= internship.ADMIN {
-		return s.srv.Defenses()
+		return s.srv.DefenseSessions()
 	} else if s.my.Role != internship.NONE {
-		sessions, err := s.srv.Defenses()
+		sessions, err := s.srv.DefenseSessions()
 		if err != nil {
-			return []internship.Defense{}, err
+			return []internship.DefenseSession{}, err
 		}
-		mySessions := make([]internship.Defense, 0, 0)
+		mySessions := make([]internship.DefenseSession, 0, 0)
 		for _, session := range sessions {
 			if session.InJury(s.my.Email) {
 				mySessions = append(mySessions, session)
@@ -358,14 +358,14 @@ func (s *Service) Defenses() ([]internship.Defense, error) {
 		}
 		return mySessions, nil
 	}
-	return []internship.Defense{}, ErrPermission
+	return []internship.DefenseSession{}, ErrPermission
 }
 
-func (s *Service) Defense(student string) (internship.Defense, error) {
+func (s *Service) DefenseSession(student string) (internship.DefenseSession, error) {
 	if s.mine(student) || s.my.Role >= internship.MAJOR {
-		return s.srv.Defense(student)
+		return s.srv.DefenseSession(student)
 	}
-	return internship.Defense{}, ErrPermission
+	return internship.DefenseSession{}, ErrPermission
 }
 
 func (s *Service) SetDefenseGrade(student string, g int) error {
@@ -373,7 +373,7 @@ func (s *Service) SetDefenseGrade(student string, g int) error {
 	if s.my.Role >= internship.ADMIN {
 		return s.srv.SetDefenseGrade(student, g)
 	}
-	def, err := s.Defense(student)
+	def, err := s.DefenseSession(student)
 	if err != nil {
 		return err
 	}
@@ -383,9 +383,9 @@ func (s *Service) SetDefenseGrade(student string, g int) error {
 	return ErrPermission
 }
 
-func (s *Service) SetDefenses(defs []internship.Defense) error {
+func (s *Service) SetDefenseSessions(defs []internship.DefenseSession) error {
 	if s.my.Role >= internship.ADMIN {
-		return s.srv.SetDefenses(defs)
+		return s.srv.SetDefenseSessions(defs)
 	}
 	return ErrPermission
 }
