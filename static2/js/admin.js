@@ -296,8 +296,6 @@ function pickBestStudentMatching(student, students) {
 	r = r.replace(new RegExp(/[ùúûü]/g), "u");
 	r = r.replace(new RegExp(/[ýÿ]/g), "y");
 	students.forEach(function(s) {
-		//email match
-		//console.log(i.Student.Lastname + "<->" + r)
 		if (s.Lastname == r) {
 			best = s.Email;
 			return false;
@@ -922,7 +920,6 @@ function showDefense(stu) {
 	def.Gradeable = myself.Role >= 3
 		//Correct date
 	if (def.Defenses) {
-        console.log(def.Date + " " + def.Defenses[0].Offset)
 		def.Date = moment(def.Date).add(def.Defenses[0].Offset * 30, "minutes")
 		def.Remote = def.Defenses[0].Remote
 		def.Private = def.Defenses[0].Private
