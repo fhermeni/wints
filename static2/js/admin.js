@@ -920,6 +920,11 @@ function showDefense(stu) {
 	def = i.Defense
 	def.Student = i.Student
 	def.Gradeable = myself.Role >= 3
+		//Correct date
+	if (def.Defenses) {
+		console.log(def.Date + " " + def.Defenses[0].Offset)
+		def.Date = moment(def.Date).add(def.Defenses[0].Offset * 30, "minutes")
+	}
 	def.Juries.forEach(function(j) {
 		if (j.Email == myself.Email) {
 			def.Gradeable = true
