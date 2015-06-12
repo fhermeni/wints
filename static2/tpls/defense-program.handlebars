@@ -1,5 +1,5 @@
+{{#if this}}
 <div style="@media print{@page {size: landscape}}">
-{{#if}}
 {{#each this}}
 <h3 class="text-center">{{longDate this.Date}}</h3>
 <h4>Salle: {{Room}}</h4>
@@ -29,5 +29,5 @@
 {{/each}}
 </div>
 {{else}}
-<h1 class="text-center">Nothing for the moment. Stay tuned.</h1>
+<h1> Soon come ...</h1>
 {{/if}}
