@@ -122,8 +122,10 @@ function rmSession() {
 	s = getSession(active);
 	activeSession(active)
 	s.Students.forEach(function(stu) {
-		students.push(getInternship(stu));
-		delete allDefenses[stu]
+		if (stu) {
+			students.push(getInternship(stu));
+			delete allDefenses[stu]
+		}
 	});
 	$("#" + hash(s)).remove()
 	defenseSessions.remove(s)
@@ -169,29 +171,32 @@ function saveDefenseSession() {
 		Room: newRoom,
 		Date: newDate,
 		Juries: oldSession.Juries.slice(),
-		Students: oldSession.Defenses.slice()
+		Students: oldSession.Students.slice()
 	};
 	if (hash(oldSession) != hash(newSession) && $("#" + hash(newSession)).length > 0) {
+		//new ID but it already exists
 		$("#room").closest(".form-group").addClass("has-error");
+		console.log("no way")
 		return
 	}
 	$("#room").closest(".form-group").removeClass("has-error");
 	$("#modal").modal('hide');
+
 	var oldPeriod = oldSession.Date.hour() < 12 ? "am" : "pm";
 
 	if (oldPeriod != newPeriod || newDay != oldSession.Date.date()) {
 		rmSession(oldSession)
 		drawSession(newSession)
 	} else {
-		//Just the room change,         
+		console.log("new stuff")
+			//Just the room change,         
 		var d = $("#" + active);
 		d.find(".room").html(newRoom)
 		d.find(".date").html(newDate.format("D MMM - HH:mm"))
 		d.attr("id", hash(newSession))
 		d.attr("onclick", "activeSession(\"" + hash(newSession) + "\")")
 	}
-	defenseSessions.push(newSession);
-	activeSession(hash(newSession))
+
 }
 
 function showNewSession() {
