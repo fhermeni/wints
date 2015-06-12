@@ -119,7 +119,7 @@ func (srv *Service) appendGrade(d *internship.Defense) error {
 func (srv *Service) appendJuries(s *internship.DefenseSession) error {
 	if JuriesStmt == nil {
 		var err error
-		JuriesStmt, err = srv.DB.Prepare("select date,room,jury from juries where date=$1 and room=$2")
+		JuriesStmt, err = srv.DB.Prepare("select jury from defenseJuries where date=$1 and room=$2")
 		if err != nil {
 			return err
 		}

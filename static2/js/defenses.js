@@ -410,7 +410,7 @@ function save() {
 			Room: session.Room,
 			Date: session.Date.toDate(),
 			Defenses: [],
-			Juries: session.Jury
+			Juries: session.Juries
 		}
 		session.Students.forEach(function(stu) {
 			if (stu) {
@@ -434,7 +434,7 @@ function load(defs) {
 		drawSession(s);
 		activeSession(hash(s));
 		s.Juries.forEach(function(j) {
-			drawJury(j.Email)
+			drawJury(j)
 		});
 		i = 0 //rank
 		s.Students = []
