@@ -2,7 +2,6 @@ package datastore
 
 import (
 	"database/sql"
-	"log"
 
 	"github.com/fhermeni/wints/internship"
 )
@@ -156,7 +155,6 @@ func (srv *Service) SetDefenseSessions(sessions []internship.DefenseSession) err
 			return rollback(err, tx)
 		}
 		for _, j := range s.Juries {
-			log.Println("J: " + j.Email)
 			if _, err = tx.Exec("insert into defenseJuries(date,room,jury) values($1,$2,$3)", s.Date, s.Room, j.Email); err != nil {
 				return rollback(err, tx)
 			}

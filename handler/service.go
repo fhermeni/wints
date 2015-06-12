@@ -351,8 +351,6 @@ func setReportContent(srv internship.Service, mailer mail.Mailer, w http.Respons
 		if err == nil {
 			if i, err := srv.Internship(em); err == nil {
 				mailer.SendReportUploaded(i.Student, i.Tutor, k)
-			} else {
-				log.Println("Bwa: " + err.Error() + em)
 			}
 		} else {
 			log.Println("No mail since: " + err.Error())
