@@ -45,7 +45,7 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string) Servic
 	http.Handle("/", s.r)
 	s.r.HandleFunc("/", mon(home(backend))).Methods("GET")
 	s.r.HandleFunc("/statistics", mon(stats())).Methods("GET")
-	//s.r.HandleFunc("/defense-program", mon(defenseProgram())).Methods("GET")
+	s.r.HandleFunc("/defense-program", mon(defenseProgram())).Methods("GET")
 	s.r.HandleFunc("/api/v1/surveys/{token}", surveyFromToken(backend)).Methods("GET")
 	s.r.HandleFunc("/api/v1/surveys/{token}", setSurveyContent(backend)).Methods("POST")
 	s.r.HandleFunc("/api/v1/statistics/", mon(statistics(backend))).Methods("GET")
@@ -673,7 +673,7 @@ func hideStudent(srv internship.Service, mailer mail.Mailer, w http.ResponseWrit
 func defenseMngt(s Service, mailer mail.Mailer) {
 	s.r.HandleFunc("/api/v1/defenses/", restHandler(getDefenses, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/defenses/", restHandler(postDefenses, s, mailer)).Methods("POST")
-	//s.r.HandleFunc("/api/v1/program/", restHandler(getPublicSessions, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/program/", restHandler(getPublicSessions, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/internships/{email}/defense", restHandler(getDefense, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/internships/{email}/defense/grade", restHandler(setDefenseGrade, s, mailer)).Methods("POST")
 }
@@ -708,47 +708,55 @@ func setDefenseGrade(srv internship.Service, mailer mail.Mailer, w http.Response
 	return srv.SetDefenseGrade(em, g)
 }
 
-/*type PublicDefense struct {
+type PublicDefenseSession struct {
+	Juries   []internship.User
+	Date     time.Time
+	Room     string
+	Defenses []PublicDefense
+}
+type PublicDefense struct {
 	Student internship.User
 	Major   string
 	Private bool
 	Remote  bool
 	Company string
 	Title   string
-	Juries  []internship.User
-	Date    time.Time
-	Room    string
+	Offset  int
 }
 
 func getPublicSessions(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
-	defs, err := srv.Defenses()
+	sessions, err := srv.DefenseSessions()
 	if err != nil {
 		return err
 	}
-	pubs := make([]PublicDefense, 0, 0)
-	for _, d := range defs {
-		i, err := srv.Internship(d.Student)
-		i.Student.Email = "" //hide stome stuff
-		if err != nil {
-			return err
+	pubs := make([]PublicDefenseSession, 0, 0)
+	for _, s := range sessions {
+		juries := make([]internship.User, 0, 0)
+		for _, em := range s.Juries {
+			j, err := srv.User(em)
+			if err != nil {
+				return err
+			}
+			juries = append(juries, j)
 		}
-		x := 0
-		for x < len(d.Juries) {
-			d.Juries[x].Email = ""
-			x++
+		ps := PublicDefenseSession{Room: s.Room, Date: s.Date, Juries: juries, Defenses: make([]PublicDefense, 0, 0)}
+		for _, d := range s.Defenses {
+			i, err := srv.Internship(d.Student)
+			if err != nil {
+				return err
+			}
+			p := PublicDefense{
+				Student: i.Student,
+				Major:   i.Major,
+				Private: d.Private,
+				Remote:  d.Remote,
+				Company: i.Cpy.Name,
+				Title:   i.Title,
+				Offset:  d.Offset,
+			}
+			ps.Defenses = append(ps.Defenses, p)
 		}
-		p := PublicDefense{
-			Student: i.Student,
-			Major:   i.Major,
-			Private: d.Private,
-			Remote:  d.Remote,
-			Company: i.Cpy.Name,
-			Title:   i.Title,
-			Date:    d.Date,
-			Room:    d.Room,
-			Juries:  d.Juries,
-		}
-		pubs = append(pubs, p)
+		pubs = append(pubs, ps)
 	}
 	return writeJSONIfOk(err, w, r, pubs)
 }
@@ -757,4 +765,4 @@ func defenseProgram() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, path+"/defense-program.html")
 	}
-}*/
+}

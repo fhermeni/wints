@@ -2,12 +2,17 @@
 {{#each this}}
 <h3 class="text-center">{{longDate this.Date}}</h3>
 <h4>Salle: {{Room}}</h4>
-<h4>Jury</h4>
-<p>
-{{#each Juries}}
-<span class="fn">{{fullname this}}</span>{{#unless @last}}, {{/unless}}
-{{/each}}
-</p>
+<h4>Jury:
+<small>
+{{#if Juries}}
+	{{#each Juries}}
+	<span class="fn">{{fullname this}}</span>{{#unless @last}}, {{/unless}}
+	{{/each}}
+{{else}}
+	<span class="fn">TBA.</span>
+{{/if}}	
+</small>
+</h4>
 <h4>Agenda</h4>
 <div style="page-break-after: always;"> 
 	{{#each Defenses}}
