@@ -12,6 +12,7 @@ import (
 
 var ReportSelectStmt *sql.Stmt
 var SurveySelectStmt *sql.Stmt
+var InternshipStmt *sql.Stmt
 
 func rollback(e error, tx *sql.Tx) error {
 	err := tx.Rollback()
@@ -146,8 +147,15 @@ func (srv *Service) SetPromotion(stu, p string) error {
 }
 
 func (srv *Service) Internship(stu string) (internship.Internship, error) {
-	sql := "select creation, male, stu.firstname, stu.lastname, stu.email, stu.tel, promotion, major, tut.firstname, tut.lastname, tut.email, tut.tel, tut.role, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, startTime, endTime, company, companyWWW, nextPosition, nextContact, foreignCountry, lab, gratification from internships, users as stu, users as tut where internships.tutor=tut.email and internships.student = stu.email and stu.email = $1"
-	rows, err := srv.DB.Query(sql, stu)
+	if InternshipStmt == nil {
+		var err error
+		InternshipStmt, err = srv.DB.Prepare("select creation, male, stu.firstname, stu.lastname, stu.email, stu.tel, promotion, major, tut.firstname, tut.lastname, tut.email, tut.tel, tut.role, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, startTime, endTime, company, companyWWW, nextPosition, nextContact, foreignCountry, lab, gratification from internships, users as stu, users as tut where internships.tutor=tut.email and internships.student = stu.email and stu.email = $1")
+		if err != nil {
+			return internship.Internship{}, err
+		}
+	}
+
+	rows, err := InternshipStmt.Query(stu)
 	if err != nil || !rows.Next() {
 		return internship.Internship{}, internship.ErrUnknownInternship
 	}
