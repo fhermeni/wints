@@ -145,9 +145,31 @@ function refresh() {
 		showDefenses();
 	} else if (currentPage == "defense-program") {
 		showDefenseProgram()
+	} else if (currentPage == "myDefenses") {
+		showMyDefenses()
 	} else {
 		console.log("Unsupported operation on '" + currentPage + "'");
 	}
+}
+
+function showMyDefenses() {
+	defenses(function(ss) {
+		ss = ss.filter(function(s) {
+			ok = false
+			s.Juries.forEach(function(j) {
+				if (j.Email == myself.Email) {
+					ok = true
+					return false;
+				}
+			})
+			return ok
+		});
+		console.log(ss)
+		var html = Handlebars.getTemplate("jury")(ss);
+		var root = $("#cnt");
+		root.html(html);
+		root.find(":checkbox").icheck();
+	});
 }
 
 function showStatus() {
