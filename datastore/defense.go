@@ -11,7 +11,6 @@ var JuryUsersStmt *sql.Stmt
 var DefStmt *sql.Stmt
 var DefsStmt *sql.Stmt
 var SessionsStmt *sql.Stmt
-var GradeStmt *sql.Stmt
 var pubDefStmt *sql.Stmt
 
 func (srv *Service) DefenseSession(student string) (internship.DefenseSession, error) {
@@ -19,7 +18,7 @@ func (srv *Service) DefenseSession(student string) (internship.DefenseSession, e
 	session := internship.DefenseSession{}
 	def := internship.Defense{}
 	if DefStmt == nil {
-		if DefStmt, err = srv.DB.Prepare("select student,date,room,rank,private,remote from defenses where student=$1"); err != nil {
+		if DefStmt, err = srv.DB.Prepare("select defenses.student,date,room,rank,private,remote,defenseGrades.grade from defenses left outer join defenseGrades on defenses.student=defenseGrades.student where defenses.student=$1"); err != nil {
 			return session, err
 		}
 	}
@@ -28,12 +27,13 @@ func (srv *Service) DefenseSession(student string) (internship.DefenseSession, e
 		return session, err
 	}
 	defer rows.Close()
+	var grade sql.NullInt64
 	if rows.Next() {
-		if err = rows.Scan(&def.Student, &session.Date, &session.Room, &def.Offset, &def.Private, &def.Remote); err != nil {
+		if err = rows.Scan(&def.Student, &session.Date, &session.Room, &def.Offset, &def.Private, &def.Remote, &grade); err != nil {
 			return session, nil
 		}
-		if err = srv.appendGrade(&def); err != nil {
-			return session, err
+		if grade.Valid {
+			def.Grade = int(grade.Int64)
 		}
 		session.Defenses = []internship.Defense{def}
 	}
@@ -75,7 +75,7 @@ func (srv *Service) appendDefenses(s *internship.DefenseSession) error {
 	s.Defenses = make([]internship.Defense, 0, 0)
 	var err error
 	if DefsStmt == nil {
-		if DefsStmt, err = srv.DB.Prepare("select student,rank,private,remote from defenses where date=$1 and room=$2 order by rank"); err != nil {
+		if DefsStmt, err = srv.DB.Prepare("select defenses.student,rank,private,remote,defenseGrades.grade from defenses left outer join defenseGrades on defenses.student=defenseGrades.student where date=$1 and room=$2 order by rank"); err != nil {
 			return err
 		}
 	}
@@ -86,41 +86,22 @@ func (srv *Service) appendDefenses(s *internship.DefenseSession) error {
 	defer rows.Close()
 	for rows.Next() {
 		def := internship.Defense{}
-		if err = rows.Scan(&def.Student, &def.Offset, &def.Private, &def.Remote); err != nil {
+		var grade sql.NullInt64
+		if err = rows.Scan(&def.Student, &def.Offset, &def.Private, &def.Remote, &grade); err != nil {
 			return err
 		}
-		if err = srv.appendGrade(&def); err != nil {
-			return err
+		if grade.Valid {
+			def.Grade = int(grade.Int64)
 		}
 		s.Defenses = append(s.Defenses, def)
 	}
 	return err
 }
 
-func (srv *Service) appendGrade(d *internship.Defense) error {
-	var err error
-	if GradeStmt == nil {
-		if GradeStmt, err = srv.DB.Prepare("select grade from defenseGrades where student=$1"); err != nil {
-			return err
-		}
-	}
-	rows, err := GradeStmt.Query(d.Student)
-	if err != nil {
-		return err
-	}
-	if rows.Next() {
-		var g sql.NullInt64
-		rows.Scan(&g)
-		if g.Valid {
-			d.Grade = int(g.Int64)
-		}
-	}
-	return nil
-}
 func (srv *Service) appendJuries(s *internship.DefenseSession) error {
 	if JuriesStmt == nil {
 		var err error
-		JuriesStmt, err = srv.DB.Prepare("select firstname,lastname,tel,email  from users,defenseJuries where date=$1 and room=$2 and users.email = defenseJuries.jury")
+		JuriesStmt, err = srv.DB.Prepare("select firstname,lastname,tel,email from users inner join defenseJuries on users.email = defenseJuries.jury where date=$1 and room=$2")
 		if err != nil {
 			return err
 		}
