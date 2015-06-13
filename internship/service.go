@@ -115,6 +115,7 @@ type Service interface {
 	//SetDefenseSessions saves all the defense sessions
 	SetDefenseSessions(defs []DefenseSession) error
 
+	PublicDefenseSessions() ([]PublicDefenseSession, error)
 	DefenseSession(student string) (DefenseSession, error)
 	//SetDefenseGrade Set the grade for a given defense
 	SetDefenseGrade(student string, g int) error

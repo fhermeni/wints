@@ -389,3 +389,7 @@ func (s *Service) SetDefenseSessions(defs []internship.DefenseSession) error {
 	}
 	return ErrPermission
 }
+
+func (s *Service) PublicDefenseSessions() ([]internship.PublicDefenseSession, error) {
+	return s.srv.PublicDefenseSessions()
+}

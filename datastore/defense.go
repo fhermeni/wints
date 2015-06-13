@@ -188,3 +188,33 @@ func (srv *Service) SetDefenseGrade(stu string, g int) error {
 	_, err = srv.DB.Exec(sql, stu, g)
 	return err
 }
+
+func (srv *Service) PublicDefenseSessions() ([]internship.PublicDefenseSession, error) {
+	sessions, err := srv.DefenseSessions()
+	pubs := make([]internship.PublicDefenseSession, 0, 0)
+	if err != nil {
+		return pubs, err
+	}
+
+	for _, s := range sessions {
+		ps := internship.PublicDefenseSession{Room: s.Room, Date: s.Date, Juries: s.Juries, Defenses: make([]internship.PublicDefense, 0, 0)}
+		for _, d := range s.Defenses {
+			i, err := srv.Internship(d.Student)
+			if err != nil {
+				return pubs, err
+			}
+			p := internship.PublicDefense{
+				Student: i.Student,
+				Major:   i.Major,
+				Private: d.Private,
+				Remote:  d.Remote,
+				Company: i.Cpy.Name,
+				Title:   i.Title,
+				Offset:  d.Offset,
+			}
+			ps.Defenses = append(ps.Defenses, p)
+		}
+		pubs = append(pubs, ps)
+	}
+	return pubs, err
+}

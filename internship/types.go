@@ -273,6 +273,22 @@ type DefenseSession struct {
 	Defenses []Defense
 }
 
+type PublicDefenseSession struct {
+	Juries   []User
+	Date     time.Time
+	Room     string
+	Defenses []PublicDefense
+}
+type PublicDefense struct {
+	Student User
+	Major   string
+	Private bool
+	Remote  bool
+	Company string
+	Title   string
+	Offset  int
+}
+
 func (s DefenseSession) InJury(em string) bool {
 	for _, j := range s.Juries {
 		if j.Email == em {

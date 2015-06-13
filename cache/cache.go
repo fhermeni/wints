@@ -266,6 +266,10 @@ func (cache *Cache) DefenseSessions() ([]internship.DefenseSession, error) {
 	return cache.backend.DefenseSessions()
 }
 
+func (cache *Cache) PublicDefenseSessions() ([]internship.PublicDefenseSession, error) {
+	return cache.backend.PublicDefenseSessions()
+}
+
 func (cache *Cache) DefenseSession(student string) (internship.DefenseSession, error) {
 	return cache.backend.DefenseSession(student)
 }
