@@ -12,6 +12,7 @@ var DefStmt *sql.Stmt
 var DefsStmt *sql.Stmt
 var SessionsStmt *sql.Stmt
 var GradeStmt *sql.Stmt
+var pubDefStmt *sql.Stmt
 
 func (srv *Service) DefenseSession(student string) (internship.DefenseSession, error) {
 	var err error
@@ -196,21 +197,33 @@ func (srv *Service) PublicDefenseSessions() ([]internship.PublicDefenseSession, 
 		return pubs, err
 	}
 
+	if pubDefStmt == nil {
+		var err error
+		pubDefStmt, err = srv.DB.Prepare("select firstname,lastname,tel,email, title, company, major, promotion from internships,users where internships.student=$1 and users.email=$1")
+		if err != nil {
+			return pubs, err
+		}
+	}
+
 	for _, s := range sessions {
 		ps := internship.PublicDefenseSession{Room: s.Room, Date: s.Date, Juries: s.Juries, Defenses: make([]internship.PublicDefense, 0, 0)}
 		for _, d := range s.Defenses {
-			i, err := srv.Internship(d.Student)
+			stu := internship.User{}
+			var title, cpy, major, promotion string
+			row := pubDefStmt.QueryRow(d.Student)
+			err = row.Scan(&stu.Firstname, &stu.Lastname, &stu.Tel, &stu.Email, &title, &cpy, &major, &promotion)
 			if err != nil {
 				return pubs, err
 			}
 			p := internship.PublicDefense{
-				Student: i.Student,
-				Major:   i.Major,
-				Private: d.Private,
-				Remote:  d.Remote,
-				Company: i.Cpy.Name,
-				Title:   i.Title,
-				Offset:  d.Offset,
+				Student:   stu,
+				Major:     major,
+				Promotion: promotion,
+				Private:   d.Private,
+				Remote:    d.Remote,
+				Company:   cpy,
+				Title:     title,
+				Offset:    d.Offset,
 			}
 			ps.Defenses = append(ps.Defenses, p)
 		}

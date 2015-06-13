@@ -280,13 +280,14 @@ type PublicDefenseSession struct {
 	Defenses []PublicDefense
 }
 type PublicDefense struct {
-	Student User
-	Major   string
-	Private bool
-	Remote  bool
-	Company string
-	Title   string
-	Offset  int
+	Student   User
+	Promotion string
+	Major     string
+	Private   bool
+	Remote    bool
+	Company   string
+	Title     string
+	Offset    int
 }
 
 func (s DefenseSession) InJury(em string) bool {
