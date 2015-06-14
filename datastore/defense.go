@@ -39,6 +39,10 @@ func (srv *Service) DefenseSession(student string) (internship.DefenseSession, e
 		if grade.Valid {
 			def.Grade = int(grade.Int64)
 		}
+		def.Surveys, err = srv.surveys(student)
+		if err != nil {
+			return session, nil
+		}
 		session.Defenses = []internship.Defense{def}
 	}
 	err = srv.appendJuries(&session)
@@ -100,6 +104,10 @@ func (srv *Service) appendDefenses(s *internship.DefenseSession) error {
 		def.Cpy = cpy
 		if grade.Valid {
 			def.Grade = int(grade.Int64)
+		}
+		def.Surveys, err = srv.surveys(def.Student.Email)
+		if err != nil {
+			return err
 		}
 		s.Defenses = append(s.Defenses, def)
 	}

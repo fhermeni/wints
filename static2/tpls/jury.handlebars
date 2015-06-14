@@ -18,18 +18,24 @@
 
 {{#each this}}
 <h5>{{dateFmt Date "D MMM YYYY HH:mm"}}; Room {{Room}}</h5>
-<h5>Jury: {{#each Juries}}{{/each}}</h5>
+<h5>Jury: {{#if Juries}}
+    {{#each Juries}}
+    <span class="fn">{{fullname this}}</span>{{#unless @last}}, {{/unless}}
+    {{/each}}
+{{else}}
+    <span class="fn">TBA.</span>
+{{/if}} 
+</h5>
 <table class="table table-hover tablesorter" id="table-conventions">
             <thead>
     <tr>
-        <th class="sorter-false" rowspan="2">
-        <input type='checkbox' data-toggle='checkbox' class='icheckbox_flat check_all'/>
-        </th>
-        <th rowspan="2">Student</th>
-        <th rowspan="2">Promotion</th>
-        <th rowspan="2">Major</th>        
-        <th rowspan="2" class="sorter-false">Company</th>        
-        <th rowspan="2" class="sorter-false text-center">Surveys</th>        
+        <th class="sorter-false"></th>
+        <th>Time</th>
+        <th>Student</th>
+        <th>Promotion</th>        
+        <th>Company</th>          
+        <th>Surveys</th>
+        <th>Grade</th>
     </tr>
     </thead>
     <tbody> 
@@ -38,13 +44,17 @@
             <td>
             <input type='checkbox' class='icheckbox_flat' data-email='{{Email}}'/>  
             </td>
+            <td>{{offset ../Date Offset}}</td>
             <td>
-            <a class='click fn' onclick="showInternship('{{Student}}')">{{shortFullname Student}}</a>
+            <a class='click fn' onclick="showDefense('{{Student}}')">{{shortFullname Student}}</a>
             </td>
-            <td></td>
-            <td></td>
-            <td></td>            
-            <td></td>            
+            <td>{{Promotion}}/{{Major}}</td>            
+            <td>{{company Cpy}}</td>            
+            <td>{{#each Surveys}}
+            <a onclick="window.open('/surveys/{{Kind}}?student={{../Student.Email}}&kind={{Kind}}','_blank')" class="badge {{surveyStatus this}}">{{Kind}}</a>
+            {{/each}}
+            </td>
+            <td>{{defenseGrade ../this }}</td>            
         </tr>    
         {{/each}}
     </tbody>

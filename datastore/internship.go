@@ -169,7 +169,7 @@ func (srv *Service) Internship(stu string) (internship.Internship, error) {
 		return internship.Internship{}, err
 	}
 
-	err = srv.appendSurveys(&i)
+	i.Surveys, err = srv.surveys(i.Student.Email)
 	if err != nil {
 		return internship.Internship{}, err
 	}
@@ -215,21 +215,21 @@ func scanInternship(r *sql.Rows) (internship.Internship, error) {
 	return i, err
 }
 
-func (srv *Service) appendSurveys(i *internship.Internship) error {
+func (srv *Service) surveys(stu string) ([]internship.Survey, error) {
+	surveys := make([]internship.Survey, 0, 0)
 	if SurveySelectStmt == nil {
 		var err error
 		SurveySelectStmt, err = srv.DB.Prepare("select kind, answers, deadline, timestamp, token from surveys where student=$1 order by deadline")
 		if err != nil {
-			return err
+			return surveys, err
 		}
 	}
 	//s := "select kind, answers, deadline, timestamp, token from surveys where student=$1 order by deadline"
 	//rows, err := srv.DB.Query(s, i.Student.Email)
-	rows, err := SurveySelectStmt.Query(i.Student.Email)
+	rows, err := SurveySelectStmt.Query(stu)
 	if err != nil {
-		return err
+		return surveys, err
 	}
-	i.Surveys = make([]internship.Survey, 0, 0)
 	defer rows.Close()
 	for rows.Next() {
 		var kind, token string
@@ -239,20 +239,21 @@ func (srv *Service) appendSurveys(i *internship.Internship) error {
 		var answers map[string]string
 		err = rows.Scan(&kind, &buf, &deadline, &timestamp, &token)
 		if err != nil {
-			return err
+			return surveys, err
 		}
 		err = json.Unmarshal(buf, &answers)
 		if err != nil {
-			return err
+			return surveys, err
 		}
 		survey := internship.Survey{Kind: kind, Deadline: deadline, Answers: answers, Token: token}
 		if timestamp.Valid {
 			survey.Timestamp = timestamp.Time
 		}
-		i.Surveys = append(i.Surveys, survey)
+		surveys = append(surveys, survey)
 	}
-	return err
+	return surveys, err
 }
+
 func (srv *Service) appendReports(i *internship.Internship) error {
 	if ReportSelectStmt == nil {
 		var err error
@@ -313,7 +314,7 @@ func (srv *Service) Internships() ([]internship.Internship, error) {
 		if err != nil {
 			return internships, err
 		}
-		err = srv.appendSurveys(&i)
+		i.Surveys, err = srv.surveys(i.Student.Email)
 		if err != nil {
 			return internships, err
 		}

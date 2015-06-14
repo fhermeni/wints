@@ -446,7 +446,7 @@ Handlebars.registerHelper('student', function(g) {
 Handlebars.registerHelper("offset", function(from, offset) {
 	var d = moment(from)
 	d = d.add(offset * 30, "minutes")
-	return d.format("HH:mm") + "-" + d.add(30, "m").format("HH:mm");
+	return d.format("HH:mm") + "-" + d.add(30, "minutes").format("HH:mm");
 })
 
 Handlebars.registerHelper('longDate', function(d) {

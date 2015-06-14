@@ -342,8 +342,31 @@ func (s *Service) HideStudent(em string, st bool) error {
 }
 
 //Defenses
-func (s *Service) DefenseSessions() ([]internship.DefenseSession, error) {
-	return s.srv.DefenseSessions()
+func (srv *Service) DefenseSessions() ([]internship.DefenseSession, error) {
+	//Basic: remove grades, surveys
+	//Jury member: my sessions
+	//admin+: all
+	ss, err := srv.srv.DefenseSessions()
+	filtered := make([]internship.DefenseSession, 0, 0)
+	if err != nil {
+		return []internship.DefenseSession{}, err
+	}
+	if srv.my.Role >= internship.ADMIN {
+		return ss, err
+	}
+	for _, s := range ss {
+		if !s.InJury(srv.my.Email) {
+			s.Defenses = make([]internship.Defense, 0, 0)
+			for _, d := range s.Defenses {
+				d.Grade = -1
+				d.Surveys = []internship.Survey{}
+				s.Defenses = append(s.Defenses, d)
+			}
+		}
+
+		filtered = append(filtered, s)
+	}
+	return filtered, nil
 }
 
 func (s *Service) DefenseSession(student string) (internship.DefenseSession, error) {

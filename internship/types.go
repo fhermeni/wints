@@ -268,6 +268,7 @@ type Defense struct {
 	Remote    bool
 	Grade     int
 	Offset    int
+	Surveys   []Survey
 }
 
 type DefenseSession struct {
