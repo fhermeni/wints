@@ -32,6 +32,7 @@
         <th class="sorter-false"></th>
         <th>Time</th>
         <th>Student</th>
+        <th>Status</th>
         <th>Promotion</th>        
         <th>Company</th>          
         <th>Surveys</th>
@@ -48,6 +49,7 @@
             <td>
             <a class='click fn' onclick="showDefense('{{Student}}')">{{shortFullname Student}}</a>
             </td>
+            <td>{{#if Private}}<span class="text-danger">Confidential</span>{{else}}Publique{{/if}}/{{#if Remote}}Visio{{else}}Physique{{/if}}</td>
             <td>{{Promotion}}/{{Major}}</td>            
             <td>{{company Cpy}}</td>            
             <td>{{#each Surveys}}
