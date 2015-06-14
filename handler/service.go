@@ -706,49 +706,9 @@ func setDefenseGrade(srv internship.Service, mailer mail.Mailer, w http.Response
 	return srv.SetDefenseGrade(em, g)
 }
 
-type PublicDefenseSession struct {
-	Juries   []internship.User
-	Date     time.Time
-	Room     string
-	Defenses []PublicDefense
-}
-type PublicDefense struct {
-	Student internship.User
-	Major   string
-	Private bool
-	Remote  bool
-	Company string
-	Title   string
-	Offset  int
-}
-
 func getPublicSessions(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
-	sessions, err := srv.DefenseSessions()
-	if err != nil {
-		return err
-	}
-	pubs := make([]PublicDefenseSession, 0, 0)
-	for _, s := range sessions {
-		ps := PublicDefenseSession{Room: s.Room, Date: s.Date, Juries: s.Juries, Defenses: make([]PublicDefense, 0, 0)}
-		for _, d := range s.Defenses {
-			i, err := srv.Internship(d.Student)
-			if err != nil {
-				return err
-			}
-			p := PublicDefense{
-				Student: i.Student,
-				Major:   i.Major,
-				Private: d.Private,
-				Remote:  d.Remote,
-				Company: i.Cpy.Name,
-				Title:   i.Title,
-				Offset:  d.Offset,
-			}
-			ps.Defenses = append(ps.Defenses, p)
-		}
-		pubs = append(pubs, ps)
-	}
-	return writeJSONIfOk(err, w, r, pubs)
+	sessions, err := srv.PublicDefenseSessions()
+	return writeJSONIfOk(err, w, r, sessions)
 }
 
 func defenseProgram() http.HandlerFunc {

@@ -20,6 +20,14 @@ const (
 	DateLayout = "02/01/2006 15:04"
 )
 
+//Person just gather informations to contact a company supervisor
+type Person struct {
+	Firstname string
+	Lastname  string
+	Email     string
+	Tel       string
+}
+
 //User denotes a person that can authenticate.
 //Students, major administrator, administrator or super user can authenticate
 type User struct {
@@ -33,6 +41,16 @@ type User struct {
 	Tel string
 	//User role
 	Role Privilege
+}
+
+type Student struct {
+	Firstname  string
+	Lastname   string
+	Email      string
+	Promotion  string
+	Major      string
+	Internship string
+	Hidden     bool
 }
 
 //Privileges denotes the string value associated to each level of privilege
@@ -116,14 +134,6 @@ type Company struct {
 	Name string
 	//The company website
 	WWW string
-}
-
-//Person just gather informations to contact a company supervisor
-type Person struct {
-	Firstname string
-	Lastname  string
-	Email     string
-	Tel       string
 }
 
 //Fullname provides the user fullname, starting with its firstname
@@ -247,16 +257,6 @@ type Stat struct {
 	Surveys map[string]map[string]string
 }
 
-type Student struct {
-	Firstname  string
-	Lastname   string
-	Email      string
-	Promotion  string
-	Major      string
-	Internship string
-	Hidden     bool
-}
-
 //Defense
 type Defense struct {
 	Student string
@@ -271,6 +271,23 @@ type DefenseSession struct {
 	Room     string
 	Juries   []User
 	Defenses []Defense
+}
+
+type PublicDefenseSession struct {
+	Juries   []User
+	Date     time.Time
+	Room     string
+	Defenses []PublicDefense
+}
+type PublicDefense struct {
+	Student   User
+	Promotion string
+	Major     string
+	Private   bool
+	Remote    bool
+	Company   string
+	Title     string
+	Offset    int
 }
 
 func (s DefenseSession) InJury(em string) bool {
