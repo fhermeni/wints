@@ -343,22 +343,7 @@ func (s *Service) HideStudent(em string, st bool) error {
 
 //Defenses
 func (s *Service) DefenseSessions() ([]internship.DefenseSession, error) {
-	if s.my.Role >= internship.ADMIN {
-		return s.srv.DefenseSessions()
-	} else if s.my.Role != internship.NONE {
-		sessions, err := s.srv.DefenseSessions()
-		if err != nil {
-			return []internship.DefenseSession{}, err
-		}
-		mySessions := make([]internship.DefenseSession, 0, 0)
-		for _, session := range sessions {
-			if session.InJury(s.my.Email) {
-				mySessions = append(mySessions, session)
-			}
-		}
-		return mySessions, nil
-	}
-	return []internship.DefenseSession{}, ErrPermission
+	return s.srv.DefenseSessions()
 }
 
 func (s *Service) DefenseSession(student string) (internship.DefenseSession, error) {
@@ -388,8 +373,4 @@ func (s *Service) SetDefenseSessions(defs []internship.DefenseSession) error {
 		return s.srv.SetDefenseSessions(defs)
 	}
 	return ErrPermission
-}
-
-func (s *Service) PublicDefenseSessions() ([]internship.PublicDefenseSession, error) {
-	return s.srv.PublicDefenseSessions()
 }

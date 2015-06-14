@@ -18,10 +18,12 @@ func (srv *Service) DefenseSession(student string) (internship.DefenseSession, e
 	session := internship.DefenseSession{}
 	def := internship.Defense{}
 	if DefStmt == nil {
-		if DefStmt, err = srv.DB.Prepare("select defenses.student,date,room,rank,private,remote,defenseGrades.grade from defenses left outer join defenseGrades on defenses.student=defenseGrades.student where defenses.student=$1"); err != nil {
+		if DefStmt, err = srv.DB.Prepare("select firstname, lastname, tel, email,major, promotion,company, companyWWW, title, date,room,rank,private,remote,defenseGrades.grade from defenses inner join users on (defenses.student=users.email) inner join internships on (defenses.student=internships.student) left outer join defenseGrades on (defenses.student=defenseGrades.student) where defenses.student=$1"); err != nil {
 			return session, err
 		}
 	}
+	stu := internship.User{}
+	cpy := internship.Company{}
 	rows, err := DefStmt.Query(student)
 	if err != nil {
 		return session, err
@@ -29,9 +31,11 @@ func (srv *Service) DefenseSession(student string) (internship.DefenseSession, e
 	defer rows.Close()
 	var grade sql.NullInt64
 	if rows.Next() {
-		if err = rows.Scan(&def.Student, &session.Date, &session.Room, &def.Offset, &def.Private, &def.Remote, &grade); err != nil {
+		if err = rows.Scan(&stu.Firstname, &stu.Lastname, &stu.Tel, &stu.Email, &def.Major, &def.Promotion, &cpy.Name, &cpy.WWW, &def.Title, &session.Date, &session.Room, &def.Offset, &def.Private, &def.Remote, &grade); err != nil {
 			return session, nil
 		}
+		def.Student = stu
+		def.Cpy = cpy
 		if grade.Valid {
 			def.Grade = int(grade.Int64)
 		}
@@ -75,7 +79,7 @@ func (srv *Service) appendDefenses(s *internship.DefenseSession) error {
 	s.Defenses = make([]internship.Defense, 0, 0)
 	var err error
 	if DefsStmt == nil {
-		if DefsStmt, err = srv.DB.Prepare("select defenses.student,rank,private,remote,defenseGrades.grade from defenses left outer join defenseGrades on defenses.student=defenseGrades.student where date=$1 and room=$2 order by rank"); err != nil {
+		if DefsStmt, err = srv.DB.Prepare("select firstname, lastname, tel, email,major, promotion,company, companyWWW, title, rank,private,remote,defenseGrades.grade from defenses inner join users on (defenses.student=users.email) inner join internships on (defenses.student=internships.student) left outer join defenseGrades on (defenses.student=defenseGrades.student) where date=$1 and room=$2 order by rank"); err != nil {
 			return err
 		}
 	}
@@ -86,10 +90,14 @@ func (srv *Service) appendDefenses(s *internship.DefenseSession) error {
 	defer rows.Close()
 	for rows.Next() {
 		def := internship.Defense{}
+		stu := internship.User{}
+		cpy := internship.Company{}
 		var grade sql.NullInt64
-		if err = rows.Scan(&def.Student, &def.Offset, &def.Private, &def.Remote, &grade); err != nil {
+		if err = rows.Scan(&stu.Firstname, &stu.Lastname, &stu.Tel, &stu.Email, &def.Major, &def.Promotion, &cpy.Name, &cpy.WWW, &def.Title, &def.Offset, &def.Private, &def.Remote, &grade); err != nil {
 			return err
 		}
+		def.Student = stu
+		def.Cpy = cpy
 		if grade.Valid {
 			def.Grade = int(grade.Int64)
 		}
@@ -142,7 +150,7 @@ func (srv *Service) SetDefenseSessions(sessions []internship.DefenseSession) err
 			}
 		}
 		for _, def := range s.Defenses {
-			if _, err = tx.Exec("insert into defenses(date,room,student,remote,private,rank) values($1,$2,$3,$4,$5,$6)", s.Date, s.Room, def.Student, def.Remote, def.Private, def.Offset); err != nil {
+			if _, err = tx.Exec("insert into defenses(date,room,student,remote,private,rank) values($1,$2,$3,$4,$5,$6)", s.Date, s.Room, def.Student.Email, def.Remote, def.Private, def.Offset); err != nil {
 				return rollback(err, tx)
 			}
 		}
@@ -169,46 +177,4 @@ func (srv *Service) SetDefenseGrade(stu string, g int) error {
 	sql = "insert into defenseGrades(student, grade) values($1,$2)"
 	_, err = srv.DB.Exec(sql, stu, g)
 	return err
-}
-
-func (srv *Service) PublicDefenseSessions() ([]internship.PublicDefenseSession, error) {
-	sessions, err := srv.DefenseSessions()
-	pubs := make([]internship.PublicDefenseSession, 0, 0)
-	if err != nil {
-		return pubs, err
-	}
-
-	if pubDefStmt == nil {
-		var err error
-		pubDefStmt, err = srv.DB.Prepare("select firstname,lastname,tel,email, title, company, major, promotion from internships,users where internships.student=$1 and users.email=$1")
-		if err != nil {
-			return pubs, err
-		}
-	}
-
-	for _, s := range sessions {
-		ps := internship.PublicDefenseSession{Room: s.Room, Date: s.Date, Juries: s.Juries, Defenses: make([]internship.PublicDefense, 0, 0)}
-		for _, d := range s.Defenses {
-			stu := internship.User{}
-			var title, cpy, major, promotion string
-			row := pubDefStmt.QueryRow(d.Student)
-			err = row.Scan(&stu.Firstname, &stu.Lastname, &stu.Tel, &stu.Email, &title, &cpy, &major, &promotion)
-			if err != nil {
-				return pubs, err
-			}
-			p := internship.PublicDefense{
-				Student:   stu,
-				Major:     major,
-				Promotion: promotion,
-				Private:   d.Private,
-				Remote:    d.Remote,
-				Company:   cpy,
-				Title:     title,
-				Offset:    d.Offset,
-			}
-			ps.Defenses = append(ps.Defenses, p)
-		}
-		pubs = append(pubs, ps)
-	}
-	return pubs, err
 }

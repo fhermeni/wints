@@ -1,5 +1,5 @@
 $(document).ready(function() {
-	defenseProgram(function(sessions) {
+	defenses(function(sessions) {
 		for (var i = 0; i < sessions.length; i++) {
 			sessions[i].Date = new Date(sessions[i].Date)
 		}

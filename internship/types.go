@@ -259,11 +259,15 @@ type Stat struct {
 
 //Defense
 type Defense struct {
-	Student string
-	Private bool
-	Remote  bool
-	Grade   int
-	Offset  int
+	Student   User
+	Major     string
+	Promotion string
+	Cpy       Company
+	Title     string
+	Private   bool
+	Remote    bool
+	Grade     int
+	Offset    int
 }
 
 type DefenseSession struct {
@@ -271,23 +275,6 @@ type DefenseSession struct {
 	Room     string
 	Juries   []User
 	Defenses []Defense
-}
-
-type PublicDefenseSession struct {
-	Juries   []User
-	Date     time.Time
-	Room     string
-	Defenses []PublicDefense
-}
-type PublicDefense struct {
-	Student   User
-	Promotion string
-	Major     string
-	Private   bool
-	Remote    bool
-	Company   string
-	Title     string
-	Offset    int
 }
 
 func (s DefenseSession) InJury(em string) bool {

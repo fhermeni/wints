@@ -425,7 +425,9 @@ function save() {
 		session.Students.forEach(function(stu) {
 			if (stu) {
 				d = allDefenses[stu]
-				d.Student = stu
+				d["Student"] = {
+					Email: stu
+				}
 				s.Defenses.push(d)
 			}
 		})
@@ -455,10 +457,10 @@ function load(defs) {
 			if (def.Offset != s.Students.length) {
 				addPause()
 			}
-			s.Students.push(def.Student);
-			students.remove(getInternship(def.Student))
-			allDefenses[def.Student] = def;
-			drawStudent(def.Student)
+			s.Students.push(def.Student.Email);
+			students.remove(getInternship(def.Student.Email))
+			allDefenses[def.Student.Email] = def;
+			drawStudent(def.Student.Email)
 		});
 		delete s.Defenses
 	});

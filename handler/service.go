@@ -671,7 +671,6 @@ func hideStudent(srv internship.Service, mailer mail.Mailer, w http.ResponseWrit
 func defenseMngt(s Service, mailer mail.Mailer) {
 	s.r.HandleFunc("/api/v1/defenses/", restHandler(getDefenses, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/defenses/", restHandler(postDefenses, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/program/", restHandler(getPublicSessions, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/internships/{email}/defense", restHandler(getDefense, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/internships/{email}/defense/grade", restHandler(setDefenseGrade, s, mailer)).Methods("POST")
 }
@@ -704,11 +703,6 @@ func setDefenseGrade(srv internship.Service, mailer mail.Mailer, w http.Response
 	}
 	em := mux.Vars(r)["email"]
 	return srv.SetDefenseGrade(em, g)
-}
-
-func getPublicSessions(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
-	sessions, err := srv.PublicDefenseSessions()
-	return writeJSONIfOk(err, w, r, sessions)
 }
 
 func defenseProgram() http.HandlerFunc {
