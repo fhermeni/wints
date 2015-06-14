@@ -20,6 +20,14 @@ const (
 	DateLayout = "02/01/2006 15:04"
 )
 
+//Person just gather informations to contact a company supervisor
+type Person struct {
+	Firstname string
+	Lastname  string
+	Email     string
+	Tel       string
+}
+
 //User denotes a person that can authenticate.
 //Students, major administrator, administrator or super user can authenticate
 type User struct {
@@ -33,6 +41,16 @@ type User struct {
 	Tel string
 	//User role
 	Role Privilege
+}
+
+type Student struct {
+	Firstname  string
+	Lastname   string
+	Email      string
+	Promotion  string
+	Major      string
+	Internship string
+	Hidden     bool
 }
 
 //Privileges denotes the string value associated to each level of privilege
@@ -116,14 +134,6 @@ type Company struct {
 	Name string
 	//The company website
 	WWW string
-}
-
-//Person just gather informations to contact a company supervisor
-type Person struct {
-	Firstname string
-	Lastname  string
-	Email     string
-	Tel       string
 }
 
 //Fullname provides the user fullname, starting with its firstname
@@ -245,16 +255,6 @@ type Stat struct {
 	Reports map[string]int
 	//Answers for each survey
 	Surveys map[string]map[string]string
-}
-
-type Student struct {
-	Firstname  string
-	Lastname   string
-	Email      string
-	Promotion  string
-	Major      string
-	Internship string
-	Hidden     bool
 }
 
 //Defense
