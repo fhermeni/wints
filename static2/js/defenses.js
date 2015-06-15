@@ -287,7 +287,7 @@ function drawStudent(em) {
 		glyphRemote = "glyphicon-facetime-video"
 	}
 	if (def.Private) {
-		glyphPrivate = "glyphicon-eye-close"
+		glyphPrivate = "glyphicon-eye-close text-danger"
 	}
 	var html = "<li>" +
 		"<input type='checkbox' data-email='" + em + "'>" +
@@ -336,9 +336,9 @@ function togglePrivate(i, em) {
 	allDefenses[em].Private = !allDefenses[em].Private;
 	var j = $(i)
 	if (j.hasClass("glyphicon-eye-open")) {
-		j.removeClass("glyphicon-eye-open").addClass("glyphicon-eye-close")
+		j.removeClass("glyphicon-eye-open").addClass("glyphicon-eye-close").addClass("text-danger")
 	} else {
-		j.addClass("glyphicon-eye-open").removeClass("glyphicon-eye-close")
+		j.addClass("glyphicon-eye-open").removeClass("glyphicon-eye-close").removeClass("text-danger")
 	}
 }
 

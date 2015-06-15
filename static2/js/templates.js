@@ -307,6 +307,18 @@ Handlebars.registerHelper('defenseGrade', function(g) {
 	return "-"
 });
 
+Handlebars.registerHelper('defenseGrade2', function(from, offset, grade) {
+	d = moment(from).add(30 * offset)
+	if (grade > 0) {
+		return grade
+	}
+	var passed = d.toDate().getTime() < new Date().getTime()
+	if (grade == -1) {
+		return passed ? "?" : "-"
+	}
+	return "-"
+});
+
 Handlebars.registerHelper('gradeAnnotation', function(r) {
 	var passed = (new Date(Date.parse(r.Deadline)).getTime() + 86400 * 1000) < new Date().getTime()
 	var d = 0

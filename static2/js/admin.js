@@ -164,7 +164,6 @@ function showMyDefenses() {
 			})
 			return ok
 		});
-		console.log(ss)
 		var html = Handlebars.getTemplate("jury")(ss);
 		var root = $("#cnt");
 		root.html(html);

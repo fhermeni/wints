@@ -1,38 +1,27 @@
-<div class="btn-group">
-  <button type="button" class="btn dropdown-toggle btn-sm" data-toggle="dropdown" aria-expanded="false"><i class="glyphicon glyphicon-envelope"></i> mail selection <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu" role="menu">
-    <li><a onclick="mailing('students')">students</a></li>
-    <li><a onclick="mailing('students','supervisors')">students (cc supervisors)</a></li>        
-  </ul>
-</div>
-
-<div class="btn-group">
-  <button type="button" class="btn btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="glyphicon glyphicon-list"></i> fullnames from selection <span class="caret"></span>
-  </button>
-  <ul class="dropdown-menu" role="menu">
-    <li><a onclick="showRawFullname('students')">Students</a></li>    
-    <li><a onclick="showRawFullname('supervisors')">Supervisors</a></li>    
-  </ul>
-</div>
+<h3>{{len this}} Session(s)
+<button type="button" class="btn btn-sm" onclick="serviceMailing()">
+<i class="glyphicon glyphicon-envelope"></i> mail selection
+</button>
+</h3>
 
 {{#each this}}
-<h5>{{dateFmt Date "D MMM YYYY HH:mm"}}; Room {{Room}}</h5>
-<h5>Jury: {{#if Juries}}
-    {{#each Juries}}
-    <span class="fn">{{fullname this}}</span>{{#unless @last}}, {{/unless}}
-    {{/each}}
-{{else}}
-    <span class="fn">TBA.</span>
-{{/if}} 
-</h5>
-<table class="table table-hover tablesorter" id="table-conventions">
-            <thead>
+<table class="table table-hover table-condensed">
+    <thead>
     <tr>
-        <th class="sorter-false"></th>
+        <td colspan="3">
+            <i class="glyphicon  glyphicon-calendar"></i> {{dateFmt Date "D MMM YYYY HH:mm"}};
+            <i class="glyphicon glyphicon-map-marker"></i> {{Room}}
+        </td>
+        <td colspan="4" class="text-right">
+            <strong>Juries: </strong>     {{#each Juries}}
+    <input type='checkbox' class='icheckbox_flat' data-email='{{Email}}'/> <span class="fn">{{fullname this}}</span>{{#unless @last}}, {{/unless}}
+    {{/each}}
+        </td>
+    </tr>
+    <tr>
+        <th></th>
         <th>Time</th>
-        <th>Student</th>
-        <th>Status</th>
+        <th>Student</th>        
         <th>Promotion</th>        
         <th>Company</th>          
         <th>Surveys</th>
@@ -43,22 +32,24 @@
         {{#each Defenses}}   
         <tr>
             <td>
-            <input type='checkbox' class='icheckbox_flat' data-email='{{Email}}'/>  
+            <input type='checkbox' class='icheckbox_flat' data-email='{{Student.Email}}'/>  
             </td>
             <td>{{offset ../Date Offset}}</td>
             <td>
             <a class='click fn' onclick="showDefense('{{Student}}')">{{shortFullname Student}}</a>
-            </td>
-            <td>{{#if Private}}<span class="text-danger">Confidential</span>{{else}}Publique{{/if}}/{{#if Remote}}Visio{{else}}Physique{{/if}}</td>
+            {{#if Private}}<i class="glyphicon glyphicon-eye-close text-danger" title="confidential defense"></i>{{/if}}
+            {{#if Remote}}<i class="glyphicon glyphicon-facetime-video" title="visio conference"></i>{{/if}}
+            </td>            
             <td>{{Promotion}}/{{Major}}</td>            
             <td>{{company Cpy}}</td>            
             <td>{{#each Surveys}}
             <a onclick="window.open('/surveys/{{Kind}}?student={{../Student.Email}}&kind={{Kind}}','_blank')" class="badge {{surveyStatus this}}">{{Kind}}</a>
             {{/each}}
             </td>
-            <td>{{defenseGrade ../this }}</td>            
+            <td onclick="showDefense('{{Student.Email}}')">{{defenseGrade2 ../Date Rank Grade}}</td>            
         </tr>    
         {{/each}}
     </tbody>
 </table>
+{{#unless @last}}<div class="page-header"></div>{{/unless}}
 {{/each}}
