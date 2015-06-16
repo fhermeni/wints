@@ -351,7 +351,7 @@ func (srv *Service) DefenseSessions() ([]internship.DefenseSession, error) {
 	if err != nil {
 		return []internship.DefenseSession{}, err
 	}
-	if srv.my.Role >= internship.ADMIN {
+	if srv.my.Role >= internship.MAJOR {
 		return ss, err
 	}
 	for _, s := range ss {

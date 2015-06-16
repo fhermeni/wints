@@ -2,6 +2,7 @@
 	width: 1em;
 	height: 1em;
 	display: inline-block;
+	border: solid 1px #fff;
 }
 
 body {

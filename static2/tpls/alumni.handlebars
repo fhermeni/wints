@@ -1,0 +1,27 @@
+<h3>Alumni <small class="text-info">{{Missings}}/{{len this}} missings</small>
+</h3>
+<p class="text-center">
+<button type="button" class="btn btn-sm" onclick="mailing('students')"><i class="glyphicon glyphicon-envelope"></i> mail selection</button>
+<button type="button" onclick="showRawFullname('students')" class="btn btn-sm"><i class="glyphicon glyphicon-list"></i> fullnames from selection</button>
+<button type="button" onclick="alumniToCSV()" class="btn btn-sm"><i class="glyphicon glyphicon-export"></i> CSV version</button>
+</p>
+<table class="table table-condensed table-hover tablesorter" id="table-conventions">
+<thead>
+<tr>
+	<th class="sorter-false" rowspan="2"><input type='checkbox' data-toggle='checkbox' class='icheckbox_flat check_all'/></th>
+	<td>Student</td>
+	<td>Next email</td>
+	<td>Next position</td>
+</tr>
+</thead>
+<tbody>
+{{#each this}}
+<tr>
+    <td><input type='checkbox' class='icheckbox_flat' data-email='{{Student.Email}}'/></td>
+	<td class="fn">{{fullname Student}}</td>
+	<td>{{Future.Contact}}</td>
+	<td data-text="{{Future.Position}}">{{nextPosition Future.Position}}</td>
+</tr>
+{{/each}}
+</tbody>
+</table>

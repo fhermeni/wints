@@ -147,6 +147,8 @@ function refresh() {
 		showDefenseProgram()
 	} else if (currentPage == "myDefenses") {
 		showMyDefenses()
+	} else if (currentPage == "alumni") {
+		showAlumni()
 	} else {
 		console.log("Unsupported operation on '" + currentPage + "'");
 	}
@@ -168,6 +170,46 @@ function showMyDefenses() {
 		var root = $("#cnt");
 		root.html(html);
 		root.find(":checkbox").icheck();
+	});
+}
+
+function showAlumni() {
+	internships(function(ii) {
+		var missings = 0
+		ii.forEach(function(i) {
+			if (i.Future.Position == 0) {
+				missings++
+			}
+		})
+		ii["Missings"] = missings
+		var html = Handlebars.getTemplate("alumni")(ii)
+		var root = $("#cnt");
+		root.html(html).find("td .icheckbox_flat").icheck({
+			callbacks: {
+				ifChecked: shiftSelect
+			}
+		});
+		$('#cnt').find(".check_all").icheck({
+			callbacks: {
+				ifChecked: function(e) {
+					$("#cnt").find("td .icheckbox_flat").icheck("checked")
+				},
+				ifUnchecked: function(e) {
+					$("#cnt").find("td .icheckbox_flat").icheck("unchecked")
+				}
+			}
+		});
+
+		root.find(".tablesorter").tablesorter({
+			theme: 'bootstrap',
+			widgets: ["uitheme"],
+			headerTemplate: '{content} {icon}',
+			headers: {
+				0: {
+					sorter: false
+				}
+			}
+		});
 	});
 }
 
@@ -777,6 +819,18 @@ function showService() {
 	});
 }
 
+function alumniToCSV() {
+	internships(function(interns) {
+		var csv = "firstname;lastname;oldEmail;newEmail;position;txtPosition\n";
+		interns.forEach(function(i) {
+			csv += i.Student.Firstname + ";" + i.Student.Lastname + ";" + i.Student.Email + ";" + i.Future.Contact + ";" + i.Future.Position + ";" + possiblePositions[i.Future.Position] + "\n";
+		});
+		var html = Handlebars.getTemplate("raw")();
+		$("#modal").html(html).modal('show');
+		$("#rawContent").html(csv);
+	});
+}
+
 function showRawService() {
 	internships(function(interns) {
 		var service = {};
@@ -802,19 +856,21 @@ function showRawFullname(kind) {
 	var fns = [];
 	checked.each(function(i, e) {
 		var em = $(e).attr("data-email");
-		var i = getInternship(em);
-		var p = i.Student;
-		if (kind == "supervisors") {
-			p = i.Sup
+		if (em) {
+			var i = getInternship(em);
+			var p = i.Student;
+			if (kind == "supervisors") {
+				p = i.Sup
 
-		} else if (kind == "tutors") {
-			p = i.Tutor
-		}
-		var fn = p.Firstname.charAt(0).toUpperCase() + p.Firstname.slice(1);
-		var ln = p.Lastname.charAt(0).toUpperCase() + p.Lastname.slice(1);
-		var n = fn + " " + ln;
-		if (fns.indexOf(n) < 0) {
-			fns.push(fn + " " + ln)
+			} else if (kind == "tutors") {
+				p = i.Tutor
+			}
+			var fn = p.Firstname.charAt(0).toUpperCase() + p.Firstname.slice(1);
+			var ln = p.Lastname.charAt(0).toUpperCase() + p.Lastname.slice(1);
+			var n = fn + " " + ln;
+			if (fns.indexOf(n) < 0) {
+				fns.push(fn + " " + ln)
+			}
 		}
 	});
 	if (fns.length > 0) {
