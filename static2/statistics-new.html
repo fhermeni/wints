@@ -130,22 +130,28 @@
             <h4>satisfaction at the end</h4>            
         </div>
 </div>
-
 </div>
-<div id="modal" class="modal fade">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header"><h3 class="modal-title">Details</h3></div>
-            <div class="modal-body">                
-                <div><canvas id="details"></canvas></div>
+<div class="row">
+<div class="col-sm-8 col-sm-offset-2">
+        <div class="thumbnail text-center">
+            <h3>The future</h3>
+        <ul class="pagination pagination-sm">            
+            <li class="alumni filter all active"><a onclick="showAlumni()">si + master</a></li>    
+            <li class="alumni filter SI"><a onclick="showAlumni('SI')">si only</a></li>    
+            <li class="alumni filter master"><a onclick="showAlumni('master')">master only</a></li>            
+        </ul>    
+            <div class="row">                        
+            <div class="col-md-4" id="alumni"><canvas width="200px" height="200px"></canvas></div>                                    
+            <div class="col-md-8"><ul class='list-unstyled text-left' id="alumni-legend"></ul></div>
             </div>
         </div>
-    </div>        
-</div>
+    </div>
 </div>
 <footer>    
         <p>© University Nice Sophia Antipolis 2014-2015</p>    
 </footer>
+
+</div>
             <!-- Bootstrap -->
             <script src="static/js/jquery-2.1.3.min.js"></script>            
             <script src="static/js/statistics2.js"></script>            
