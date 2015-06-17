@@ -92,13 +92,13 @@ func newRoot(em string, ds *datastore.Service, m mail.Mailer) {
 
 func main() {
 
-	fakeMailer := flag.Bool("fakeMailer", false, "Use a fake mailer that print mail on stdout")
+	fakeMailer := flag.Bool("fake-mailer", false, "Use a fake mailer that print mail on stdout")
 	cfgPath := flag.String("conf", "./wints.conf", "daemon configuration file")
 	install := flag.Bool("install", false, "/!\\ Create database tables")
 	makeRoot := flag.String("invite-root", "", "Invite a root user")
 	testMail := flag.Bool("test-mailer", false, "Test the mailer by sending a mail to the administrator")
 	testFeeder := flag.Bool("test-feeder", false, "Test the convention feeder")
-	testAll := flag.Bool("test", false, "equivalent to --testMail --testDB --testFeeder")
+	testAll := flag.Bool("test", false, "equivalent to --test-mailer --test-feeder")
 	blankConf := flag.Bool("generate-config", false, "Print a default configuration file")
 	flag.Parse()
 
