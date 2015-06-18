@@ -152,7 +152,10 @@ function tplEvaluationMail() {
 	var email = $.urlParam("student")
 	var kind = $.urlParam("kind")
 	internship(email, function(i) {						
-    	var txt = Handlebars.getTemplate("eval-" + kind)({I:i, URL:getToken(i, kind)});
+		var txt = Handlebars.getTemplate("eval-" + kind)({
+			I: i,
+			URL: getToken(i, kind)
+		});
     	var to=encodeURIComponent(i.Sup.Email)    
     	var s=encodeURIComponent(i.Student.Firstname.capitalize() + " " + i.Student.Lastname.capitalize() + " - Evaluation");
     	window.location.href = "mailto:" + to + "?subject=" + s + "&body=" + encodeURIComponent(txt);    
