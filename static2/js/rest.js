@@ -294,7 +294,7 @@ function statistics(ok, no) {
 	return get("/statistics/", ok, no)
 }
 
-function students(ok, no) {
+function getStudents(ok, no) {
 	return get("/students/", ok, no)
 }
 

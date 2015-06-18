@@ -194,7 +194,7 @@ function showAlumni() {
 
 
 function showStatus() {
-	students(function(stus) {
+	getStudents(function(stus) {
 		var placed = 0
 		var known = [];
 		var toPlace = stus.length;
