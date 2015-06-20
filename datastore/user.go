@@ -1,6 +1,7 @@
 package datastore
 
 import (
+	"log"
 	"time"
 
 	"github.com/fhermeni/wints/internship"
@@ -181,6 +182,7 @@ func (s *Service) ResetPassword(email string) ([]byte, error) {
 	d, _ := time.ParseDuration("48h")
 	_, err := s.DB.Exec("insert into password_renewal(email,token,deadline) values($1,$2,$3)", email, token, time.Now().Add(d))
 	if err != nil {
+		log.Println(err.Error())
 		//Not very sure, might be a SQL error or a connexion error as well.
 		return []byte{}, internship.ErrUnknownUser
 	}
