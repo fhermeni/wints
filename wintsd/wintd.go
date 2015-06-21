@@ -15,6 +15,7 @@ import (
 	"github.com/fhermeni/wints/feeder"
 	"github.com/fhermeni/wints/handler"
 	"github.com/fhermeni/wints/internship"
+	"github.com/fhermeni/wints/journal"
 	"github.com/fhermeni/wints/mail"
 
 	_ "github.com/lib/pq"
@@ -167,7 +168,7 @@ func main() {
 
 	startFeederDaemon(puller, cc, period)
 
-	www := handler.NewService(cc, mailer, cfg.HTTP.Path)
+	www := handler.NewService(cc, mailer, cfg.HTTP.Path, journal.FileBacked(cfg.Journal.Path))
 	log.Println("Listening on " + cfg.HTTP.Listen)
 	err = www.Listen(cfg.HTTP.Listen, cfg.HTTP.Certificate, cfg.HTTP.PrivateKey)
 	if err != nil {

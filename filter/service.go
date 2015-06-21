@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/fhermeni/wints/internship"
+	"github.com/fhermeni/wints/journal"
 )
 
 var (
@@ -18,4 +19,5 @@ to its role and or relationships
 type Service struct {
 	my  internship.User
 	srv internship.Service
+	log journal.Journal
 }

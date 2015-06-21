@@ -11,6 +11,7 @@ import (
 
 	"github.com/fhermeni/wints/filter"
 	"github.com/fhermeni/wints/internship"
+	"github.com/fhermeni/wints/journal"
 	"github.com/fhermeni/wints/mail"
 )
 
@@ -70,7 +71,7 @@ func mon(h http.HandlerFunc) http.HandlerFunc {
 	}
 }
 
-func restHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *http.Request) error, srv Service, mailer mail.Mailer) http.HandlerFunc {
+func restHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *http.Request) error, journal journal.Journal, srv Service, mailer mail.Mailer) http.HandlerFunc {
 
 	return mon(func(w http.ResponseWriter, r *http.Request) {
 
@@ -91,7 +92,7 @@ func restHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *
 			http.Error(w, err.Error(), http.StatusForbidden)
 			return
 		}
-		wrapper, _ := filter.NewService(srv.backend, u)
+		wrapper, _ := filter.NewService(journal, srv.backend, u)
 		e := cb(wrapper, mailer, w, r)
 		//Error management
 		if e != nil {
