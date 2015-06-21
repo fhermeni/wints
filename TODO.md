@@ -21,5 +21,6 @@
 - clean a bit the code
 	1. Reduce/compose structures better
 	2. Reduce the number of queries ?
+	3. nicer rest middleware. Explicit context
 - tests and comments
 - simplify DB with less fake values and more optional fields hidden in JSONs

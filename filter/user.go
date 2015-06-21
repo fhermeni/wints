@@ -8,7 +8,7 @@ import (
 
 func (v *Service) Registered(email string, password []byte) ([]byte, error) {
 	cnt, err := v.srv.Registered(email, password)
-	v.log.Log(email, " log in", err)
+	v.log.Log(email, "log in", err)
 	return cnt, err
 }
 
@@ -30,7 +30,6 @@ func (v *Service) Sessions() (map[string]time.Time, error) {
 	if v.my.Role == internship.ROOT {
 		sessions, err = v.srv.Sessions()
 	}
-	v.UserLog("list user sessions", err)
 	return sessions, err
 }
 func (v *Service) NewTutor(p internship.User) ([]byte, error) {

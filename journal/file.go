@@ -12,7 +12,8 @@ import (
 
 var TIME_FMT = "02/01/06 15:04:05"
 
-//File is a structure to store a journal into a file
+//File is a structure to store a journal into a file.
+//The file is never zeroed.
 type File struct {
 	path  string
 	mutex sync.Mutex
@@ -26,22 +27,22 @@ func FileBacked(p string) *File {
 //Log the event into the file.
 func (f *File) UserLog(u internship.User, msg string, err error) {
 	go func() {
-		st := "OK"
-		if err != nil {
-			st = err.Error()
-		}
-		f.log("[%s] %s (%s) - %s: %s\n", time.Now().Format(TIME_FMT), u.Email, u.Role.String(), msg, st)
+		f.log("[%s] %s (%s) - %s: %s\n", time.Now().Format(TIME_FMT), u.Email, u.Role.String(), msg, status(err))
 	}()
 }
 
 func (f *File) Log(em, msg string, err error) {
+	fmt.Println("hop")
 	go func() {
-		st := "OK"
-		if err != nil {
-			st = err.Error()
-		}
-		f.log("[%s] %s - %s: %s\n", time.Now().Format(TIME_FMT), em, msg, st)
+		f.log("[%s] %s - %s: %s\n", time.Now().Format(TIME_FMT), em, msg, status(err))
 	}()
+}
+
+func status(err error) string {
+	if err == nil {
+		return "OK"
+	}
+	return err.Error()
 }
 
 func (f *File) log(format string, args ...interface{}) {

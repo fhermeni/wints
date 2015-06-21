@@ -25,7 +25,6 @@ func (s *Service) DefenseSessions() ([]internship.DefenseSession, error) {
 			}
 		}
 	}
-	//s.log.Log(s.my, "get defense sessions", err)
 	return defs, err
 }
 
