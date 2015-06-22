@@ -11,10 +11,14 @@ import (
 	"github.com/fhermeni/wints/internship"
 )
 
-var TIME_FMT = "02/01/06 15:04:05"
-
-var ACCESS_LOG = "access.log"
-var EVENT_LOG = "event.log"
+var (
+	//TimeFmt indicates the output format for timestamps
+	TimeFmt = "02/01/06 15:04:05"
+	//AccessLog is the filename where the rest call are stored
+	AccessLog = "access.log"
+	//EventLog is the file containing wints events
+	EventLog = "event.log"
+)
 
 //File is a structure to store a journal into a file.
 //The file is never zeroed.
@@ -23,7 +27,7 @@ type File struct {
 	mutex sync.Mutex
 }
 
-//FileBackend make a new file backend from the path provided as argument
+//FileBacked makes a new file backend from the path provided as argument
 func FileBacked(p string) (*File, error) {
 	err := os.MkdirAll(p, 0770)
 	if err != nil && !os.IsExist(err) {
@@ -32,16 +36,16 @@ func FileBacked(p string) (*File, error) {
 	return &File{path: p, mutex: sync.Mutex{}}, nil
 }
 
-//Log the event into the file.
+//UserLog stores the event emitted by a logged user into the file.
 func (f *File) UserLog(u internship.User, msg string, err error) {
 	go func() {
-		f.log(EVENT_LOG, "[%s] %s (%s) - %s: %s\n", time.Now().Format(TIME_FMT), u.Email, u.Role.String(), msg, status(err))
+		f.log(EventLog, "[%s] %s (%s) - %s: %s\n", time.Now().Format(TimeFmt), u.Email, u.Role.String(), msg, status(err))
 	}()
 }
 
 func (f *File) Log(em, msg string, err error) {
 	go func() {
-		f.log(EVENT_LOG, "[%s] %s - %s: %s\n", time.Now().Format(TIME_FMT), em, msg, status(err))
+		f.log(EventLog, "[%s] %s - %s: %s\n", time.Now().Format(TimeFmt), em, msg, status(err))
 	}()
 }
 
@@ -67,12 +71,12 @@ func (f *File) log(fn, format string, args ...interface{}) {
 }
 func (f *File) Wipe() {
 	go func() {
-		f.log(EVENT_LOG, "[%s] *** WIPE ***\n", time.Now().Format(TIME_FMT))
+		f.log(EventLog, "[%s] *** WIPE ***\n", time.Now().Format(TimeFmt))
 	}()
 }
 
 func (f *File) Access(method, url string, statusCode, latency int) {
 	go func() {
-		f.log(ACCESS_LOG, "[%s] \"%s %s\" %d %d\n", time.Now().Format(TIME_FMT), method, url, statusCode, latency)
+		f.log(AccessLog, "[%s] \"%s %s\" %d %d\n", time.Now().Format(TimeFmt), method, url, statusCode, latency)
 	}()
 }

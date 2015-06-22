@@ -16,5 +16,6 @@ type Journal interface {
 	//Wipe indicates the database has been reseted
 	Wipe()
 
+	//Access notify an access to a Rest endPoint. The latency is in milliseconds
 	Access(method, url string, statusCode, latency int)
 }
