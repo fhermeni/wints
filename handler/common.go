@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"reflect"
 	"strings"
-	"time"
 
 	"github.com/fhermeni/wints/filter"
 	"github.com/fhermeni/wints/internship"
@@ -61,19 +60,9 @@ func writeJSONIfOk(e error, w http.ResponseWriter, r *http.Request, j interface{
 	return enc.Encode(j)
 }
 
-func mon(h http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		start := time.Now()
-		defer func() {
-			log.Printf("%dms %s %s\n", time.Since(start).Nanoseconds()/1000000, r.Method, r.URL.String())
-		}()
-		h(w, r)
-	}
-}
+func restHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *http.Request) error, j journal.Journal, srv Service, mailer mail.Mailer) http.HandlerFunc {
 
-func restHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *http.Request) error, journal journal.Journal, srv Service, mailer mail.Mailer) http.HandlerFunc {
-
-	return mon(func(w http.ResponseWriter, r *http.Request) {
+	return mon(j, func(w http.ResponseWriter, r *http.Request) {
 
 		email, err := authenticated(srv.backend, w, r)
 		if err == ErrMissingCookies || err == internship.ErrSessionExpired {
@@ -92,12 +81,8 @@ func restHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *
 			http.Error(w, err.Error(), http.StatusForbidden)
 			return
 		}
-		wrapper, _ := filter.NewService(journal, srv.backend, u)
+		wrapper, _ := filter.NewService(j, srv.backend, u)
 		e := cb(wrapper, mailer, w, r)
-		//Error management
-		if e != nil {
-			log.Println("Reply with error " + e.Error())
-		}
 		switch e {
 		case internship.ErrInvalidToken, internship.ErrSessionExpired:
 			return

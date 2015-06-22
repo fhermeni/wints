@@ -101,7 +101,7 @@ func Blank() error {
 		internship.SurveyDef{Name: "midterm", Deadline: "relative", Value: "1440h"},
 		internship.SurveyDef{Name: "final", Deadline: "absolute", Value: "01/09/2015 23:59"},
 	}
-	journal := JournalConfig{Path: "journal.log"}
+	journal := JournalConfig{Path: "logs"}
 	cfg := Config{
 		Puller:  puller,
 		Reports: reports,

@@ -15,4 +15,6 @@ type Journal interface {
 
 	//Wipe indicates the database has been reseted
 	Wipe()
+
+	Access(method, url string, statusCode, latency int)
 }

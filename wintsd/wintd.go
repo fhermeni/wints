@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"strconv"
 	"time"
 
 	"github.com/fhermeni/wints/cache"
@@ -168,8 +169,15 @@ func main() {
 
 	startFeederDaemon(puller, cc, period)
 
-	www := handler.NewService(cc, mailer, cfg.HTTP.Path, journal.FileBacked(cfg.Journal.Path))
+	j, err := journal.FileBacked(cfg.Journal.Path)
+	if err != nil {
+		log.Fatalln("Unable to create logs: " + err.Error())
+	}
+	j.Log(cfg.Mailer.Sender, "Starting wints", nil)
+	www := handler.NewService(cc, mailer, cfg.HTTP.Path, j)
 	log.Println("Listening on " + cfg.HTTP.Listen)
+	j.Log(cfg.Mailer.Sender, "Listening on "+cfg.HTTP.Listen+"\n", nil)
+	j.Log(cfg.Mailer.Sender, "Working over "+strconv.Itoa(runtime.NumCPU())+" CPU(s)\n", nil)
 	err = www.Listen(cfg.HTTP.Listen, cfg.HTTP.Certificate, cfg.HTTP.PrivateKey)
 	if err != nil {
 		log.Fatalln("Server exited:" + err.Error())

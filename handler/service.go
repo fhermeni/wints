@@ -44,13 +44,13 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string, j jour
 	fileHandler := http.FileServer(fs)
 	r.PathPrefix("/" + path + "/").Handler(httpgzip.NewHandler(http.StripPrefix("/"+path, fileHandler)))
 	http.Handle("/", s.r)
-	s.r.HandleFunc("/", mon(home(backend))).Methods("GET")
-	s.r.HandleFunc("/statistics", mon(stats())).Methods("GET")
-	s.r.HandleFunc("/defense-program", mon(defenseProgram())).Methods("GET")
+	s.r.HandleFunc("/", mon(j, home(backend))).Methods("GET")
+	s.r.HandleFunc("/statistics", mon(j, stats())).Methods("GET")
+	s.r.HandleFunc("/defense-program", mon(j, defenseProgram())).Methods("GET")
 	s.r.HandleFunc("/api/v1/surveys/{token}", surveyFromToken(backend)).Methods("GET")
 	s.r.HandleFunc("/api/v1/surveys/{token}", setSurveyContent(backend)).Methods("POST")
-	s.r.HandleFunc("/api/v1/statistics/", mon(statistics(backend))).Methods("GET")
-	s.r.HandleFunc("/api/v1/majors/", mon(majors(backend))).Methods("GET")
+	s.r.HandleFunc("/api/v1/statistics/", mon(j, statistics(backend))).Methods("GET")
+	s.r.HandleFunc("/api/v1/majors/", mon(j, majors(backend))).Methods("GET")
 	return s
 }
 
@@ -106,13 +106,13 @@ func userMngt(s Service, mailer mail.Mailer, j journal.Journal) {
 	s.r.HandleFunc("/api/v1/users/{email}/profile", restHandler(setUserProfile, j, s, mailer)).Methods("PUT")
 	s.r.HandleFunc("/api/v1/users/{email}/role", restHandler(setUserRole, j, s, mailer)).Methods("PUT")
 	s.r.HandleFunc("/api/v1/users/", restHandler(newTutor, j, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/users/{email}/password", mon(resetPassword(s.backend, mailer))).Methods("DELETE")
+	s.r.HandleFunc("/api/v1/users/{email}/password", mon(j, resetPassword(s.backend, mailer))).Methods("DELETE")
 	s.r.HandleFunc("/api/v1/users/{email}/password", restHandler(setPassword, j, s, mailer)).Methods("PUT")
 	s.r.HandleFunc("/api/v1/sessions/", restHandler(sessions, j, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/newPassword", mon(newPassword(s.backend, mailer))).Methods("POST")
-	s.r.HandleFunc("/api/v1/login", mon(login(s.backend))).Methods("POST")
-	s.r.HandleFunc("/api/v1/logout", mon(logout(s.backend))).Methods("GET")
-	s.r.HandleFunc("/resetPassword", mon(password)).Methods("GET")
+	s.r.HandleFunc("/api/v1/newPassword", mon(j, newPassword(s.backend, mailer))).Methods("POST")
+	s.r.HandleFunc("/api/v1/login", mon(j, login(s.backend))).Methods("POST")
+	s.r.HandleFunc("/api/v1/logout", mon(j, logout(s.backend))).Methods("GET")
+	s.r.HandleFunc("/resetPassword", mon(j, password)).Methods("GET")
 }
 
 func password(w http.ResponseWriter, r *http.Request) {
