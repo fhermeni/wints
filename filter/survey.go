@@ -17,8 +17,9 @@ func (v *Service) Survey(student, kind string) (internship.Survey, error) {
 }
 
 func (v *Service) SetSurveyContent(token string, cnt map[string]string) error {
+	err := v.SetSurveyContent(token, cnt)
 	v.log.Log(token, "uploaded the survey", err)
-	return v.SetSurveyContent(token, cnt)
+	return err
 }
 
 func (v *Service) SurveyDefs() []internship.SurveyDef {
