@@ -29,6 +29,12 @@ func authenticated(backend internship.Service, w http.ResponseWriter, r *http.Re
 	return cookie.Value, err
 }
 
+func asset(path string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, path)
+	}
+}
+
 func jsonRequest(w http.ResponseWriter, r *http.Request, j interface{}) error {
 	dec := json.NewDecoder(r.Body)
 	err := dec.Decode(&j)

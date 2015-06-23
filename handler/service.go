@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"path/filepath"
 	"time"
 
 	"github.com/fhermeni/wints/internship"
@@ -44,8 +45,8 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string) Servic
 	r.PathPrefix("/" + path + "/").Handler(httpgzip.NewHandler(http.StripPrefix("/"+path, fileHandler)))
 	http.Handle("/", s.r)
 	s.r.HandleFunc("/", mon(home(backend))).Methods("GET")
-	s.r.HandleFunc("/statistics", mon(stats())).Methods("GET")
-	s.r.HandleFunc("/defense-program", mon(defenseProgram())).Methods("GET")
+	s.r.HandleFunc("/statistics", mon(asset(filepath.Join(path, "statistics-new.html")))).Methods("GET")
+	s.r.HandleFunc("/defense-program", mon(asset(filepath.Join(path, "defense-program.html")))).Methods("GET")
 	s.r.HandleFunc("/api/v1/surveys/{token}", surveyFromToken(backend)).Methods("GET")
 	s.r.HandleFunc("/api/v1/surveys/{token}", setSurveyContent(backend)).Methods("POST")
 	s.r.HandleFunc("/api/v1/statistics/", mon(statistics(backend))).Methods("GET")
@@ -64,12 +65,6 @@ func statistics(backend internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		stats, err := backend.Statistics()
 		writeJSONIfOk(err, w, r, stats)
-	}
-}
-
-func stats() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, path+"/statistics-new.html")
 	}
 }
 
@@ -111,11 +106,7 @@ func userMngt(s Service, mailer mail.Mailer) {
 	s.r.HandleFunc("/api/v1/newPassword", mon(newPassword(s.backend, mailer))).Methods("POST")
 	s.r.HandleFunc("/api/v1/login", mon(login(s.backend))).Methods("POST")
 	s.r.HandleFunc("/api/v1/logout", mon(logout(s.backend))).Methods("GET")
-	s.r.HandleFunc("/resetPassword", mon(password)).Methods("GET")
-}
-
-func password(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, path+"/new_password.html")
+	s.r.HandleFunc("/resetPassword", mon(asset(filepath.Join(path, "new_password.html")))).Methods("GET")
 }
 
 type PasswordUpdate struct {
@@ -709,10 +700,4 @@ func setDefenseGrade(srv internship.Service, mailer mail.Mailer, w http.Response
 func getPublicSessions(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	sessions, err := srv.PublicDefenseSessions()
 	return writeJSONIfOk(err, w, r, sessions)
-}
-
-func defenseProgram() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, path+"/defense-program.html")
-	}
 }
