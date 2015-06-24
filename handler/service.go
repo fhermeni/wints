@@ -665,7 +665,7 @@ func hideStudent(srv internship.Service, mailer mail.Mailer, w http.ResponseWrit
 func defenseMngt(s Service, mailer mail.Mailer, j journal.Journal) {
 	s.r.HandleFunc("/api/v1/defenses/", restHandler(getDefenses, j, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/defenses/", restHandler(postDefenses, j, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/program/", restHandler(getPublicSessions, j, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/program/", mon(j, getPublicSessions(s.backend))).Methods("GET")
 	s.r.HandleFunc("/api/v1/internships/{email}/defense", restHandler(getDefense, j, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/internships/{email}/defense/grade", restHandler(setDefenseGrade, j, s, mailer)).Methods("POST")
 }
@@ -700,7 +700,9 @@ func setDefenseGrade(srv internship.Service, mailer mail.Mailer, w http.Response
 	return srv.SetDefenseGrade(em, g)
 }
 
-func getPublicSessions(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
-	sessions, err := srv.PublicDefenseSessions()
-	return writeJSONIfOk(err, w, r, sessions)
+func getPublicSessions(srv internship.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		sessions, err := srv.PublicDefenseSessions()
+		writeJSONIfOk(err, w, r, sessions)
+	}
 }
