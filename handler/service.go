@@ -45,9 +45,9 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string, j jour
 	fileHandler := http.FileServer(fs)
 	r.PathPrefix("/" + path + "/").Handler(httpgzip.NewHandler(http.StripPrefix("/"+path, fileHandler)))
 	http.Handle("/", s.r)
-	s.r.HandleFunc("/", mon(home(backend))).Methods("GET")
-	s.r.HandleFunc("/statistics", mon(asset(filepath.Join(path, "statistics-new.html")))).Methods("GET")
-	s.r.HandleFunc("/defense-program", mon(asset(filepath.Join(path, "defense-program.html")))).Methods("GET")
+	s.r.HandleFunc("/", mon(j, home(backend))).Methods("GET")
+	s.r.HandleFunc("/statistics", mon(j, asset(filepath.Join(path, "statistics-new.html")))).Methods("GET")
+	s.r.HandleFunc("/defense-program", mon(j, asset(filepath.Join(path, "defense-program.html")))).Methods("GET")
 	s.r.HandleFunc("/api/v1/surveys/{token}", surveyFromToken(backend)).Methods("GET")
 	s.r.HandleFunc("/api/v1/surveys/{token}", setSurveyContent(backend)).Methods("POST")
 	s.r.HandleFunc("/api/v1/statistics/", mon(j, statistics(backend))).Methods("GET")
@@ -94,40 +94,19 @@ func (s *Service) Listen(host string, cert, pk string) error {
 }
 
 func userMngt(s Service, mailer mail.Mailer, j journal.Journal) {
-
-<<<<<<< HEAD
 	s.r.HandleFunc("/api/v1/users/{email}", restHandler(user, j, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/users/", restHandler(users, j, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/users/{email}", restHandler(rmUser, j, s, mailer)).Methods("DELETE")
 	s.r.HandleFunc("/api/v1/users/{email}/profile", restHandler(setUserProfile, j, s, mailer)).Methods("PUT")
 	s.r.HandleFunc("/api/v1/users/{email}/role", restHandler(setUserRole, j, s, mailer)).Methods("PUT")
 	s.r.HandleFunc("/api/v1/users/", restHandler(newTutor, j, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/users/{email}/password", mon(j, resetPassword(s.backend, mailer))).Methods("DELETE")
+	s.r.HandleFunc("/api/v1/users/{email}/password", mon(j, resetPassword(j, s.backend, mailer))).Methods("DELETE")
 	s.r.HandleFunc("/api/v1/users/{email}/password", restHandler(setPassword, j, s, mailer)).Methods("PUT")
 	s.r.HandleFunc("/api/v1/sessions/", restHandler(sessions, j, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/newPassword", mon(j, newPassword(s.backend, mailer))).Methods("POST")
-	s.r.HandleFunc("/api/v1/login", mon(j, login(s.backend))).Methods("POST")
-	s.r.HandleFunc("/api/v1/logout", mon(j, logout(s.backend))).Methods("GET")
-	s.r.HandleFunc("/resetPassword", mon(j, password)).Methods("GET")
-}
-
-func password(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, path+"/new_password.html")
-=======
-	s.r.HandleFunc("/api/v1/users/{email}", restHandler(user, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/users/", restHandler(users, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/users/{email}", restHandler(rmUser, s, mailer)).Methods("DELETE")
-	s.r.HandleFunc("/api/v1/users/{email}/profile", restHandler(setUserProfile, s, mailer)).Methods("PUT")
-	s.r.HandleFunc("/api/v1/users/{email}/role", restHandler(setUserRole, s, mailer)).Methods("PUT")
-	s.r.HandleFunc("/api/v1/users/", restHandler(newTutor, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/users/{email}/password", mon(resetPassword(s.backend, mailer))).Methods("DELETE")
-	s.r.HandleFunc("/api/v1/users/{email}/password", restHandler(setPassword, s, mailer)).Methods("PUT")
-	s.r.HandleFunc("/api/v1/sessions/", restHandler(sessions, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/newPassword", mon(newPassword(s.backend, mailer))).Methods("POST")
-	s.r.HandleFunc("/api/v1/login", mon(login(s.backend))).Methods("POST")
-	s.r.HandleFunc("/api/v1/logout", mon(logout(s.backend))).Methods("GET")
-	s.r.HandleFunc("/resetPassword", mon(asset(filepath.Join(path, "new_password.html")))).Methods("GET")
->>>>>>> master
+	s.r.HandleFunc("/api/v1/newPassword", mon(j, newPassword(j, s.backend, mailer))).Methods("POST")
+	s.r.HandleFunc("/api/v1/login", mon(j, login(j, s.backend))).Methods("POST")
+	s.r.HandleFunc("/api/v1/logout", mon(j, logout(j, s.backend))).Methods("GET")
+	s.r.HandleFunc("/resetPassword", mon(j, asset(filepath.Join(path, "new_password.html")))).Methods("GET")
 }
 
 type PasswordUpdate struct {
@@ -140,11 +119,12 @@ type NewPassword struct {
 	New   string
 }
 
-func login(srv internship.Service) http.HandlerFunc {
+func login(j journal.Journal, srv internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		login := r.PostFormValue("login")
 		password := r.PostFormValue("password")
 		t, err := srv.Registered(login, []byte(password))
+		j.Log(login, "login", err)
 		if err != nil {
 			http.Redirect(w, r, "/#badLogin", 302)
 			return
@@ -166,7 +146,7 @@ func login(srv internship.Service) http.HandlerFunc {
 	}
 }
 
-func logout(srv internship.Service) http.HandlerFunc {
+func logout(j journal.Journal, srv internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		email := &http.Cookie{
 			Name:   "session",
@@ -187,11 +167,12 @@ func logout(srv internship.Service) http.HandlerFunc {
 	}
 }
 
-func newPassword(srv internship.Service, mailer mail.Mailer) http.HandlerFunc {
+func newPassword(j journal.Journal, srv internship.Service, mailer mail.Mailer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		token := r.PostFormValue("token")
 		password := r.PostFormValue("password")
 		email, err := srv.NewPassword([]byte(token), []byte(password))
+		j.Log(token, "reset his password (email='"+email+"')", err)
 		switch err {
 		case internship.ErrNoPendingRequests:
 			http.Redirect(w, r, "/resetPassword?token="+token+"#noRequest", 302)
@@ -226,10 +207,11 @@ func setPassword(srv internship.Service, mailer mail.Mailer, w http.ResponseWrit
 	return srv.SetUserPassword(e, []byte(u.Old), []byte(u.New))
 }
 
-func resetPassword(srv internship.Service, mailer mail.Mailer) http.HandlerFunc {
+func resetPassword(j journal.Journal, srv internship.Service, mailer mail.Mailer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		e := mux.Vars(r)["email"]
 		token, err := srv.ResetPassword(e)
+		j.Log(e, "initiate password reset", err)
 		if err != nil {
 			log.Println("Unable to get the reset token for " + e + ": " + err.Error())
 			return

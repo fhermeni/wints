@@ -176,8 +176,8 @@ func main() {
 	j.Log(cfg.Mailer.Sender, "Starting wints", nil)
 	www := handler.NewService(cc, mailer, cfg.HTTP.Path, j)
 	log.Println("Listening on " + cfg.HTTP.Listen)
-	j.Log(cfg.Mailer.Sender, "Listening on "+cfg.HTTP.Listen+"\n", nil)
-	j.Log(cfg.Mailer.Sender, "Working over "+strconv.Itoa(runtime.NumCPU())+" CPU(s)\n", nil)
+	j.Log(cfg.Mailer.Sender, "Listening on "+cfg.HTTP.Listen, nil)
+	j.Log(cfg.Mailer.Sender, "Working over "+strconv.Itoa(runtime.NumCPU())+" CPU(s)", nil)
 	err = www.Listen(cfg.HTTP.Listen, cfg.HTTP.Certificate, cfg.HTTP.PrivateKey)
 	if err != nil {
 		log.Fatalln("Server exited:" + err.Error())

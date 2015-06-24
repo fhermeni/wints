@@ -55,13 +55,14 @@ func (v *Service) Internship(stu string) (internship.Internship, error) {
 	i := internship.Internship{}
 	if v.mine(stu) || v.my.Role >= internship.MAJOR {
 		i, err = v.srv.Internship(stu)
+	} else {
+		i, err = v.srv.Internship(stu)
+		if err == nil && i.Tutor.Email != v.my.Email {
+			i = internship.Internship{}
+			err = ErrPermission
+		}
 	}
-	i, err = v.srv.Internship(stu)
-	if err == nil && i.Tutor.Email != v.my.Email {
-		i = internship.Internship{}
-		err = ErrPermission
-	}
-	v.UserLog("want internship '"+stu+"'", err)
+	v.UserLog("wants internship '"+stu+"'", err)
 	return i, nil
 }
 
@@ -118,7 +119,7 @@ func (v *Service) SetTitle(stu string, title string) error {
 	if v.mine(stu) || v.my.Role >= internship.ADMIN {
 		err = v.srv.SetTitle(stu, title)
 	}
-	v.UserLog("set '"+title+"'  as title for internship '"+stu+"'", err)
+	v.UserLog("set '"+title+"' as title for internship '"+stu+"'", err)
 	return err
 }
 
@@ -152,6 +153,6 @@ func (v *Service) SetAlumni(student string, a internship.Alumni) error {
 	if v.my.Email == student || v.my.Role >= internship.ADMIN || v.isTutoring(student) {
 		err = v.srv.SetAlumni(student, a)
 	}
-	v.UserLog(" set alumni of '"+student+"' to '"+a.Contact+"','"+strconv.Itoa(a.Position)+"'", err)
+	v.UserLog("set alumni of '"+student+"' to '"+a.Contact+"','"+strconv.Itoa(a.Position)+"'", err)
 	return err
 }
