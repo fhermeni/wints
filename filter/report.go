@@ -36,7 +36,7 @@ func (v *Service) ReportContent(kind, email string) ([]byte, error) {
 	if v.mine(email) || v.my.Role >= internship.ADMIN || v.isTutoring(email) {
 		cnt, err = v.srv.ReportContent(kind, email)
 	}
-	v.UserLog("upload report '"+kind+"' of '"+email+"'", err)
+	v.UserLog("download report '"+kind+"' of '"+email+"'", err)
 	return cnt, err
 }
 
