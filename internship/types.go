@@ -57,6 +57,9 @@ type Student struct {
 var Privileges = [...]string{"none", "tutor", "major", "admin", "root"}
 
 func (p Privilege) String() string {
+	if p < 0 {
+		return "tutor"
+	}
 	return Privileges[p]
 }
 
@@ -82,7 +85,7 @@ type ReportHeader struct {
 	//The report deadline
 	Deadline time.Time
 	Delivery time.Time
-	Reviewed *time.Time `json:"omitempty"`
+	Reviewed *time.Time `,json:"omitempty"`
 	//The grade, between 0 and 20 if graded. <-2 if their is no report, -1 if it is waiting for a review. >=0 once graded
 	Grade int
 	//The tutor comment

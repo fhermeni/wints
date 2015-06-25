@@ -45,9 +45,6 @@ func jsonRequest(w http.ResponseWriter, r *http.Request, j interface{}) error {
 }
 
 func writeJSONIfOk(e error, w http.ResponseWriter, r *http.Request, j interface{}) error {
-	if e != nil {
-		return e
-	}
 	w.Header().Set("Content-type", "application/json; charset=utf-8")
 	//gzip if it is a slice
 	switch reflect.TypeOf(j).Kind() {
