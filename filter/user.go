@@ -39,6 +39,10 @@ func (v *Service) NewTutor(p internship.User) ([]byte, error) {
 		token, err = v.srv.NewTutor(p)
 	}
 	v.UserLog("new tutor '"+p.Email+"'", err)
+	if err == nil {
+		v.mailer.SendAdminInvitation(p, token)
+	}
+
 	return token, err
 }
 
@@ -48,6 +52,12 @@ func (v *Service) RmUser(email string) error {
 		err = v.srv.RmUser(email)
 	}
 	v.UserLog("delete user '"+email+"'", err)
+	if err == nil {
+		u, err := v.srv.User(email)
+		if err == nil {
+			v.mailer.SendAccountRemoval(u)
+		}
+	}
 	return err
 }
 
@@ -94,6 +104,9 @@ func (v *Service) SetUserRole(email string, priv internship.Privilege) error {
 		err = v.srv.SetUserRole(email, priv)
 	}
 	v.UserLog("set role of '"+email+"' to '"+priv.String()+"'", err)
+	if u, err := v.srv.User(email); err == nil {
+		v.mailer.SendRoleUpdate(u)
+	}
 	return err
 }
 

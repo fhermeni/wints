@@ -1,6 +1,7 @@
 package filter
 
 import (
+	"log"
 	"strconv"
 	"time"
 
@@ -46,6 +47,13 @@ func (v *Service) SetReportContent(kind, email string, cnt []byte) error {
 		err = v.srv.SetReportContent(kind, email, cnt)
 	}
 	v.UserLog("upload '"+kind+"' report content for '"+email+"'", err)
+	if err == nil {
+		if i, err := v.srv.Internship(email); err == nil {
+			v.mailer.SendReportUploaded(i.Student, i.Tutor, kind)
+		} else {
+			log.Println("No mail since: " + err.Error())
+		}
+	}
 	return err
 }
 
@@ -55,6 +63,14 @@ func (v *Service) SetReportGrade(kind, email string, r int, comment string) erro
 		err = v.srv.SetReportGrade(kind, email, r, comment)
 	}
 	v.UserLog("set '"+kind+"' report grade for '"+email+"' to "+strconv.Itoa(r), err)
+	if err == nil {
+		if i, err := v.srv.Internship(email); err == nil {
+			v.mailer.SendGradeUploaded(i.Student, i.Tutor, kind)
+		} else {
+			log.Println("No mail since: " + err.Error())
+		}
+	}
+
 	return err
 }
 
@@ -64,6 +80,14 @@ func (v *Service) SetReportDeadline(kind, email string, t time.Time) error {
 		err = v.srv.SetReportDeadline(kind, email, t)
 	}
 	v.UserLog("set '"+kind+"' report deadline to '"+t.String()+"'", err)
+	if err == nil {
+		if i, err := v.srv.Internship(email); err != nil {
+			v.mailer.SendReportDeadline(i.Student, i.Tutor, kind, t)
+		} else {
+			log.Println("No mail since: " + err.Error())
+		}
+	}
+
 	return err
 }
 
@@ -77,5 +101,11 @@ func (v *Service) SetReportPrivate(kind, email string, p bool) error {
 		st = "private"
 	}
 	v.UserLog("set '"+kind+"' report '"+st+"'for '"+email+"'", err)
+	if err == nil {
+		if i, err := v.srv.Internship(email); err != nil {
+			v.mailer.SendReportPrivate(i.Student, i.Tutor, kind, p)
+		}
+	}
+
 	return err
 }

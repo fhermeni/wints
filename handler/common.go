@@ -84,7 +84,7 @@ func restHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *
 			http.Error(w, err.Error(), http.StatusForbidden)
 			return
 		}
-		wrapper, _ := filter.NewService(j, srv.backend, u)
+		wrapper, _ := filter.NewService(j, srv.backend, u, mailer)
 		e := cb(wrapper, mailer, w, r)
 		switch e {
 		case internship.ErrInvalidToken, internship.ErrSessionExpired:

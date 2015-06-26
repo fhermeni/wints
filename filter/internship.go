@@ -13,6 +13,11 @@ func (v *Service) NewInternship(c internship.Convention) ([]byte, error) {
 		res, err = v.srv.NewInternship(c)
 	}
 	v.UserLog("import convention of '"+c.Student.Email+"'", err)
+	if err == nil {
+		s := internship.User{Firstname: c.Student.Firstname, Lastname: c.Student.Lastname, Email: c.Student.Email}
+		v.mailer.SendStudentInvitation(s, res)
+		v.mailer.SendTutorNotification(c.Student, c.Tutor)
+	}
 	return res, err
 }
 
@@ -81,6 +86,15 @@ func (v *Service) SetTutor(stu string, t string) error {
 		err = v.srv.SetTutor(stu, t)
 	}
 	v.UserLog("set '"+t+"' as tutor for internship '"+stu+"'", err)
+	if err == nil {
+		i, err := v.srv.Internship(stu)
+		if err == nil {
+			if u, err := v.srv.User(t); err == nil {
+				v.mailer.SendTutorUpdate(i.Student, i.Tutor, u)
+			}
+		}
+	}
+
 	return err
 }
 

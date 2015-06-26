@@ -242,10 +242,7 @@ func newTutor(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter,
 	if err != nil {
 		return err
 	}
-	t, err := srv.NewTutor(u)
-	if err == nil {
-		go mailer.SendAdminInvitation(u, t)
-	}
+	_, err = srv.NewTutor(u)
 	return err
 }
 
@@ -256,16 +253,7 @@ func setUserRole(srv internship.Service, mailer mail.Mailer, w http.ResponseWrit
 		return err
 	}
 	em := mux.Vars(r)["email"]
-	err = srv.SetUserRole(em, p)
-	if err != nil {
-		return err
-	}
-	go func() {
-		if u, err := srv.User(em); err == nil {
-			mailer.SendRoleUpdate(u)
-		}
-	}()
-	return nil
+	return srv.SetUserRole(em, p)
 }
 
 type ProfileUpdate struct {
@@ -293,11 +281,7 @@ func rmUser(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r
 	if err != nil {
 		return err
 	}
-	err = srv.RmUser(u.Email)
-	if err == nil {
-		go mailer.SendAccountRemoval(u)
-	}
-	return err
+	return srv.RmUser(u.Email)
 }
 
 func users(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
@@ -341,15 +325,6 @@ func setReportContent(srv internship.Service, mailer mail.Mailer, w http.Respons
 	em := mux.Vars(r)["email"]
 	k := mux.Vars(r)["kind"]
 	err = srv.SetReportContent(k, em, cnt)
-	go func() {
-		if err == nil {
-			if i, err := srv.Internship(em); err == nil {
-				mailer.SendReportUploaded(i.Student, i.Tutor, k)
-			}
-		} else {
-			log.Println("No mail since: " + err.Error())
-		}
-	}()
 	return err
 }
 
@@ -366,16 +341,7 @@ func setReportGrade(srv internship.Service, mailer mail.Mailer, w http.ResponseW
 	}
 	k := mux.Vars(r)["kind"]
 	em := mux.Vars(r)["email"]
-	err = srv.SetReportGrade(k, em, n.Grade, n.Comment)
-
-	go func() {
-		if err == nil {
-			if i, err := srv.Internship(em); err == nil {
-				mailer.SendGradeUploaded(i.Student, i.Tutor, k)
-			}
-		}
-	}()
-	return err
+	return srv.SetReportGrade(k, em, n.Grade, n.Comment)
 }
 
 func setReportDeadline(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
@@ -384,15 +350,7 @@ func setReportDeadline(srv internship.Service, mailer mail.Mailer, w http.Respon
 	if err != nil {
 		return err
 	}
-	err = srv.SetReportDeadline(mux.Vars(r)["kind"], mux.Vars(r)["email"], t)
-	go func() {
-		if err == nil {
-			if i, err := srv.Internship(mux.Vars(r)["email"]); err != nil {
-				mailer.SendReportDeadline(i.Student, i.Tutor, mux.Vars(r)["kind"], t)
-			}
-		}
-	}()
-	return err
+	return srv.SetReportDeadline(mux.Vars(r)["kind"], mux.Vars(r)["email"], t)
 }
 
 func setReportPrivate(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
@@ -401,15 +359,7 @@ func setReportPrivate(srv internship.Service, mailer mail.Mailer, w http.Respons
 	if err != nil {
 		return err
 	}
-	err = srv.SetReportPrivate(mux.Vars(r)["kind"], mux.Vars(r)["email"], b)
-	go func() {
-		if err == nil {
-			if i, err := srv.Internship(mux.Vars(r)["email"]); err != nil {
-				mailer.SendReportPrivate(i.Student, i.Tutor, mux.Vars(r)["kind"], b)
-			}
-		}
-	}()
-	return err
+	return srv.SetReportPrivate(mux.Vars(r)["kind"], mux.Vars(r)["email"], b)
 }
 
 func conventionMgnt(s Service, mailer mail.Mailer, j journal.Journal) {
@@ -468,14 +418,7 @@ func newInternship(srv internship.Service, mailer mail.Mailer, w http.ResponseWr
 	if err != nil {
 		return err
 	}
-	token, err := srv.NewInternship(c)
-	if err == nil {
-		go func() {
-			s := internship.User{Firstname: c.Student.Firstname, Lastname: c.Student.Lastname, Email: c.Student.Email}
-			mailer.SendStudentInvitation(s, token)
-			mailer.SendTutorNotification(c.Student, c.Tutor)
-		}()
-	}
+	_, err = srv.NewInternship(c)
 	return err
 }
 
@@ -541,19 +484,11 @@ func setTutor(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter,
 		return err
 	}
 	em := mux.Vars(r)["email"]
-	i, err := srv.Internship(em)
+	_, err = srv.Internship(em)
 	if err != nil {
 		return err
 	}
-	err = srv.SetTutor(em, s)
-	go func() {
-		if err == nil {
-			if u, err := srv.User(s); err == nil {
-				mailer.SendTutorUpdate(i.Student, i.Tutor, u)
-			}
-		}
-	}()
-	return err
+	return srv.SetTutor(em, s)
 }
 
 func surveyMngt(s Service, mailer mail.Mailer, j journal.Journal) {

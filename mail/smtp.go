@@ -124,145 +124,165 @@ func join(mails ...string) []string {
 }
 
 func (m *SMTP) SendAdminInvitation(u internship.User, token []byte) {
-	d := InvitationData{WWW: m.www, Token: string(token), Login: u.Email}
-	if err := m.mail(join(u.Email), join(), m.path+"/tutor_welcome.txt", d); err != nil {
-		log.Printf("Unable to send invitation to '%s': %s\n", u.Fullname(), err.Error())
-	}
+	go func() {
+		d := InvitationData{WWW: m.www, Token: string(token), Login: u.Email}
+		if err := m.mail(join(u.Email), join(), m.path+"/tutor_welcome.txt", d); err != nil {
+			log.Printf("Unable to send invitation to '%s': %s\n", u.Fullname(), err.Error())
+		}
+	}()
 }
 
 func (m *SMTP) SendStudentInvitation(u internship.User, token []byte) {
-	d := InvitationData{WWW: m.www, Token: string(token), Login: u.Email}
-	if err := m.mail(join(u.Email), join(), m.path+"/student_welcome.txt", d); err != nil {
-		log.Printf("Unable to send invitation to '%s': %s\n", u.Fullname(), err.Error())
-	}
+	go func() {
+		d := InvitationData{WWW: m.www, Token: string(token), Login: u.Email}
+		if err := m.mail(join(u.Email), join(), m.path+"/student_welcome.txt", d); err != nil {
+			log.Printf("Unable to send invitation to '%s': %s\n", u.Fullname(), err.Error())
+		}
+	}()
 }
 
 func (m *SMTP) SendPasswordResetLink(u internship.User, token []byte) {
-	d := InvitationData{WWW: m.www, Token: string(token)}
-	if err := m.mail(join(u.Email), join(), m.path+"/reset.txt", d); err != nil {
-		log.Printf("Unable to send the reset link to '%s': %s\n", u.Fullname(), err.Error())
-	}
+	go func() {
+		d := InvitationData{WWW: m.www, Token: string(token)}
+		if err := m.mail(join(u.Email), join(), m.path+"/reset.txt", d); err != nil {
+			log.Printf("Unable to send the reset link to '%s': %s\n", u.Fullname(), err.Error())
+		}
+	}()
 }
 
 func (m *SMTP) SendAccountRemoval(u internship.User) {
-	empty := struct{}{}
-	if err := m.mail(join(u.Email), join(), m.path+"/delete.txt", empty); err != nil {
-		log.Printf("Unable to send the account removal mail to '%s': %s\n", u.Fullname(), err.Error())
-	}
+	go func() {
+		empty := struct{}{}
+		if err := m.mail(join(u.Email), join(), m.path+"/delete.txt", empty); err != nil {
+			log.Printf("Unable to send the account removal mail to '%s': %s\n", u.Fullname(), err.Error())
+		}
+	}()
 }
 
 func (m *SMTP) SendRoleUpdate(u internship.User) {
-	d := struct {
-		WWW  string
-		Role string
-	}{
-		m.www,
-		u.Role.String(),
-	}
-	if err := m.mail(join(u.Email), join(), m.path+"/privileges.txt", d); err != nil {
-		log.Printf("Unable to send the role update mail to '%s': %s\n", u.Fullname(), err.Error())
-	}
+	go func() {
+		d := struct {
+			WWW  string
+			Role string
+		}{
+			m.www,
+			u.Role.String(),
+		}
+		if err := m.mail(join(u.Email), join(), m.path+"/privileges.txt", d); err != nil {
+			log.Printf("Unable to send the role update mail to '%s': %s\n", u.Fullname(), err.Error())
+		}
+	}()
 }
 
 func (m *SMTP) SendTutorNotification(s internship.Person, t internship.Person) {
-	d := struct {
-		Student internship.Person
-		Tutor   internship.Person
-		WWW     string
-	}{
-		s,
-		t,
-		m.www,
-	}
-	if err := m.mail(join(t.Email), join(), m.path+"/tutor.txt", d); err != nil {
-		log.Printf("Unable to notify tutor '%s' about its new student '%s': %s\n", t.Fullname(), s.Fullname(), err.Error())
-	}
-
+	go func() {
+		d := struct {
+			Student internship.Person
+			Tutor   internship.Person
+			WWW     string
+		}{
+			s,
+			t,
+			m.www,
+		}
+		if err := m.mail(join(t.Email), join(), m.path+"/tutor.txt", d); err != nil {
+			log.Printf("Unable to notify tutor '%s' about its new student '%s': %s\n", t.Fullname(), s.Fullname(), err.Error())
+		}
+	}()
 }
 
 func (m *SMTP) SendTutorUpdate(s internship.User, old internship.User, now internship.User) {
-	d := struct {
-		WWW string
-		Old internship.User
-		New internship.User
-	}{
-		m.www,
-		old,
-		now,
-	}
-	if err := m.mail(join(s.Email, now.Email), join(old.Email), m.path+"/tutor_switch.txt", d); err != nil {
-		log.Printf("Unable to send the role update mail to '%s': %s\n", now.Fullname(), err.Error())
-	}
+	go func() {
+		d := struct {
+			WWW string
+			Old internship.User
+			New internship.User
+		}{
+			m.www,
+			old,
+			now,
+		}
+		if err := m.mail(join(s.Email, now.Email), join(old.Email), m.path+"/tutor_switch.txt", d); err != nil {
+			log.Printf("Unable to send the role update mail to '%s': %s\n", now.Fullname(), err.Error())
+		}
+	}()
 }
 
 func (m *SMTP) SendReportUploaded(s internship.User, t internship.User, kind string) {
-	d := struct {
-		WWW     string
-		Student internship.User
-		Tutor   internship.User
-		Kind    string
-	}{
-		m.www,
-		s,
-		t,
-		kind,
-	}
-	if err := m.mail(join(t.Email), join(s.Email), m.path+"/report_uploaded.txt", d); err != nil {
-		log.Printf("Unable to send the report uploaded notificationl to '%s': %s\n", t.Fullname(), err.Error())
-	}
-
+	go func() {
+		d := struct {
+			WWW     string
+			Student internship.User
+			Tutor   internship.User
+			Kind    string
+		}{
+			m.www,
+			s,
+			t,
+			kind,
+		}
+		if err := m.mail(join(t.Email), join(s.Email), m.path+"/report_uploaded.txt", d); err != nil {
+			log.Printf("Unable to send the report uploaded notificationl to '%s': %s\n", t.Fullname(), err.Error())
+		}
+	}()
 }
 
 func (m *SMTP) SendReportDeadline(s internship.User, t internship.User, kind string, deadline time.Time) {
-	d := struct {
-		WWW     string
-		Student internship.User
-		Tutor   internship.User
-		Kind    string
-		Date    time.Time
-	}{
-		m.www,
-		s,
-		t,
-		kind,
-		deadline,
-	}
-	if err := m.mail(join(s.Email), join(t.Email), m.path+"/report_deadline.txt", d); err != nil {
-		log.Printf("Unable to send the report deadline notification to '%s': %s\n", s.Fullname(), err.Error())
-	}
+	go func() {
+		d := struct {
+			WWW     string
+			Student internship.User
+			Tutor   internship.User
+			Kind    string
+			Date    time.Time
+		}{
+			m.www,
+			s,
+			t,
+			kind,
+			deadline,
+		}
+		if err := m.mail(join(s.Email), join(t.Email), m.path+"/report_deadline.txt", d); err != nil {
+			log.Printf("Unable to send the report deadline notification to '%s': %s\n", s.Fullname(), err.Error())
+		}
+	}()
 }
 
 func (m *SMTP) SendGradeUploaded(s internship.User, t internship.User, kind string) {
-	d := struct {
-		WWW     string
-		Student internship.User
-		Tutor   internship.User
-		Kind    string
-	}{
-		m.www,
-		s,
-		t,
-		kind,
-	}
-	if err := m.mail(join(s.Email), join(t.Email), m.path+"/report_graded.txt", d); err != nil {
-		log.Printf("Unable to send the report graded notification to '%s': %s\n", s.Fullname(), err.Error())
-	}
+	go func() {
+		d := struct {
+			WWW     string
+			Student internship.User
+			Tutor   internship.User
+			Kind    string
+		}{
+			m.www,
+			s,
+			t,
+			kind,
+		}
+		if err := m.mail(join(s.Email), join(t.Email), m.path+"/report_graded.txt", d); err != nil {
+			log.Printf("Unable to send the report graded notification to '%s': %s\n", s.Fullname(), err.Error())
+		}
+	}()
 }
 
 func (m *SMTP) SendReportPrivate(s internship.User, t internship.User, kind string, b bool) {
-	d := struct {
-		WWW     string
-		Student internship.User
-		Tutor   internship.User
-		Kind    string
-		Status  string
-	}{Student: s, Tutor: t, Kind: kind, Status: "public"}
-	if b {
-		d.Status = "private"
-	}
-	if err := m.mail(join(s.Email), join(t.Email), m.path+"/report_status.txt", d); err != nil {
-		log.Printf("Unable to send the report status update to '%s': %s\n", s.Fullname(), err.Error())
-	}
+	go func() {
+		d := struct {
+			WWW     string
+			Student internship.User
+			Tutor   internship.User
+			Kind    string
+			Status  string
+		}{Student: s, Tutor: t, Kind: kind, Status: "public"}
+		if b {
+			d.Status = "private"
+		}
+		if err := m.mail(join(s.Email), join(t.Email), m.path+"/report_status.txt", d); err != nil {
+			log.Printf("Unable to send the report status update to '%s': %s\n", s.Fullname(), err.Error())
+		}
+	}()
 }
 
 func (m *SMTP) SendTest(s string) error {
