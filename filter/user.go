@@ -113,6 +113,10 @@ func (v *Service) SetUserRole(email string, priv internship.Privilege) error {
 func (v *Service) ResetPassword(email string) ([]byte, error) {
 	cnt, err := v.srv.ResetPassword(email)
 	v.log.Log(email, "password reset", err)
+	if u, err := v.srv.User(email); err == nil {
+		v.mailer.SendPasswordResetLink(u, cnt)
+	}
+
 	return cnt, err
 }
 

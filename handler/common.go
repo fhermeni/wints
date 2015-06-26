@@ -86,28 +86,31 @@ func restHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *
 		}
 		wrapper, _ := filter.NewService(j, srv.backend, u, mailer)
 		e := cb(wrapper, mailer, w, r)
-		switch e {
-		case internship.ErrInvalidToken, internship.ErrSessionExpired:
-			return
-		case internship.ErrUnknownSurvey, internship.ErrUnknownUser, internship.ErrUnknownReport, internship.ErrUnknownInternship:
-			http.Error(w, e.Error(), http.StatusNotFound)
-			return
-		case internship.ErrReportExists, internship.ErrUserExists, internship.ErrInternshipExists, internship.ErrCredentials, internship.ErrUserTutoring:
-			http.Error(w, e.Error(), http.StatusConflict)
-			return
-		case internship.ErrInvalidSurvey, internship.ErrInvalidAlumniEmail, internship.ErrDeadlinePassed, internship.ErrInvalidGrade, internship.ErrInvalidMajor, internship.ErrInvalidPeriod, internship.ErrGradedReport:
-			http.Error(w, e.Error(), http.StatusBadRequest)
-			return
-		case filter.ErrPermission:
-			http.Error(w, e.Error(), http.StatusForbidden)
-			return
-		case nil:
-			return
-		default:
-			http.Error(w, "Internal server error. A possible bug to report", http.StatusInternalServerError)
-			log.Printf("Unsupported error: %s\n", e.Error())
-		}
+		status(w, e)
 	})
+}
+func status(w http.ResponseWriter, e error) {
+	switch e {
+	case internship.ErrInvalidToken, internship.ErrSessionExpired:
+		return
+	case internship.ErrUnknownSurvey, internship.ErrUnknownUser, internship.ErrUnknownReport, internship.ErrUnknownInternship:
+		http.Error(w, e.Error(), http.StatusNotFound)
+		return
+	case internship.ErrReportExists, internship.ErrUserExists, internship.ErrInternshipExists, internship.ErrCredentials, internship.ErrUserTutoring:
+		http.Error(w, e.Error(), http.StatusConflict)
+		return
+	case internship.ErrInvalidSurvey, internship.ErrInvalidAlumniEmail, internship.ErrDeadlinePassed, internship.ErrInvalidGrade, internship.ErrInvalidMajor, internship.ErrInvalidPeriod, internship.ErrGradedReport:
+		http.Error(w, e.Error(), http.StatusBadRequest)
+		return
+	case filter.ErrPermission:
+		http.Error(w, e.Error(), http.StatusForbidden)
+		return
+	case nil:
+		return
+	default:
+		http.Error(w, "Internal server error. A possible bug to report", http.StatusInternalServerError)
+		log.Printf("Unsupported error: %s\n", e.Error())
+	}
 }
 
 func fileReplyIfOk(e error, w http.ResponseWriter, mime, filename string, cnt []byte) error {

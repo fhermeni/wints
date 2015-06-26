@@ -209,25 +209,10 @@ func setPassword(srv internship.Service, mailer mail.Mailer, w http.ResponseWrit
 
 func resetPassword(j journal.Journal, srv internship.Service, mailer mail.Mailer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		e := mux.Vars(r)["email"]
-		token, err := srv.ResetPassword(e)
-		j.Log(e, "initiate password reset", err)
-		if err != nil {
-			log.Println("Unable to get the reset token for " + e + ": " + err.Error())
-			return
-		}
-		b := r.URL.Query().Get("invite")
-		go func() {
-			if b == "true" {
-				if u, err := srv.User(e); err == nil {
-					mailer.SendAdminInvitation(u, token)
-				}
-			} else {
-				if u, err := srv.User(e); err == nil {
-					mailer.SendPasswordResetLink(u, token)
-				}
-			}
-		}()
+		em := mux.Vars(r)["email"]
+		_, err := srv.ResetPassword(em)
+		j.Log(em, "initiate password reset", err)
+		status(w, err)
 	}
 }
 
