@@ -105,11 +105,11 @@ func statistics(backend internship.Service) http.HandlerFunc {
 	}
 }
 
-func home(backend internship.Service) http.HandlerFunc {	
+func home(backend internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Here")
 		r.Header.Del("Cache-Control")
-		r.Header.Del("If-Modified-Since")		)
+		r.Header.Del("If-Modified-Since")
 		email, err := authenticated(backend, w, r)
 		if err != nil {
 			log.Println("home: " + err.Error())
