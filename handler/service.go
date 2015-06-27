@@ -35,12 +35,6 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string, j jour
 	r := mux.NewRouter()
 	path = p
 	s := Service{backend: backend, r: r, mailer: mailer}
-	userMngt(s, mailer, j)
-	internshipsMngt(s, mailer, j)
-	reportMngt(s, mailer, j)
-	conventionMgnt(s, mailer, j)
-	surveyMngt(s, mailer, j)
-	defenseMngt(s, mailer, j)
 	fs := http.Dir(path + "/")
 	fileHandler := http.FileServer(fs)
 	r.PathPrefix("/" + path + "/").Handler(httpgzip.NewHandler(http.StripPrefix("/"+path, fileHandler)))
@@ -52,6 +46,48 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string, j jour
 	s.r.HandleFunc("/api/v1/surveys/{token}", setSurveyContent(backend)).Methods("POST")
 	s.r.HandleFunc("/api/v1/statistics/", mon(j, statistics(backend))).Methods("GET")
 	s.r.HandleFunc("/api/v1/majors/", mon(j, majors(backend))).Methods("GET")
+	s.r.HandleFunc("/api/v1/users/{email}", restHandler(user, j, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/users/", restHandler(users, j, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/users/{email}", restHandler(rmUser, j, s, mailer)).Methods("DELETE")
+	s.r.HandleFunc("/api/v1/users/{email}/profile", restHandler(setUserProfile, j, s, mailer)).Methods("PUT")
+	s.r.HandleFunc("/api/v1/users/{email}/role", restHandler(setUserRole, j, s, mailer)).Methods("PUT")
+	s.r.HandleFunc("/api/v1/users/", restHandler(newTutor, j, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/users/{email}/password", mon(j, resetPassword(j, s.backend, mailer))).Methods("DELETE")
+	s.r.HandleFunc("/api/v1/users/{email}/password", restHandler(setPassword, j, s, mailer)).Methods("PUT")
+	s.r.HandleFunc("/api/v1/sessions/", restHandler(sessions, j, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/newPassword", mon(j, newPassword(j, s.backend, mailer))).Methods("POST")
+	s.r.HandleFunc("/api/v1/login", mon(j, login(j, s.backend))).Methods("POST")
+	s.r.HandleFunc("/api/v1/logout", mon(j, logout(j, s.backend))).Methods("GET")
+	s.r.HandleFunc("/resetPassword", mon(j, asset(filepath.Join(path, "new_password.html")))).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}", restHandler(report, j, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/content", restHandler(reportContent, j, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/content", restHandler(setReportContent, j, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/grade", restHandler(setReportGrade, j, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/deadline", restHandler(setReportDeadline, j, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/private", restHandler(setReportPrivate, j, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/conventions/", restHandler(conventions, j, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/conventions/{email}/skip", restHandler(skipConvention, j, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/conventions/{email}", restHandler(deleteConvention, j, s, mailer)).Methods("DELETE")
+	s.r.HandleFunc("/api/v1/internships/{email}", restHandler(getInternship, j, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/", restHandler(internships, j, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/", restHandler(newInternship, j, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/supervisor", restHandler(setSupervisor, j, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/tutor", restHandler(setTutor, j, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/company", restHandler(setCompany, j, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/title", restHandler(setTitle, j, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/major", restHandler(setMajor, j, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/promotion", restHandler(setPromotion, j, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/alumni", restHandler(setAlumni, j, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/students/", restHandler(students, j, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/students/{email}", restHandler(insertStudents, j, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/students/{email}/internship", restHandler(alignStudentWithInternship, j, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/students/{email}/hidden", restHandler(hideStudent, j, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/defenses/", restHandler(getDefenses, j, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/defenses/", restHandler(postDefenses, j, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/api/v1/program/", mon(j, getPublicSessions(s.backend))).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/{email}/defense", restHandler(getDefense, j, s, mailer)).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/{email}/defense/grade", restHandler(setDefenseGrade, j, s, mailer)).Methods("POST")
+
 	return s
 }
 
@@ -91,22 +127,6 @@ func home(backend internship.Service) http.HandlerFunc {
 
 func (s *Service) Listen(host string, cert, pk string) error {
 	return http.ListenAndServeTLS(host, cert, pk, nil)
-}
-
-func userMngt(s Service, mailer mail.Mailer, j journal.Journal) {
-	s.r.HandleFunc("/api/v1/users/{email}", restHandler(user, j, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/users/", restHandler(users, j, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/users/{email}", restHandler(rmUser, j, s, mailer)).Methods("DELETE")
-	s.r.HandleFunc("/api/v1/users/{email}/profile", restHandler(setUserProfile, j, s, mailer)).Methods("PUT")
-	s.r.HandleFunc("/api/v1/users/{email}/role", restHandler(setUserRole, j, s, mailer)).Methods("PUT")
-	s.r.HandleFunc("/api/v1/users/", restHandler(newTutor, j, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/users/{email}/password", mon(j, resetPassword(j, s.backend, mailer))).Methods("DELETE")
-	s.r.HandleFunc("/api/v1/users/{email}/password", restHandler(setPassword, j, s, mailer)).Methods("PUT")
-	s.r.HandleFunc("/api/v1/sessions/", restHandler(sessions, j, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/newPassword", mon(j, newPassword(j, s.backend, mailer))).Methods("POST")
-	s.r.HandleFunc("/api/v1/login", mon(j, login(j, s.backend))).Methods("POST")
-	s.r.HandleFunc("/api/v1/logout", mon(j, logout(j, s.backend))).Methods("GET")
-	s.r.HandleFunc("/resetPassword", mon(j, asset(filepath.Join(path, "new_password.html")))).Methods("GET")
 }
 
 type PasswordUpdate struct {
@@ -274,15 +294,6 @@ func users(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r 
 	return writeJSONIfOk(err, w, r, us)
 }
 
-func reportMngt(s Service, mailer mail.Mailer, j journal.Journal) {
-	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}", restHandler(report, j, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/content", restHandler(reportContent, j, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/content", restHandler(setReportContent, j, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/grade", restHandler(setReportGrade, j, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/deadline", restHandler(setReportDeadline, j, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/private", restHandler(setReportPrivate, j, s, mailer)).Methods("POST")
-}
-
 func report(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	h, err := srv.Report(mux.Vars(r)["kind"], mux.Vars(r)["email"])
 	return writeJSONIfOk(err, w, r, h)
@@ -347,12 +358,6 @@ func setReportPrivate(srv internship.Service, mailer mail.Mailer, w http.Respons
 	return srv.SetReportPrivate(mux.Vars(r)["kind"], mux.Vars(r)["email"], b)
 }
 
-func conventionMgnt(s Service, mailer mail.Mailer, j journal.Journal) {
-	s.r.HandleFunc("/api/v1/conventions/", restHandler(conventions, j, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/conventions/{email}/skip", restHandler(skipConvention, j, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/conventions/{email}", restHandler(deleteConvention, j, s, mailer)).Methods("DELETE")
-}
-
 func skipConvention(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	var b bool
 	err := jsonRequest(w, r, &b)
@@ -369,23 +374,6 @@ func deleteConvention(srv internship.Service, mailer mail.Mailer, w http.Respons
 func conventions(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	c, err := srv.Conventions()
 	return writeJSONIfOk(err, w, r, c)
-}
-
-func internshipsMngt(s Service, mailer mail.Mailer, j journal.Journal) {
-	s.r.HandleFunc("/api/v1/internships/{email}", restHandler(getInternship, j, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/internships/", restHandler(internships, j, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/internships/", restHandler(newInternship, j, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/supervisor", restHandler(setSupervisor, j, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/tutor", restHandler(setTutor, j, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/company", restHandler(setCompany, j, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/title", restHandler(setTitle, j, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/major", restHandler(setMajor, j, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/promotion", restHandler(setPromotion, j, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/alumni", restHandler(setAlumni, j, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/students/", restHandler(students, j, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/students/{email}", restHandler(insertStudents, j, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/students/{email}/internship", restHandler(alignStudentWithInternship, j, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/students/{email}/hidden", restHandler(hideStudent, j, s, mailer)).Methods("POST")
 }
 
 func setAlumni(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
@@ -580,14 +568,6 @@ func hideStudent(srv internship.Service, mailer mail.Mailer, w http.ResponseWrit
 		return err
 	}
 	return srv.HideStudent(mux.Vars(r)["email"], flag)
-}
-
-func defenseMngt(s Service, mailer mail.Mailer, j journal.Journal) {
-	s.r.HandleFunc("/api/v1/defenses/", restHandler(getDefenses, j, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/defenses/", restHandler(postDefenses, j, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/program/", mon(j, getPublicSessions(s.backend))).Methods("GET")
-	s.r.HandleFunc("/api/v1/internships/{email}/defense", restHandler(getDefense, j, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/internships/{email}/defense/grade", restHandler(setDefenseGrade, j, s, mailer)).Methods("POST")
 }
 
 func getDefenses(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
