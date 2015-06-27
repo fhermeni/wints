@@ -51,7 +51,7 @@ func mon(j journal.Journal, h http.HandlerFunc) http.HandlerFunc {
 			//log.Println("st: " + strconv.Itoa(myRw.Status()))
 			j.Access(r.Method, r.URL.String(), 0, int(time.Since(start).Nanoseconds()/1000000))
 		}()
-		log.Println(r.URL.String())
+		log.Println("mon: " + r.URL.String())
 		h(myRw, r)
 	}
 }
