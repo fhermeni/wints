@@ -160,7 +160,7 @@ func login(j journal.Journal, srv internship.Service) http.HandlerFunc {
 			Value: string(t),
 			Path:  "/",
 		}
-
+		log.Println(login + " " + string(t))
 		http.SetCookie(w, cookie)
 		http.SetCookie(w, token)
 		http.Redirect(w, r, "/", 302)
