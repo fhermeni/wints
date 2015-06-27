@@ -117,6 +117,7 @@ func home(backend internship.Service) http.HandlerFunc {
 		}
 		u, err := backend.User(email)
 		if err != nil {
+			log.Println("hup: " + err.Error())
 			http.ServeFile(w, r, path+"/login.html")
 			return
 		}
