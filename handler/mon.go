@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/fhermeni/wints/journal"
@@ -36,7 +38,7 @@ func (w MyResponseWriter) Write(data []byte) (int, error) {
 func (w MyResponseWriter) WriteHeader(statusCode int) {
 	// Store the status code
 	w.status = statusCode
-
+	log.Println("Store status " + strconv.Itoa(statusCode))
 	// Write the status code onward.
 	w.ResponseWriter.WriteHeader(statusCode)
 }
@@ -48,6 +50,7 @@ func mon(j journal.Journal, h http.HandlerFunc) http.HandlerFunc {
 		defer func() {
 			j.Access(r.Method, r.URL.String(), myRw.Status(), int(time.Since(start).Nanoseconds()/1000000))
 		}()
+		log.Println(r.URL.String())
 		h(myRw, r)
 	}
 }
