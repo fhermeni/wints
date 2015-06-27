@@ -119,8 +119,10 @@ func home(backend internship.Service) http.HandlerFunc {
 			return
 		}
 		if u.Role == internship.NONE {
+			log.Println("hop")
 			http.ServeFile(w, r, path+"/student.html")
 		} else {
+			log.Println("hip")
 			http.ServeFile(w, r, path+"/admin.html")
 		}
 	}
