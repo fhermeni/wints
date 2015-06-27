@@ -118,6 +118,8 @@ func home(backend internship.Service) http.HandlerFunc {
 			http.ServeFile(w, r, path+"/login.html")
 			return
 		}
+		r.Header.Del("Cache-Control")
+		r.Header.Del("If-Modified-Since")
 		if u.Role == internship.NONE {
 			log.Println("hop")
 			http.ServeFile(w, r, path+"/student.html")
