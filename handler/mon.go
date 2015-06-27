@@ -48,6 +48,7 @@ func mon(j journal.Journal, h http.HandlerFunc) http.HandlerFunc {
 		myRw := NewMyResponseWriter(w)
 		start := time.Now()
 		defer func() {
+			log.Println("st: " + strconv.Itoa(myRw.Status()))
 			j.Access(r.Method, r.URL.String(), myRw.Status(), int(time.Since(start).Nanoseconds()/1000000))
 		}()
 		log.Println(r.URL.String())
