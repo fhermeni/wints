@@ -108,6 +108,7 @@ func statistics(backend internship.Service) http.HandlerFunc {
 func home(backend internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		email, err := authenticated(backend, w, r)
+		log.Println("home: " + err.Error())
 		if err != nil {
 			http.ServeFile(w, r, path+"/login.html")
 			return
