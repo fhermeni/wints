@@ -68,7 +68,10 @@ func restHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *
 	return mon(j, func(w http.ResponseWriter, r *http.Request) {
 
 		email, err := authenticated(srv.backend, w, r)
-		if err == ErrMissingCookies || err == internship.ErrSessionExpired {
+		if err == ErrMissingCookies {
+			http.Error(w, err.Error(), http.StatusForbidden)
+			return
+		} else if err == internship.ErrSessionExpired {
 			log.Println("expired " + r.URL.String() + " " + err.Error())
 			http.Error(w, "Session expired. Reload the page to re-authenticate", http.StatusRequestTimeout)
 			return
