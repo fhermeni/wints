@@ -1,19 +1,5 @@
 var mine;
 
-$(document).ready(function() {
-	waitingBlock = $("#cnt").clone().html();
-
-	majors(function(m) {
-		allMajors = m;
-	})
-
-	user(getCookie("session"), function(u) {
-		myself = u;
-		$("#fullname").html(u.Firstname + " " + u.Lastname);
-		showDashboard();
-	});
-});
-
 function showDashboard() {
 	internship(myself.Email, function(i) {
 		mine = i

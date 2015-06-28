@@ -12,20 +12,21 @@ $(document).ready(function() {
 
 	majors(function(m) {
 		allMajors = m;
-	})
-	user(getCookie("session"), function(u) {
-		myself = u;
-		$("#fullname").html(u.Firstname + " " + u.Lastname);
-		showMyServices(u.Role);
-		if (myself.Role == 0) {
-			showDashboard();
-		} else if (myself.Role >= 2) {
-			showPage(undefined, "conventions");
-		} else {
-			showPage(undefined, "myStudents");
-		}
+		user(getCookie("session"), function(u) {
+			myself = u;
+			$("#fullname").html(u.Firstname + " " + u.Lastname);
+			showMyServices(u.Role);
+			if (myself.Role == 0) {
+				showDashboard();
+			} else if (myself.Role >= 2) {
+				showPage(undefined, "conventions");
+			} else {
+				showPage(undefined, "myStudents");
+			}
 
-	});
+		});
+
+	})
 
 	$(document).keydown(function(e) {
 		if (e.keyCode == 16) {
