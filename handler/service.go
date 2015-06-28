@@ -107,6 +107,7 @@ func statistics(backend internship.Service) http.HandlerFunc {
 
 func home(backend internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		log.Println("home()")
 		if _, err := authenticated(backend, w, r); err != nil {
 			log.Println("err: " + err.Error())
 			http.Redirect(w, r, "/login", 302)
