@@ -94,8 +94,7 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string, j jour
 
 func majors(backend internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		m := backend.Majors()
-		writeJSONIfOk(nil, w, r, m)
+		writeJSONIfOk(nil, w, r, backend.Majors())
 	}
 }
 
@@ -108,24 +107,11 @@ func statistics(backend internship.Service) http.HandlerFunc {
 
 func home(backend internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		_, err := authenticated(backend, w, r)
-		if err != nil {
+		if _, err := authenticated(backend, w, r); err != nil {
 			http.Redirect(w, r, "/login", 302)
 			return
 		}
-		/*u, err := backend.User(email)
-		if err != nil {
-			http.Redirect(w, r, "/login", 302)
-			return
-		}*/
 		http.ServeFile(w, r, filepath.Join(path, "home.html"))
-		/*		r.Header.Del("Cache-Control")
-				r.Header.Del("If-Modified-Since")
-				if u.Role == internship.NONE {
-					http.ServeFile(w, r, path+"/student.html")
-				} else {
-					http.ServeFile(w, r, path+"/admin.html")
-				}*/
 	}
 }
 
@@ -222,12 +208,10 @@ func newPassword(j journal.Journal, srv internship.Service, mailer mail.Mailer) 
 
 func setPassword(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	var u PasswordUpdate
-	err := jsonRequest(w, r, &u)
-	if err != nil {
+	if err := jsonRequest(w, r, &u); err != nil {
 		return err
 	}
-	e := mux.Vars(r)["email"]
-	return srv.SetUserPassword(e, []byte(u.Old), []byte(u.New))
+	return srv.SetUserPassword(mux.Vars(r)["email"], []byte(u.Old), []byte(u.New))
 }
 
 func resetPassword(j journal.Journal, srv internship.Service, mailer mail.Mailer) http.HandlerFunc {
@@ -256,12 +240,10 @@ func newTutor(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter,
 
 func setUserRole(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	var p internship.Privilege
-	err := jsonRequest(w, r, &p)
-	if err != nil {
+	if err := jsonRequest(w, r, &p); err != nil {
 		return err
 	}
-	em := mux.Vars(r)["email"]
-	return srv.SetUserRole(em, p)
+	return srv.SetUserRole(mux.Vars(r)["email"], p)
 }
 
 type ProfileUpdate struct {
@@ -272,8 +254,7 @@ type ProfileUpdate struct {
 
 func setUserProfile(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	var p ProfileUpdate
-	err := jsonRequest(w, r, &p)
-	if err != nil {
+	if err := jsonRequest(w, r, &p); err != nil {
 		return err
 	}
 	return srv.SetUserProfile(mux.Vars(r)["email"], p.Firstname, p.Lastname, p.Tel)
@@ -321,10 +302,7 @@ func setReportContent(srv internship.Service, mailer mail.Mailer, w http.Respons
 		http.Error(w, "The report must be a PDF", http.StatusBadRequest)
 		return errors.New("The report must be a PDF")
 	}
-	em := mux.Vars(r)["email"]
-	k := mux.Vars(r)["kind"]
-	err = srv.SetReportContent(k, em, cnt)
-	return err
+	return srv.SetReportContent(mux.Vars(r)["kind"], mux.Vars(r)["email"], cnt)
 }
 
 type ReportGrade struct {
@@ -334,19 +312,15 @@ type ReportGrade struct {
 
 func setReportGrade(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	var n ReportGrade
-	err := jsonRequest(w, r, &n)
-	if err != nil {
+	if err := jsonRequest(w, r, &n); err != nil {
 		return err
 	}
-	k := mux.Vars(r)["kind"]
-	em := mux.Vars(r)["email"]
-	return srv.SetReportGrade(k, em, n.Grade, n.Comment)
+	return srv.SetReportGrade(mux.Vars(r)["kind"], mux.Vars(r)["email"], n.Grade, n.Comment)
 }
 
 func setReportDeadline(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	var t time.Time
-	err := jsonRequest(w, r, &t)
-	if err != nil {
+	if err := jsonRequest(w, r, &t); err != nil {
 		return err
 	}
 	return srv.SetReportDeadline(mux.Vars(r)["kind"], mux.Vars(r)["email"], t)
@@ -354,8 +328,7 @@ func setReportDeadline(srv internship.Service, mailer mail.Mailer, w http.Respon
 
 func setReportPrivate(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	var b bool
-	err := jsonRequest(w, r, &b)
-	if err != nil {
+	if err := jsonRequest(w, r, &b); err != nil {
 		return err
 	}
 	return srv.SetReportPrivate(mux.Vars(r)["kind"], mux.Vars(r)["email"], b)
@@ -363,8 +336,7 @@ func setReportPrivate(srv internship.Service, mailer mail.Mailer, w http.Respons
 
 func skipConvention(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	var b bool
-	err := jsonRequest(w, r, &b)
-	if err != nil {
+	if err := jsonRequest(w, r, &b); err != nil {
 		return err
 	}
 	return srv.SkipConvention(mux.Vars(r)["email"], b)
@@ -381,8 +353,7 @@ func conventions(srv internship.Service, mailer mail.Mailer, w http.ResponseWrit
 
 func setAlumni(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	var c internship.Alumni
-	err := jsonRequest(w, r, &c)
-	if err != nil {
+	if err := jsonRequest(w, r, &c); err != nil {
 		return err
 	}
 	return srv.SetAlumni(mux.Vars(r)["email"], c)
@@ -410,8 +381,7 @@ func internships(srv internship.Service, mailer mail.Mailer, w http.ResponseWrit
 
 func setCompany(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	var c internship.Company
-	err := jsonRequest(w, r, &c)
-	if err != nil {
+	if err := jsonRequest(w, r, &c); err != nil {
 		return err
 	}
 	return srv.SetCompany(mux.Vars(r)["email"], c)
@@ -419,8 +389,7 @@ func setCompany(srv internship.Service, mailer mail.Mailer, w http.ResponseWrite
 
 func setMajor(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	var c string
-	err := jsonRequest(w, r, &c)
-	if err != nil {
+	if err := jsonRequest(w, r, &c); err != nil {
 		return err
 	}
 	return srv.SetMajor(mux.Vars(r)["email"], c)
@@ -428,8 +397,7 @@ func setMajor(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter,
 
 func setTitle(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	var c string
-	err := jsonRequest(w, r, &c)
-	if err != nil {
+	if err := jsonRequest(w, r, &c); err != nil {
 		return err
 	}
 	return srv.SetTitle(mux.Vars(r)["email"], c)
@@ -437,8 +405,7 @@ func setTitle(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter,
 
 func setPromotion(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	var c string
-	err := jsonRequest(w, r, &c)
-	if err != nil {
+	if err := jsonRequest(w, r, &c); err != nil {
 		return err
 	}
 	return srv.SetPromotion(mux.Vars(r)["email"], c)
@@ -446,8 +413,7 @@ func setPromotion(srv internship.Service, mailer mail.Mailer, w http.ResponseWri
 
 func setSupervisor(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	var s internship.Person
-	err := jsonRequest(w, r, &s)
-	if err != nil {
+	if err := jsonRequest(w, r, &s); err != nil {
 		return err
 	}
 	return srv.SetSupervisor(mux.Vars(r)["email"], s)
@@ -548,8 +514,7 @@ func students(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter,
 
 func alignStudentWithInternship(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	var intern string
-	err := jsonRequest(w, r, &intern)
-	if err != nil {
+	if err := jsonRequest(w, r, &intern); err != nil {
 		return err
 	}
 	return srv.AlignWithInternship(mux.Vars(r)["email"], intern)
@@ -557,8 +522,7 @@ func alignStudentWithInternship(srv internship.Service, mailer mail.Mailer, w ht
 
 func insertStudents(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	var all string
-	err := jsonRequest(w, r, &all)
-	if err != nil {
+	if err := jsonRequest(w, r, &all); err != nil {
 		return err
 	}
 	return srv.InsertStudents(all)
@@ -566,8 +530,7 @@ func insertStudents(srv internship.Service, mailer mail.Mailer, w http.ResponseW
 
 func hideStudent(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	var flag bool
-	err := jsonRequest(w, r, &flag)
-	if err != nil {
+	if err := jsonRequest(w, r, &flag); err != nil {
 		return err
 	}
 	return srv.HideStudent(mux.Vars(r)["email"], flag)
@@ -580,27 +543,23 @@ func getDefenses(srv internship.Service, mailer mail.Mailer, w http.ResponseWrit
 
 func postDefenses(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	var defs []internship.DefenseSession
-	err := jsonRequest(w, r, &defs)
-	if err != nil {
+	if err := jsonRequest(w, r, &defs); err != nil {
 		return err
 	}
 	return srv.SetDefenseSessions(defs)
 }
 
 func getDefense(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
-	em := mux.Vars(r)["email"]
-	def, err := srv.DefenseSession(em)
+	def, err := srv.DefenseSession(mux.Vars(r)["email"])
 	return writeJSONIfOk(err, w, r, def)
 }
 
 func setDefenseGrade(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
 	var g int
-	err := jsonRequest(w, r, &g)
-	if err != nil {
+	if err := jsonRequest(w, r, &g); err != nil {
 		return err
 	}
-	em := mux.Vars(r)["email"]
-	return srv.SetDefenseGrade(em, g)
+	return srv.SetDefenseGrade(mux.Vars(r)["email"], g)
 }
 
 func getPublicSessions(srv internship.Service) http.HandlerFunc {
