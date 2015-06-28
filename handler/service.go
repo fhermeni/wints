@@ -108,9 +108,11 @@ func statistics(backend internship.Service) http.HandlerFunc {
 func home(backend internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if _, err := authenticated(backend, w, r); err != nil {
+			log.Println("err: " + err.Error())
 			http.Redirect(w, r, "/login", 302)
 			return
 		}
+		log.Println("Already registered")
 		http.ServeFile(w, r, filepath.Join(path, "home.html"))
 	}
 }

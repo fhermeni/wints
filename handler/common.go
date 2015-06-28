@@ -69,12 +69,10 @@ func restHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *
 
 		email, err := authenticated(srv.backend, w, r)
 		if err == ErrMissingCookies || err == internship.ErrSessionExpired {
-			log.Println(err.Error())
-			http.Redirect(w, r, "/login", 302)
+			http.Error(w, err.Error(), http.StatusForbidden)
 			return
 		} else if err == internship.ErrCredentials {
-			log.Println(err.Error())
-			http.Redirect(w, r, "/login", 302)
+			http.Error(w, err.Error(), http.StatusForbidden)
 			return
 		} else if err != nil {
 			log.Println(err.Error())
