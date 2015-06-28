@@ -17,7 +17,10 @@ $(document).ready(function() {
 		myself = u;
 		$("#fullname").html(u.Firstname + " " + u.Lastname);
 		showMyServices(u.Role);
-		if (myself.Role >= 2) {
+		console.log(u.Role)
+		if (myself.Role == 0) {
+			showDashboard();
+		} else if (myself.Role >= 2) {
 			showPage(undefined, "conventions");
 		} else {
 			showPage(undefined, "myStudents");

@@ -108,23 +108,24 @@ func statistics(backend internship.Service) http.HandlerFunc {
 
 func home(backend internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		email, err := authenticated(backend, w, r)
+		_, err := authenticated(backend, w, r)
 		if err != nil {
 			http.Redirect(w, r, "/login", 302)
 			return
 		}
-		u, err := backend.User(email)
+		/*u, err := backend.User(email)
 		if err != nil {
 			http.Redirect(w, r, "/login", 302)
 			return
-		}
-		r.Header.Del("Cache-Control")
-		r.Header.Del("If-Modified-Since")
-		if u.Role == internship.NONE {
-			http.ServeFile(w, r, path+"/student.html")
-		} else {
-			http.ServeFile(w, r, path+"/admin.html")
-		}
+		}*/
+		http.ServeFile(w, r, filepath.Join(path, "home.html"))
+		/*		r.Header.Del("Cache-Control")
+				r.Header.Del("If-Modified-Since")
+				if u.Role == internship.NONE {
+					http.ServeFile(w, r, path+"/student.html")
+				} else {
+					http.ServeFile(w, r, path+"/admin.html")
+				}*/
 	}
 }
 
