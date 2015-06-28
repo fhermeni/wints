@@ -172,7 +172,7 @@ func logout(j journal.Journal, srv internship.Service) http.HandlerFunc {
 		}
 		http.SetCookie(w, email)
 		http.SetCookie(w, token)
-		http.Redirect(w, r, "/", 302)
+		http.Redirect(w, r, "/login", 302)
 	}
 }
 
