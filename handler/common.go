@@ -72,7 +72,7 @@ func restHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *
 			http.Redirect(w, r, "/login", 302)
 			return
 		} else if err == internship.ErrCredentials {
-			http.Error(w, err.Error(), http.StatusForbidden)
+			http.Redirect(w, r, "/login", 302)
 			return
 		} else if err != nil {
 			http.Error(w, "", http.StatusInternalServerError)
