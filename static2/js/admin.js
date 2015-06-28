@@ -17,7 +17,6 @@ $(document).ready(function() {
 		myself = u;
 		$("#fullname").html(u.Firstname + " " + u.Lastname);
 		showMyServices(u.Role);
-		console.log(u.Role)
 		if (myself.Role == 0) {
 			showDashboard();
 		} else if (myself.Role >= 2) {
