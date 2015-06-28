@@ -29,7 +29,6 @@ function noCb(no) {
 
 function restError(no) {
 	return function(jqr) {
-		debugger
 		if (jqr.status == 408) {
 			window.location.href = "/login?#sessionExpired"
 		} else {

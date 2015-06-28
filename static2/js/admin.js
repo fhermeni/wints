@@ -24,6 +24,8 @@ $(document).ready(function() {
 				showPage(undefined, "myStudents");
 			}
 
+		}, function() {
+			window.location.href = "/login"
 		});
 
 	});
