@@ -40,6 +40,7 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string, j jour
 	r.PathPrefix("/" + path + "/").Handler(httpgzip.NewHandler(http.StripPrefix("/"+path, fileHandler)))
 	http.Handle("/", s.r)
 	s.r.HandleFunc("/", mon(j, home(backend))).Methods("GET")
+	s.r.HandleFunc("/login", mon(j, asset(filepath.Join(path, "login.html")))).Methods("GET")
 	s.r.HandleFunc("/statistics", mon(j, asset(filepath.Join(path, "statistics-new.html")))).Methods("GET")
 	s.r.HandleFunc("/defense-program", mon(j, asset(filepath.Join(path, "defense-program.html")))).Methods("GET")
 	s.r.HandleFunc("/api/v1/surveys/{token}", surveyFromToken(backend)).Methods("GET")
@@ -107,18 +108,18 @@ func statistics(backend internship.Service) http.HandlerFunc {
 
 func home(backend internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		r.Header.Del("Cache-Control")
-		r.Header.Del("If-Modified-Since")
 		email, err := authenticated(backend, w, r)
 		if err != nil {
-			http.ServeFile(w, r, path+"/login.html")
+			http.Redirect(w, r, "/login", 302)
 			return
 		}
 		u, err := backend.User(email)
 		if err != nil {
-			http.ServeFile(w, r, path+"/login.html")
+			http.Redirect(w, r, "/login", 302)
 			return
 		}
+		r.Header.Del("Cache-Control")
+		r.Header.Del("If-Modified-Since")
 		if u.Role == internship.NONE {
 			http.ServeFile(w, r, path+"/student.html")
 		} else {

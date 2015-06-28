@@ -69,7 +69,7 @@ func restHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *
 
 		email, err := authenticated(srv.backend, w, r)
 		if err == ErrMissingCookies || err == internship.ErrSessionExpired {
-			http.Error(w, "Session expired. Reload the page to re-authenticate", http.StatusRequestTimeout)
+			http.Redirect(w, r, "/login", 302)
 			return
 		} else if err == internship.ErrCredentials {
 			http.Error(w, err.Error(), http.StatusForbidden)
