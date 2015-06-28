@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"log"
 	"time"
 
 	"github.com/fhermeni/wints/internship"
@@ -23,12 +24,15 @@ func (cache *Cache) Internships() ([]internship.Internship, error) {
 	var err error
 	err = nil
 	if !cache.hot.Get() {
+		log.Println("! in cache")
 		cache.internships, err = cache.backend.Internships()
 		if err != nil {
 			cache.hot.Set(false)
 		} else {
 			cache.hot.Set(true)
 		}
+	} else {
+		log.Println("In cache")
 	}
 	return cache.internships, err
 }
