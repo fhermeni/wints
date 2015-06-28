@@ -42,10 +42,10 @@ func (w MyResponseWriter) WriteHeader(statusCode int) {
 
 func mon(j journal.Journal, h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		myRw := NewMyResponseWriter(w)
+		myRw := w
 		start := time.Now()
 		defer func() {
-			j.Access(r.Method, r.URL.String(), myRw.Status(), int(time.Since(start).Nanoseconds()/1000000))
+			j.Access(r.Method, r.URL.String(), 0, int(time.Since(start).Nanoseconds()/1000000))
 		}()
 		h(myRw, r)
 	}
