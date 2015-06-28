@@ -107,26 +107,21 @@ func statistics(backend internship.Service) http.HandlerFunc {
 
 func home(backend internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Here")
 		r.Header.Del("Cache-Control")
 		r.Header.Del("If-Modified-Since")
 		email, err := authenticated(backend, w, r)
 		if err != nil {
-			log.Println("home: " + err.Error())
 			http.ServeFile(w, r, path+"/login.html")
 			return
 		}
 		u, err := backend.User(email)
 		if err != nil {
-			log.Println("hup: " + err.Error())
 			http.ServeFile(w, r, path+"/login.html")
 			return
 		}
 		if u.Role == internship.NONE {
-			log.Println("hop")
 			http.ServeFile(w, r, path+"/student.html")
 		} else {
-			log.Println("hip")
 			http.ServeFile(w, r, path+"/admin.html")
 		}
 	}
@@ -166,7 +161,6 @@ func login(j journal.Journal, srv internship.Service) http.HandlerFunc {
 			Value: string(t),
 			Path:  "/",
 		}
-		log.Println(login + " " + string(t))
 		http.SetCookie(w, cookie)
 		http.SetCookie(w, token)
 		http.Redirect(w, r, "/", 302)
