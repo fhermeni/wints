@@ -75,9 +75,8 @@ func restHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *
 			http.Error(w, err.Error(), http.StatusForbidden)
 			return
 		} else if err != nil {
-			log.Println(err.Error())
 			http.Error(w, "", http.StatusInternalServerError)
-			log.Printf("Unsupported error: %s\n", err.Error())
+			j.Log("ERROR", "Unsupported error: %s\n", err)
 			return
 		}
 		u, err := srv.backend.User(email)
