@@ -1,10 +1,10 @@
 package handler
 
 import (
+	"log"
 	"net/http"
+	"strconv"
 	"time"
-
-	"github.com/fhermeni/wints/journal"
 )
 
 // Create our own MyResponseWriter to wrap a standard http.ResponseWriter
@@ -36,16 +36,17 @@ func (w MyResponseWriter) Write(data []byte) (int, error) {
 func (w MyResponseWriter) WriteHeader(statusCode int) {
 	// Store the status code
 	w.status = statusCode
+	log.Println("here: " + strconv.Itoa(statusCode))
 	// Write the status code onward.
 	w.ResponseWriter.WriteHeader(statusCode)
 }
 
-func mon(j journal.Journal, h http.HandlerFunc) http.HandlerFunc {
+func (s *Service) mon(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		myRw := w
+		myRw := NewMyResponseWriter(w)
 		start := time.Now()
 		defer func() {
-			j.Access(r.Method, r.URL.String(), 0, int(time.Since(start).Nanoseconds()/1000000))
+			s.j.Access(r.Method, r.URL.String(), myRw.Status(), int(time.Since(start).Nanoseconds()/1000000))
 		}()
 		h(myRw, r)
 	}
