@@ -279,8 +279,27 @@ func (m *SMTP) SendReportPrivate(s internship.User, t internship.User, kind stri
 		if b {
 			d.Status = "private"
 		}
-		if err := m.mail(join(s.Email), join(t.Email), m.path+"/report_status.txt", d); err != nil {
+		if err := m.mail(join(t.Email), join(), m.path+"/report_status.txt", d); err != nil {
 			log.Printf("Unable to send the report status update to '%s': %s\n", s.Fullname(), err.Error())
+		}
+	}()
+}
+
+func (m *SMTP) SendSurveyUploaded(tutor internship.User, student internship.User, kind string) {
+	go func() {
+		d := struct {
+			WWW     string
+			Student internship.User
+			Tutor   internship.User
+			Kind    string
+		}{
+			m.www,
+			student,
+			tutor,
+			kind,
+		}
+		if err := m.mail(join(student.Email), join(tutor.Email), m.path+"/survey_uploaded.txt", d); err != nil {
+			log.Printf("Unable to send the '%s' survey uploaded status update to '%s': %s\n", kind, tutor.String(), err.Error())
 		}
 	}()
 }

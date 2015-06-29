@@ -43,8 +43,8 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string, j jour
 	s.r.HandleFunc("/login", mon(j, asset(filepath.Join(path, "login.html")))).Methods("GET")
 	s.r.HandleFunc("/statistics", mon(j, asset(filepath.Join(path, "statistics-new.html")))).Methods("GET")
 	s.r.HandleFunc("/defense-program", mon(j, asset(filepath.Join(path, "defense-program.html")))).Methods("GET")
-	s.r.HandleFunc("/api/v1/surveys/{token}", surveyFromToken(backend)).Methods("GET")
-	s.r.HandleFunc("/api/v1/surveys/{token}", setSurveyContent(backend)).Methods("POST")
+	s.r.HandleFunc("/api/v1/surveys/{token}", mon(j, surveyFromToken(backend))).Methods("GET")
+	s.r.HandleFunc("/api/v1/surveys/{token}", mon(j, setSurveyContent(j, mailer, backend))).Methods("POST")
 	s.r.HandleFunc("/api/v1/statistics/", mon(j, statistics(backend))).Methods("GET")
 	s.r.HandleFunc("/api/v1/majors/", mon(j, majors(backend))).Methods("GET")
 	s.r.HandleFunc("/api/v1/users/{email}", restHandler(user, j, s, mailer)).Methods("GET")
@@ -490,7 +490,7 @@ func surveyFromToken(backend internship.Service) http.HandlerFunc {
 	}
 }
 
-func setSurveyContent(backend internship.Service) http.HandlerFunc {
+func setSurveyContent(j journal.Journal, m mail.Mailer, backend internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tok := mux.Vars(r)["token"]
 		//Check for suspicious content (too long for example)
@@ -502,8 +502,23 @@ func setSurveyContent(backend internship.Service) http.HandlerFunc {
 		}
 		err = backend.SetSurveyContent(tok, cnt)
 		if err != nil {
-			log.Println("Unable to store the survey: " + err.Error())
 			http.Error(w, "Bad content", http.StatusBadRequest)
+			return
+		}
+
+		j.Log(tok, "uploaded the survey", err)
+		if err == nil {
+			stu, kind, err2 := backend.SurveyToken(tok)
+			if err2 != nil {
+				j.Log(tok, "Unable to mail about survey", err2)
+				return
+			}
+			i, err2 := backend.Internship(stu)
+			if err2 != nil {
+				j.Log(tok, "Unable to mail about survey", err2)
+				return
+			}
+			m.SendSurveyUploaded(i.Tutor, i.Student, kind)
 		}
 	}
 }
