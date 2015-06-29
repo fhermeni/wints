@@ -118,6 +118,7 @@ func home(backend internship.Service) http.HandlerFunc {
 		}
 		log.Println("Already registered")
 		log.Println(r.Header)
+		w.Header().Set("Pragma", "no-cache")
 		http.ServeFile(w, r, filepath.Join(path, "home.html"))
 	}
 }
