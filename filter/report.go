@@ -81,7 +81,8 @@ func (v *Service) SetReportDeadline(kind, email string, t time.Time) error {
 	}
 	v.UserLog("set '"+kind+"' report deadline to '"+t.String()+"'", err)
 	if err == nil {
-		if i, err := v.srv.Internship(email); err != nil {
+		i, err := v.srv.Internship(email)
+		if err == nil {
 			v.mailer.SendReportDeadline(i.Student, i.Tutor, kind, t)
 		} else {
 			log.Println("No mail since: " + err.Error())
