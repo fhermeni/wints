@@ -63,7 +63,7 @@ func writeJSONIfOk(e error, w http.ResponseWriter, r *http.Request, j interface{
 	return enc.Encode(j)
 }
 
-func restHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *http.Request) error, j journal.Journal, srv Service, mailer mail.Mailer) http.HandlerFunc {
+func restHandler(cb func(internship.Service, http.ResponseWriter, *http.Request) error, j journal.Journal, srv Service, mailer mail.Mailer) http.HandlerFunc {
 
 	return mon(j, func(w http.ResponseWriter, r *http.Request) {
 
@@ -85,7 +85,7 @@ func restHandler(cb func(internship.Service, mail.Mailer, http.ResponseWriter, *
 			return
 		}
 		wrapper, _ := filter.NewService(j, srv.backend, u, mailer)
-		e := cb(wrapper, mailer, w, r)
+		e := cb(wrapper, w, r)
 		status(w, e)
 	})
 }
