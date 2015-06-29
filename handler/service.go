@@ -3,7 +3,6 @@ package handler
 import (
 	"errors"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"path/filepath"
@@ -43,7 +42,7 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string, j jour
 	s.r.HandleFunc("/login", mon(j, asset(filepath.Join(path, "login.html")))).Methods("GET")
 	s.r.HandleFunc("/statistics", mon(j, asset(filepath.Join(path, "statistics-new.html")))).Methods("GET")
 	s.r.HandleFunc("/defense-program", mon(j, asset(filepath.Join(path, "defense-program.html")))).Methods("GET")
-	s.r.HandleFunc("/api/v1/surveys/{token}", mon(j, surveyFromToken(backend))).Methods("GET")
+	s.r.HandleFunc("/api/v1/surveys/{token}", mon(j, surveyFromToken(j, backend))).Methods("GET")
 	s.r.HandleFunc("/api/v1/surveys/{token}", mon(j, setSurveyContent(j, mailer, backend))).Methods("POST")
 	s.r.HandleFunc("/api/v1/statistics/", mon(j, statistics(backend))).Methods("GET")
 	s.r.HandleFunc("/api/v1/majors/", mon(j, majors(backend))).Methods("GET")
@@ -205,7 +204,6 @@ func newPassword(j journal.Journal, srv internship.Service, mailer mail.Mailer) 
 			http.SetCookie(w, cookie)
 			http.Redirect(w, r, "/?email="+url.QueryEscape(email), 302)
 		default:
-			log.Println("Unable to reset the password for token " + token + ": " + err.Error())
 			http.Error(w, "Unable to reset the password", http.StatusInternalServerError)
 			return
 		}
@@ -460,7 +458,7 @@ type LongSurvey struct {
 	Answers   map[string]string
 }
 
-func surveyFromToken(backend internship.Service) http.HandlerFunc {
+func surveyFromToken(j journal.Journal, backend internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tok := mux.Vars(r)["token"]
 		student, kind, err := backend.SurveyToken(tok)
@@ -474,13 +472,13 @@ func surveyFromToken(backend internship.Service) http.HandlerFunc {
 		}
 		s, err := backend.Survey(student, kind)
 		if err != nil {
-			log.Printf("Unable to send the survey ", err.Error())
+			j.Log(tok, "Sending the long survey", err)
 			http.Error(w, "A possible bug to report", http.StatusInternalServerError)
 			return
 		}
 		i, err := backend.Internship(student)
 		if err != nil {
-			log.Printf("Unable to send the survey ", err.Error())
+			j.Log(tok, "Sending the long survey", err)
 			http.Error(w, "A possible bug to report", http.StatusInternalServerError)
 			return
 		}
