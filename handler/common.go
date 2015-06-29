@@ -10,8 +10,6 @@ import (
 
 	"github.com/fhermeni/wints/filter"
 	"github.com/fhermeni/wints/internship"
-	"github.com/fhermeni/wints/journal"
-	"github.com/fhermeni/wints/mail"
 )
 
 func authenticated(backend internship.Service, w http.ResponseWriter, r *http.Request) (string, error) {
@@ -27,12 +25,6 @@ func authenticated(backend internship.Service, w http.ResponseWriter, r *http.Re
 
 	err = backend.OpenedSession(cookie.Value, token.Value)
 	return cookie.Value, err
-}
-
-func asset(path string) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, path)
-	}
 }
 
 func jsonRequest(w http.ResponseWriter, r *http.Request, j interface{}) error {
@@ -63,32 +55,6 @@ func writeJSONIfOk(e error, w http.ResponseWriter, r *http.Request, j interface{
 	return enc.Encode(j)
 }
 
-func restHandler(cb func(internship.Service, http.ResponseWriter, *http.Request) error, j journal.Journal, srv Service, mailer mail.Mailer) http.HandlerFunc {
-
-	return mon(j, func(w http.ResponseWriter, r *http.Request) {
-
-		email, err := authenticated(srv.backend, w, r)
-		if err == ErrMissingCookies || err == internship.ErrSessionExpired {
-			http.Error(w, err.Error(), http.StatusForbidden)
-			return
-		} else if err == internship.ErrCredentials {
-			http.Error(w, err.Error(), http.StatusForbidden)
-			return
-		} else if err != nil {
-			http.Error(w, "", http.StatusInternalServerError)
-			j.Log("ERROR", "Unsupported error: %s\n", err)
-			return
-		}
-		u, err := srv.backend.User(email)
-		if err == internship.ErrUnknownUser {
-			http.Error(w, err.Error(), http.StatusForbidden)
-			return
-		}
-		wrapper, _ := filter.NewService(j, srv.backend, u, mailer)
-		e := cb(wrapper, w, r)
-		status(w, e)
-	})
-}
 func status(w http.ResponseWriter, e error) {
 	switch e {
 	case internship.ErrInvalidToken, internship.ErrSessionExpired:
