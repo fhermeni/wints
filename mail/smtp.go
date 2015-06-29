@@ -202,7 +202,7 @@ func (m *SMTP) SendTutorUpdate(s internship.User, old internship.User, now inter
 			now,
 		}
 		err := m.mail(join(s.Email, now.Email), join(old.Email), m.path+"/tutor_switch.txt", d)
-		m.log("Sending the tutor switch of '"+s.Fullname()+"' to '"+now.Fullname()+"' and '"+old.Fullname()+"'", err)
+		m.log("Sending the tutor switch of '"+s.Fullname()+"' to '"+now.Fullname()+"'(new) and '"+old.Fullname()+"' (old)", err)
 	}()
 }
 
@@ -220,7 +220,7 @@ func (m *SMTP) SendReportUploaded(s internship.User, t internship.User, kind str
 			kind,
 		}
 		err := m.mail(join(t.Email), join(s.Email), m.path+"/report_uploaded.txt", d)
-		m.log("Sending the report uploaded notification to '"+t.Fullname()+"'", err)
+		m.log("Sending the '"+kind+"' report uploaded notification to '"+t.Fullname()+"'", err)
 	}()
 }
 
@@ -240,7 +240,7 @@ func (m *SMTP) SendReportDeadline(s internship.User, t internship.User, kind str
 			deadline,
 		}
 		err := m.mail(join(s.Email), join(t.Email), m.path+"/report_deadline.txt", d)
-		m.log("Send the report deadline notification to '"+s.Fullname()+"'", err)
+		m.log("Send the '"+kind+"' report deadline notification to '"+s.Fullname()+"'", err)
 	}()
 }
 
@@ -258,7 +258,7 @@ func (m *SMTP) SendGradeUploaded(s internship.User, t internship.User, kind stri
 			kind,
 		}
 		err := m.mail(join(s.Email), join(t.Email), m.path+"/report_graded.txt", d)
-		m.log("Send the report graded notification to '"+s.Fullname()+"'", err)
+		m.log("Send the '"+kind+"' report graded notification to '"+s.Fullname()+"'", err)
 	}()
 }
 
@@ -275,7 +275,7 @@ func (m *SMTP) SendReportPrivate(s internship.User, t internship.User, kind stri
 			d.Status = "private"
 		}
 		err := m.mail(join(t.Email), join(), m.path+"/report_status.txt", d)
-		m.log("Sending the report status update to '"+s.Fullname()+"'", err)
+		m.log("Sending the '"+kind+"' report status update to '"+t.Fullname()+"'", err)
 	}()
 }
 
@@ -292,8 +292,8 @@ func (m *SMTP) SendSurveyUploaded(tutor internship.User, student internship.User
 			tutor,
 			kind,
 		}
-		err := m.mail(join(student.Email), join(tutor.Email), m.path+"/survey_uploaded.txt", d)
-		m.log("Sending the '%s' survey uploaded status update to '"+tutor.Fullname()+"'", err)
+		err := m.mail(join(tutor.Email), join(), m.path+"/survey_uploaded.txt", d)
+		m.log("Sending the '"+kind+"' survey uploaded status update to '"+tutor.Fullname()+"'", err)
 	}()
 }
 
