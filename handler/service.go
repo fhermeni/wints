@@ -88,6 +88,8 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string, j jour
 	s.r.HandleFunc("/api/v1/program/", mon(j, getPublicSessions(s.backend))).Methods("GET")
 	s.r.HandleFunc("/api/v1/internships/{email}/defense", restHandler(getDefense, j, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/internships/{email}/defense/grade", restHandler(setDefenseGrade, j, s, mailer)).Methods("POST")
+	s.r.HandleFunc("/surveys/{kind}", surveyForm).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/{student}/surveys/{kind}", restHandler(survey, j, s, mailer)).Methods("GET")
 
 	return s
 }
@@ -435,11 +437,6 @@ func setTutor(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter,
 		return err
 	}
 	return srv.SetTutor(em, s)
-}
-
-func surveyMngt(s Service, mailer mail.Mailer, j journal.Journal) {
-	s.r.HandleFunc("/surveys/{kind}", surveyForm).Methods("GET")
-	s.r.HandleFunc("/api/v1/internships/{student}/surveys/{kind}", restHandler(survey, j, s, mailer)).Methods("GET")
 }
 
 func surveyForm(w http.ResponseWriter, r *http.Request) {
