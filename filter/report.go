@@ -1,7 +1,6 @@
 package filter
 
 import (
-	"log"
 	"strconv"
 	"time"
 
@@ -48,10 +47,10 @@ func (v *Service) SetReportContent(kind, email string, cnt []byte) error {
 	}
 	v.UserLog("upload '"+kind+"' report content for '"+email+"'", err)
 	if err == nil {
-		if i, err := v.srv.Internship(email); err == nil {
+		if i, err2 := v.srv.Internship(email); err2 == nil {
 			v.mailer.SendReportUploaded(i.Student, i.Tutor, kind)
 		} else {
-			log.Println("No mail since: " + err.Error())
+			v.UserLog("Unable to mail about the report upload", err2)
 		}
 	}
 	return err
@@ -64,10 +63,11 @@ func (v *Service) SetReportGrade(kind, email string, r int, comment string) erro
 	}
 	v.UserLog("set '"+kind+"' report grade for '"+email+"' to "+strconv.Itoa(r), err)
 	if err == nil {
-		if i, err := v.srv.Internship(email); err == nil {
+		i, err2 := v.srv.Internship(email)
+		if err2 == nil {
 			v.mailer.SendGradeUploaded(i.Student, i.Tutor, kind)
 		} else {
-			log.Println("No mail since: " + err.Error())
+			v.UserLog("Unable to mail about the report grade", err2)
 		}
 	}
 
@@ -85,7 +85,7 @@ func (v *Service) SetReportDeadline(kind, email string, t time.Time) error {
 		if err == nil {
 			v.mailer.SendReportDeadline(i.Student, i.Tutor, kind, t)
 		} else {
-			log.Println("No mail since: " + err.Error())
+			v.UserLog("Unable to notify about the new deadline since: ", err)
 		}
 	}
 

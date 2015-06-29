@@ -88,7 +88,7 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string, j jour
 	s.r.HandleFunc("/api/v1/program/", mon(j, getPublicSessions(s.backend))).Methods("GET")
 	s.r.HandleFunc("/api/v1/internships/{email}/defense", restHandler(getDefense, j, s, mailer)).Methods("GET")
 	s.r.HandleFunc("/api/v1/internships/{email}/defense/grade", restHandler(setDefenseGrade, j, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/surveys/{kind}", surveyForm).Methods("GET")
+	s.r.HandleFunc("/surveys/{kind}", mon(j, surveyForm)).Methods("GET")
 	s.r.HandleFunc("/api/v1/internships/{student}/surveys/{kind}", restHandler(survey, j, s, mailer)).Methods("GET")
 
 	return s

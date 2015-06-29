@@ -1,10 +1,6 @@
 package filter
 
-import (
-	"log"
-
-	"github.com/fhermeni/wints/internship"
-)
+import "github.com/fhermeni/wints/internship"
 
 func (v *Service) SurveyToken(kind string) (string, string, error) {
 	return v.srv.SurveyToken(kind)
@@ -26,12 +22,12 @@ func (v *Service) SetSurveyContent(token string, cnt map[string]string) error {
 	if err == nil {
 		stu, kind, err2 := v.srv.SurveyToken(token)
 		if err2 != nil {
-			log.Println("Unable to mail about survey '" + token + "' uploaded: " + err2.Error())
+			v.log.Log(token, "Unable to mail about the uploaded survey", err2)
 			return err
 		}
 		u, err2 := v.srv.User(stu)
 		if err2 != nil {
-			log.Println("Unable to mail about survey '" + token + "' uploaded: " + err2.Error())
+			v.log.Log(token, "Unable to mail about the uploaded survey", err2)
 			return err
 		}
 		v.mailer.SendSurveyUploaded(v.my, u, kind)
