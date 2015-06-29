@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/csv"
 	"io"
-	"log"
 	"strings"
 
 	"github.com/fhermeni/wints/internship"
@@ -42,7 +41,6 @@ func (s *Service) Students() ([]internship.Student, error) {
 
 func (s *Service) AlignWithInternship(student string, intern string) error {
 	req := "update pending set internship=$2 where email=$1"
-	log.Println(student + " |" + intern + "|")
 	return SingleUpdate(s.DB, internship.ErrUnknownUser, req, student, intern)
 }
 
