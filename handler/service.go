@@ -2,9 +2,11 @@ package handler
 
 import (
 	"errors"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -40,7 +42,7 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string, j jour
 	fs := http.Dir(path + "/")
 	fileHandler := http.FileServer(fs)
 	r.PathPrefix("/" + path + "/").Handler(httpgzip.NewHandler(http.StripPrefix("/"+path, fileHandler)))
-	r.NotFoundHandler = s.mon(s.asset("404.html"))
+	r.NotFoundHandler = s.mon(s.errorPage())
 	http.Handle("/", s.r)
 	s.r.HandleFunc("/", s.mon(home(backend))).Methods("GET")
 	s.r.HandleFunc("/login", s.mon(s.asset("login.html"))).Methods("GET")
@@ -95,6 +97,20 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string, j jour
 	s.r.HandleFunc("/api/v1/internships/{student}/surveys/{kind}", s.rest(survey)).Methods("GET")
 
 	return s
+}
+
+func (s *Service) errorPage() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html")
+		w.WriteHeader(404)
+
+		in, err := os.Open(filepath.Join(s.assetPath, "404.html"))
+		if err != nil {
+			return
+		}
+		defer in.Close()
+		_, err = io.Copy(w, in)
+	}
 }
 
 func (s *Service) rest(cb func(internship.Service, http.ResponseWriter, *http.Request) error) http.HandlerFunc {

@@ -1,9 +1,7 @@
 package handler
 
 import (
-	"log"
 	"net/http"
-	"strconv"
 	"time"
 )
 
@@ -20,23 +18,22 @@ func NewMyResponseWriter(res http.ResponseWriter) *MyResponseWriter {
 }
 
 // Give a way to get the status
-func (w MyResponseWriter) Status() int {
+func (w *MyResponseWriter) Status() int {
 	return w.status
 }
 
 // Satisfy the http.ResponseWriter interface
-func (w MyResponseWriter) Header() http.Header {
+func (w *MyResponseWriter) Header() http.Header {
 	return w.ResponseWriter.Header()
 }
 
-func (w MyResponseWriter) Write(data []byte) (int, error) {
+func (w *MyResponseWriter) Write(data []byte) (int, error) {
 	return w.ResponseWriter.Write(data)
 }
 
-func (w MyResponseWriter) WriteHeader(statusCode int) {
+func (w *MyResponseWriter) WriteHeader(statusCode int) {
 	// Store the status code
 	w.status = statusCode
-	log.Println("here: " + strconv.Itoa(statusCode))
 	// Write the status code onward.
 	w.ResponseWriter.WriteHeader(statusCode)
 }
