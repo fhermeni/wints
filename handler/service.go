@@ -159,6 +159,13 @@ func statistics(backend internship.Service) http.HandlerFunc {
 	}
 }
 
+func getPublicSessions(srv internship.Service) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		sessions, err := srv.PublicDefenseSessions()
+		writeJSONIfOk(err, w, r, sessions)
+	}
+}
+
 func home(backend internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		r.Header.Del("Cache-Control")
@@ -280,11 +287,6 @@ func resetPassword(j journal.Journal, srv internship.Service, mailer mail.Mailer
 	}
 }
 
-func sessions(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
-	res, err := srv.Sessions()
-	return writeJSONIfOk(err, w, r, res)
-}
-
 func newTutor(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var u internship.User
 	err := jsonRequest(w, r, &u)
@@ -317,11 +319,6 @@ func setUserProfile(srv internship.Service, w http.ResponseWriter, r *http.Reque
 	return srv.SetUserProfile(mux.Vars(r)["email"], p.Firstname, p.Lastname, p.Tel)
 }
 
-func user(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
-	us, err := srv.User(mux.Vars(r)["email"])
-	return writeJSONIfOk(err, w, r, us)
-}
-
 func rmUser(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	u, err := srv.User(mux.Vars(r)["email"])
 	if err != nil {
@@ -330,14 +327,49 @@ func rmUser(srv internship.Service, w http.ResponseWriter, r *http.Request) erro
 	return srv.RmUser(u.Email)
 }
 
+func getInternship(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	i, err := srv.Internship(mux.Vars(r)["email"])
+	return writeJSONIfOk(err, w, r, i)
+}
+
+func internships(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	i, err := srv.Internships()
+	return writeJSONIfOk(err, w, r, i)
+}
+
+func getDefenses(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	defs, err := srv.DefenseSessions()
+	return writeJSONIfOk(err, w, r, defs)
+}
+
+func sessions(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	res, err := srv.Sessions()
+	return writeJSONIfOk(err, w, r, res)
+}
+
 func users(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	us, err := srv.Users()
 	return writeJSONIfOk(err, w, r, us)
 }
 
+func conventions(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	c, err := srv.Conventions()
+	return writeJSONIfOk(err, w, r, c)
+}
+
+func getDefense(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	def, err := srv.DefenseSession(mux.Vars(r)["email"])
+	return writeJSONIfOk(err, w, r, def)
+}
+
 func report(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	h, err := srv.Report(mux.Vars(r)["kind"], mux.Vars(r)["email"])
 	return writeJSONIfOk(err, w, r, h)
+}
+
+func user(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	us, err := srv.User(mux.Vars(r)["email"])
+	return writeJSONIfOk(err, w, r, us)
 }
 
 func reportContent(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
@@ -403,11 +435,6 @@ func deleteConvention(srv internship.Service, w http.ResponseWriter, r *http.Req
 	return srv.DeleteConvention(mux.Vars(r)["email"])
 }
 
-func conventions(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
-	c, err := srv.Conventions()
-	return writeJSONIfOk(err, w, r, c)
-}
-
 func setAlumni(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var c internship.Alumni
 	if err := jsonRequest(w, r, &c); err != nil {
@@ -424,16 +451,6 @@ func newInternship(srv internship.Service, w http.ResponseWriter, r *http.Reques
 	}
 	_, err = srv.NewInternship(c)
 	return err
-}
-
-func getInternship(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
-	i, err := srv.Internship(mux.Vars(r)["email"])
-	return writeJSONIfOk(err, w, r, i)
-}
-
-func internships(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
-	i, err := srv.Internships()
-	return writeJSONIfOk(err, w, r, i)
 }
 
 func setCompany(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
@@ -603,11 +620,6 @@ func hideStudent(srv internship.Service, w http.ResponseWriter, r *http.Request)
 	return srv.HideStudent(mux.Vars(r)["email"], flag)
 }
 
-func getDefenses(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
-	defs, err := srv.DefenseSessions()
-	return writeJSONIfOk(err, w, r, defs)
-}
-
 func postDefenses(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var defs []internship.DefenseSession
 	if err := jsonRequest(w, r, &defs); err != nil {
@@ -616,22 +628,10 @@ func postDefenses(srv internship.Service, w http.ResponseWriter, r *http.Request
 	return srv.SetDefenseSessions(defs)
 }
 
-func getDefense(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
-	def, err := srv.DefenseSession(mux.Vars(r)["email"])
-	return writeJSONIfOk(err, w, r, def)
-}
-
 func setDefenseGrade(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var g int
 	if err := jsonRequest(w, r, &g); err != nil {
 		return err
 	}
 	return srv.SetDefenseGrade(mux.Vars(r)["email"], g)
-}
-
-func getPublicSessions(srv internship.Service) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		sessions, err := srv.PublicDefenseSessions()
-		writeJSONIfOk(err, w, r, sessions)
-	}
 }
