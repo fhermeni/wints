@@ -6,6 +6,7 @@ var months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oc
 var ccountry = undefined,
 	csector = undefined,
 	calumni = undefined,
+	cMidtermDelay = undefined,
 	barGratification;
 
 $(document).ready(function() {
@@ -47,6 +48,8 @@ $(document).ready(function() {
 			grades('Final')
 			surveys("midterm")
 			showAlumni();
+			delays("Midterm", "Delivery")
+				//delays("Final", "Delivery")
 		})
 	})
 });
@@ -54,6 +57,123 @@ $(document).ready(function() {
 String.prototype.endsWith = function(suffix) {
 	return this.indexOf(suffix, this.length - suffix.length) !== -1;
 };
+
+function delays(kind, type) {
+	var dates = []
+	var now = new Date();
+	var missing = 0;
+	stats.forEach(function(s) {
+		s.Reports.forEach(function(r) {
+			if (r.Kind == kind) {
+				var from = new Date(r.Deadline)
+				if (type == "Delivery") {
+					if (moment(from).isAfter(moment(now))) {
+						//not passed						
+						return
+					}
+					if (new Date(r.Delivery).getTime() > 0) {
+						//delivered
+						var d = nbDays(from, new Date(r.Delivery))
+						if (d < 0) {
+							d = 0;
+						}
+						dates[d] = dates[d] ? dates[d] + 1 : 1
+					} else {
+						//not delivered
+						missing++;
+					}
+				} else {
+					var del = new Date(r.Delivery)
+					var rev = new Date(r.Reviewed)
+
+					if (del.getTime() > 0) {
+						if (rev.getTime() <= 0) {
+							missing++;
+						} else {
+							d = nbDays(del, rev)
+							if (d < 0) {
+								console.log(del + " " + rev + " " + r.Grade);
+							}
+							dates[d] = dates[d] ? dates[d] + 1 : 1
+						}
+					} else if (moment(from).isBefore(moment(now))) {
+						if (rev.getTime() < 0) {
+							missing++;
+						} else {
+							d = nbDays(del, rev)
+							dates[d] = dates[d] ? dates[d] + 1 : 1
+						}
+					}
+				}
+			}
+		})
+	});
+	var keys = Object.keys(dates).map(function(x) {
+		return x + " d.";
+	})
+	keys.push("missing")
+	var values = Object.keys(dates).map(function(x) {
+		return dates[x];
+	})
+	values.push(missing)
+
+	var late = $("#delays-" + kind).get(0).getContext("2d");
+	var data = {
+		labels: keys,
+		datasets: [line(values)]
+	}
+	if (!cMidtermDelay) {
+		cMidtermDelay = new Chart(late).Bar(data, {
+			showTooltip: false
+		});
+	} else {
+		console.log(keys)
+		console.log(values)
+		cMidtermDelay.labels = keys
+		cMidtermDelay.datasets[0] = line(values)
+		cMidtermDelay.update()
+	}
+
+}
+
+function flatten(arr) {
+	var res = [];
+	var x = 0;
+	var prev = -1;
+	Object.keys(arr).sort().forEach(function(d) {
+		if (prev >= 0) {
+			//padding			
+			for (i = prev; i < d; i++) {
+				res.push(0);
+			}
+		}
+		res.push(arr[d]);
+		prev = d;
+	});
+	return res;
+}
+
+function toCDF(arr) {
+	var cdf = [];
+	var x = 0;
+	var prev = -1;
+	Object.keys(arr).sort().forEach(function(d) {
+		x += arr[d];
+		if (prev >= 0) {
+			//padding			
+			for (i = prev; i < d; i++) {
+				cdf[i] = cdf[prev];
+			}
+		}
+		cdf[d] = x;
+		prev = d;
+	});
+	return cdf;
+}
+
+function nbDays(from, to) {
+	return moment(to).dayOfYear() - moment(from).dayOfYear();
+}
 
 function declared() {
 	var at = [];
@@ -250,16 +370,18 @@ function grades(kind, filter) {
 	var all = 0
 	var nb = 0
 	stats.forEach(function(s) {
-		if (s.Reports[kind] && s.Reports[kind] >= 0) {
-			g = s.Reports[kind]
-			nb++
-			all += g
-			if (filter == "promotion") {
-				qty[s.Promotion == "SI" ? 0 : 1].push(g)
-			} else if (filter == "major") {
-				byMajor[allMajors.indexOf(s.Major)].push(g);
+		s.Reports.forEach(function(r) {
+			if (r.Kind == kind && r.Grade >= 0) {
+				g = r.Grade
+				nb++
+				all += g
+				if (filter == "promotion") {
+					qty[s.Promotion == "SI" ? 0 : 1].push(g)
+				} else if (filter == "major") {
+					byMajor[allMajors.indexOf(s.Major)].push(g);
+				}
 			}
-		}
+		})
 	});
 	//Hide when no data
 	if (nb) {
