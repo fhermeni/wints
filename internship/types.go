@@ -255,9 +255,9 @@ type Stat struct {
 	End            time.Time
 	Cpy            Company
 	//Grade for each report
-	Reports map[string]int
+	Reports []ReportHeader
 	//Answers for each survey
-	Surveys map[string]map[string]string
+	Surveys []Survey
 }
 
 //Defense

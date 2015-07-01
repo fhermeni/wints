@@ -27,18 +27,44 @@ func (srv *Service) Statistics() ([]internship.Stat, error) {
 }
 
 func convertSkipped(c internship.Convention) internship.Stat {
-	return internship.Stat{
-		Male:           c.Male,
-		Creation:       c.Creation,
-		Begin:          c.Begin,
-		End:            c.End,
-		Promotion:      c.Promotion,
-		ForeignCountry: c.ForeignCountry,
-		Lab:            c.Lab,
-		Gratification:  c.Gratification,
-		Reports:        make(map[string]int),
-		Surveys:        make(map[string]map[string]string),
-		Cpy:            c.Cpy,
+	st :=
+		internship.Stat{
+			Male:           c.Male,
+			Creation:       c.Creation,
+			Begin:          c.Begin,
+			End:            c.End,
+			Promotion:      c.Promotion,
+			ForeignCountry: c.ForeignCountry,
+			Lab:            c.Lab,
+			Gratification:  c.Gratification,
+			Reports:        make([]internship.ReportHeader, 0, 0),
+			Surveys:        make([]internship.Survey, 0, 0),
+			Cpy:            c.Cpy,
+		}
+	return st
+}
+
+func anonReport(r internship.ReportHeader) internship.ReportHeader {
+	//hide the comments
+	return internship.ReportHeader{
+		Private:  r.Private,
+		Grade:    r.Grade,
+		Kind:     r.Kind,
+		Deadline: r.Deadline,
+		Delivery: r.Delivery,
+		Reviewed: r.Reviewed,
+		ToGrade:  r.ToGrade,
+	}
+}
+
+func anonSurvey(s internship.Survey) internship.Survey {
+	//hide the comments
+	return internship.Survey{
+		Kind:      s.Kind,
+		Deadline:  s.Deadline,
+		Timestamp: s.Timestamp,
+		Token:     "",
+		Answers:   s.Answers,
 	}
 }
 
@@ -54,17 +80,15 @@ func convert(i internship.Internship) internship.Stat {
 		ForeignCountry: i.ForeignCountry,
 		Lab:            i.Lab,
 		Gratification:  i.Gratification,
-		Reports:        make(map[string]int),
-		Surveys:        make(map[string]map[string]string),
+		Reports:        make([]internship.ReportHeader, 0, 0),
+		Surveys:        make([]internship.Survey, 0, 0),
 		Cpy:            i.Cpy,
 	}
 	for _, r := range i.Reports {
-		if r.ToGrade {
-			s.Reports[r.Kind] = r.Grade
-		}
+		s.Reports = append(s.Reports, anonReport(r))
 	}
 	for _, survey := range i.Surveys {
-		s.Surveys[survey.Kind] = survey.Answers
+		s.Surveys = append(s.Surveys, anonSurvey(survey))
 	}
 	return s
 }

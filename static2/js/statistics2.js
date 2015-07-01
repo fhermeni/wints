@@ -6,8 +6,11 @@ var months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oc
 var ccountry = undefined,
 	csector = undefined,
 	calumni = undefined,
+	cMidtermDelay = undefined,
 	barGratification;
 
+var delayKind = "Midterm"
+var delayType = "Delivery"
 $(document).ready(function() {
 	waitingBlock = $("#cnt").clone().html();
 
@@ -47,6 +50,15 @@ $(document).ready(function() {
 			grades('Final')
 			surveys("midterm")
 			showAlumni();
+
+			var token = getCookie("session")
+			if (token) {
+				user(token, function(u) {
+					if (u.Role != 0) {
+						delays("Midterm", "Delivery")
+					}
+				});
+			}
 		})
 	})
 });
@@ -54,6 +66,109 @@ $(document).ready(function() {
 String.prototype.endsWith = function(suffix) {
 	return this.indexOf(suffix, this.length - suffix.length) !== -1;
 };
+
+function delays(kind, type) {
+	$("li.delays").removeClass("active")
+	if (kind) {
+		delayKind = kind;
+	} else {
+		kind = delayKind;
+	}
+
+	if (type) {
+		delayType = type;
+	} else {
+		type = delayType;
+	}
+
+	$("li.delays." + kind).addClass("active")
+	$("li.delays." + type).addClass("active")
+
+	var dates = []
+	var now = new Date();
+	var missing = 0;
+	console.log(kind + " " + type)
+	stats.forEach(function(s) {
+		s.Reports.forEach(function(r) {
+			if (r.Kind != kind) {
+				return
+			}
+			var from = new Date(r.Deadline)
+			if (type == "Delivery") {
+				if (moment(from).isAfter(moment(now))) {
+					//not passed						
+					return
+				}
+				if (new Date(r.Delivery).getTime() > 0) {
+					//delivered
+					var d = nbDays(from, new Date(r.Delivery))
+					if (d < 0) {
+						d = 0;
+					}
+					if (d > 14) {
+						d = 14
+					}
+					dates[d] = dates[d] ? dates[d] + 1 : 1
+				} else {
+					//not delivered
+					missing++;
+				}
+			} else {
+				var del = new Date(r.Delivery)
+				var rev = new Date(r.Reviewed)
+
+				if (del.getTime() > 0) {
+					if (rev.getTime() <= 0) {
+						if (r.Grade < 0) {
+							//negative means not reviewed.
+							//>0 means reviewed but no timestamp
+							missing++;
+						}
+					} else {
+						d = Math.round(nbDays(del, rev) / 7) //per week
+						dates[d] = dates[d] ? dates[d] + 1 : 1
+					}
+				} else if (moment(from).isBefore(moment(now))) {
+					//not delivered
+					if (r.Grade >= 0 || rev.getTime() > 0) {
+						//but reviewed
+						d = Math.round(nbDays(del, rev) / 7) //per week
+						dates[d] = dates[d] ? dates[d] + 1 : 1
+					}
+				}
+			}
+		})
+	});
+	$("#delays").closest(".hidden").removeClass('hidden')
+	var keys = Object.keys(dates).map(function(x) {
+		if (type == "Delivery") {
+			return x + " d.";
+		} else {
+			return x + " w.";
+		}
+	})
+	if (type == "Delivery") {
+		keys[keys.length - 1] = "14 d. +";
+	}
+	keys.push("missing")
+	var values = Object.keys(dates).map(function(x) {
+		return dates[x];
+	})
+	values.push(missing)
+
+	var late = $("#delays").html("").append("<canvas></canvas>").find("canvas").get(0).getContext("2d");
+	var data = {
+		labels: keys,
+		datasets: [line(values)]
+	}
+	cMidtermDelay = new Chart(late).Bar(data, {
+		showTooltip: false
+	});
+}
+
+function nbDays(from, to) {
+	return moment(to).dayOfYear() - moment(from).dayOfYear();
+}
 
 function declared() {
 	var at = [];
@@ -250,16 +365,18 @@ function grades(kind, filter) {
 	var all = 0
 	var nb = 0
 	stats.forEach(function(s) {
-		if (s.Reports[kind] && s.Reports[kind] >= 0) {
-			g = s.Reports[kind]
-			nb++
-			all += g
-			if (filter == "promotion") {
-				qty[s.Promotion == "SI" ? 0 : 1].push(g)
-			} else if (filter == "major") {
-				byMajor[allMajors.indexOf(s.Major)].push(g);
+		s.Reports.forEach(function(r) {
+			if (r.Kind == kind && r.Grade >= 0) {
+				g = r.Grade
+				nb++
+				all += g
+				if (filter == "promotion") {
+					qty[s.Promotion == "SI" ? 0 : 1].push(g)
+				} else if (filter == "major") {
+					byMajor[allMajors.indexOf(s.Major)].push(g);
+				}
 			}
-		}
+		})
 	});
 	//Hide when no data
 	if (nb) {
@@ -310,14 +427,19 @@ function grades(kind, filter) {
 function surveys(kind) {
 	var all = 0
 	var nb = 0
-	stats.forEach(function(s) {
-		q = s.Surveys[kind]
-		if (q && Object.keys(q).length > 0) {
-			nb++
-			if (kind == "midterm" && q[19] == "true") {
-				all++
+	stats.forEach(function(stat) {
+		stat.Surveys.forEach(function(s) {
+			if (s.Kind != kind) {
+				return
 			}
-		}
+			var q = s.Answers
+			if (q && Object.keys(q).length > 0) {
+				nb++
+				if (kind == "midterm" && q[19] == "true") {
+					all++
+				}
+			}
+		})
 	});
 	//Hide when no data
 	if (nb) {
