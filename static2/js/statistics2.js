@@ -596,7 +596,7 @@ function showAlumni(filter) {
 
 	qty = zeroes(possiblePositions.length);
 	stats.forEach(function(s) {
-		if (filter == "all" || s.Promotion == filter) {
+		if (s.Reports.length > 0 && (filter == "all" || s.Promotion == filter)) {
 			qty[s.Future.Position] += 1;
 		}
 	});
