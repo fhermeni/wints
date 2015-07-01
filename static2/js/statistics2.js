@@ -141,8 +141,6 @@ function delays(kind, type) {
 	cMidtermDelay = new Chart(late).Bar(data, {
 		showTooltip: false
 	});
-
-
 }
 
 function flatten(arr) {
@@ -423,14 +421,19 @@ function grades(kind, filter) {
 function surveys(kind) {
 	var all = 0
 	var nb = 0
-	stats.forEach(function(s) {
-		q = s.Surveys[kind]
-		if (q && Object.keys(q).length > 0) {
-			nb++
-			if (kind == "midterm" && q[19] == "true") {
-				all++
+	stats.forEach(function(stat) {
+		stat.Surveys.forEach(function(s) {
+			if (s.Kind != kind) {
+				return
 			}
-		}
+			var q = s.Answers
+			if (q && Object.keys(q).length > 0) {
+				nb++
+				if (kind == "midterm" && q[19] == "true") {
+					all++
+				}
+			}
+		})
 	});
 	//Hide when no data
 	if (nb) {

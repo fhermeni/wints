@@ -257,7 +257,7 @@ type Stat struct {
 	//Grade for each report
 	Reports []ReportHeader
 	//Answers for each survey
-	Surveys map[string]map[string]string
+	Surveys []Survey
 }
 
 //Defense

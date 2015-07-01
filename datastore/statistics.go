@@ -38,7 +38,7 @@ func convertSkipped(c internship.Convention) internship.Stat {
 			Lab:            c.Lab,
 			Gratification:  c.Gratification,
 			Reports:        make([]internship.ReportHeader, 0, 0),
-			Surveys:        make(map[string]map[string]string),
+			Surveys:        make([]internship.Survey, 0, 0),
 			Cpy:            c.Cpy,
 		}
 	return st
@@ -57,6 +57,17 @@ func anonReport(r internship.ReportHeader) internship.ReportHeader {
 	}
 }
 
+func anonSurvey(s internship.Survey) internship.Survey {
+	//hide the comments
+	return internship.Survey{
+		Kind:      s.Kind,
+		Deadline:  s.Deadline,
+		Timestamp: s.Timestamp,
+		Token:     "",
+		Answers:   s.Answers,
+	}
+}
+
 func convert(i internship.Internship) internship.Stat {
 	s := internship.Stat{
 		Male:           i.Male,
@@ -70,14 +81,14 @@ func convert(i internship.Internship) internship.Stat {
 		Lab:            i.Lab,
 		Gratification:  i.Gratification,
 		Reports:        make([]internship.ReportHeader, 0, 0),
-		Surveys:        make(map[string]map[string]string),
+		Surveys:        make([]internship.Survey, 0, 0),
 		Cpy:            i.Cpy,
 	}
 	for _, r := range i.Reports {
 		s.Reports = append(s.Reports, anonReport(r))
 	}
 	for _, survey := range i.Surveys {
-		s.Surveys[survey.Kind] = survey.Answers
+		s.Surveys = append(s.Surveys, anonSurvey(survey))
 	}
 	return s
 }
