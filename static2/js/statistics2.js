@@ -143,23 +143,6 @@ function delays(kind, type) {
 	});
 }
 
-function flatten(arr) {
-	var res = [];
-	var x = 0;
-	var prev = -1;
-	Object.keys(arr).sort().forEach(function(d) {
-		if (prev >= 0) {
-			//padding			
-			for (i = prev; i < d; i++) {
-				res.push(0);
-			}
-		}
-		res.push(arr[d]);
-		prev = d;
-	});
-	return res;
-}
-
 function nbDays(from, to) {
 	return moment(to).dayOfYear() - moment(from).dayOfYear();
 }
