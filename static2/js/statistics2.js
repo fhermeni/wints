@@ -48,8 +48,16 @@ $(document).ready(function() {
 			grades('Final')
 			surveys("midterm")
 			showAlumni();
-			delays("Midterm", "Delivery")
-			delays("Final", "Delivery")
+
+			var token = getCookie("session")
+			if (token) {
+				user(token, function(u) {
+					if (u.Role != 0) {
+						delays("Midterm", "Delivery")
+						delays("Final", "Delivery")
+					}
+				});
+			}
 		})
 	})
 });
@@ -112,7 +120,6 @@ function delays(kind, type) {
 			}
 		})
 	});
-	console.log(dates.length)
 	if (dates.length) {
 		$("#delays-" + kind).closest(".hidden").removeClass('hidden')
 	}
