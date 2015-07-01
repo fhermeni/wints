@@ -122,6 +122,7 @@ function delays(kind, type) {
 	});
 	if (dates.length) {
 		$("#delays-" + kind).closest(".hidden").removeClass('hidden')
+		return
 	}
 	var keys = Object.keys(dates).map(function(x) {
 		return x + " d.";
