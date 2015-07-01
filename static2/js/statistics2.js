@@ -120,9 +120,8 @@ function delays(kind, type) {
 			}
 		})
 	});
-	if (dates.length) {
+	if (dates.length != 0) {
 		$("#delays-" + kind).closest(".hidden").removeClass('hidden')
-		return
 	}
 	var keys = Object.keys(dates).map(function(x) {
 		return x + " d.";
@@ -138,6 +137,7 @@ function delays(kind, type) {
 		labels: keys,
 		datasets: [line(values)]
 	}
+	console.log(kind + " " + values)
 	cMidtermDelay = new Chart(late).Bar(data, {
 		showTooltip: false
 	});
