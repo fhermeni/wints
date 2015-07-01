@@ -9,6 +9,8 @@ var ccountry = undefined,
 	cMidtermDelay = undefined,
 	barGratification;
 
+var delayKind = "Midterm"
+var delayType = "Delivery"
 $(document).ready(function() {
 	waitingBlock = $("#cnt").clone().html();
 
@@ -54,7 +56,6 @@ $(document).ready(function() {
 				user(token, function(u) {
 					if (u.Role != 0) {
 						delays("Midterm", "Delivery")
-						delays("Final", "Delivery")
 					}
 				});
 			}
@@ -67,11 +68,26 @@ String.prototype.endsWith = function(suffix) {
 };
 
 function delays(kind, type) {
-	$("li.delays-" + kind).removeClass("active")
-	$("li.delays-" + kind + "." + type).addClass("active")
+	$("li.delays").removeClass("active")
+	if (kind) {
+		delayKind = kind;
+	} else {
+		kind = delayKind;
+	}
+
+	if (type) {
+		delayType = type;
+	} else {
+		type = delayType;
+	}
+
+	$("li.delays." + kind).addClass("active")
+	$("li.delays." + type).addClass("active")
+
 	var dates = []
 	var now = new Date();
 	var missing = 0;
+	console.log(kind + " " + type)
 	stats.forEach(function(s) {
 		s.Reports.forEach(function(r) {
 			if (r.Kind != kind) {
@@ -88,6 +104,9 @@ function delays(kind, type) {
 					var d = nbDays(from, new Date(r.Delivery))
 					if (d < 0) {
 						d = 0;
+					}
+					if (d > 14) {
+						d = 14
 					}
 					dates[d] = dates[d] ? dates[d] + 1 : 1
 				} else {
@@ -106,38 +125,42 @@ function delays(kind, type) {
 							missing++;
 						}
 					} else {
-						d = nbDays(del, rev)
+						d = Math.round(nbDays(del, rev) / 7) //per week
 						dates[d] = dates[d] ? dates[d] + 1 : 1
 					}
 				} else if (moment(from).isBefore(moment(now))) {
 					//not delivered
 					if (r.Grade >= 0 || rev.getTime() > 0) {
 						//but reviewed
-						d = nbDays(del, rev)
+						d = Math.round(nbDays(del, rev) / 7) //per week
 						dates[d] = dates[d] ? dates[d] + 1 : 1
 					}
 				}
 			}
 		})
 	});
-	if (dates.length != 0) {
-		$("#delays-" + kind).closest(".hidden").removeClass('hidden')
-	}
+	$("#delays").closest(".hidden").removeClass('hidden')
 	var keys = Object.keys(dates).map(function(x) {
-		return x + " d.";
+		if (type == "Delivery") {
+			return x + " d.";
+		} else {
+			return x + " w.";
+		}
 	})
+	if (type == "Delivery") {
+		keys[keys.length - 1] = "14 d. +";
+	}
 	keys.push("missing")
 	var values = Object.keys(dates).map(function(x) {
 		return dates[x];
 	})
 	values.push(missing)
 
-	var late = $("#delays-" + kind).html("").append("<canvas></canvas>").find("canvas").get(0).getContext("2d");
+	var late = $("#delays").html("").append("<canvas></canvas>").find("canvas").get(0).getContext("2d");
 	var data = {
 		labels: keys,
 		datasets: [line(values)]
 	}
-	console.log(kind + " " + values)
 	cMidtermDelay = new Chart(late).Bar(data, {
 		showTooltip: false
 	});
