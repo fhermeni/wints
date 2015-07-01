@@ -36,6 +36,7 @@ func NewSMTP(srv, login, passwd, emitter, www, path string, j journal.Journal) (
 		www:    www,
 		auth:   smtp.PlainAuth("", login, passwd, hostname),
 		tls:    tls.Config{ServerName: hostname, InsecureSkipVerify: true},
+		j:      j,
 	}
 	return &m, err
 }
