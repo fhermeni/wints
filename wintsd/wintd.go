@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"runtime"
+	"runtime/pprof"
 	"strconv"
 	"time"
 
@@ -125,12 +126,23 @@ func main() {
 	testFeeder := flag.Bool("test-feeder", false, "Test the convention feeder")
 	testAll := flag.Bool("test", false, "equivalent to --test-mailer --test-feeder")
 	blankConf := flag.Bool("generate-config", false, "Print a default configuration file")
+	cpuProfile := flag.String("cpu-profile", "", "Store CPU profiling output in a given file")
 	flag.Parse()
 
 	if *blankConf {
 		config.Blank()
 		os.Exit(0)
 	}
+
+	if *cpuProfile != "" {
+		f, err := os.Create(*cpuProfile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		pprof.StartCPUProfile(f)
+		defer pprof.StopCPUProfile()
+	}
+
 	cfg, err := config.Load(*cfgPath)
 	if err != nil {
 		log.Fatalln("Error while parsing " + *cfgPath + ": " + err.Error())
