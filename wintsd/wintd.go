@@ -78,6 +78,9 @@ func newCache(backend internship.Service) *cache.Cache {
 
 func test(j journal.Journal, msg string, err error) bool {
 	j.Log("wintsd", msg+" ", err)
+	if err != nil {
+		log.Fatalln(msg + ": " + err.Error())
+	}
 	return err == nil
 }
 
