@@ -26,7 +26,7 @@ func (s *Service) AlignWithInternship(student string, intern string) error {
 	if s.my.Role >= internship.ADMIN {
 		err = s.srv.AlignWithInternship(student, intern)
 	}
-	s.UserLog("Student '"+student+"' aligned with internship '"+intern+"'", err)
+	s.UserLog("student '"+student+"' aligned with internship '"+intern+"'", err)
 	return err
 }
 

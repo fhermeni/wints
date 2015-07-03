@@ -67,7 +67,9 @@ func (v *Service) Internship(stu string) (internship.Internship, error) {
 			err = ErrPermission
 		}
 	}
-	v.UserLog("wants internship '"+stu+"'", err)
+	if !v.mine(stu) {
+		v.UserLog("wants internship '"+stu+"'", err)
+	}
 	return i, nil
 }
 
