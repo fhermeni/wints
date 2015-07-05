@@ -7,9 +7,10 @@ import (
 	"log"
 	"os"
 	"runtime"
-	"runtime/pprof"
 	"strconv"
 	"time"
+
+	"github.com/davecheney/profile"
 
 	"github.com/fhermeni/wints/cache"
 	"github.com/fhermeni/wints/config"
@@ -129,7 +130,7 @@ func main() {
 	testFeeder := flag.Bool("test-feeder", false, "Test the convention feeder")
 	testAll := flag.Bool("test", false, "equivalent to --test-mailer --test-feeder")
 	blankConf := flag.Bool("generate-config", false, "Print a default configuration file")
-	cpuProfile := flag.String("cpu-profile", "", "Store CPU profiling output in a given file")
+	cpuProfile := flag.Bool("cpu-profile", false, "Profile CPU usage")
 	flag.Parse()
 
 	if *blankConf {
@@ -137,18 +138,17 @@ func main() {
 		os.Exit(0)
 	}
 
-	if *cpuProfile != "" {
-		f, err := os.Create(*cpuProfile)
-		if err != nil {
-			log.Fatal(err)
-		}
-		pprof.StartCPUProfile(f)
-		defer pprof.StopCPUProfile()
-	}
-
 	cfg, err := config.Load(*cfgPath)
 	if err != nil {
 		log.Fatalln("Error while parsing " + *cfgPath + ": " + err.Error())
+	}
+
+	if *cpuProfile {
+		prof := &profile.Config{
+			CPUProfile:  true,
+			ProfilePath: cfg.Journal.Path,
+		}
+		defer profile.Start(prof).Stop()
 	}
 
 	j := newJournal(cfg)
