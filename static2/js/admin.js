@@ -10,6 +10,14 @@ var allMajors;
 $(document).ready(function() {
 	waitingBlock = $("#cnt").clone().html();
 
+	//IE8 stuff
+	if (typeof Array.prototype.forEach != 'function') {
+		Array.prototype.forEach = function(callback) {
+			for (var i = 0; i < this.length; i++) {
+				callback.apply(this, [this[i], i, this]);
+			}
+		};
+	}
 	majors(function(m) {
 		allMajors = m;
 		user(getCookie("session"), function(u) {

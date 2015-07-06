@@ -11,7 +11,18 @@ var ccountry = undefined,
 
 var delayKind = "Midterm"
 var delayType = "Delivery"
+
 $(document).ready(function() {
+
+	//IE8 stuff
+	if (typeof Array.prototype.forEach != 'function') {
+		Array.prototype.forEach = function(callback) {
+			for (var i = 0; i < this.length; i++) {
+				callback.apply(this, [this[i], i, this]);
+			}
+		};
+	}
+
 	waitingBlock = $("#cnt").clone().html();
 
 	statistics(function(m) {
@@ -55,7 +66,7 @@ $(document).ready(function() {
 			if (token) {
 				user(token, function(u) {
 					if (u.Role != 0) {
-						delays("Midterm", "Delivery")
+						delays("DoW", "Delivery")
 					}
 				});
 			}
@@ -87,7 +98,6 @@ function delays(kind, type) {
 	var dates = []
 	var now = new Date();
 	var missing = 0;
-	console.log(kind + " " + type)
 	stats.forEach(function(s) {
 		s.Reports.forEach(function(r) {
 			if (r.Kind != kind) {
