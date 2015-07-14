@@ -281,8 +281,18 @@ func setPassword(srv internship.Service, w http.ResponseWriter, r *http.Request)
 func resetPassword(j journal.Journal, srv internship.Service, mailer mail.Mailer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		em := mux.Vars(r)["email"]
-		_, err := srv.ResetPassword(em)
+		token, err := srv.ResetPassword(em)
 		j.Log(em, "initiate password reset", err)
+		if err != nil {
+			u, err := srv.User(em)
+			if err != nil {
+				mailer.SendPasswordResetLink(u, token)
+			} else {
+				j.Log(em, "Unable to send the reset token", err)
+			}
+
+		}
+
 		status(w, err)
 	}
 }
