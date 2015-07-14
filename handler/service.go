@@ -283,9 +283,9 @@ func resetPassword(j journal.Journal, srv internship.Service, mailer mail.Mailer
 		em := mux.Vars(r)["email"]
 		token, err := srv.ResetPassword(em)
 		j.Log(em, "initiate password reset", err)
-		if err != nil {
+		if err == nil {
 			u, err := srv.User(em)
-			if err != nil {
+			if err == nil {
 				mailer.SendPasswordResetLink(u, token)
 			} else {
 				j.Log(em, "Unable to send the reset token", err)
