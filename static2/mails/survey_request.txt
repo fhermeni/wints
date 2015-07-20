@@ -1,4 +1,4 @@
-Subject: {{.Internship.Student.Fullname}} - Evaluation
+Subject: {{.Internship.Student.Fullname}} - {{.Survey.Kind}} Evaluation
 
 Bonjour
 
