@@ -298,6 +298,28 @@ func (m *SMTP) SendSurveyUploaded(tutor internship.User, student internship.User
 	}()
 }
 
+func (m *SMTP) SendSurveyRequest(i internship.Internship, kind string) {
+	go func() {
+		var su internship.Survey
+		for _, s := range i.Surveys {
+			if s.Kind == kind {
+				su = s
+				break
+			}
+		}
+		d := struct {
+			WWW        string
+			Survey     internship.Survey
+			Internship internship.Internship
+		}{
+			m.www,
+			su,
+			i,
+		}
+		err := m.mail(join(i.Sup.Email), join(i.Tutor.Email), m.path+"/survey_request.txt", d)
+		m.log("Sending the '"+kind+"' request survey for student '"+i.Student.Fullname()+"' ("+i.Student.Email+") to '"+i.Sup.Email+"'", err)
+	}()
+}
 func (m *SMTP) SendTest(s string) error {
 	return m.mail(join(s), join(s), m.path+"/test.txt", struct{}{})
 }

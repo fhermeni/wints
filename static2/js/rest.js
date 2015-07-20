@@ -330,3 +330,7 @@ function postDefenseGrade(stu, g, ok, no) {
 function defense(student, ok, no) {
 	return get("/internships/" + student + "/defense", ok, no)
 }
+
+function requestSurvey(student, kind, ok, no) {
+	return get("/internships/" + student + "/surveys/" + kind + "/request", ok, no)
+}

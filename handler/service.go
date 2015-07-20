@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -95,6 +96,7 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string, j jour
 	s.r.HandleFunc("/api/v1/internships/{email}/defense/grade", s.rest(setDefenseGrade)).Methods("POST")
 	s.r.HandleFunc("/surveys/{kind}", s.mon(surveyForm)).Methods("GET")
 	s.r.HandleFunc("/api/v1/internships/{student}/surveys/{kind}", s.rest(survey)).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/{student}/surveys/{kind}/request", s.rest(requestSurveys)).Methods("GET")
 
 	return s
 }
@@ -515,6 +517,11 @@ func setTutor(srv internship.Service, w http.ResponseWriter, r *http.Request) er
 		return err
 	}
 	return srv.SetTutor(em, s)
+}
+
+func requestSurveys(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	log.Println("hop")
+	return srv.RequestSurvey(mux.Vars(r)["student"], mux.Vars(r)["kind"])
 }
 
 func surveyForm(w http.ResponseWriter, r *http.Request) {

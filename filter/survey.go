@@ -38,3 +38,10 @@ func (v *Service) SetSurveyContent(token string, cnt map[string]string) error {
 func (v *Service) SurveyDefs() []internship.SurveyDef {
 	return v.srv.SurveyDefs()
 }
+
+func (s *Service) RequestSurvey(stu, kind string) error {
+	if s.my.Role != internship.ROOT {
+		return ErrPermission
+	}
+	return s.srv.RequestSurvey(stu, kind)
+}

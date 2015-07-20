@@ -61,6 +61,9 @@ func (m *Mock) SendSurveyUploaded(tutor internship.User, student internship.User
 	log.Printf("Key '%s', the %s' survey has been uploaded for student '%s'\n", tutor.Fullname(), kind, student.Fullname())
 }
 
+func (m *Mock) SendSurveyRequest(i internship.Internship, kind string) {
+	log.Printf("Key '%s', the '%s' survey for student '%s' must be fullfilled\n", i.Sup.Fullname(), kind, i.Student.Fullname())
+}
 func (m *Mock) SendTest(e string) error {
 	log.Println("Test mail to %s\n", e)
 	return nil

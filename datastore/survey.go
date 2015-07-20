@@ -53,3 +53,12 @@ func (s *Service) SetSurveyContent(token string, cnt map[string]string) error {
 func (s *Service) SurveyDefs() []internship.SurveyDef {
 	return s.surveyDefs
 }
+
+func (s *Service) RequestSurvey(stu, kind string) error {
+	if i, err := s.Internship(stu); err != nil {
+		return err
+	} else {
+		s.mailer.SendSurveyRequest(i, kind)
+	}
+	return nil
+}

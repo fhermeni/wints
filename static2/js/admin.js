@@ -1028,3 +1028,10 @@ function tplEvaluationMail(kind, student, url) {
 	var s = encodeURIComponent(i.Student.Firstname.capitalize() + " " + i.Student.Lastname.capitalize() + " - Evaluation");
 	window.location.href = "mailto:" + to + "?subject=" + s + "&body=" + encodeURIComponent(txt);
 }
+
+function requestSurveys(kind) {
+	$(".icheckbox.checked").find(":checkbox").each(function(i, c) {
+		var em = $(c).attr("data-email")
+		requestSurvey(em, kind)
+	});
+}
