@@ -25,3 +25,9 @@ h4 {
 .fn {
 	color: rgb(67, 74, 84);
 }
+
+@media print {
+	.alert {
+	display: none !important;
+}
+}

@@ -443,15 +443,27 @@ Handlebars.registerHelper('student', function(g) {
 	return new Handlebars.SafeString(buf);
 });
 
-Handlebars.registerHelper("offset", function(from, offset) {
+Handlebars.registerHelper("offset", function(from, offset, tz) {
+	if (tz === undefined) {
+		tz = true;
+	}
 	var d = moment(from)
+	if (tz) {
+		d = d.tz('Europe/Paris');
+	}
 	d = d.add(offset * 30, "minutes")
 	return d.format("HH:mm") + "-" + d.add(30, "m").format("HH:mm");
 })
 
+Handlebars.registerHelper("offset_local", function(from, offset, tz) {
+	var d = moment(from)
+	d = d.add(offset * 30, "minutes")
+	return d.format("dddd D MMMM HH:mm") + "-" + d.add(30, "m").format("HH:mm");
+})
+
 Handlebars.registerHelper('longDate', function(d) {
 	var m = moment(d);
-	m.locale("fr")
+	m.locale("fr").tz('Europe/Paris')
 	return m.format("dddd D MMMM");
 });
 
