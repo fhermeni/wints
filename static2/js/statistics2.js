@@ -376,7 +376,7 @@ function grades(kind, filter) {
 	var nb = 0
 	stats.forEach(function(s) {
 		s.Reports.forEach(function(r) {
-			if (r.Kind == kind && r.Grade >= 0 && new Date(r.Delivery).getTime() > 0) {
+			if (r.Kind == kind && r.Grade > 0 && new Date(r.Delivery).getTime() > 0) {
 				g = r.Grade
 				nb++
 				all += g
