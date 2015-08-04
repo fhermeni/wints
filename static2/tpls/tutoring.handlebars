@@ -39,14 +39,6 @@ This is the students you are following as an academic tutor. Your role is to:
 <li><span class="color btn-danger"></span>Grade < 10</li>
 </ul>
 </div>
-<div class="legend">
-<span class="title">Survey color legend: </span>
-<ul class="legend">
-<li><span class="color badge-info"></span>Answers are missing</li>
-<li><span class="color badge-danger"></span>Answers are missing, deadline passed</li>
-<li><span class="color badge-success"></span>Answers available</li>
-</ul>
-</div>
 <table class="table table-hover tablesorter" id="table-conventions">
     {{#each this}}
         {{#if @first}}
@@ -61,12 +53,15 @@ This is the students you are following as an academic tutor. Your role is to:
         <th rowspan="2" class="sorter-false">Supervisor</th>
         <th rowspan="2" class="sorter-false">Company</th>
         <th class="sorter-false text-center" colspan="{{len Reports}}">Reports</th>
-        <th rowspan="2" class="sorter-false text-center">Surveys</th>        
+        <th class="sorter-false text-center" colspan="{{len Surveys}}">Surveys</th>
     </tr>
     <tr>        
         {{#each Reports}}        
         <th>{{shortKind this}}</th>
-        {{/each}}        
+        {{/each}}
+        {{#each Surveys}}        
+        <th>{{shortKind this}}</th>
+        {{/each}}            
     </tr>
     </thead>
     <tbody>
@@ -91,11 +86,13 @@ This is the students you are following as an academic tutor. Your role is to:
             {{reportGrade this}}
             </td>            
             {{/each}}
-            <td>                      
+
+
             {{#each Surveys}}
-            <a onclick="window.open('/surveys/{{Kind}}?student={{../Student.Email}}&kind={{Kind}}','_blank')" class="badge {{surveyStatus this}}">{{Kind}}</a>
+            <td class="click text-center" data-text="{{surveyAnnotation this}}" onclick="window.open('/surveys/{{Kind}}?student={{../Student.Email}}&kind={{Kind}}','_blank')">
+            {{surveyGrade this}}
+            </td>
             {{/each}}
-            </td>            
         </tr>
     {{/each}}
     </tbody>

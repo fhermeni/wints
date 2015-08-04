@@ -322,27 +322,32 @@ Handlebars.registerHelper('gradeAnnotation', function(r) {
 	return -9999
 });
 
-Handlebars.registerHelper('surveyAnnotation', function(surveys) {
-	//-1 by missing reports
-	g = 0
-	surveys.forEach(function(s) {
-		if (Object.keys(s.Answers).length == 0) {
-			g--
-		}
-	})
-	return g;
+Handlebars.registerHelper('surveyAnnotation', function(s) {
+	if (Object.keys(s.Answers).length == 0) {
+		return -1;
+	}
+	return 0;
 });
 
 
-Handlebars.registerHelper('surveyStatus', function(s) {
-	var passed = (new Date(Date.parse(s.Deadline)).getTime() + 86400 * 1000) < new Date().getTime()
-	var style = "badge-info"
-	if (passed && s.Answers == {}) {
-		style = "badge-danger"
-	} else if (Object.keys(s.Answers).length > 0) {
-		style = "badge-success"
+Handlebars.registerHelper('surveyGrade', function(s) {
+	if (Object.keys(s.Answers).length == 0) {
+		return "?"
 	}
-	return style;
+	if (s.Kind == "midterm") {
+		if (s.Answers[19] == "true") {
+			return new Handlebars.SafeString("<i class='text-success glyphicon glyphicon-ok'></i>");
+		}
+		return new Handlebars.SafeString("<i class='text-danger glyphicon glyphicon-no'></i>");
+
+	} else {
+		return "-"
+	}
+
+});
+
+Handlebars.registerHelper('surveyStatus', function(s) {
+	return "";
 });
 
 
