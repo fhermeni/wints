@@ -183,6 +183,7 @@ function showMyDefenses() {
 		var root = $("#cnt");
 		root.html(html);
 		root.find(":checkbox").icheck();
+		root.find("select").selecter();
 	});
 }
 
@@ -1024,6 +1025,7 @@ function showDefense(stu) {
 	buf = Handlebars.getTemplate("defense-modal")(def)
 	$("#modal").html(buf).modal('show');
 	$('#modal').find(":checkbox").icheck();
+	$('#modal').find("select").selecter();
 }
 
 function gradeDefense(stu) {

@@ -22,9 +22,9 @@
         <th></th>
         <th>Time</th>
         <th>Student</th>        
-        <th>Promotion</th>        
-        <th>Company</th>                  
+        <th>Promotion</th>                
         <th>Grade</th>
+        <th>Next position</th>
     </tr>
     </thead>
     <tbody> 
@@ -35,13 +35,15 @@
             </td>
             <td>{{offset ../Date Offset}}</td>
             <td>
-            <a class='click fn' onclick="showDefense('{{Student}}')">{{shortFullname Student}}</a>
+            <a class='click fn' onclick="showDefense('{{Student.Email}}')">{{shortFullname Student}}</a>
             {{#if Private}}<i class="glyphicon glyphicon-eye-close text-danger" title="confidential defense"></i>{{/if}}
             {{#if Remote}}<i class="glyphicon glyphicon-facetime-video" title="visio conference"></i>{{/if}}
             </td>            
-            <td>{{Promotion}}/{{Major}}</td>            
-            <td>{{company Cpy}}</td>            
-            <td onclick="showDefense('{{Student.Email}}')">{{defenseGrade2 ../Date Rank Grade}}</td>            
+            <td>{{Promotion}}/{{Major}}</td>                            
+            <td class="click" onclick="showDefense('{{Student.Email}}')">{{defenseGrade2 ../Date Rank Grade}}</td>
+            <td class="click" onclick="showDefense('{{Student.Email}}')">
+            {{nextPosition Future.Position}}
+            </td>            
         </tr>    
         {{/each}}
     </tbody>
