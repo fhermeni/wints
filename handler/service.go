@@ -4,7 +4,6 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -520,7 +519,6 @@ func setTutor(srv internship.Service, w http.ResponseWriter, r *http.Request) er
 }
 
 func requestSurveys(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
-	log.Println("hop")
 	return srv.RequestSurvey(mux.Vars(r)["student"], mux.Vars(r)["kind"])
 }
 

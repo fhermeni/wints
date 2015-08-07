@@ -5,12 +5,17 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-	"reflect"
-	"strings"
+	"sync"
 
 	"github.com/fhermeni/wints/filter"
 	"github.com/fhermeni/wints/internship"
 )
+
+// Create a Pool that contains previously used Writers and
+// can create new ones if we run out.
+var zippers = sync.Pool{New: func() interface{} {
+	return gzip.NewWriter(nil)
+}}
 
 func authenticated(backend internship.Service, w http.ResponseWriter, r *http.Request) (string, error) {
 	var err error
@@ -38,20 +43,19 @@ func jsonRequest(w http.ResponseWriter, r *http.Request, j interface{}) error {
 
 func writeJSONIfOk(e error, w http.ResponseWriter, r *http.Request, j interface{}) error {
 	w.Header().Set("Content-type", "application/json; charset=utf-8")
-	//gzip if it is a slice
-	switch reflect.TypeOf(j).Kind() {
-	case reflect.Slice:
-		w.Header().Add("Vary", "Accept-Encoding")
-		if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
-			break
-		}
-		w.Header().Set("Content-Encoding", "gzip")
-		gz := gzip.NewWriter(w)
-		defer gz.Close()
-		enc := json.NewEncoder(gz)
-		return enc.Encode(j)
-	}
-	enc := json.NewEncoder(w)
+	w.Header().Add("Vary", "Accept-Encoding")
+	w.Header().Set("Content-Encoding", "gzip")
+	// Get a Writer from the Pool
+	gz := zippers.Get().(*gzip.Writer)
+
+	// When done, put the Writer back in to the Pool
+	defer zippers.Put(gz)
+
+	// We use Reset to set the writer we want to use.
+	gz.Reset(w)
+	defer gz.Close()
+
+	enc := json.NewEncoder(gz)
 	return enc.Encode(j)
 }
 

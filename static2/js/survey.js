@@ -189,7 +189,6 @@ function ui() {
 		d.find(".token").html(url)
 		d.removeClass("hidden")
 		readOnly();
-		$(".content").addClass("hidden")
 	}
 }
 
