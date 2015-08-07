@@ -23,8 +23,7 @@
         <th>Time</th>
         <th>Student</th>        
         <th>Promotion</th>        
-        <th>Company</th>          
-        <th>Surveys</th>
+        <th>Company</th>                  
         <th>Grade</th>
     </tr>
     </thead>
@@ -42,10 +41,6 @@
             </td>            
             <td>{{Promotion}}/{{Major}}</td>            
             <td>{{company Cpy}}</td>            
-            <td>{{#each Surveys}}
-            <a onclick="window.open('/surveys/{{Kind}}?student={{../Student.Email}}&kind={{Kind}}','_blank')" class="badge {{surveyStatus this}}">{{Kind}}</a>
-            {{/each}}
-            </td>
             <td onclick="showDefense('{{Student.Email}}')">{{defenseGrade2 ../Date Rank Grade}}</td>            
         </tr>    
         {{/each}}

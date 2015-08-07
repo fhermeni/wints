@@ -43,14 +43,6 @@ As a major leader or an administrator, you can follow the progress of every stud
 <li><span class="color btn-danger"></span>grade < 10</li>
 </ul>
 </div>
-<div class="legend">
-<span class="title">Survey color legend: </span>
-<ul class="legend">
-<li><span class="color badge-info"></span>Answers are missing</li>
-<li><span class="color badge-danger"></span>Answers are missing, deadline passed</li>
-<li><span class="color badge-success"></span>Answers available</li>
-</ul>
-</div>
 <table class="table table-condensed table-hover tablesorter" id="table-conventions">
     {{#each this}}
         {{#if @first}}
@@ -62,15 +54,17 @@ As a major leader or an administrator, you can follow the progress of every stud
         <th rowspan="2">Student</th>
         <th rowspan="2">Promotion</th>
         <th rowspan="2">Major</th>
-        <th rowspan="2" class="sorter-false">Supervisor</th>
         <th rowspan="2" >Tutor</th>
         <th class="sorter-false text-center" colspan="{{len Reports}}">Reports</th>
-        <th rowspan="2" class="text-center">Surveys</th>
-        <th rowspan="2" >Def</th>        
+        <th class="sorter-false text-center" colspan="{{len Surveys}}">Surveys</th>
+        <th rowspan="2" >def</th>
     </tr>
     <tr>        
         {{#each Reports}}        
-        <th>{{shortKind this}}</th>
+        <th><small>{{shortKind this}}</small></th>
+        {{/each}}        
+        {{#each Surveys}}        
+        <th><small>{{shortKind this}}</small></th>
         {{/each}}        
     </tr>    
     </thead>
@@ -86,21 +80,18 @@ As a major leader or an administrator, you can follow the progress of every stud
             <td>{{shortProm Promotion}}</td>
             <td>{{Major}}</td>
             <td>                
-                <a class="fn" href='mailto:{{Sup.Email}}' title='{{fullname Sup}}'>{{shortFullname Sup}}</a>
-            </td>
-            <td>                
                 <a class="fn" href='mailto:{{Tutor.Email}}' title='{{fullname Tutor}}'>{{shortFullname Tutor}}</a>
             </td>            
             {{#each Reports}}
             <td class="click {{reportStatus this}} text-center" data-text="{{gradeAnnotation this}}" onclick="showReport('{{../Student.Email}}', '{{Kind}}')">            
             {{reportGrade this}}
             </td>  
-            {{/each}}
-            <td data-text="{{surveyAnnotation Surveys}}">                      
+            {{/each}}            
+            
             {{#each Surveys}}
-            <a onclick="window.open('/surveys/{{Kind}}?student={{../Student.Email}}&kind={{Kind}}','_blank')" class="badge {{surveyStatus this}}">{{Kind}}</a>
+            <td onclick="window.open('/surveys/{{Kind}}?student={{../Student.Email}}&kind={{Kind}}','_blank')" class="{{surveyStatus this}} text-center click" data-text="{{surveyAnnotation this}}">{{surveyGrade this}}</td>
             {{/each}}
-            </td>
+
             {{#if Defense.Defenses}}            
             <td class="text-center" onclick="showDefense('{{Student.Email}}')" class="{{defenseStatus Defense}}">{{defenseGrade Defense}}</td>
             {{else}}

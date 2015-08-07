@@ -10,7 +10,8 @@
 <h6>Surveys</h6>
 <ul class="list-unstyled">
 {{#each Surveys}}
-<li>{{@key}}: <span class="text-danger click" onclick="selectBy('surveys', '{{@key}}','missing')">{{Missing}}/{{Total}} missing</a></li>
+	<li>{{@key}}: <span class="text-danger click" onclick="selectBy('surveys', '{{@key}}','missing')">{{Missing}}/{{Total}} missing</span>
+	<strong class="click pull-right text-danger" onclick="requestSurveys('{{@key}}')">request</strong></li>
 {{/each}}
 </ul>
 </small>

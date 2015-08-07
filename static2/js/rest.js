@@ -30,8 +30,9 @@ function noCb(no) {
 function restError(no) {
 	return function(jqr) {
 		if (jqr.status == 408) {
-			window.location.href = "/?#sessionExpired"
+			window.location.href = "/login?#sessionExpired"
 		} else {
+
 			if (no != undefined) {
 				no(jqr)
 			} else {
@@ -294,7 +295,7 @@ function statistics(ok, no) {
 	return get("/statistics/", ok, no)
 }
 
-function students(ok, no) {
+function getStudents(ok, no) {
 	return get("/students/", ok, no)
 }
 
@@ -328,4 +329,8 @@ function postDefenseGrade(stu, g, ok, no) {
 
 function defense(student, ok, no) {
 	return get("/internships/" + student + "/defense", ok, no)
+}
+
+function requestSurvey(student, kind, ok, no) {
+	return get("/internships/" + student + "/surveys/" + kind + "/request", ok, no)
 }

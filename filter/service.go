@@ -4,6 +4,8 @@ import (
 	"errors"
 
 	"github.com/fhermeni/wints/internship"
+	"github.com/fhermeni/wints/journal"
+	"github.com/fhermeni/wints/mail"
 )
 
 var (
@@ -16,6 +18,8 @@ Service restricts the operation that can be executed by the current user with re
 to its role and or relationships
 */
 type Service struct {
-	my  internship.User
-	srv internship.Service
+	my     internship.User
+	srv    internship.Service
+	log    journal.Journal
+	mailer mail.Mailer
 }

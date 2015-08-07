@@ -19,5 +19,7 @@ type Mailer interface {
 	SendReportDeadline(s internship.User, t internship.User, kind string, d time.Time)
 	SendReportPrivate(s internship.User, t internship.User, kind string, b bool)
 	SendTest(dst string) error
+	SendSurveyUploaded(tutor internship.User, student internship.User, kind string)
+	SendSurveyRequest(i internship.Internship, kind string)
 	Fake(bool)
 }

@@ -42,6 +42,10 @@ type HTTPConfig struct {
 	Path        string
 }
 
+type JournalConfig struct {
+	Path string
+}
+
 //Config aggregates all the subcomponents configuration parameters
 type Config struct {
 	Puller  PullerConfig
@@ -52,6 +56,7 @@ type Config struct {
 	HTTP    HTTPConfig
 	Logfile string
 	Majors  []string
+	Journal JournalConfig
 }
 
 //Load allows to parse a configuration for a JSON message
@@ -96,6 +101,7 @@ func Blank() error {
 		internship.SurveyDef{Name: "midterm", Deadline: "relative", Value: "1440h"},
 		internship.SurveyDef{Name: "final", Deadline: "absolute", Value: "01/09/2015 23:59"},
 	}
+	journal := JournalConfig{Path: "logs"}
 	cfg := Config{
 		Puller:  puller,
 		Reports: reports,
@@ -104,6 +110,7 @@ func Blank() error {
 		Mailer:  mailer,
 		HTTP:    http,
 		Majors:  []string{},
+		Journal: journal,
 	}
 	out, err := json.MarshalIndent(cfg, "", "  ")
 	if err != nil {

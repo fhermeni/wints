@@ -3,7 +3,6 @@ package feeder
 import (
 	"encoding/csv"
 	"io"
-	"log"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -13,6 +12,7 @@ import (
 	"code.google.com/p/go-charset/charset"
 	_ "code.google.com/p/go-charset/data"
 	"github.com/fhermeni/wints/internship"
+	"github.com/fhermeni/wints/journal"
 )
 
 const (
@@ -47,10 +47,11 @@ type HTTPFeeder struct {
 	password   string
 	promotions []string
 	encoding   string
+	j          journal.Journal
 }
 
-func NewHTTPFeeder(url, login, password string, promotions []string, enc string) *HTTPFeeder {
-	return &HTTPFeeder{url: url, login: login, password: password, promotions: promotions, encoding: enc}
+func NewHTTPFeeder(j journal.Journal, url, login, password string, promotions []string, enc string) *HTTPFeeder {
+	return &HTTPFeeder{j: j, url: url, login: login, password: password, promotions: promotions, encoding: enc}
 }
 
 func cleanPerson(fn, ln, email, tel string) internship.Person {
@@ -76,6 +77,9 @@ func clean(str string) string {
 	return strings.ToLower(strings.TrimSpace(str))
 }
 
+func (f *HTTPFeeder) log(msg string, err error) {
+	f.j.Log("feeder", msg, err)
+}
 func cleanInt(str string) int {
 	s := strings.Replace(str, " ", "", -1)
 	m := regexp.MustCompile(`^(\d+)`).FindSubmatch([]byte(s))
@@ -167,7 +171,7 @@ func (f *HTTPFeeder) InjectOnePromotion(s internship.Service, y int, p string) (
 	nb := 0
 	conventions, err := f.scan(y, p)
 	if err != nil {
-		log.Println("Unable to scan promotion" + p + ": " + err.Error())
+		f.log("Scanning promotion '"+p+"'", err)
 		return nb, err
 	}
 	for _, c := range conventions {
@@ -177,7 +181,7 @@ func (f *HTTPFeeder) InjectOnePromotion(s internship.Service, y int, p string) (
 			if err == nil {
 				nb++
 			} else if err != internship.ErrConventionExists {
-				log.Println("Unable insert a convention: " + err.Error())
+				f.log("Unable to insert convention '"+c.Student.Fullname()+"'", err)
 				return nb, err
 			}
 		}

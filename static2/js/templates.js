@@ -256,23 +256,24 @@ Handlebars.registerHelper('shortSlotEntry', function(s) {
 });
 
 Handlebars.registerHelper('shortKind', function(r) {
-	return r.Kind.substring(0, 3)
+	return r.Kind.toLowerCase();
+	//return r.Kind.substring(0, 3)
 });
 
 Handlebars.registerHelper('reportStatus', function(r) {
 	var passed = (new Date(Date.parse(r.Deadline)).getTime() + 86400 * 1000) < new Date().getTime()
-	var style = "btn-link";
+	var style = "bg-link";
 
 	//Deadline passed, nothing
 	if (passed && r.Grade == -2) {
-		style = "btn-warning";
+		style = "bg-warning";
 	} else if (r.Grade == -1) {
 		//waiting for beging reviewed
-		style = "btn-primary";
+		style = "bg-info";
 	} else if (r.ToGrade && r.Grade >= 0 && r.Grade < 10) {
-		style = "btn-danger";
+		style = "bg-danger";
 	} else if ((!r.ToGrade && r.Grade >= 0) || r.Grade >= 10) {
-		style = "btn-success";
+		style = "bg-success";
 	}
 
 	return style;
@@ -280,16 +281,16 @@ Handlebars.registerHelper('reportStatus', function(r) {
 
 Handlebars.registerHelper('defenseStatus', function(g) {
 	var passed = new Date(g.Date).getTime() < new Date().getTime()
-	var style = "btn-link";
+	var style = "bg-link";
 	if (new Date(g.Date).getTime() < 0) {
 		return style;
 	}
 	if (g.Grade >= 0 && g.Grade < 10) {
-		style = "btn-danger";
+		style = "bg-danger";
 	} else if (g.Grade >= 10) {
-		style = "btn-success";
+		style = "bg-success";
 	} else if (passed) {
-		style = "btn-primary"
+		style = "bg-primary"
 	}
 	return style;
 });
@@ -334,27 +335,54 @@ Handlebars.registerHelper('gradeAnnotation', function(r) {
 	return -9999
 });
 
-Handlebars.registerHelper('surveyAnnotation', function(surveys) {
-	//-1 by missing reports
-	g = 0
-	surveys.forEach(function(s) {
-		if (Object.keys(s.Answers).length == 0) {
-			g--
-		}
-	})
-	return g;
+Handlebars.registerHelper('surveyAnnotation', function(s) {
+	if (Object.keys(s.Answers).length == 0) {
+		return -10;
+	}
+	if (s.Kind == "midterm" && s.Answers[19] == "false") {
+		return -1;
+	}
+
+	if (s.Kind == "final" && s.Answers["q17"] < 10) {
+		return -1;
+	}
+
+	return 0;
 });
 
 
-Handlebars.registerHelper('surveyStatus', function(s) {
-	var passed = (new Date(Date.parse(s.Deadline)).getTime() + 86400 * 1000) < new Date().getTime()
-	var style = "badge-info"
-	if (passed && s.Answers == {}) {
-		style = "badge-danger"
-	} else if (Object.keys(s.Answers).length > 0) {
-		style = "badge-success"
+Handlebars.registerHelper('surveyGrade', function(s) {
+	if (Object.keys(s.Answers).length == 0) {
+		return "-"
 	}
-	return style;
+	if (s.Kind == "midterm") {
+		if (s.Answers[19] == "true") {
+			return new Handlebars.SafeString("&#10003;");
+		}
+		return new Handlebars.SafeString("x");
+	} else {
+		return s.Answers["q17"];
+	}
+	return "-";
+});
+
+Handlebars.registerHelper('surveyStatus', function(s) {
+	if (Object.keys(s.Answers).length == 0) {
+		return ""
+	}
+	if (s.Kind == "midterm") {
+		if (s.Answers[19] == "true") {
+			return "bg-success";
+		}
+		return "bg-danger";
+	}
+	if (s.Kind == "final") {
+		if (s.Answers["q17"] >= 10) {
+			return "bg-success";
+		}
+		return "bg-danger";
+	}
+	return "";
 });
 
 
@@ -455,15 +483,27 @@ Handlebars.registerHelper('student', function(g) {
 	return new Handlebars.SafeString(buf);
 });
 
-Handlebars.registerHelper("offset", function(from, offset) {
+Handlebars.registerHelper("offset", function(from, offset, tz) {
+	if (tz === undefined) {
+		tz = true;
+	}
 	var d = moment(from)
+	if (tz) {
+		d = d.tz('Europe/Paris');
+	}
 	d = d.add(offset * 30, "minutes")
 	return d.format("HH:mm") + "-" + d.add(30, "minutes").format("HH:mm");
 })
 
+Handlebars.registerHelper("offset_local", function(from, offset, tz) {
+	var d = moment(from)
+	d = d.add(offset * 30, "minutes")
+	return d.format("dddd D MMMM HH:mm") + "-" + d.add(30, "m").format("HH:mm");
+})
+
 Handlebars.registerHelper('longDate', function(d) {
 	var m = moment(d);
-	m.locale("fr")
+	m.locale("fr").tz('Europe/Paris')
 	return m.format("dddd D MMMM");
 });
 

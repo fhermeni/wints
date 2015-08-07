@@ -10,18 +10,31 @@ var allMajors;
 $(document).ready(function() {
 	waitingBlock = $("#cnt").clone().html();
 
+	//IE8 stuff
+	if (typeof Array.prototype.forEach != 'function') {
+		Array.prototype.forEach = function(callback) {
+			for (var i = 0; i < this.length; i++) {
+				callback.apply(this, [this[i], i, this]);
+			}
+		};
+	}
 	majors(function(m) {
 		allMajors = m;
-	})
-	user(getCookie("session"), function(u) {
-		myself = u;
-		$("#fullname").html(u.Firstname + " " + u.Lastname);
-		showMyServices(u.Role);
-		if (myself.Role >= 2) {
-			showPage(undefined, "conventions");
-		} else {
-			showPage(undefined, "myStudents");
-		}
+		user(getCookie("session"), function(u) {
+			myself = u;
+			$("#fullname").html(u.Firstname + " " + u.Lastname);
+			showMyServices(u.Role);
+			if (myself.Role == 0) {
+				showDashboard();
+			} else if (myself.Role >= 2) {
+				showPage(undefined, "conventions");
+			} else {
+				showPage(undefined, "myStudents");
+			}
+
+		}, function() {
+			window.location.href = "/login"
+		});
 
 	});
 
@@ -214,7 +227,7 @@ function showAlumni() {
 }
 
 function showStatus() {
-	students(function(stus) {
+	getStudents(function(stus) {
 		var placed = 0
 		var known = [];
 		var toPlace = stus.length;
@@ -1034,4 +1047,11 @@ function tplEvaluationMail(kind, student, url) {
 	var to = encodeURIComponent(i.Sup.Email)
 	var s = encodeURIComponent(i.Student.Firstname.capitalize() + " " + i.Student.Lastname.capitalize() + " - Evaluation");
 	window.location.href = "mailto:" + to + "?subject=" + s + "&body=" + encodeURIComponent(txt);
+}
+
+function requestSurveys(kind) {
+	$(".icheckbox.checked").find(":checkbox").each(function(i, c) {
+		var em = $(c).attr("data-email")
+		requestSurvey(em, kind)
+	});
 }

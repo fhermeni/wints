@@ -1,6 +1,7 @@
 package datastore
 
 import (
+	"log"
 	"time"
 
 	"github.com/fhermeni/wints/internship"
@@ -63,7 +64,6 @@ func (s *Service) Sessions() (map[string]time.Time, error) {
 }
 func (s *Service) Logout(email, token string) error {
 	err := SingleUpdate(s.DB, internship.ErrUnknownUser, "update sessions set token=$3 where email=$1 and token=$2", token, email, randomBytes(32)) //unknown token (to remind last visit)
-	//_, err := s.DB.Exec("delete from sessions where email=$1 and token=$2", email, token)
 	return err
 }
 
@@ -181,6 +181,7 @@ func (s *Service) ResetPassword(email string) ([]byte, error) {
 	d, _ := time.ParseDuration("48h")
 	_, err := s.DB.Exec("insert into password_renewal(email,token,deadline) values($1,$2,$3)", email, token, time.Now().Add(d))
 	if err != nil {
+		log.Println(err.Error())
 		//Not very sure, might be a SQL error or a connexion error as well.
 		return []byte{}, internship.ErrUnknownUser
 	}

@@ -279,3 +279,7 @@ func (cache *Cache) SetDefenseSessions(defs []internship.DefenseSession) error {
 	cache.hot.Set(false)
 	return cache.backend.SetDefenseSessions(defs)
 }
+
+func (c *Cache) RequestSurvey(stu, kind string) error {
+	return c.backend.RequestSurvey(stu, kind)
+}

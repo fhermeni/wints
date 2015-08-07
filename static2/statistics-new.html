@@ -89,10 +89,9 @@
             <div class="text-justify" id="employers"></div>
         </div>
         </div>
-
     </div>
-<div class="row">
 
+<div class="row">
 <div class="col-sm-4 hidden">
         <div class="thumbnail text-center">
             <h3>Midterm report</h3>
@@ -122,17 +121,16 @@
             <h1 class="survey" id="surveys-midterm"></h1>
             <h4>satisfaction at midterm</h4>            
         </div>
-</div>
+    </div>
 
 <div class="col-sm-3 hidden">
         <div class="thumbnail text-center">
             <h1 class="survey" id="surveys-final"></h1>
             <h4>satisfaction at the end</h4>            
         </div>
-</div>
-</div>
+</div>    
 <div class="row">
-<div class="col-sm-8 col-sm-offset-2">
+<div class="col-sm-7">
         <div class="thumbnail text-center">
             <h3>The future</h3>
         <ul class="pagination pagination-sm">            
@@ -141,11 +139,28 @@
             <li class="alumni filter master"><a onclick="showAlumni('master')">master only</a></li>            
         </ul>    
             <div class="row">                        
-            <div class="col-md-4" id="alumni"><canvas width="200px" height="200px"></canvas></div>                                    
-            <div class="col-md-8"><ul class='list-unstyled text-left' id="alumni-legend"></ul></div>
+            <div class="col-md-5" id="alumni"><canvas width="200px" height="200px"></canvas></div>                                    
+            <div class="col-md-7"><ul class='list-unstyled text-left' id="alumni-legend"></ul></div>
             </div>
         </div>
     </div>
+
+<div class="col-sm-5 hidden">
+        <div class="thumbnail text-center">
+            <h3>Reporting delays</h3>                    
+        <ul class="pagination pagination-sm">            
+            <li class="delays DoW active"><a onclick="delays('DoW')">Dow</a></li>    
+            <li class="delays Midterm"><a onclick="delays('Midterm')">Midterm</a></li>    
+            <li class="delays Final"><a onclick="delays('Final')">Final</a></li>    
+        </ul>
+
+        <ul class="pagination pagination-sm">            
+            <li class="delays Delivery active"><a onclick="delays(undefined, 'Delivery')">delivery</a></li>    
+            <li class="delays Reviewing"><a onclick="delays(undefined, 'Reviewing')">review</a></li>    
+        </ul>
+        <div id="delays"></div>    
+        </div>
+</div>
 </div>
 <footer>    
         <p>© University Nice Sophia Antipolis 2014-2015</p>    
@@ -153,9 +168,10 @@
 
 </div>
             <!-- Bootstrap -->
-            <script src="static/js/jquery-2.1.3.min.js"></script>            
-            <script src="static/js/statistics2.js"></script>            
+            <script src="static/js/jquery-1.11.3.min.js"></script>            
+            <script src="static/js/moment.min.js"></script>            
             <script src="static/js/rest.js"></script> 
+            <script src="static/js/statistics2.js"></script>                        
             <script src="static/js/Chart.min.js"></script>            
             <script src="static/js/bootstrap.min.js"></script>            
             <script>

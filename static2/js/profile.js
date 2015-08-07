@@ -1,51 +1,55 @@
 function showMyServices(r) {
-    for (i = 0; i <= r; i++) {
-        $(".role-" + i).show()
-    }
+	for (i = 0; i <= r; i++) {
+		$(".role-" + i).removeClass("hidden")
+	}
 }
 
 function showProfileEditor() {
-    var buf = Handlebars.getTemplate("profileEditor")(myself);
-    $("#modal").html(buf).modal('show')
+	var buf = Handlebars.getTemplate("profileEditor")(myself);
+	$("#modal").html(buf).modal('show')
 }
 
 function showPasswordEditor() {
-    var buf = Handlebars.getTemplate("passwordEditor")(myself);
-    $("#modal").html(buf).modal('show')
+	var buf = Handlebars.getTemplate("passwordEditor")(myself);
+	$("#modal").html(buf).modal('show')
 }
 
 
 function updateProfile() {
-    if (missing("lbl-firstname") || missing("lbl-lastname")) {
-        return false
-    }
-    setUser( $("#lbl-firstname").val(),  $("#lbl-lastname").val(),  $("#lbl-tel").val(), updateCb);
+	if (missing("lbl-firstname") || missing("lbl-lastname")) {
+		return false
+	}
+	setUser($("#lbl-firstname").val(), $("#lbl-lastname").val(), $("#lbl-tel").val(), updateCb);
 }
 
 function updatePassword() {
-    var ok = true;
-    if (missing("lbl-old-password") || missing("lbl-password1") || missing("lbl-password2")) {
-        return;
-    }
+	var ok = true;
+	if (missing("lbl-old-password") ||  missing("lbl-password1") || missing("lbl-password2")) {
+		return;
+	}
 
-    var p1 = $("#lbl-password1").val();
-    var p2 = $("#lbl-password2").val();
-    if (p1 != p2) {
-        $("#lbl-password2").notify("The passwords do not match", {className : "danger"});
-        return
-    }
-    if (p2.length < 8) {
-        $("#lbl-password1").notify("Password must be 8 characters length minimum", {className : "error"})
-        return
-    }    
-    setPassword($("#lbl-old-password").val(), $("#lbl-password1").val(), function() {
-            $("#modal").modal('hide');
-            reportSuccess("Password changed successfully");
-    });
+	var p1 = $("#lbl-password1").val();
+	var p2 = $("#lbl-password2").val();
+	if (p1 != p2) {
+		$("#lbl-password2").notify("The passwords do not match", {
+			className: "danger"
+		});
+		return
+	}
+	if (p2.length < 8) {
+		$("#lbl-password1").notify("Password must be 8 characters length minimum", {
+			className: "error"
+		})
+		return
+	}
+	setPassword($("#lbl-old-password").val(), $("#lbl-password1").val(), function() {
+		$("#modal").modal('hide');
+		reportSuccess("Password changed successfully");
+	});
 }
 
-function updateCb(data, resp, xhr) {        
-        $("#modal").modal('hide');
-        reportSuccess("Profile updated successfully");
-        $("#fullname").html($("#lbl-firstname").val() + " " + $("#lbl-lastname").val());
+function updateCb(data, resp, xhr) {
+	$("#modal").modal('hide');
+	reportSuccess("Profile updated successfully");
+	$("#fullname").html($("#lbl-firstname").val() + " " + $("#lbl-lastname").val());
 }

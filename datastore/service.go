@@ -4,6 +4,8 @@ import (
 	"database/sql"
 
 	"github.com/fhermeni/wints/internship"
+	"github.com/fhermeni/wints/journal"
+	"github.com/fhermeni/wints/mail"
 
 	"code.google.com/p/go.crypto/bcrypt"
 )
@@ -14,11 +16,13 @@ type Service struct {
 	reportDefs []internship.ReportDef
 	surveyDefs []internship.SurveyDef
 	majors     []string
+	j          journal.Journal
+	mailer     mail.Mailer
 }
 
 //NewService initiate the storage servive
-func NewService(db *sql.DB, reportDefs []internship.ReportDef, surveyDefs []internship.SurveyDef, majors []string) (*Service, error) {
-	s := Service{DB: db, reportDefs: reportDefs, surveyDefs: surveyDefs, majors: majors}
+func NewService(db *sql.DB, reportDefs []internship.ReportDef, surveyDefs []internship.SurveyDef, majors []string, j journal.Journal, m mail.Mailer) (*Service, error) {
+	s := Service{DB: db, reportDefs: reportDefs, surveyDefs: surveyDefs, majors: majors, j: j, mailer: m}
 	return &s, nil
 }
 

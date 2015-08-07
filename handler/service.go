@@ -2,13 +2,17 @@ package handler
 
 import (
 	"errors"
+	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"time"
 
+	"github.com/fhermeni/wints/filter"
 	"github.com/fhermeni/wints/internship"
+	"github.com/fhermeni/wints/journal"
 	"github.com/fhermeni/wints/mail"
 	"github.com/gorilla/mux"
 
@@ -18,9 +22,11 @@ import (
 var path string
 
 type Service struct {
-	backend internship.Service
-	mailer  mail.Mailer
-	r       *mux.Router
+	backend   internship.Service
+	mailer    mail.Mailer
+	r         *mux.Router
+	assetPath string
+	j         journal.Journal
 }
 
 var (
@@ -28,35 +34,122 @@ var (
 	ErrMissingCookies = errors.New("Cookies 'session' or 'token' are missing or empty")
 )
 
-func NewService(backend internship.Service, mailer mail.Mailer, p string) Service {
+func NewService(backend internship.Service, mailer mail.Mailer, p string, j journal.Journal) Service {
 	//Rest stuff
 	r := mux.NewRouter()
 	path = p
-	s := Service{backend: backend, r: r, mailer: mailer}
-	userMngt(s, mailer)
-	internshipsMngt(s, mailer)
-	reportMngt(s, mailer)
-	conventionMgnt(s, mailer)
-	surveyMngt(s, mailer)
-	defenseMngt(s, mailer)
+	s := Service{backend: backend, r: r, mailer: mailer, assetPath: p, j: j}
 	fs := http.Dir(path + "/")
 	fileHandler := http.FileServer(fs)
 	r.PathPrefix("/" + path + "/").Handler(httpgzip.NewHandler(http.StripPrefix("/"+path, fileHandler)))
+	r.NotFoundHandler = s.mon(s.errorPage())
 	http.Handle("/", s.r)
-	s.r.HandleFunc("/", mon(home(backend))).Methods("GET")
-	s.r.HandleFunc("/statistics", mon(stats())).Methods("GET")
-	s.r.HandleFunc("/defense-program", mon(defenseProgram())).Methods("GET")
-	s.r.HandleFunc("/api/v1/surveys/{token}", surveyFromToken(backend)).Methods("GET")
-	s.r.HandleFunc("/api/v1/surveys/{token}", setSurveyContent(backend)).Methods("POST")
-	s.r.HandleFunc("/api/v1/statistics/", mon(statistics(backend))).Methods("GET")
-	s.r.HandleFunc("/api/v1/majors/", mon(majors(backend))).Methods("GET")
+	s.r.HandleFunc("/", s.mon(home(backend))).Methods("GET")
+	s.r.HandleFunc("/login", s.mon(s.asset("login.html"))).Methods("GET")
+	s.r.HandleFunc("/statistics", s.mon(s.asset("statistics-new.html"))).Methods("GET")
+	s.r.HandleFunc("/defense-program", s.mon(s.asset("defense-program.html"))).Methods("GET")
+	s.r.HandleFunc("/api/v1/surveys/{token}", s.mon(surveyFromToken(j, backend))).Methods("GET")
+	s.r.HandleFunc("/api/v1/surveys/{token}", s.mon(setSurveyContent(j, mailer, backend))).Methods("POST")
+	s.r.HandleFunc("/api/v1/statistics/", s.mon(statistics(backend))).Methods("GET")
+	s.r.HandleFunc("/api/v1/majors/", s.mon(majors(backend))).Methods("GET")
+	s.r.HandleFunc("/api/v1/users/{email}", s.rest(user)).Methods("GET")
+	s.r.HandleFunc("/api/v1/users/", s.rest(users)).Methods("GET")
+	s.r.HandleFunc("/api/v1/users/{email}", s.rest(rmUser)).Methods("DELETE")
+	s.r.HandleFunc("/api/v1/users/{email}/profile", s.rest(setUserProfile)).Methods("PUT")
+	s.r.HandleFunc("/api/v1/users/{email}/role", s.rest(setUserRole)).Methods("PUT")
+	s.r.HandleFunc("/api/v1/users/", s.rest(newTutor)).Methods("POST")
+	s.r.HandleFunc("/api/v1/users/{email}/password", s.mon(resetPassword(j, s.backend, mailer))).Methods("DELETE")
+	s.r.HandleFunc("/api/v1/users/{email}/password", s.rest(setPassword)).Methods("PUT")
+	s.r.HandleFunc("/api/v1/sessions/", s.rest(sessions)).Methods("GET")
+	s.r.HandleFunc("/api/v1/newPassword", s.mon(newPassword(j, s.backend, mailer))).Methods("POST")
+	s.r.HandleFunc("/api/v1/login", s.mon(login(j, s.backend))).Methods("POST")
+	s.r.HandleFunc("/api/v1/logout", s.mon(logout(j, s.backend))).Methods("GET")
+	s.r.HandleFunc("/resetPassword", s.mon(s.asset("new_password.html"))).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}", s.rest(report)).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/content", s.rest(reportContent)).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/content", s.rest(setReportContent)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/grade", s.rest(setReportGrade)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/deadline", s.rest(setReportDeadline)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/private", s.rest(setReportPrivate)).Methods("POST")
+	s.r.HandleFunc("/api/v1/conventions/", s.rest(conventions)).Methods("GET")
+	s.r.HandleFunc("/api/v1/conventions/{email}/skip", s.rest(skipConvention)).Methods("POST")
+	s.r.HandleFunc("/api/v1/conventions/{email}", s.rest(deleteConvention)).Methods("DELETE")
+	s.r.HandleFunc("/api/v1/internships/{email}", s.rest(getInternship)).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/", s.rest(internships)).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/", s.rest(newInternship)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/supervisor", s.rest(setSupervisor)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/tutor", s.rest(setTutor)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/company", s.rest(setCompany)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/title", s.rest(setTitle)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/major", s.rest(setMajor)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/promotion", s.rest(setPromotion)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/alumni", s.rest(setAlumni)).Methods("POST")
+	s.r.HandleFunc("/api/v1/students/", s.rest(students)).Methods("GET")
+	s.r.HandleFunc("/api/v1/students/{email}", s.rest(insertStudents)).Methods("POST")
+	s.r.HandleFunc("/api/v1/students/{email}/internship", s.rest(alignStudentWithInternship)).Methods("POST")
+	s.r.HandleFunc("/api/v1/students/{email}/hidden", s.rest(hideStudent)).Methods("POST")
+	s.r.HandleFunc("/api/v1/defenses/", s.rest(getDefenses)).Methods("GET")
+	s.r.HandleFunc("/api/v1/defenses/", s.rest(postDefenses)).Methods("POST")
+	//s.r.HandleFunc("/api/v1/program/", s.mon(getPublicSessions(s.backend))).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/{email}/defense", s.rest(getDefense)).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/{email}/defense/grade", s.rest(setDefenseGrade)).Methods("POST")
+	s.r.HandleFunc("/surveys/{kind}", s.mon(surveyForm)).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/{student}/surveys/{kind}", s.rest(survey)).Methods("GET")
+	s.r.HandleFunc("/api/v1/internships/{student}/surveys/{kind}/request", s.rest(requestSurveys)).Methods("GET")
+
 	return s
+}
+
+func (s *Service) errorPage() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "text/html")
+		w.WriteHeader(404)
+
+		in, err := os.Open(filepath.Join(s.assetPath, "404.html"))
+		if err != nil {
+			return
+		}
+		defer in.Close()
+		_, err = io.Copy(w, in)
+	}
+}
+
+func (s *Service) rest(cb func(internship.Service, http.ResponseWriter, *http.Request) error) http.HandlerFunc {
+
+	return s.mon(func(w http.ResponseWriter, r *http.Request) {
+
+		email, err := authenticated(s.backend, w, r)
+		if err == ErrMissingCookies || err == internship.ErrSessionExpired {
+			http.Error(w, err.Error(), http.StatusForbidden)
+			return
+		} else if err == internship.ErrCredentials {
+			http.Error(w, err.Error(), http.StatusForbidden)
+			return
+		} else if err != nil {
+			http.Error(w, "", http.StatusInternalServerError)
+			s.j.Log("ERROR", "Unsupported error: %s\n", err)
+			return
+		}
+		u, err := s.backend.User(email)
+		if err == internship.ErrUnknownUser {
+			http.Error(w, err.Error(), http.StatusForbidden)
+			return
+		}
+		wrapper, _ := filter.NewService(s.j, s.backend, u, s.mailer)
+		e := cb(wrapper, w, r)
+		status(w, e)
+	})
+}
+
+func (s *Service) asset(file string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, filepath.Join(s.assetPath, file))
+	}
 }
 
 func majors(backend internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		m := backend.Majors()
-		writeJSONIfOk(nil, w, r, m)
+		writeJSONIfOk(nil, w, r, backend.Majors())
 	}
 }
 
@@ -67,55 +160,29 @@ func statistics(backend internship.Service) http.HandlerFunc {
 	}
 }
 
-func stats() http.HandlerFunc {
+/*func getPublicSessions(srv internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, path+"/statistics-new.html")
+		sessions, err := srv.PublicDefenseSessions()
+		writeJSONIfOk(err, w, r, sessions)
 	}
-}
+}*/
 
 func home(backend internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		email, err := authenticated(backend, w, r)
-		if err != nil {
-			http.ServeFile(w, r, path+"/login.html")
+		r.Header.Del("Cache-Control")
+		r.Header.Set("Pragma", "no-cache")
+		r.Header.Del("If-Modified-Since")
+		if _, err := authenticated(backend, w, r); err != nil {
+			http.Redirect(w, r, "/login", 302)
 			return
 		}
-		u, err := backend.User(email)
-		if err != nil {
-			http.ServeFile(w, r, path+"/login.html")
-			return
-		}
-		if u.Role == internship.NONE {
-			http.ServeFile(w, r, path+"/student.html")
-		} else {
-			http.ServeFile(w, r, path+"/admin.html")
-		}
+		w.Header().Set("Pragma", "no-cache")
+		http.ServeFile(w, r, filepath.Join(path, "home.html"))
 	}
 }
 
 func (s *Service) Listen(host string, cert, pk string) error {
 	return http.ListenAndServeTLS(host, cert, pk, nil)
-}
-
-func userMngt(s Service, mailer mail.Mailer) {
-
-	s.r.HandleFunc("/api/v1/users/{email}", restHandler(user, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/users/", restHandler(users, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/users/{email}", restHandler(rmUser, s, mailer)).Methods("DELETE")
-	s.r.HandleFunc("/api/v1/users/{email}/profile", restHandler(setUserProfile, s, mailer)).Methods("PUT")
-	s.r.HandleFunc("/api/v1/users/{email}/role", restHandler(setUserRole, s, mailer)).Methods("PUT")
-	s.r.HandleFunc("/api/v1/users/", restHandler(newTutor, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/users/{email}/password", mon(resetPassword(s.backend, mailer))).Methods("DELETE")
-	s.r.HandleFunc("/api/v1/users/{email}/password", restHandler(setPassword, s, mailer)).Methods("PUT")
-	s.r.HandleFunc("/api/v1/sessions/", restHandler(sessions, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/newPassword", mon(newPassword(s.backend, mailer))).Methods("POST")
-	s.r.HandleFunc("/api/v1/login", mon(login(s.backend))).Methods("POST")
-	s.r.HandleFunc("/api/v1/logout", mon(logout(s.backend))).Methods("GET")
-	s.r.HandleFunc("/resetPassword", mon(password)).Methods("GET")
-}
-
-func password(w http.ResponseWriter, r *http.Request) {
-	http.ServeFile(w, r, path+"/new_password.html")
 }
 
 type PasswordUpdate struct {
@@ -128,11 +195,12 @@ type NewPassword struct {
 	New   string
 }
 
-func login(srv internship.Service) http.HandlerFunc {
+func login(j journal.Journal, srv internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		login := r.PostFormValue("login")
 		password := r.PostFormValue("password")
 		t, err := srv.Registered(login, []byte(password))
+		j.Log(login, "login", err)
 		if err != nil {
 			http.Redirect(w, r, "/#badLogin", 302)
 			return
@@ -147,14 +215,13 @@ func login(srv internship.Service) http.HandlerFunc {
 			Value: string(t),
 			Path:  "/",
 		}
-
 		http.SetCookie(w, cookie)
 		http.SetCookie(w, token)
 		http.Redirect(w, r, "/", 302)
 	}
 }
 
-func logout(srv internship.Service) http.HandlerFunc {
+func logout(j journal.Journal, srv internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		email := &http.Cookie{
 			Name:   "session",
@@ -171,15 +238,16 @@ func logout(srv internship.Service) http.HandlerFunc {
 		}
 		http.SetCookie(w, email)
 		http.SetCookie(w, token)
-		http.Redirect(w, r, "/", 302)
+		http.Redirect(w, r, "/login", 302)
 	}
 }
 
-func newPassword(srv internship.Service, mailer mail.Mailer) http.HandlerFunc {
+func newPassword(j journal.Journal, srv internship.Service, mailer mail.Mailer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		token := r.PostFormValue("token")
 		password := r.PostFormValue("password")
 		email, err := srv.NewPassword([]byte(token), []byte(password))
+		j.Log(token, "reset his password (email='"+email+"')", err)
 		switch err {
 		case internship.ErrNoPendingRequests:
 			http.Redirect(w, r, "/resetPassword?token="+token+"#noRequest", 302)
@@ -197,81 +265,55 @@ func newPassword(srv internship.Service, mailer mail.Mailer) http.HandlerFunc {
 			http.SetCookie(w, cookie)
 			http.Redirect(w, r, "/?email="+url.QueryEscape(email), 302)
 		default:
-			log.Println("Unable to reset the password for token " + token + ": " + err.Error())
 			http.Error(w, "Unable to reset the password", http.StatusInternalServerError)
 			return
 		}
 	}
 }
 
-func setPassword(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func setPassword(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var u PasswordUpdate
-	err := jsonRequest(w, r, &u)
-	if err != nil {
+	if err := jsonRequest(w, r, &u); err != nil {
 		return err
 	}
-	e := mux.Vars(r)["email"]
-	return srv.SetUserPassword(e, []byte(u.Old), []byte(u.New))
+	return srv.SetUserPassword(mux.Vars(r)["email"], []byte(u.Old), []byte(u.New))
 }
 
-func resetPassword(srv internship.Service, mailer mail.Mailer) http.HandlerFunc {
+func resetPassword(j journal.Journal, srv internship.Service, mailer mail.Mailer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		e := mux.Vars(r)["email"]
-		token, err := srv.ResetPassword(e)
-		if err != nil {
-			log.Println("Unable to get the reset token for " + e + ": " + err.Error())
-			return
-		}
-		b := r.URL.Query().Get("invite")
-		go func() {
-			if b == "true" {
-				if u, err := srv.User(e); err == nil {
-					mailer.SendAdminInvitation(u, token)
-				}
+		em := mux.Vars(r)["email"]
+		token, err := srv.ResetPassword(em)
+		j.Log(em, "initiate password reset", err)
+		if err == nil {
+			u, err := srv.User(em)
+			if err == nil {
+				mailer.SendPasswordResetLink(u, token)
 			} else {
-				if u, err := srv.User(e); err == nil {
-					mailer.SendPasswordResetLink(u, token)
-				}
+				j.Log(em, "Unable to send the reset token", err)
 			}
-		}()
+
+		}
+
+		status(w, err)
 	}
 }
 
-func sessions(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
-	res, err := srv.Sessions()
-	return writeJSONIfOk(err, w, r, res)
-}
-
-func newTutor(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func newTutor(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var u internship.User
 	err := jsonRequest(w, r, &u)
 	if err != nil {
 		return err
 	}
-	t, err := srv.NewTutor(u)
-	if err == nil {
-		go mailer.SendAdminInvitation(u, t)
-	}
+	_, err = srv.NewTutor(u)
 	return err
 }
 
-func setUserRole(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func setUserRole(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var p internship.Privilege
-	err := jsonRequest(w, r, &p)
-	if err != nil {
+	if err := jsonRequest(w, r, &p); err != nil {
 		return err
 	}
-	em := mux.Vars(r)["email"]
-	err = srv.SetUserRole(em, p)
-	if err != nil {
-		return err
-	}
-	go func() {
-		if u, err := srv.User(em); err == nil {
-			mailer.SendRoleUpdate(u)
-		}
-	}()
-	return nil
+	return srv.SetUserRole(mux.Vars(r)["email"], p)
 }
 
 type ProfileUpdate struct {
@@ -280,57 +322,73 @@ type ProfileUpdate struct {
 	Tel       string
 }
 
-func setUserProfile(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func setUserProfile(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var p ProfileUpdate
-	err := jsonRequest(w, r, &p)
-	if err != nil {
+	if err := jsonRequest(w, r, &p); err != nil {
 		return err
 	}
 	return srv.SetUserProfile(mux.Vars(r)["email"], p.Firstname, p.Lastname, p.Tel)
 }
 
-func user(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
-	us, err := srv.User(mux.Vars(r)["email"])
-	return writeJSONIfOk(err, w, r, us)
-}
-
-func rmUser(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func rmUser(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	u, err := srv.User(mux.Vars(r)["email"])
 	if err != nil {
 		return err
 	}
-	err = srv.RmUser(u.Email)
-	if err == nil {
-		go mailer.SendAccountRemoval(u)
-	}
-	return err
+	return srv.RmUser(u.Email)
 }
 
-func users(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func getInternship(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	i, err := srv.Internship(mux.Vars(r)["email"])
+	return writeJSONIfOk(err, w, r, i)
+}
+
+func internships(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	i, err := srv.Internships()
+	return writeJSONIfOk(err, w, r, i)
+}
+
+func getDefenses(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	defs, err := srv.DefenseSessions()
+	return writeJSONIfOk(err, w, r, defs)
+}
+
+func sessions(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	res, err := srv.Sessions()
+	return writeJSONIfOk(err, w, r, res)
+}
+
+func users(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	us, err := srv.Users()
 	return writeJSONIfOk(err, w, r, us)
 }
 
-func reportMngt(s Service, mailer mail.Mailer) {
-	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}", restHandler(report, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/content", restHandler(reportContent, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/content", restHandler(setReportContent, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/grade", restHandler(setReportGrade, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/deadline", restHandler(setReportDeadline, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/reports/{kind}/private", restHandler(setReportPrivate, s, mailer)).Methods("POST")
+func conventions(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	c, err := srv.Conventions()
+	return writeJSONIfOk(err, w, r, c)
 }
 
-func report(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func getDefense(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	def, err := srv.DefenseSession(mux.Vars(r)["email"])
+	return writeJSONIfOk(err, w, r, def)
+}
+
+func report(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	h, err := srv.Report(mux.Vars(r)["kind"], mux.Vars(r)["email"])
 	return writeJSONIfOk(err, w, r, h)
 }
 
-func reportContent(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func user(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	us, err := srv.User(mux.Vars(r)["email"])
+	return writeJSONIfOk(err, w, r, us)
+}
+
+func reportContent(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	cnt, err := srv.ReportContent(mux.Vars(r)["kind"], mux.Vars(r)["email"])
 	return fileReplyIfOk(err, w, "application/pdf", mux.Vars(r)["kind"]+".pdf", cnt)
 }
 
-func setReportContent(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func setReportContent(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	fi, fh, err := r.FormFile("report")
 	if err != nil {
 		return err
@@ -344,19 +402,7 @@ func setReportContent(srv internship.Service, mailer mail.Mailer, w http.Respons
 		http.Error(w, "The report must be a PDF", http.StatusBadRequest)
 		return errors.New("The report must be a PDF")
 	}
-	em := mux.Vars(r)["email"]
-	k := mux.Vars(r)["kind"]
-	err = srv.SetReportContent(k, em, cnt)
-	go func() {
-		if err == nil {
-			if i, err := srv.Internship(em); err == nil {
-				mailer.SendReportUploaded(i.Student, i.Tutor, k)
-			}
-		} else {
-			log.Println("No mail since: " + err.Error())
-		}
-	}()
-	return err
+	return srv.SetReportContent(mux.Vars(r)["kind"], mux.Vars(r)["email"], cnt)
 }
 
 type ReportGrade struct {
@@ -364,207 +410,116 @@ type ReportGrade struct {
 	Comment string
 }
 
-func setReportGrade(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func setReportGrade(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var n ReportGrade
-	err := jsonRequest(w, r, &n)
-	if err != nil {
+	if err := jsonRequest(w, r, &n); err != nil {
 		return err
 	}
-	k := mux.Vars(r)["kind"]
-	em := mux.Vars(r)["email"]
-	err = srv.SetReportGrade(k, em, n.Grade, n.Comment)
-
-	go func() {
-		if err == nil {
-			if i, err := srv.Internship(em); err == nil {
-				mailer.SendGradeUploaded(i.Student, i.Tutor, k)
-			}
-		}
-	}()
-	return err
+	return srv.SetReportGrade(mux.Vars(r)["kind"], mux.Vars(r)["email"], n.Grade, n.Comment)
 }
 
-func setReportDeadline(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func setReportDeadline(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var t time.Time
-	err := jsonRequest(w, r, &t)
-	if err != nil {
+	if err := jsonRequest(w, r, &t); err != nil {
 		return err
 	}
-	err = srv.SetReportDeadline(mux.Vars(r)["kind"], mux.Vars(r)["email"], t)
-	go func() {
-		if err == nil {
-			if i, err := srv.Internship(mux.Vars(r)["email"]); err != nil {
-				mailer.SendReportDeadline(i.Student, i.Tutor, mux.Vars(r)["kind"], t)
-			}
-		}
-	}()
-	return err
+	return srv.SetReportDeadline(mux.Vars(r)["kind"], mux.Vars(r)["email"], t)
 }
 
-func setReportPrivate(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func setReportPrivate(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var b bool
-	err := jsonRequest(w, r, &b)
-	if err != nil {
+	if err := jsonRequest(w, r, &b); err != nil {
 		return err
 	}
-	err = srv.SetReportPrivate(mux.Vars(r)["kind"], mux.Vars(r)["email"], b)
-	go func() {
-		if err == nil {
-			if i, err := srv.Internship(mux.Vars(r)["email"]); err != nil {
-				mailer.SendReportPrivate(i.Student, i.Tutor, mux.Vars(r)["kind"], b)
-			}
-		}
-	}()
-	return err
+	return srv.SetReportPrivate(mux.Vars(r)["kind"], mux.Vars(r)["email"], b)
 }
 
-func conventionMgnt(s Service, mailer mail.Mailer) {
-	s.r.HandleFunc("/api/v1/conventions/", restHandler(conventions, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/conventions/{email}/skip", restHandler(skipConvention, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/conventions/{email}", restHandler(deleteConvention, s, mailer)).Methods("DELETE")
-}
-
-func skipConvention(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func skipConvention(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var b bool
-	err := jsonRequest(w, r, &b)
-	if err != nil {
+	if err := jsonRequest(w, r, &b); err != nil {
 		return err
 	}
 	return srv.SkipConvention(mux.Vars(r)["email"], b)
 }
 
-func deleteConvention(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func deleteConvention(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	return srv.DeleteConvention(mux.Vars(r)["email"])
 }
 
-func conventions(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
-	c, err := srv.Conventions()
-	return writeJSONIfOk(err, w, r, c)
-}
-
-func internshipsMngt(s Service, mailer mail.Mailer) {
-	s.r.HandleFunc("/api/v1/internships/{email}", restHandler(getInternship, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/internships/", restHandler(internships, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/internships/", restHandler(newInternship, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/supervisor", restHandler(setSupervisor, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/tutor", restHandler(setTutor, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/company", restHandler(setCompany, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/title", restHandler(setTitle, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/major", restHandler(setMajor, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/promotion", restHandler(setPromotion, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/alumni", restHandler(setAlumni, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/students/", restHandler(students, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/students/{email}", restHandler(insertStudents, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/students/{email}/internship", restHandler(alignStudentWithInternship, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/students/{email}/hidden", restHandler(hideStudent, s, mailer)).Methods("POST")
-}
-
-func setAlumni(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func setAlumni(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var c internship.Alumni
-	err := jsonRequest(w, r, &c)
-	if err != nil {
+	if err := jsonRequest(w, r, &c); err != nil {
 		return err
 	}
 	return srv.SetAlumni(mux.Vars(r)["email"], c)
 }
 
-func newInternship(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func newInternship(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var c internship.Convention
 	err := jsonRequest(w, r, &c)
 	if err != nil {
 		return err
 	}
-	token, err := srv.NewInternship(c)
-	if err == nil {
-		go func() {
-			s := internship.User{Firstname: c.Student.Firstname, Lastname: c.Student.Lastname, Email: c.Student.Email}
-			mailer.SendStudentInvitation(s, token)
-			mailer.SendTutorNotification(c.Student, c.Tutor)
-		}()
-	}
+	_, err = srv.NewInternship(c)
 	return err
 }
 
-func getInternship(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
-	i, err := srv.Internship(mux.Vars(r)["email"])
-	return writeJSONIfOk(err, w, r, i)
-}
-
-func internships(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
-	i, err := srv.Internships()
-	return writeJSONIfOk(err, w, r, i)
-}
-
-func setCompany(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func setCompany(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var c internship.Company
-	err := jsonRequest(w, r, &c)
-	if err != nil {
+	if err := jsonRequest(w, r, &c); err != nil {
 		return err
 	}
 	return srv.SetCompany(mux.Vars(r)["email"], c)
 }
 
-func setMajor(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func setMajor(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var c string
-	err := jsonRequest(w, r, &c)
-	if err != nil {
+	if err := jsonRequest(w, r, &c); err != nil {
 		return err
 	}
 	return srv.SetMajor(mux.Vars(r)["email"], c)
 }
 
-func setTitle(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func setTitle(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var c string
-	err := jsonRequest(w, r, &c)
-	if err != nil {
+	if err := jsonRequest(w, r, &c); err != nil {
 		return err
 	}
 	return srv.SetTitle(mux.Vars(r)["email"], c)
 }
 
-func setPromotion(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func setPromotion(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var c string
-	err := jsonRequest(w, r, &c)
-	if err != nil {
+	if err := jsonRequest(w, r, &c); err != nil {
 		return err
 	}
 	return srv.SetPromotion(mux.Vars(r)["email"], c)
 }
 
-func setSupervisor(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func setSupervisor(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var s internship.Person
-	err := jsonRequest(w, r, &s)
-	if err != nil {
+	if err := jsonRequest(w, r, &s); err != nil {
 		return err
 	}
 	return srv.SetSupervisor(mux.Vars(r)["email"], s)
 }
 
-func setTutor(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func setTutor(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var s string
 	err := jsonRequest(w, r, &s)
 	if err != nil {
 		return err
 	}
 	em := mux.Vars(r)["email"]
-	i, err := srv.Internship(em)
+	_, err = srv.Internship(em)
 	if err != nil {
 		return err
 	}
-	err = srv.SetTutor(em, s)
-	go func() {
-		if err == nil {
-			if u, err := srv.User(s); err == nil {
-				mailer.SendTutorUpdate(i.Student, i.Tutor, u)
-			}
-		}
-	}()
-	return err
+	return srv.SetTutor(em, s)
 }
 
-func surveyMngt(s Service, mailer mail.Mailer) {
-	s.r.HandleFunc("/surveys/{kind}", surveyForm).Methods("GET")
-	s.r.HandleFunc("/api/v1/internships/{student}/surveys/{kind}", restHandler(survey, s, mailer)).Methods("GET")
+func requestSurveys(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	return srv.RequestSurvey(mux.Vars(r)["student"], mux.Vars(r)["kind"])
 }
 
 func surveyForm(w http.ResponseWriter, r *http.Request) {
@@ -572,7 +527,7 @@ func surveyForm(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, path+"/"+k+".html")
 }
 
-func survey(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func survey(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	student := mux.Vars(r)["student"]
 	kind := mux.Vars(r)["kind"]
 	s, err := srv.Survey(student, kind)
@@ -588,7 +543,7 @@ type LongSurvey struct {
 	Answers   map[string]string
 }
 
-func surveyFromToken(backend internship.Service) http.HandlerFunc {
+func surveyFromToken(j journal.Journal, backend internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tok := mux.Vars(r)["token"]
 		student, kind, err := backend.SurveyToken(tok)
@@ -602,13 +557,13 @@ func surveyFromToken(backend internship.Service) http.HandlerFunc {
 		}
 		s, err := backend.Survey(student, kind)
 		if err != nil {
-			log.Printf("Unable to send the survey ", err.Error())
+			j.Log(tok, "Sending the long survey", err)
 			http.Error(w, "A possible bug to report", http.StatusInternalServerError)
 			return
 		}
 		i, err := backend.Internship(student)
 		if err != nil {
-			log.Printf("Unable to send the survey ", err.Error())
+			j.Log(tok, "Sending the long survey", err)
 			http.Error(w, "A possible bug to report", http.StatusInternalServerError)
 			return
 		}
@@ -618,7 +573,7 @@ func surveyFromToken(backend internship.Service) http.HandlerFunc {
 	}
 }
 
-func setSurveyContent(backend internship.Service) http.HandlerFunc {
+func setSurveyContent(j journal.Journal, m mail.Mailer, backend internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tok := mux.Vars(r)["token"]
 		//Check for suspicious content (too long for example)
@@ -630,83 +585,68 @@ func setSurveyContent(backend internship.Service) http.HandlerFunc {
 		}
 		err = backend.SetSurveyContent(tok, cnt)
 		if err != nil {
-			log.Println("Unable to store the survey: " + err.Error())
 			http.Error(w, "Bad content", http.StatusBadRequest)
+			return
+		}
+
+		j.Log(tok, "uploaded the survey", err)
+		if err == nil {
+			stu, kind, err2 := backend.SurveyToken(tok)
+			if err2 != nil {
+				j.Log(tok, "Unable to mail about survey", err2)
+				return
+			}
+			i, err2 := backend.Internship(stu)
+			if err2 != nil {
+				j.Log(tok, "Unable to mail about survey", err2)
+				return
+			}
+			m.SendSurveyUploaded(i.Tutor, i.Student, kind)
 		}
 	}
 }
 
-func students(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func students(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	st, err := srv.Students()
 	return writeJSONIfOk(err, w, r, st)
 }
 
-func alignStudentWithInternship(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func alignStudentWithInternship(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var intern string
-	err := jsonRequest(w, r, &intern)
-	if err != nil {
+	if err := jsonRequest(w, r, &intern); err != nil {
 		return err
 	}
 	return srv.AlignWithInternship(mux.Vars(r)["email"], intern)
 }
 
-func insertStudents(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func insertStudents(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var all string
-	err := jsonRequest(w, r, &all)
-	if err != nil {
+	if err := jsonRequest(w, r, &all); err != nil {
 		return err
 	}
 	return srv.InsertStudents(all)
 }
 
-func hideStudent(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func hideStudent(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var flag bool
-	err := jsonRequest(w, r, &flag)
-	if err != nil {
+	if err := jsonRequest(w, r, &flag); err != nil {
 		return err
 	}
 	return srv.HideStudent(mux.Vars(r)["email"], flag)
 }
 
-func defenseMngt(s Service, mailer mail.Mailer) {
-	s.r.HandleFunc("/api/v1/defenses/", restHandler(getDefenses, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/defenses/", restHandler(postDefenses, s, mailer)).Methods("POST")
-	s.r.HandleFunc("/api/v1/internships/{email}/defense", restHandler(getDefense, s, mailer)).Methods("GET")
-	s.r.HandleFunc("/api/v1/internships/{email}/defense/grade", restHandler(setDefenseGrade, s, mailer)).Methods("POST")
-}
-
-func getDefenses(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
-	defs, err := srv.DefenseSessions()
-	return writeJSONIfOk(err, w, r, defs)
-}
-
-func postDefenses(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func postDefenses(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var defs []internship.DefenseSession
-	err := jsonRequest(w, r, &defs)
-	if err != nil {
+	if err := jsonRequest(w, r, &defs); err != nil {
 		return err
 	}
 	return srv.SetDefenseSessions(defs)
 }
 
-func getDefense(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
-	em := mux.Vars(r)["email"]
-	def, err := srv.DefenseSession(em)
-	return writeJSONIfOk(err, w, r, def)
-}
-
-func setDefenseGrade(srv internship.Service, mailer mail.Mailer, w http.ResponseWriter, r *http.Request) error {
+func setDefenseGrade(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
 	var g int
-	err := jsonRequest(w, r, &g)
-	if err != nil {
+	if err := jsonRequest(w, r, &g); err != nil {
 		return err
 	}
-	em := mux.Vars(r)["email"]
-	return srv.SetDefenseGrade(em, g)
-}
-
-func defenseProgram() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, path+"/defense-program.html")
-	}
+	return srv.SetDefenseGrade(mux.Vars(r)["email"], g)
 }
