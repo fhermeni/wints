@@ -1,3 +1,5 @@
+var survey;
+
 function fn(p) {
 	return "<a href='mailto:" + p.Email + "'>" + p.Firstname + " " + p.Lastname + "</a>"
 }
@@ -24,8 +26,20 @@ function setLang(l) {
 	$('.sat').html(l == "fr" ? "Satisfaisant" : "Satisfactory")
 	$('.unsat').html(l == "fr" ? "Insatisfaisant" : "Non satisfactory")
 	$('.na').html(l == "fr" ? "Non applicable" : "Non applicable")
-	$("select").selecter("destroy")
-	$("select").selecter()
+}
+
+function choices() {
+	$(".choice").each(function(idx, e) {
+		var buf = "<select name='" + e.id + "' class='col-md-3'>";
+		buf += "<option value=''> - </option>";
+		buf += "<option value='4' class='ex'></option>";
+		buf += "<option value='3' class='go'></option>";
+		buf += "<option value='2' class='sat'></option>";
+		buf += "<option value='1' class='unsat'></option>";
+		buf += "<option value='0' class='na'></option>";
+		buf += "</select>";
+		$(e).after(buf);
+	});
 }
 
 function showAnswers(answers) {
@@ -88,19 +102,20 @@ function textarea() {
 	});
 }
 
-function fill() {
+function number() {
+	$(".number").each(function(idx, e) {
+		var buf = " <input type='number' name='" + e.id + "'/>";
+		$(e).after(buf);
+	});
+}
+
+function loadSurvey(ok) {
 	var token = $.urlParam("token")
 	if (token) {
 		longSurvey(token, function(s) {
 			var d = new Date(s.Timestamp)
-			if (d.getTime() > 0) {
-				console.log("committed")
-				$(".alert-success").show();
-				readOnly();
-			}
-			$("#student").html(fn(s.Student))
-			$("#tutor").html(fn(s.Tutor))
-			showAnswers(s.Answers)
+			survey = s;
+			ok()
 		}, function(jqr) {
 			$("#errorMessage").html(jqr.responseText)
 			$("#modal").modal('show')
@@ -109,43 +124,32 @@ function fill() {
 		var email = $.urlParam("student")
 		var kind = $.urlParam("kind")
 		internship(email, function(i) {
-			$("#student").html(fn(i.Student))
-			$("#tutor").html(fn(i.Tutor))
 			var url = window.location.protocol + "//" + window.location.host + "/surveys/" + kind + "?token="
-			i.Surveys.forEach(function(s) {
-				var d = new Date(s.Timestamp)
-				if (s.Kind == kind) {
-					if (d.getTime() > 0) {
-						$(".alert-success").show();
-					} else {
-						d = $(".alert-warning");
-						t = ""
-						d.find(".token").html(getToken(i, kind))
-						d.show()
-					}
-					showAnswers(s.Answers)
-					readOnly()
-				}
-				return false
-			})
+			survey = i.Surveys.filter(function(s) {
+				return s.Kind == kind
+			})[0]
+			survey.Student = i.Student
+			survey.Tutor = i.Tutor
+			ok()
 		})
+	}
+}
+
+function fullfill() {
+	$("#student").html(fn(survey.Student))
+	$("#tutor").html(fn(survey.Tutor))
+	var d = new Date(survey.Timestamp)
+	if (d.getTime() > 0) {
+		if ($.urlParam("token")) {
+			$(".alert-success").removeClass("hidden");
+		}
+		showAnswers(survey.Answers);
+		readOnly();
 	}
 }
 
 String.prototype.capitalize = function() {
 	return this.charAt(0).toUpperCase() + this.substring(1)
-}
-
-function getToken(i, kind) {
-	var url = window.location.protocol + "//" + window.location.host + "/surveys/" + kind + "?token="
-	var t = undefined
-	i.Surveys.forEach(function(s) {
-		if (s.Kind == kind) {
-			t = s.Token
-			return false;
-		}
-	});
-	return url + t;
 }
 
 function tplEvaluationMail() {
@@ -160,6 +164,33 @@ function tplEvaluationMail() {
 		var s = encodeURIComponent(i.Student.Firstname.capitalize() + " " + i.Student.Lastname.capitalize() + " - Evaluation");
 		window.location.href = "mailto:" + to + "?subject=" + s + "&body=" + encodeURIComponent(txt);
 	});
+}
+
+function expand() {
+	yesno();
+	textarea();
+	choices();
+	number();
+	setLang("fr")
+}
+
+function ui() {
+	$(":radio").iCheck();
+	$("select").selecter();
+	var d = new Date(survey.Timestamp)
+	if (d.getTime() > 0) {
+		readOnly();
+	}
+	var token = $.urlParam("token")
+	if (!token && d.getTime() < 0) {
+		var url = window.location.protocol + "//" + window.location.host + "/surveys/" + survey.Kind + "?token=" + survey.Token
+			//supervisor version
+		d = $(".alert-warning");
+		d.find(".token").html(url)
+		d.removeClass("hidden")
+		readOnly();
+		$(".content").addClass("hidden")
+	}
 }
 
 function submit() {
@@ -185,10 +216,17 @@ function submit() {
 	$("textarea").each(function(idx, i) {
 		cnt[i.name] = i.value;
 	});
+	$("select").each(function(idx, i) {
+		cnt[i.name] = i.value;
+	});
+	$("input[type=number]").each(function(idx, i) {
+		cnt[i.name] = i.value;
+	});
 	setSurveyAnswers($.urlParam("token"), cnt,
 		function() {
-			$(".alert-success").show()
+			$(".alert-success").removeClass("hidden")
 			readOnly();
 			window.location.href = "#"
 		});
+
 }

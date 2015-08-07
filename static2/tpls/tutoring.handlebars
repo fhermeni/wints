@@ -57,10 +57,10 @@ This is the students you are following as an academic tutor. Your role is to:
     </tr>
     <tr>        
         {{#each Reports}}        
-        <th>{{shortKind this}}</th>
+        <th><small>{{shortKind this}}</small></th>
         {{/each}}
         {{#each Surveys}}        
-        <th>{{shortKind this}}</th>
+        <th><small>{{shortKind this}}</small></th>
         {{/each}}            
     </tr>
     </thead>
@@ -89,7 +89,7 @@ This is the students you are following as an academic tutor. Your role is to:
 
 
             {{#each Surveys}}
-            <td class="click text-center" data-text="{{surveyAnnotation this}}" onclick="window.open('/surveys/{{Kind}}?student={{../Student.Email}}&kind={{Kind}}','_blank')">
+            <td class="click text-center {{surveyStatus this}}" data-text="{{surveyAnnotation this}}" onclick="window.open('/surveys/{{Kind}}?student={{../Student.Email}}&kind={{Kind}}','_blank')">
             {{surveyGrade this}}
             </td>
             {{/each}}

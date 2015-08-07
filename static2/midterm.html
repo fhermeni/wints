@@ -35,7 +35,7 @@ body {
 <h4><span class="tut">:</span> <small class="fn" id="tutor"></small></h4>
 
 <div class="row">
-<div class="alert alert-warning text-left col-md-6 col-md-offset-3" style="visible: none">
+<div class="alert alert-warning text-left col-md-6 col-md-offset-3 hidden">
     <p>
     <strong>Warning !</strong>
     This link is for the academic tutors. The link to send to the advisor is:
@@ -45,12 +45,12 @@ body {
     </p>
     <p>You can also use a <a class='click' onclick="tplEvaluationMail()"><i class='glyphicon glyphicon-envelope'> </i> premade e-mail</a></p>    
 </div>
-<div class="alert alert-success text-center col-md-6 col-md-offset-3" style="visible: none">    
+<div class="alert alert-success text-center col-md-6 col-md-offset-3 hidden">    
     <p id="committed"></p>
 </div>
 </div>
 
-
+<div class="content">
 <h3 class="tr"></h3>
 <div class="form-group">
 <label class="tr r yesno" id="q1"></label>
@@ -113,7 +113,7 @@ body {
 <br/><label class="tr textarea" id="q21"></label>
 
 <div class="row">
-<div class="alert alert-danger text-center col-md-6 col-md-offset-3" style="visible: none">
+<div class="alert alert-danger text-center col-md-6 col-md-offset-3 hidden">
     <p id="missing-fields"></p>
 </div>
 </div>
@@ -121,6 +121,7 @@ body {
     <button type="button" class="btn btn-lg btn-success submit" id="submit" onclick="submit()"></button>    
 </div>
 </div>
+    </div>
 <div id="modal" class="modal fade">
     <div class="modal-dialog">
     <div class="modal-content alert alert-danger">

@@ -5,7 +5,7 @@ const (
 drop table if exists pending;
 drop table if exists reports;
 drop table if exists surveys;
-drop table if exists internships;
+drop table if exists internships cascade;
 drop table if exists conventions;
 drop table if exists sessions;
 drop table if exists password_renewal;

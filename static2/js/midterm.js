@@ -64,20 +64,9 @@ function lang() {
 }
 
 $(document).ready(function() {
-
-	//IE8 stuff
-	if (typeof Array.prototype.forEach != 'function') {
-		Array.prototype.forEach = function(callback) {
-			for (var i = 0; i < this.length; i++) {
-				callback.apply(this, [this[i], i, this]);
-			}
-		};
-	}
-
-	$(".alert").hide();
-	yesno();
-	textarea();
-	setLang('fr');
-	fill();
-	$(":radio").iCheck();
+	expand();
+	loadSurvey(function() {
+		fullfill()
+		ui();
+	})
 });

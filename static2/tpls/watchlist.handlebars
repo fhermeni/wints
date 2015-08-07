@@ -54,18 +54,17 @@ As a major leader or an administrator, you can follow the progress of every stud
         <th rowspan="2">Student</th>
         <th rowspan="2">Promotion</th>
         <th rowspan="2">Major</th>
-        <th rowspan="2" class="sorter-false">Supervisor</th>
         <th rowspan="2" >Tutor</th>
         <th class="sorter-false text-center" colspan="{{len Reports}}">Reports</th>
         <th class="sorter-false text-center" colspan="{{len Surveys}}">Surveys</th>
-        <th rowspan="2" >Def</th>
+        <th rowspan="2" >def</th>
     </tr>
     <tr>        
         {{#each Reports}}        
-        <th>{{shortKind this}}</th>
+        <th><small>{{shortKind this}}</small></th>
         {{/each}}        
         {{#each Surveys}}        
-        <th>{{shortKind this}}</th>
+        <th><small>{{shortKind this}}</small></th>
         {{/each}}        
     </tr>    
     </thead>
@@ -81,9 +80,6 @@ As a major leader or an administrator, you can follow the progress of every stud
             <td>{{shortProm Promotion}}</td>
             <td>{{Major}}</td>
             <td>                
-                <a class="fn" href='mailto:{{Sup.Email}}' title='{{fullname Sup}}'>{{shortFullname Sup}}</a>
-            </td>
-            <td>                
                 <a class="fn" href='mailto:{{Tutor.Email}}' title='{{fullname Tutor}}'>{{shortFullname Tutor}}</a>
             </td>            
             {{#each Reports}}
@@ -93,7 +89,7 @@ As a major leader or an administrator, you can follow the progress of every stud
             {{/each}}            
             
             {{#each Surveys}}
-            <td onclick="window.open('/surveys/{{Kind}}?student={{../Student.Email}}&kind={{Kind}}','_blank')" class="text-center click" data-text="{{surveyAnnotation this}}">{{surveyGrade this}}</td>
+            <td onclick="window.open('/surveys/{{Kind}}?student={{../Student.Email}}&kind={{Kind}}','_blank')" class="{{surveyStatus this}} text-center click" data-text="{{surveyAnnotation this}}">{{surveyGrade this}}</td>
             {{/each}}
 
             {{#if Defense.Defenses}}            

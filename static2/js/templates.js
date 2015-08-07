@@ -256,23 +256,24 @@ Handlebars.registerHelper('shortSlotEntry', function(s) {
 });
 
 Handlebars.registerHelper('shortKind', function(r) {
-	return r.Kind.substring(0, 3)
+	return r.Kind.toLowerCase();
+	//return r.Kind.substring(0, 3)
 });
 
 Handlebars.registerHelper('reportStatus', function(r) {
 	var passed = (new Date(Date.parse(r.Deadline)).getTime() + 86400 * 1000) < new Date().getTime()
-	var style = "btn-link";
+	var style = "bg-link";
 
 	//Deadline passed, nothing
 	if (passed && r.Grade == -2) {
-		style = "btn-warning";
+		style = "bg-warning";
 	} else if (r.Grade == -1) {
 		//waiting for beging reviewed
-		style = "btn-primary";
+		style = "bg-info";
 	} else if (r.ToGrade && r.Grade >= 0 && r.Grade < 10) {
-		style = "btn-danger";
+		style = "bg-danger";
 	} else if ((!r.ToGrade && r.Grade >= 0) || r.Grade >= 10) {
-		style = "btn-success";
+		style = "bg-success";
 	}
 
 	return style;
@@ -280,16 +281,16 @@ Handlebars.registerHelper('reportStatus', function(r) {
 
 Handlebars.registerHelper('defenseStatus', function(g) {
 	var passed = new Date(g.Date).getTime() < new Date().getTime()
-	var style = "btn-link";
+	var style = "bg-link";
 	if (new Date(g.Date).getTime() < 0) {
 		return style;
 	}
 	if (g.Grade >= 0 && g.Grade < 10) {
-		style = "btn-danger";
+		style = "bg-danger";
 	} else if (g.Grade >= 10) {
-		style = "btn-success";
+		style = "bg-success";
 	} else if (passed) {
-		style = "btn-primary"
+		style = "bg-primary"
 	}
 	return style;
 });
@@ -324,29 +325,51 @@ Handlebars.registerHelper('gradeAnnotation', function(r) {
 
 Handlebars.registerHelper('surveyAnnotation', function(s) {
 	if (Object.keys(s.Answers).length == 0) {
+		return -10;
+	}
+	if (s.Kind == "midterm" && s.Answers[19] == "false") {
 		return -1;
 	}
+
+	if (s.Kind == "final" && s.Answers["q17"] < 10) {
+		return -1;
+	}
+
 	return 0;
 });
 
 
 Handlebars.registerHelper('surveyGrade', function(s) {
 	if (Object.keys(s.Answers).length == 0) {
-		return "?"
+		return "-"
 	}
 	if (s.Kind == "midterm") {
 		if (s.Answers[19] == "true") {
-			return new Handlebars.SafeString("<i class='text-success glyphicon glyphicon-ok'></i>");
+			return new Handlebars.SafeString("&#10003;");
 		}
-		return new Handlebars.SafeString("<i class='text-danger glyphicon glyphicon-no'></i>");
-
+		return new Handlebars.SafeString("x");
 	} else {
-		return "-"
+		return s.Answers["q17"];
 	}
-
+	return "-";
 });
 
 Handlebars.registerHelper('surveyStatus', function(s) {
+	if (Object.keys(s.Answers).length == 0) {
+		return ""
+	}
+	if (s.Kind == "midterm") {
+		if (s.Answers[19] == "true") {
+			return "bg-success";
+		}
+		return "bg-danger";
+	}
+	if (s.Kind == "final") {
+		if (s.Answers["q17"] >= 10) {
+			return "bg-success";
+		}
+		return "bg-danger";
+	}
 	return "";
 });
 
