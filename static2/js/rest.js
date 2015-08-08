@@ -58,6 +58,17 @@ function missing(id) {
 	return false;
 }
 
+function isGrade(v) {
+	if (isNaN(v)) {
+		return "number expected";
+	}
+	var x = parseInt(v)
+	if (x < 0 || x > 20) {
+		return "between 0 and 20, inclusive"
+	}
+	return undefined
+}
+
 function equals(f1, f2) {
 	var v1 = $("#" + f1).val();
 	if (v1.length < 8) {
@@ -289,6 +300,10 @@ function setAlumni(student, pos, email, ok, no) {
 		Contact: email,
 		Position: pos
 	}, ok, no)
+}
+
+function setNextPosition(student, pos, ok, no) {
+	return post("/internships/" + student + "/alumni/position", pos, ok, no)
 }
 
 function statistics(ok, no) {

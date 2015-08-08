@@ -334,3 +334,8 @@ func (v *Service) SetAlumni(student string, a internship.Alumni) error {
 	sql := "update internships set nextPosition=$1, nextContact=$2 where student=$3"
 	return SingleUpdate(v.DB, internship.ErrUnknownInternship, sql, a.Position, a.Contact, student)
 }
+
+func (v *Service) SetNextPosition(student string, pos int) error {
+	sql := "update internships set nextPosition=$1 where student=$2"
+	return SingleUpdate(v.DB, internship.ErrUnknownInternship, sql, pos, student)
+}

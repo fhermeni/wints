@@ -99,6 +99,7 @@ type Service interface {
 	DeleteConvention(student string) error
 	SetAlumni(student string, a Alumni) error
 
+	SetNextPosition(student string, pos int) error
 	//public statistics
 	Statistics() ([]Stat, error)
 

@@ -84,6 +84,7 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string, j jour
 	s.r.HandleFunc("/api/v1/internships/{email}/major", s.rest(setMajor)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/promotion", s.rest(setPromotion)).Methods("POST")
 	s.r.HandleFunc("/api/v1/internships/{email}/alumni", s.rest(setAlumni)).Methods("POST")
+	s.r.HandleFunc("/api/v1/internships/{email}/alumni/position", s.rest(setNextPosition)).Methods("POST")
 	s.r.HandleFunc("/api/v1/students/", s.rest(students)).Methods("GET")
 	s.r.HandleFunc("/api/v1/students/{email}", s.rest(insertStudents)).Methods("POST")
 	s.r.HandleFunc("/api/v1/students/{email}/internship", s.rest(alignStudentWithInternship)).Methods("POST")
@@ -452,6 +453,14 @@ func setAlumni(srv internship.Service, w http.ResponseWriter, r *http.Request) e
 		return err
 	}
 	return srv.SetAlumni(mux.Vars(r)["email"], c)
+}
+
+func setNextPosition(srv internship.Service, w http.ResponseWriter, r *http.Request) error {
+	var p int
+	if err := jsonRequest(w, r, &p); err != nil {
+		return err
+	}
+	return srv.SetNextPosition(mux.Vars(r)["email"], p)
 }
 
 func newInternship(srv internship.Service, w http.ResponseWriter, r *http.Request) error {

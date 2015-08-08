@@ -1,9 +1,15 @@
+{{#if this}}
 <h3>{{len this}} Session(s)
 <button type="button" class="btn btn-sm" onclick="serviceMailing()">
 <i class="glyphicon glyphicon-envelope"></i> mail selection
 </button>
 </h3>
 
+    <p>Below is the sessions you are participating as a jury member. The role of the jury is to</p>
+<ul>
+    <li>grade every defense</li>    
+    <li>if needed, ask the student about its future position</li>
+</ul>
 {{#each this}}
 <table class="table table-hover table-condensed">
     <thead>
@@ -24,7 +30,7 @@
         <th>Student</th>        
         <th>Promotion</th>                
         <th>Grade</th>
-        <th>Next position</th>
+        <th class="col-sm-4">Next position</th>
     </tr>
     </thead>
     <tbody> 
@@ -34,19 +40,19 @@
             <input type='checkbox' class='icheckbox_flat' data-email='{{Student.Email}}'/>  
             </td>
             <td>{{offset ../Date Offset}}</td>
-            <td>
-            <a class='click fn' onclick="showDefense('{{Student.Email}}')">{{shortFullname Student}}</a>
+            <td class='fn'>{{shortFullname Student}}
             {{#if Private}}<i class="glyphicon glyphicon-eye-close text-danger" title="confidential defense"></i>{{/if}}
             {{#if Remote}}<i class="glyphicon glyphicon-facetime-video" title="visio conference"></i>{{/if}}
             </td>            
             <td>{{Promotion}}/{{Major}}</td>                            
-            <td class="click" onclick="showDefense('{{Student.Email}}')">{{defenseGrade2 ../Date Rank Grade}}</td>
-            <td class="click" onclick="showDefense('{{Student.Email}}')">
-            {{nextPosition Future.Position}}
-            </td>            
+            <td><a href="#" data-type="text" class="grade" data-email="{{Student.Email}}">{{defenseGrade3 Grade}}</a></td>
+            <td><a href="#" data-type="select" class="position editable editable-click" data-email="{{Student.Email}}">{{nextPosition NextPosition}}</a></td>
         </tr>    
         {{/each}}
     </tbody>
 </table>
 {{#unless @last}}<div class="page-header"></div>{{/unless}}
 {{/each}}
+{{else}}
+    <h5 class="text-center">No defenses to attend to</h5>
+{{/if}}

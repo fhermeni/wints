@@ -38,6 +38,8 @@ func (srv *Service) DefenseSession(student string) (internship.DefenseSession, e
 		def.Cpy = cpy
 		if grade.Valid {
 			def.Grade = int(grade.Int64)
+		} else {
+			def.Grade = -1
 		}
 		def.Surveys, err = srv.surveys(student)
 		if err != nil {
@@ -83,7 +85,7 @@ func (srv *Service) appendDefenses(s *internship.DefenseSession) error {
 	s.Defenses = make([]internship.Defense, 0, 0)
 	var err error
 	if DefsStmt == nil {
-		if DefsStmt, err = srv.DB.Prepare("select firstname, lastname, tel, email,major, promotion,company, companyWWW, title, rank,private,remote,defenseGrades.grade from defenses inner join users on (defenses.student=users.email) inner join internships on (defenses.student=internships.student) left outer join defenseGrades on (defenses.student=defenseGrades.student) where date=$1 and room=$2 order by rank"); err != nil {
+		if DefsStmt, err = srv.DB.Prepare("select firstname, lastname, tel, email,major, promotion,company, companyWWW, title, rank,private,remote,defenseGrades.grade, nextPosition from defenses inner join users on (defenses.student=users.email) inner join internships on (defenses.student=internships.student) left outer join defenseGrades on (defenses.student=defenseGrades.student) where date=$1 and room=$2 order by rank"); err != nil {
 			return err
 		}
 	}
@@ -96,14 +98,19 @@ func (srv *Service) appendDefenses(s *internship.DefenseSession) error {
 		def := internship.Defense{}
 		stu := internship.User{}
 		cpy := internship.Company{}
-		var grade sql.NullInt64
-		if err = rows.Scan(&stu.Firstname, &stu.Lastname, &stu.Tel, &stu.Email, &def.Major, &def.Promotion, &cpy.Name, &cpy.WWW, &def.Title, &def.Offset, &def.Private, &def.Remote, &grade); err != nil {
+		var grade, nextPosition sql.NullInt64
+		if err = rows.Scan(&stu.Firstname, &stu.Lastname, &stu.Tel, &stu.Email, &def.Major, &def.Promotion, &cpy.Name, &cpy.WWW, &def.Title, &def.Offset, &def.Private, &def.Remote, &grade, &nextPosition); err != nil {
 			return err
 		}
 		def.Student = stu
 		def.Cpy = cpy
 		if grade.Valid {
 			def.Grade = int(grade.Int64)
+		} else {
+			def.Grade = -1
+		}
+		if nextPosition.Valid {
+			def.NextPosition = int(nextPosition.Int64)
 		}
 		def.Surveys, err = srv.surveys(def.Student.Email)
 		if err != nil {

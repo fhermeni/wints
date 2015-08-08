@@ -196,6 +196,17 @@ var possiblePositions = [
 	"entrepreneurship"
 ];
 
+function editablePositions() {
+	var arr = []
+	possiblePositions.forEach(function(p, i) {
+		arr.push({
+			value: i,
+			text: p
+		})
+	})
+	return arr
+}
+
 Handlebars.registerHelper('nextPosition', function(pos) {
 	return new Handlebars.SafeString("<i>" + possiblePositions[pos] + "</i>");
 });
@@ -282,23 +293,27 @@ Handlebars.registerHelper('reportStatus', function(r) {
 Handlebars.registerHelper('defenseStatus', function(g) {
 	var passed = new Date(g.Date).getTime() < new Date().getTime()
 	var style = "bg-link";
-	if (new Date(g.Date).getTime() < 0) {
-		return style;
-	}
-	if (g.Grade >= 0 && g.Grade < 10) {
-		style = "bg-danger";
-	} else if (g.Grade >= 10) {
-		style = "bg-success";
+	if (g.Defenses[0].Grade >= 0 && g.Defenses[0].Grade < 10) {
+		return "bg-danger";
+	} else if (g.Defenses[0].Grade >= 10) {
+		return "bg-success";
 	} else if (passed) {
-		style = "bg-primary"
+		return "bg-primary"
 	}
-	return style;
+	return "bg-link"
+});
+
+Handlebars.registerHelper('defenseGrade3', function(g) {
+	if (g >= 0) {
+		return g;
+	}
+	return "?"
 });
 
 Handlebars.registerHelper('defenseGrade', function(g) {
 	d = moment(g.Date).add(30 * g.Defenses[0].Offset)
 	grade = g.Defenses[0].Grade
-	if (grade > 0) {
+	if (grade >= 0) {
 		return grade
 	}
 	var passed = d.toDate().getTime() < new Date().getTime()

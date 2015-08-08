@@ -172,3 +172,16 @@ func (v *Service) SetAlumni(student string, a internship.Alumni) error {
 	v.UserLog("set alumni of '"+student+"' to '"+a.Contact+"','"+strconv.Itoa(a.Position)+"'", err)
 	return err
 }
+
+func (v *Service) SetNextPosition(student string, p int) error {
+	def, err := v.DefenseSession(student)
+	if err != nil {
+		return err
+	}
+	if !def.InJury(v.my.Email) {
+		return ErrPermission
+	}
+	err = v.SetNextPosition(student, p)
+	v.UserLog("set next position of '"+student+"' to '"+strconv.Itoa(p)+"'", err)
+	return err
+}

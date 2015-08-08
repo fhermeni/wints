@@ -179,11 +179,31 @@ function showMyDefenses() {
 			})
 			return ok
 		});
+		console.log(ss)
 		var html = Handlebars.getTemplate("jury")(ss);
 		var root = $("#cnt");
 		root.html(html);
 		root.find(":checkbox").icheck();
 		root.find("select").selecter();
+		root.find(".grade").each(function(i, e) {
+			$(e).editable({
+				pk: "1",
+				url: function(p) {
+					return postDefenseGrade($(e).data("email"), parseInt(p.value))
+				},
+				validate: isGrade
+			});
+		})
+		root.find(".position").each(function(i, e) {
+			$(e).editable({
+				pk: "1",
+				source: editablePositions(),
+				url: function(p) {
+					return setNextPosition($(e).data("email"), parseInt(p.value))
+				}
+			});
+		})
+
 	});
 }
 

@@ -44,9 +44,13 @@ func (s *Service) SetDefenseGrade(student string, g int) error {
 		err = s.srv.SetDefenseGrade(student, g)
 	}
 	def, err := s.DefenseSession(student)
-	if err == nil && def.InJury(s.my.Email) {
-		err = s.srv.SetDefenseGrade(student, g)
+	if err != nil {
+		return err
 	}
+	if !def.InJury(s.my.Email) {
+		return ErrPermission
+	}
+	err = s.srv.SetDefenseGrade(student, g)
 	s.UserLog("grades defense of '"+student+"' to "+strconv.Itoa(g), err)
 	return err
 }
@@ -59,7 +63,3 @@ func (s *Service) SetDefenseSessions(defs []internship.DefenseSession) error {
 	s.UserLog("new defense program", err)
 	return err
 }
-
-/*func (s *Service) PublicDefenseSessions() ([]internship.PublicDefenseSession, error) {
-	return s.srv.PublicDefenseSessions()
-}*/

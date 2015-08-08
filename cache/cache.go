@@ -234,6 +234,11 @@ func (cache *Cache) SetAlumni(student string, a internship.Alumni) error {
 	return cache.backend.SetAlumni(student, a)
 }
 
+func (cache *Cache) SetNextPosition(student string, p int) error {
+	cache.hot.Set(false)
+	return cache.backend.SetNextPosition(student, p)
+}
+
 //public statistics
 func (cache *Cache) Statistics() ([]internship.Stat, error) {
 	return cache.backend.Statistics()

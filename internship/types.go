@@ -262,16 +262,17 @@ type Stat struct {
 
 //Defense
 type Defense struct {
-	Student   User
-	Major     string
-	Promotion string
-	Cpy       Company
-	Title     string
-	Private   bool
-	Remote    bool
-	Grade     int
-	Offset    int
-	Surveys   []Survey
+	Student      User
+	Major        string
+	Promotion    string
+	Cpy          Company
+	Title        string
+	Private      bool
+	Remote       bool
+	Grade        int
+	Offset       int
+	Surveys      []Survey
+	NextPosition int
 }
 
 type DefenseSession struct {
