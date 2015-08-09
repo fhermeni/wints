@@ -81,7 +81,7 @@ As a major leader or an administrator, you can follow the progress of every stud
             <td>{{shortProm Promotion}}</td>
             <td><a href="#" class="major" data-email="{{Student.Email}}" data-type="select">{{Major}}</a></td>
             <td>                
-                <a class="fn" href='mailto:{{Tutor.Email}}' title='{{fullname Tutor}}'>{{shortFullname Tutor}}</a>
+                <a class="fn tutor" href='#' data-type="select" data-email="{{Student.Email}}" title='{{fullname Tutor}}'>{{shortFullname Tutor}}</a>
             </td>            
             {{#each Reports}}
             <td class="click {{reportStatus this}} text-center" data-text="{{gradeAnnotation this}}" onclick="showReport('{{../Student.Email}}', '{{Kind}}')">            

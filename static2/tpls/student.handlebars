@@ -12,14 +12,11 @@
                 <dt>promotion</dt>
                 <dd>{{I.Promotion}}</dd>
                 <dt>major</dt>
-                <dd>{{I.Major}}</dd>                
+                <dd>{{I.Major}}
+                </dd>                
                 <dt>academic tutor</dt>                
                 <dd class="fn">
-                    {{#if Admin}}
-                        <select class="select-tutor">{{userSelecter Tutors}}</select>                    
-                    {{else}}
                     <a href="mailto:{{I.Tutor.Email}}">{{fullname I.Tutor}} ({{I.Tutor.Tel}})</a>
-                    {{/if}}
                 </dd>
             </dl>
 

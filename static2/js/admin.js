@@ -510,8 +510,32 @@ function displayMyConventions() {
 						}
 					}
 				});
-			})
+			});
+
+			users(function(uss) {
+				uss = uss.filter(function(u) {
+					return u.Role != 0; //get rid of students
+				});
+				var tutors = []
+				uss.forEach(function(e) {
+					tutors.push({
+						value: e.Email,
+						text: e.Firstname.capitalize() + " " + e.Lastname.capitalize()
+					})
+				});
+				root.find(".tutor").each(function(i, e) {
+					$(e).editable({
+						pk: "1",
+						source: tutors,
+						value: getInternship($(e).data("email")).Tutor.Email,
+						url: function(p) {
+							return setTutor($(e).data("email"), p.value)
+						}
+					});
+				})
+			});
 		}
+
 		if (myself.Role >= 2) {
 			//Major rights and more
 			root.find(".major").each(function(i, e) {
@@ -523,10 +547,9 @@ function displayMyConventions() {
 						return setMajor($(e).data("email"), p.value)
 					}
 				});
-			})
+			});
 		}
 	});
-	//});
 }
 
 
@@ -990,9 +1013,6 @@ function showInternship(s) {
 			buf = Handlebars.getTemplate("student")({
 				I: i,
 				SurveyAdmin: myself.Email == i.Tutor.Email || myself.Role >= 3,
-				Admin: myself.Role >= 3,
-				Major: myself.Role >= 2,
-				Tutors: uss,
 				URL: window.location.protocol + "//" + window.location.host + "/surveys/"
 			})
 			$("#modal").html(buf).modal('show');
