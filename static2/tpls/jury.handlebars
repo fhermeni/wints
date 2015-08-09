@@ -4,8 +4,12 @@
 <i class="glyphicon glyphicon-envelope"></i> mail selection
 </button>
 </h3>
-
-    <p>Below is the sessions you are participating as a jury member. The role of the jury is to grade every defense, and to check if the student notified us about its future position. Click on each these items to update their value.</p>
+    <p>This is the sessions you are participating as a jury member. The role of the jury is to:
+    </p>
+    <ul>
+    <li>Grade every student</li>
+    <li>Ask about their next position (it might be out-dated)</li>
+    </ul>
 {{#each this}}
 <table class="table table-hover table-condensed">
     <thead>
@@ -41,8 +45,8 @@
             {{#if Remote}}<i class="glyphicon glyphicon-facetime-video" title="visio conference"></i>{{/if}}
             </td>            
             <td>{{Promotion}}/{{Major}}</td>                            
-            <td><a href="#" data-type="text" class="grade" data-email="{{Student.Email}}">{{defenseGrade3 Grade}}</a></td>
-            <td><a href="#" data-type="select" class="position editable editable-click" data-email="{{Student.Email}}">{{nextPosition NextPosition}}</a></td>
+            <td><a title="click to edit" href="#" data-type="text" class="grade" data-email="{{Student.Email}}">{{defenseGrade3 Grade}}</a></td>
+            <td><a title="click to edit" href="#" data-type="select" class="position editable editable-click" data-email="{{Student.Email}}">{{nextPosition NextPosition}}</a></td>
         </tr>    
         {{/each}}
     </tbody>

@@ -33,6 +33,7 @@
 	height: 12px;
 	display: inline-block;	
 	margin-right: 5px;
+	border: solid grey 1px;
 }
 
 .alert-text {
