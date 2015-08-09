@@ -174,14 +174,17 @@ func (v *Service) SetAlumni(student string, a internship.Alumni) error {
 }
 
 func (v *Service) SetNextPosition(student string, p int) error {
-	def, err := v.DefenseSession(student)
+	if v.my.Role >= internship.ADMIN {
+		return v.srv.SetNextPosition(student, p)
+	}
+	def, err := v.srv.DefenseSession(student)
 	if err != nil {
 		return err
 	}
 	if !def.InJury(v.my.Email) {
 		return ErrPermission
 	}
-	err = v.SetNextPosition(student, p)
+	err = v.srv.SetNextPosition(student, p)
 	v.UserLog("set next position of '"+student+"' to '"+strconv.Itoa(p)+"'", err)
 	return err
 }

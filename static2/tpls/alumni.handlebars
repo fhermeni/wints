@@ -20,7 +20,8 @@
     <td><input type='checkbox' class='icheckbox_flat' data-email='{{Student.Email}}'/></td>
 	<td class="fn">{{fullname Student}}</td>
 	<td>{{Future.Contact}}</td>
-	<td data-text="{{Future.Position}}">{{nextPosition Future.Position}}</td>
+	<td data-text="{{Future.Position}}">
+	<a class="position" href="#" data-email="{{Student.Email}}" data-type="select">{{nextPosition Future.Position}}</a></td>
 </tr>
 {{/each}}
 </tbody>

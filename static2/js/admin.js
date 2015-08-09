@@ -208,6 +208,7 @@ function showMyDefenses() {
 		root.find(".position").each(function(i, e) {
 			$(e).editable({
 				pk: "1",
+				value: getInternship($(e).data("email")).Future.Position,
 				source: editablePositions(),
 				url: function(p) {
 					return setNextPosition($(e).data("email"), parseInt(p.value))
@@ -255,6 +256,18 @@ function showAlumni() {
 				}
 			}
 		});
+		if (myself.Role >= 3) {
+			root.find(".position").each(function(i, e) {
+				$(e).editable({
+					pk: "1",
+					value: getInternship($(e).data("email")).Future.Position,
+					source: editablePositions(),
+					url: function(p) {
+						return setNextPosition($(e).data("email"), parseInt(p.value))
+					}
+				});
+			})
+		}
 	});
 }
 
