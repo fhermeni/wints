@@ -58,6 +58,7 @@ As a major leader or an administrator, you can follow the progress of every stud
         <th class="sorter-false text-center" colspan="{{len Reports}}">Reports</th>
         <th class="sorter-false text-center" colspan="{{len Surveys}}">Surveys</th>
         <th rowspan="2" >def</th>
+        <th rowspan="2">alumni</th>
     </tr>
     <tr>        
         {{#each Reports}}        
@@ -97,6 +98,12 @@ As a major leader or an administrator, you can follow the progress of every stud
             {{else}}
             <td class="text-center"><i>n/a</i></td>
             {{/if}}
+            
+            {{#if Future.Position}}
+            <td class="text-center" data-text="1"><i class="glyphicon glyphicon-star-empty"></i></td>
+            {{else}}
+            <td class="text-center" data-text="0"></td>           
+            {{/if}}            
         </tr>
     {{/each}}
     </tbody>
