@@ -99,6 +99,17 @@ function summary() {
 	return sum
 }
 
+function editableMajors() {
+	var arr = []
+	allMajors.forEach(function(p, i) {
+		arr.push({
+			value: p,
+			text: p
+		})
+	})
+	return arr
+}
+
 function selectStudent(stu, ok) {
 	var ic = $("input[data-email='" + stu + "']").closest(".icheckbox")
 	if (ok) {
@@ -482,25 +493,39 @@ function displayMyConventions() {
 				}
 			}
 		});
-		root.find(".grade").each(function(i, e) {
-			$(e).editable({
-				pk: "1",
-				url: function(p) {
-					return postDefenseGrade($(e).data("email"), parseInt(p.value))
-				},
-				validate: isGrade,
-				success: function(r, v) {
-					var p = $(e).parent()
-					if (parseInt(v) < 10) {
-						p.removeClass("bg-success").addClass("bg-danger")
-					} else {
-						p.removeClass("bg-danger").addClass("bg-success")
+		if (myself.Role >= 3) {
+			root.find(".grade").each(function(i, e) {
+				$(e).editable({
+					pk: "1",
+					url: function(p) {
+						return postDefenseGrade($(e).data("email"), parseInt(p.value))
+					},
+					validate: isGrade,
+					success: function(r, v) {
+						var p = $(e).parent()
+						if (parseInt(v) < 10) {
+							p.removeClass("bg-success").addClass("bg-danger")
+						} else {
+							p.removeClass("bg-danger").addClass("bg-success")
+						}
 					}
-				}
-			});
-		})
+				});
+			})
+		}
+		if (myself.Role >= 2) {
+			//Major rights and more
+			root.find(".major").each(function(i, e) {
+				$(e).editable({
+					pk: "1",
+					source: editableMajors(),
+					value: getInternship($(e).data("email")).Major,
+					url: function(p) {
+						return setMajor($(e).data("email"), p.value)
+					}
+				});
+			})
+		}
 	});
-
 	//});
 }
 
