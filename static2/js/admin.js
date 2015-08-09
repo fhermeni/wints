@@ -1010,6 +1010,12 @@ function showInternship(s) {
 			uss = uss.filter(function(u) {
 				return u.Role != 0; //get rid of students
 			});
+			i.Defense.Privileges = false;
+			if (i.Defense.Defenses) {
+				i.Defense.Mine = i.Defense.Defenses[0]
+				i.Defense.Privileges = i.Defense.Defenses[0].Remote || i.Defense.Defenses[0].Private
+			}
+
 			buf = Handlebars.getTemplate("student")({
 				I: i,
 				SurveyAdmin: myself.Email == i.Tutor.Email || myself.Role >= 3,

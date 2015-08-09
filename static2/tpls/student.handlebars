@@ -9,15 +9,9 @@
                 <dd><a href="mailto:{{I.Student.Email}}">{{I.Student.Email}}</a></dd>
                 <dt>tel</dt>
                 <dd>{{I.Student.Tel}}</dd>
-                <dt>promotion</dt>
-                <dd>{{I.Promotion}}</dd>
-                <dt>major</dt>
-                <dd>{{I.Major}}
+                <dt>promotion / major</dt>
+                <dd>{{I.Promotion}} / {{I.Major}}</dd>
                 </dd>                
-                <dt>academic tutor</dt>                
-                <dd class="fn">
-                    <a href="mailto:{{I.Tutor.Email}}">{{fullname I.Tutor}} ({{I.Tutor.Tel}})</a>
-                </dd>
             </dl>
 
             <h4 class="text-center">{{company I.Cpy}}</h4>
@@ -28,7 +22,12 @@
                 <dd>
                     <a class="fn" href="mailto:{{I.Sup.Email}}">{{fullname I.Sup}}</a>
                     ({{I.Sup.Tel}})
-                </dd>                
+                </dd>
+                                <dt>academic tutor</dt>                
+                <dd class="fn">
+                <a href="mailto:{{I.Tutor.Email}}">{{fullname I.Tutor}}</a> ({{I.Tutor.Tel}})
+                </dd>
+                
             </dl>
             {{#if SurveyAdmin}}
             <h4 class="text-center">Links for the surveys</h4>
@@ -40,6 +39,29 @@
                 {{/each}}
             </dl>
             {{/if}}
+            {{#if I.Defense.Defenses}}
+            <h4 class="text-center">Defense</h4>
+            <dl class="dl-horizontal">
+                <dt><i class="glyphicon glyphicon-calendar"></i></dt>
+                <dd>                                
+                    {{offset_local I.Defense.Date I.Defense.Mine.Offset}}</dd>                
+                <dt><i class="glyphicon glyphicon-map-marker"></i></dt>
+                <dd>{{I.Defense.Room}}</dd>
+                <dt>Juries</dt>
+                <dd>
+                {{#each I.Defense.Juries}}
+                    <a href="mailto:{{Email}}" class="fn">{{Firstname}} {{Lastname}}</a>{{#unless @last}}, {{/unless}}
+                {{/each}}
+                </dd>
+                {{#if I.Defense.Privileges}}
+                <dt>Privileges</dt>
+                <dd>                                
+                {{#if I.Defense.Mine.Remote}}<i class="glyphicon glyphicon-facetime-video"></i> visio; {{/if}}
+                {{#if I.Defense.Mine.Private}}<i class="glyphicon glyphicon-eye-close"></i> confidential{{/if}}                
+                </dd>
+                {{/if}}
+            </dl>        
+            {{/if}}    
             <h4 class="text-center">Future position</h4>
             <dl class="dl-horizontal">        
                 <dt>Next position</dt>
