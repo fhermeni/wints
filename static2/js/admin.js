@@ -482,6 +482,23 @@ function displayMyConventions() {
 				}
 			}
 		});
+		root.find(".grade").each(function(i, e) {
+			$(e).editable({
+				pk: "1",
+				url: function(p) {
+					return postDefenseGrade($(e).data("email"), parseInt(p.value))
+				},
+				validate: isGrade,
+				success: function(r, v) {
+					var p = $(e).parent()
+					if (parseInt(v) < 10) {
+						p.removeClass("bg-success").addClass("bg-danger")
+					} else {
+						p.removeClass("bg-danger").addClass("bg-success")
+					}
+				}
+			});
+		})
 	});
 
 	//});

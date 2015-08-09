@@ -41,7 +41,7 @@ func (s *Service) DefenseSession(student string) (internship.DefenseSession, err
 func (s *Service) SetDefenseGrade(student string, g int) error {
 	err := ErrPermission
 	if s.my.Role >= internship.ADMIN {
-		err = s.srv.SetDefenseGrade(student, g)
+		return s.srv.SetDefenseGrade(student, g)
 	}
 	def, err := s.DefenseSession(student)
 	if err != nil {
