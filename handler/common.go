@@ -72,7 +72,7 @@ func status(w http.ResponseWriter, e error) {
 	case internship.ErrInvalidSurvey, internship.ErrInvalidAlumniEmail, internship.ErrDeadlinePassed, internship.ErrInvalidGrade, internship.ErrInvalidMajor, internship.ErrInvalidPeriod, internship.ErrGradedReport:
 		http.Error(w, e.Error(), http.StatusBadRequest)
 		return
-	case filter.ErrPermission:
+	case filter.ErrPermission, filter.ErrConfidentialReport:
 		http.Error(w, e.Error(), http.StatusForbidden)
 		return
 	case nil:

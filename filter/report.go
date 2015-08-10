@@ -33,6 +33,13 @@ func (v *Service) Report(kind, email string) (internship.ReportHeader, error) {
 func (v *Service) ReportContent(kind, email string) ([]byte, error) {
 	err := ErrPermission
 	cnt := []byte{}
+	if hdr, err := v.srv.Report(kind, email); err != nil {
+		return cnt, err
+	} else {
+		if hdr.Private && !v.isTutoring(email) {
+			return cnt, ErrConfidentialReport
+		}
+	}
 	if v.mine(email) || v.my.Role >= internship.ADMIN || v.isTutoring(email) {
 		cnt, err = v.srv.ReportContent(kind, email)
 	}

@@ -10,7 +10,8 @@ import (
 
 var (
 	//ErrPermission indicates an operation that is forbidden by the current user
-	ErrPermission = errors.New("Permission denied")
+	ErrPermission         = errors.New("Permission denied")
+	ErrConfidentialReport = errors.New("Permission denied. The report is confidential")
 )
 
 /*
