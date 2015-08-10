@@ -178,6 +178,22 @@ function refresh() {
 	}
 }
 
+function nextPositionFromDefenseSessions(sessions, em) {
+	var p = undefined
+	sessions.forEach(function(session) {
+		session.Defenses.forEach(function(d) {
+			if (d.Student.Email == em) {
+				p = d.nextPosition
+				return false
+			}
+		})
+		if (p != undefined) {
+			return false
+		}
+	})
+	return p;
+}
+
 function showMyDefenses() {
 	defenses(function(ss) {
 		ss = ss.filter(function(s) {
@@ -190,7 +206,6 @@ function showMyDefenses() {
 			})
 			return ok
 		});
-		console.log(ss)
 		var html = Handlebars.getTemplate("jury")(ss);
 		var root = $("#cnt");
 		root.html(html);
@@ -206,12 +221,13 @@ function showMyDefenses() {
 			});
 		})
 		root.find(".position").each(function(i, e) {
+			var em = $(e).data("email");
 			$(e).editable({
 				pk: "1",
-				value: getInternship($(e).data("email")).Future.Position,
+				value: nextPositionFromDefenseSessions(ss, em),
 				source: editablePositions(),
 				url: function(p) {
-					return setNextPosition($(e).data("email"), parseInt(p.value))
+					return setNextPosition(em, parseInt(p.value))
 				}
 			});
 		})
