@@ -45,8 +45,8 @@
             {{#if Remote}}<i class="glyphicon glyphicon-facetime-video" title="visio conference"></i>{{/if}}
             </td>            
             <td>{{Promotion}}/{{Major}}</td>                            
-            <td><a title="click to edit" href="#" data-type="text" class="grade" data-email="{{Student.Email}}">{{defenseGrade3 Grade}}</a></td>
-            <td><a title="click to edit" href="#" data-type="select" class="position editable editable-click" data-email="{{Student.Email}}">{{nextPosition NextPosition}}</a></td>
+            <td><a title="click to edit" href="#" data-value="{{defenseGrade3 Grade}}" data-type="text" class="grade" data-email="{{Student.Email}}">{{defenseGrade3 Grade}}</a></td>
+            <td><a title="click to edit" href="#" data-value="{{NextPosition}}" data-type="select" class="position editable editable-click" data-email="{{Student.Email}}">{{nextPosition NextPosition}}</a></td>
         </tr>    
         {{/each}}
     </tbody>

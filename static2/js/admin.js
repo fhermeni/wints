@@ -224,7 +224,6 @@ function showMyDefenses() {
 			var em = $(e).data("email");
 			$(e).editable({
 				pk: "1",
-				value: nextPositionFromDefenseSessions(ss, em),
 				source: editablePositions(),
 				url: function(p) {
 					return setNextPosition(em, parseInt(p.value))
@@ -276,7 +275,6 @@ function showAlumni() {
 			root.find(".position").each(function(i, e) {
 				$(e).editable({
 					pk: "1",
-					value: getInternship($(e).data("email")).Future.Position,
 					source: editablePositions(),
 					url: function(p) {
 						return setNextPosition($(e).data("email"), parseInt(p.value))
@@ -548,15 +546,14 @@ function displayMyConventions() {
 				var tutors = []
 				uss.forEach(function(e) {
 					tutors.push({
-						value: e.Email,
-						text: e.Firstname.capitalize() + " " + e.Lastname.capitalize()
+						text: e.Firstname.capitalize() + " " + e.Lastname.capitalize(),
+						value: e.Email
 					})
 				});
 				root.find(".tutor").each(function(i, e) {
 					$(e).editable({
 						pk: "1",
 						source: tutors,
-						value: getInternship($(e).data("email")).Tutor.Email,
 						url: function(p) {
 							return setTutor($(e).data("email"), p.value)
 						}
@@ -571,7 +568,6 @@ function displayMyConventions() {
 				$(e).editable({
 					pk: "1",
 					source: editableMajors(),
-					value: getInternship($(e).data("email")).Major,
 					url: function(p) {
 						return setMajor($(e).data("email"), p.value)
 					}
@@ -585,8 +581,6 @@ function displayMyConventions() {
 function shiftSelect(e) {
 	document.getSelection().removeAllRanges();
 	if (shiftPressed) {
-		//debugger
-
 		var myTd = $(e).closest("td")
 		var tr = myTd.parent()
 		var col = tr.children().index(myTd)

@@ -79,9 +79,9 @@ As a major leader or an administrator, you can follow the progress of every stud
             <a class='click fn' onclick="showInternship('{{Student.Email}}')">{{shortFullname Student}}</a>
             </td>
             <td>{{shortProm Promotion}}</td>
-            <td><a href="#" class="major" data-email="{{Student.Email}}" data-type="select">{{Major}}</a></td>
+            <td><a href="#" class="major" data-email="{{Student.Email}}" data-type="select" data-value="{{Major}}">{{Major}}</a></td>
             <td>                
-                <a class="fn tutor" href='#' data-type="select" data-email="{{Student.Email}}" title='{{fullname Tutor}}'>{{shortFullname Tutor}}</a>
+                <a class="fn tutor" href='#' data-type="select" data-value="{{Tutor.Email}}" data-email="{{Student.Email}}" title='{{fullname Tutor}}'>{{shortFullname Tutor}}</a>
             </td>            
             {{#each Reports}}
             <td class="click {{reportStatus this}} text-center" data-text="{{gradeAnnotation this}}" onclick="showReport('{{../Student.Email}}', '{{Kind}}')">            
@@ -94,7 +94,7 @@ As a major leader or an administrator, you can follow the progress of every stud
             {{/each}}
 
             {{#if Defense.Defenses}}            
-            <td class="text-center {{defenseStatus Defense}}"><a href="#" data-type="text" data-email="{{Student.Email}}" class="grade">{{defenseGrade Defense}}</a></td>
+            <td class="text-center {{defenseStatus Defense}}"><a href="#" data-value="{{defenseGrade Defense}}" data-type="text" data-email="{{Student.Email}}" class="grade">{{defenseGrade Defense}}</a></td>
             {{else}}
             <td class="text-center"><i>n/a</i></td>
             {{/if}}
