@@ -178,22 +178,6 @@ function refresh() {
 	}
 }
 
-function nextPositionFromDefenseSessions(sessions, em) {
-	var p = undefined
-	sessions.forEach(function(session) {
-		session.Defenses.forEach(function(d) {
-			if (d.Student.Email == em) {
-				p = d.nextPosition
-				return false
-			}
-		})
-		if (p != undefined) {
-			return false
-		}
-	})
-	return p;
-}
-
 function showMyDefenses() {
 	defenses(function(ss) {
 		ss = ss.filter(function(s) {
@@ -210,10 +194,8 @@ function showMyDefenses() {
 		var root = $("#cnt");
 		root.html(html);
 		root.find(":checkbox").icheck();
-		root.find("select").selecter();
 		root.find(".grade").each(function(i, e) {
 			$(e).editable({
-				pk: "1",
 				url: function(p) {
 					return postDefenseGrade($(e).data("email"), parseInt(p.value))
 				},
@@ -223,7 +205,6 @@ function showMyDefenses() {
 		root.find(".position").each(function(i, e) {
 			var em = $(e).data("email");
 			$(e).editable({
-				pk: "1",
 				source: editablePositions(),
 				url: function(p) {
 					return setNextPosition(em, parseInt(p.value))
@@ -264,17 +245,11 @@ function showAlumni() {
 		root.find(".tablesorter").tablesorter({
 			theme: 'bootstrap',
 			widgets: ["uitheme"],
-			headerTemplate: '{content} {icon}',
-			headers: {
-				0: {
-					sorter: false
-				}
-			}
+			headerTemplate: '{content} {icon}'
 		});
 		if (myself.Role >= 3) {
 			root.find(".position").each(function(i, e) {
 				$(e).editable({
-					pk: "1",
 					source: editablePositions(),
 					url: function(p) {
 						return setNextPosition($(e).data("email"), parseInt(p.value))
@@ -470,12 +445,7 @@ function displayMyStudents() {
 		$("#table-conventions").tablesorter({
 			theme: 'bootstrap',
 			widgets: ["uitheme"],
-			headerTemplate: '{content} {icon}',
-			headers: {
-				0: {
-					sorter: false
-				}
-			}
+			headerTemplate: '{content} {icon}'
 		});
 	});
 }
@@ -513,17 +483,11 @@ function displayMyConventions() {
 		$("#table-conventions").tablesorter({
 			theme: 'bootstrap',
 			widgets: ["uitheme"],
-			headerTemplate: '{content} {icon}',
-			headers: {
-				0: {
-					sorter: false
-				}
-			}
+			headerTemplate: '{content} {icon}'
 		});
 		if (myself.Role >= 3) {
 			root.find(".grade").each(function(i, e) {
 				$(e).editable({
-					pk: "1",
 					url: function(p) {
 						return postDefenseGrade($(e).data("email"), parseInt(p.value))
 					},
@@ -552,7 +516,6 @@ function displayMyConventions() {
 				});
 				root.find(".tutor").each(function(i, e) {
 					$(e).editable({
-						pk: "1",
 						source: tutors,
 						url: function(p) {
 							return setTutor($(e).data("email"), p.value)
@@ -566,7 +529,6 @@ function displayMyConventions() {
 			//Major rights and more
 			root.find(".major").each(function(i, e) {
 				$(e).editable({
-					pk: "1",
 					source: editableMajors(),
 					url: function(p) {
 						return setMajor($(e).data("email"), p.value)
@@ -1045,18 +1007,6 @@ function showInternship(s) {
 				URL: window.location.protocol + "//" + window.location.host + "/surveys/"
 			})
 			$("#modal").html(buf).modal('show');
-			var c = $("#modal").find("select.select-tutor");
-			c.val(i.Tutor.Email)
-			$("#modal").find("select.select-major").selecter({
-				callback: function(v) {
-					sendMajor(i.Student.Email, v)
-				}
-			});
-			$("#modal").find("select.select-tutor").selecter({
-				callback: function(v) {
-					sendTutor(i.Student.Email, v)
-				}
-			});
 		});
 	});
 }
@@ -1101,52 +1051,8 @@ function nbDaysLate(deadline, now) {
 	return d1 - d2;
 }
 
-function sendMajor(e, m) {
-	setMajor(e, m, function() {
-		reportSuccess("Major updated")
-		refresh()
-	})
-}
 
-function sendTutor(e, s) {
-	setTutor(e, s, function() {
-		reportSuccess("Tutor updated")
-		refresh();
-	})
-}
 
-function showDefense(stu) {
-	i = getInternship(stu)
-	def = i.Defense
-	def.Student = i.Student
-	def.Gradeable = myself.Role >= 3
-		//Correct date
-	if (def.Defenses) {
-		def.Date = moment(def.Date).add(def.Defenses[0].Offset * 30, "minutes")
-		def.Remote = def.Defenses[0].Remote
-		def.Private = def.Defenses[0].Private
-		def.Grade = def.Defenses[0].Grade
-	}
-	def.Juries.forEach(function(j) {
-		if (j.Email == myself.Email) {
-			def.Gradeable = true
-			return false
-		}
-	})
-	buf = Handlebars.getTemplate("defense-modal")(def)
-	$("#modal").html(buf).modal('show');
-	$('#modal').find(":checkbox").icheck();
-	$('#modal').find("select").selecter();
-}
-
-function gradeDefense(stu) {
-	var g = $("#modal").find("#grade").val()
-	postDefenseGrade(stu, parseInt(g), function() {
-		$("#modal").find("#grade").val(g).removeClass("has-error")
-		$("#modal").modal('hide')
-		refresh();
-	})
-}
 String.prototype.capitalize = function() {
 	return this.charAt(0).toUpperCase() + this.substring(1)
 }
