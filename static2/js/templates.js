@@ -196,7 +196,7 @@ var possiblePositions = [
 	"entrepreneurship"
 ];
 
-function editablePositions() {
+function editablePossiblePositions() {
 	var arr = []
 	possiblePositions.forEach(function(p, i) {
 		arr.push({

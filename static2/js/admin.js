@@ -204,16 +204,18 @@ function showMyDefenses() {
 				validate: isGrade
 			});
 		})
-		root.find(".position").each(function(i, e) {
-			var em = $(e).data("email");
-			$(e).editable({
-				source: editablePositions(),
-				url: function(p) {
-					return setNextPosition(em, parseInt(p.value))
-				}
-			});
-		})
+		root.find(".position").each(editablePosition)
 
+	});
+}
+
+function editablePosition(i, e) {
+	var em = $(e).data("email");
+	$(e).editable({
+		source: editablePossiblePositions(),
+		url: function(p) {
+			return setNextPosition(em, parseInt(p.value))
+		}
 	});
 }
 
@@ -228,22 +230,11 @@ function showAlumni() {
 		ii["Missings"] = missings
 		var html = Handlebars.getTemplate("alumni")(ii)
 		var root = $("#cnt");
-		root.html(html).find("td .icheckbox_flat").icheck({
-			callbacks: {
-				ifChecked: shiftSelect
-			}
-		});
+		root.html(html).find("td .icheckbox_flat").icheck(shiftSelect());
 		$('#cnt').find(".check_all").icheck(selectAllNone($("#cnt")));
 		root.find(".tablesorter").tablesorter();
 		if (myself.Role >= 3) {
-			root.find(".position").each(function(i, e) {
-				$(e).editable({
-					source: editablePositions(),
-					url: function(p) {
-						return setNextPosition($(e).data("email"), parseInt(p.value))
-					}
-				});
-			})
+			root.find(".position").each(editablePosition)
 		}
 	});
 }
@@ -415,11 +406,7 @@ function displayMyStudents() {
 			return true
 		}
 
-		$("#cnt").find("td .icheckbox_flat").icheck({
-			callbacks: {
-				ifChecked: shiftSelect
-			}
-		});
+		$("#cnt").find("td .icheckbox_flat").icheck(shiftSelect());
 		$('#cnt').find(".check_all").icheck(selectAllNone($("#cnt")));
 		$("#table-conventions").tablesorter();
 	});
@@ -440,11 +427,7 @@ function displayMyConventions() {
 			return true
 		}
 
-		$("#cnt").find("td .icheckbox_flat").icheck({
-			callbacks: {
-				ifChecked: shiftSelect
-			}
-		});
+		$("#cnt").find("td .icheckbox_flat").icheck(shiftSelect());
 		$('#cnt').find(".check_all").icheck(selectAllNone($("#cnt")));
 		$("#table-conventions").tablesorter();
 		if (myself.Role >= 3) {
@@ -502,21 +485,27 @@ function displayMyConventions() {
 }
 
 
-function shiftSelect(e) {
-	document.getSelection().removeAllRanges();
-	if (shiftPressed) {
-		var myTd = $(e).closest("td")
-		var tr = myTd.parent()
-		var col = tr.children().index(myTd)
-		var p = tr.prev();
-		while (p.length > 0) {
-			var chk = $(p.children().get(col)).find(".icheckbox")
-			if (chk.hasClass("checked")) {
-				break;
-			} else {
-				chk.icheck("checked")
+function shiftSelect() {
+	return {
+		callbacks: {
+			ifChecked: function(e) {
+				document.getSelection().removeAllRanges();
+				if (shiftPressed) {
+					var myTd = $(e).closest("td")
+					var tr = myTd.parent()
+					var col = tr.children().index(myTd)
+					var p = tr.prev();
+					while (p.length > 0) {
+						var chk = $(p.children().get(col)).find(".icheckbox")
+						if (chk.hasClass("checked")) {
+							break;
+						} else {
+							chk.icheck("checked")
+						}
+						p = p.prev();
+					}
+				}
 			}
-			p = p.prev();
 		}
 	}
 }
@@ -860,11 +849,7 @@ function showService() {
 		var html = Handlebars.getTemplate("service")(service);
 		$("#cnt").html(html);
 
-		$("#cnt").find("td .icheckbox_flat").icheck({
-			callbacks: {
-				ifChecked: shiftSelect
-			}
-		});
+		$("#cnt").find("td .icheckbox_flat").icheck(shiftSelect());
 		$('#cnt').find(".check_all").icheck(selectAllNone($("#cnt")));
 	});
 }
@@ -957,23 +942,18 @@ function selectText(elm) {
 
 function showInternship(s) {
 	internship(s, function(i) {
-		users(function(uss) {
-			uss = uss.filter(function(u) {
-				return u.Role != 0; //get rid of students
-			});
-			i.Defense.Privileges = false;
-			if (i.Defense.Defenses) {
-				i.Defense.Mine = i.Defense.Defenses[0]
-				i.Defense.Privileges = i.Defense.Defenses[0].Remote || i.Defense.Defenses[0].Private
-			}
+		i.Defense.Privileges = false;
+		if (i.Defense.Defenses) {
+			i.Defense.Mine = i.Defense.Defenses[0]
+			i.Defense.Privileges = i.Defense.Defenses[0].Remote || i.Defense.Defenses[0].Private
+		}
 
-			buf = Handlebars.getTemplate("student")({
-				I: i,
-				SurveyAdmin: myself.Email == i.Tutor.Email || myself.Role >= 3,
-				URL: window.location.protocol + "//" + window.location.host + "/surveys/"
-			})
-			$("#modal").html(buf).modal('show');
-		});
+		buf = Handlebars.getTemplate("student")({
+			I: i,
+			SurveyAdmin: myself.Email == i.Tutor.Email || myself.Role >= 3,
+			URL: window.location.protocol + "//" + window.location.host + "/surveys/"
+		})
+		$("#modal").html(buf).modal('show');
 	});
 }
 
