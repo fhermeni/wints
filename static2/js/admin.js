@@ -233,17 +233,7 @@ function showAlumni() {
 				ifChecked: shiftSelect
 			}
 		});
-		$('#cnt').find(".check_all").icheck({
-			callbacks: {
-				ifChecked: function(e) {
-					$("#cnt").find("td .icheckbox_flat").icheck("checked")
-				},
-				ifUnchecked: function(e) {
-					$("#cnt").find("td .icheckbox_flat").icheck("unchecked")
-				}
-			}
-		});
-
+		$('#cnt').find(".check_all").icheck(selectAllNone($("#cnt")));
 		root.find(".tablesorter").tablesorter();
 		if (myself.Role >= 3) {
 			root.find(".position").each(function(i, e) {
@@ -430,16 +420,7 @@ function displayMyStudents() {
 				ifChecked: shiftSelect
 			}
 		});
-		$('#cnt').find(".check_all").icheck({
-			callbacks: {
-				ifChecked: function(e) {
-					$("#cnt").find("td .icheckbox_flat").icheck("checked")
-				},
-				ifUnchecked: function(e) {
-					$("#cnt").find("td .icheckbox_flat").icheck("unchecked")
-				}
-			}
-		});
+		$('#cnt').find(".check_all").icheck(selectAllNone($("#cnt")));
 		$("#table-conventions").tablesorter();
 	});
 }
@@ -464,16 +445,7 @@ function displayMyConventions() {
 				ifChecked: shiftSelect
 			}
 		});
-		$('#cnt').find(".check_all").icheck({
-			callbacks: {
-				ifChecked: function(e) {
-					$("#cnt").find("td .icheckbox_flat").icheck("checked")
-				},
-				ifUnchecked: function(e) {
-					$("#cnt").find("td .icheckbox_flat").icheck("unchecked")
-				}
-			}
-		});
+		$('#cnt').find(".check_all").icheck(selectAllNone($("#cnt")));
 		$("#table-conventions").tablesorter();
 		if (myself.Role >= 3) {
 			root.find(".grade").each(function(i, e) {
@@ -857,6 +829,19 @@ function getInternship(email) {
 	return i;
 }
 
+function selectAllNone(root) {
+	return {
+		callbacks: {
+			ifChecked: function(e) {
+				root.find("td .icheckbox_flat").icheck("checked")
+			},
+			ifUnchecked: function(e) {
+				root.find("td .icheckbox_flat").icheck("unchecked")
+			}
+		}
+	};
+}
+
 function showService() {
 	internships(function(interns) {
 		var service = {};
@@ -880,16 +865,7 @@ function showService() {
 				ifChecked: shiftSelect
 			}
 		});
-		$('#cnt').find(".check_all").icheck({
-			callbacks: {
-				ifChecked: function(e) {
-					$("#cnt").find("td .icheckbox_flat").icheck("checked")
-				},
-				ifUnchecked: function(e) {
-					$("#cnt").find("td .icheckbox_flat").icheck("unchecked")
-				}
-			}
-		});
+		$('#cnt').find(".check_all").icheck(selectAllNone($("#cnt")));
 	});
 }
 
