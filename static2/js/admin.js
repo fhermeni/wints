@@ -333,8 +333,8 @@ function showFullnames(source) {
 		var em = $(e).attr("data-email");
 		source.forEach(function(src) {
 			if (src.Email == em) {
-				var fn = src.Firstname.charAt(0).toUpperCase() + src.Firstname.slice(1);
-				var ln = src.Lastname.charAt(0).toUpperCase() + src.Lastname.slice(1);
+				var fn = src.Firstname.capitalize()
+				var ln = src.Lastname.capitalize()
 				var n = fn + " " + ln;
 				if (fns.indexOf(n) < 0) {
 					fns.push(fn + " " + ln)
@@ -402,10 +402,6 @@ function displayMyStudents() {
 		var html = Handlebars.getTemplate("tutoring")(interns);
 		var root = $("#cnt");
 		root.html(html);
-		if (interns.length == 0) {
-			return true
-		}
-
 		$("#cnt").find("td .icheckbox_flat").icheck(shiftSelect());
 		$('#cnt').find(".check_all").icheck(selectAllNone($("#cnt")));
 		$("#table-conventions").tablesorter();
@@ -744,12 +740,6 @@ function gradeReport(toGrade, email, kind) {
 	}
 	var grade = $("#grade").val();
 	var comment = $("#comment").val();
-	if (comment.length < 3) {
-		$("#comment").notify("required", {
-			className: "danger"
-		});
-		return
-	}
 	setReportGrade(email, kind, parseInt(grade), comment, function() {
 		reportSuccess("Operation successfull")
 		$("#modal").modal('hide');
@@ -900,8 +890,8 @@ function showRawFullname(kind) {
 			} else if (kind == "tutors") {
 				p = i.Tutor
 			}
-			var fn = p.Firstname.charAt(0).toUpperCase() + p.Firstname.slice(1);
-			var ln = p.Lastname.charAt(0).toUpperCase() + p.Lastname.slice(1);
+			var fn = p.Firstname.capitalize();
+			var ln = p.Lastname.capitalize();
 			var n = fn + " " + ln;
 			if (fns.indexOf(n) < 0) {
 				fns.push(fn + " " + ln)
