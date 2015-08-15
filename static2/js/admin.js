@@ -9,7 +9,9 @@ var allMajors;
 
 $(document).ready(function() {
 	waitingBlock = $("#cnt").clone().html();
-
+	$.tablesorter.defaults.widgets = ["uitheme"]
+	$.tablesorter.defaults.theme = 'bootstrap';
+	$.tablesorter.defaults.headerTemplate = '{content} {icon}';
 	//IE8 stuff
 	if (typeof Array.prototype.forEach != 'function') {
 		Array.prototype.forEach = function(callback) {
@@ -242,11 +244,7 @@ function showAlumni() {
 			}
 		});
 
-		root.find(".tablesorter").tablesorter({
-			theme: 'bootstrap',
-			widgets: ["uitheme"],
-			headerTemplate: '{content} {icon}'
-		});
+		root.find(".tablesorter").tablesorter();
 		if (myself.Role >= 3) {
 			root.find(".position").each(function(i, e) {
 				$(e).editable({
@@ -442,11 +440,7 @@ function displayMyStudents() {
 				}
 			}
 		});
-		$("#table-conventions").tablesorter({
-			theme: 'bootstrap',
-			widgets: ["uitheme"],
-			headerTemplate: '{content} {icon}'
-		});
+		$("#table-conventions").tablesorter();
 	});
 }
 
@@ -480,11 +474,7 @@ function displayMyConventions() {
 				}
 			}
 		});
-		$("#table-conventions").tablesorter({
-			theme: 'bootstrap',
-			widgets: ["uitheme"],
-			headerTemplate: '{content} {icon}'
-		});
+		$("#table-conventions").tablesorter();
 		if (myself.Role >= 3) {
 			root.find(".grade").each(function(i, e) {
 				$(e).editable({
