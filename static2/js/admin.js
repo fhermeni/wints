@@ -121,34 +121,6 @@ function selectStudent(stu, ok) {
 	}
 }
 
-function selectBy(nature, kind, f) {
-	interns.forEach(function(i) {
-		if (nature == "reports") {
-			i.Reports.forEach(function(r) {
-				if (r.Kind == kind) {
-					if (f == "missing") {
-						var late = nbDaysLate(new Date(r.Deadline), new Date()) < 0 && new Date(r.Delivery).getTime() < 0
-						selectStudent(i.Student.Email, late)
-					} else if (f == "pending") {
-						var late = new Date(r.Delivery).getTime() > 0 && r.Grade < 0
-						selectStudent(i.Student.Email, late)
-					}
-				}
-				var delayWithDeadline = nbDaysLate(new Date(r.Deadline), new Date(r.Delivery))
-				r.Late = nbDaysLate(new Date(r.Deadline), new Date(r.Delivery)) < 0
-			})
-		} else if (nature == "surveys") {
-			i.Surveys.forEach(function(s) {
-				if (s.Kind == kind) {
-					if (f == "missing") {
-						selectStudent(i.Student.Email, Object.keys(s.Answers) == 0)
-					}
-				}
-			});
-		}
-	});
-}
-
 function refresh() {
 	//reset the div
 	if (currentPage == "myStudents") {
@@ -479,7 +451,6 @@ function displayMyConventions() {
 		}
 	});
 }
-
 
 function shiftSelect() {
 	return {
@@ -986,8 +957,6 @@ function nbDaysLate(deadline, now) {
 	var d2 = moment(now)
 	return d1 - d2;
 }
-
-
 
 String.prototype.capitalize = function() {
 	return this.charAt(0).toUpperCase() + this.substring(1)
