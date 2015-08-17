@@ -9,17 +9,11 @@ var allMajors;
 
 $(document).ready(function() {
 	waitingBlock = $("#cnt").clone().html();
+
 	$.tablesorter.defaults.widgets = ["uitheme"]
 	$.tablesorter.defaults.theme = 'bootstrap';
 	$.tablesorter.defaults.headerTemplate = '{content} {icon}';
-	//IE8 stuff
-	if (typeof Array.prototype.forEach != 'function') {
-		Array.prototype.forEach = function(callback) {
-			for (var i = 0; i < this.length; i++) {
-				callback.apply(this, [this[i], i, this]);
-			}
-		};
-	}
+
 	majors(function(m) {
 		allMajors = m;
 		user(getCookie("session"), function(u) {
@@ -29,9 +23,9 @@ $(document).ready(function() {
 			if (myself.Role == 0) {
 				showDashboard();
 			} else if (myself.Role >= 2) {
-				showPage(undefined, "conventions");
+				displayMyStudents()
 			} else {
-				showPage(undefined, "myStudents");
+				displayMyConventions()
 			}
 
 		}, function() {
@@ -51,17 +45,6 @@ $(document).ready(function() {
 		}
 	});
 });
-
-function showPage(li, id) {
-	$("#cnt").html(waitingBlock);
-
-	$("#menu-pages").find("li").removeClass("active");
-	if (li) {
-		$(li.parentNode).addClass("active");
-	}
-	currentPage = id;
-	refresh();
-}
 
 function summary() {
 	var sum = {
@@ -133,8 +116,6 @@ function refresh() {
 		showPrivileges();
 	} else if (currentPage == "pending") {
 		showPendingConventions();
-	} else if (currentPage == "juries") {
-		showJuryService();
 	} else if (currentPage == "service") {
 		showService();
 	} else if (currentPage == "status") {
@@ -281,7 +262,7 @@ function showStatus() {
 					var reader = new FileReader();
 					reader.onload = function(e) {
 						sendStudents(e.target.result, function() {
-							refresh();
+							showStatus();
 						});
 					};
 					reader.readAsText(file);

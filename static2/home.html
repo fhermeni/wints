@@ -48,23 +48,23 @@
                             </ul>
                         </li>
                         <li class="role-1 hidden">
-                            <a onclick="showPage(this, 'myStudents');"> <i class="glyphicon glyphicon-briefcase"></i>
+                            <a onclick="displayMyStudents()"> <i class="glyphicon glyphicon-briefcase"></i>
                                 Tutored students
                             </a>
                         </li>
                         <li class="role-1 hidden">
-                            <a onclick="showPage(this, 'myDefenses');"> <i class="glyphicon glyphicon-facetime-video"> </i>
+                            <a onclick="showMyDefenses()"> <i class="glyphicon glyphicon-facetime-video"> </i>
                             My defenses
                             </a>
                         </li>                        
                         <li class="role-2 hidden">
-                            <a onclick="showPage(this, 'conventions');">
+                            <a onclick="displayMyConventions();">
                                 <i class="glyphicon glyphicon-eye-open"></i>
                                 Watchlist
                             </a>
                         </li>
                         <li>
-                            <a class="role-2 hidden" onclick="showPage(this, 'alumni')">
+                            <a class="role-2 hidden" onclick="showAlumni()">
                                 <i class="glyphicon glyphicon-star"></i>
                                 Alumni
                             </a>
@@ -77,32 +77,32 @@
                             <span class="dropdown-arrow"></span>
                             <ul class="dropdown-menu" role="menu">
                                 <li class="role-3 hidden">
-                                    <a onclick="showPage(this, 'pending')">
+                                    <a onclick="showPendingConventions()">
                                         <i class="glyphicon glyphicon-filter"></i>
                                         Import conventions
                                         <span id="pending-counter"></span>
                                     </a>
                                 </li>
                                 <li class="role-3 hidden">
-                                    <a onclick="showPage(this, 'status')">
+                                    <a onclick="showStatus()">
                                         <i class="glyphicon glyphicon-question-sign"></i>
                                         Placement status
                                     </a>
                                 </li>
                                 <li class="role-3 hidden">
-                                    <a onclick="showPage(this, 'defenses-schedule')">
+                                    <a onclick="showDefenses()">
                                         <i class="glyphicon glyphicon-calendar"></i>
                                         Schedule defenses
                                     </a>
                                 </li>
                                 <li class="role-4 hidden" >
-                                    <a onclick="showPage(this, 'privileges')">
+                                    <a onclick="showPrivileges()">
                                         <i class="glyphicon glyphicon-user"></i>
                                         Users
                                     </a>
                                 </li>
                                 <li class="role-3 hidden">
-                                    <a onclick="showPage(this, 'service')">
+                                    <a onclick="showService()">
                                         <i class="glyphicon glyphicon-euro"></i>
                                         Service
                                     </a>
