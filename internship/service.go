@@ -1,7 +1,10 @@
 //Package internship defines the interface specifying common methods to manipulate student internships
 package internship
 
-import "time"
+import (
+	"errors"
+	"time"
+)
 
 //Service specifies the core methods to manage student internships
 type Service interface {
@@ -13,7 +16,7 @@ type Service interface {
 	Internship(stu string) (Internship, error)
 
 	//Set the supervisor for the internship of a given student
-	SetSupervisor(stu string, sup Person) error
+	SetSupervisor(stu string, sup User) error
 
 	//Set the tutor for the internship of a given student
 	SetTutor(stu string, t string) error
@@ -107,7 +110,6 @@ type Service interface {
 	Students() ([]Student, error)
 	InsertStudents(csv string) error
 	AddStudent(s Student) error
-	AlignWithInternship(student string, internship string) error
 	HideStudent(em string, st bool) error
 
 	//DefenseSessions returns all the registered defense sessions
@@ -122,3 +124,28 @@ type Service interface {
 
 	RequestSurvey(stu, kind string) error
 }
+
+var (
+	ErrReportExists       = errors.New("Report already exists")
+	ErrUnknownReport      = errors.New("Unknown report or user")
+	ErrInvalidGrade       = errors.New("The grade must be between 0 and 20 (inclusive)")
+	ErrReportConflict     = errors.New("The report has not been uploaded")
+	ErrInternshipExists   = errors.New("Internship already exists")
+	ErrUnknownInternship  = errors.New("Unknown internship")
+	ErrUserExists         = errors.New("User already exists")
+	ErrUnknownUser        = errors.New("User not found")
+	ErrUserTutoring       = errors.New("The user is tutoring students")
+	ErrCredentials        = errors.New("Incorrect credentials")
+	ErrNoPendingRequests  = errors.New("No password renewable request pending")
+	ErrInvalidPeriod      = errors.New("invalid internship period")
+	ErrConventionExists   = errors.New("convention already scanned")
+	ErrInvalidMajor       = errors.New("Invalid major")
+	ErrDeadlinePassed     = errors.New("Deadline passed")
+	ErrGradedReport       = errors.New("Report already graded")
+	ErrSessionExpired     = errors.New("Session expired")
+	ErrInvalidToken       = errors.New("Invalid session")
+	ErrUnknownSurvey      = errors.New("Unknown survey")
+	ErrInvalidSurvey      = errors.New("Invalid answers")
+	ErrUnknownAlumni      = errors.New("No informations for future alumni")
+	ErrInvalidAlumniEmail = errors.New("Invalid email. It must not be served by polytech' or unice")
+)
