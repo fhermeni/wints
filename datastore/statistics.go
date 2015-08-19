@@ -1,7 +1,6 @@
 package datastore
 
-import "github.com/fhermeni/wints/internship"
-
+/*
 func (srv *Service) Statistics() ([]internship.Stat, error) {
 
 	interns, err := srv.Internships()
@@ -92,3 +91,4 @@ func convert(i internship.Internship) internship.Stat {
 	}
 	return s
 }
+*/

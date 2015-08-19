@@ -1,22 +1,15 @@
 package datastore
 
-import (
-	"log"
-	"time"
-
-	"github.com/fhermeni/wints/internship"
-
-	"code.google.com/p/go.crypto/bcrypt"
-	"github.com/lib/pq"
-)
-
 //Prepared requests
+/*
+func (s *Service) Visit(u string) error {
+	q := "update users set lastVisit=$1 where email=$2"
+	return SingleUpdate(s.DB, internship.ErrUnknownUser, q, time.Now(), u)
+}
 
-func (s *Service) Registered(email string, password []byte) ([]byte, error) {
-	var fn, ln, tel string
+func (s *Service) Login(email string, password []byte) ([]byte, error) {
 	var p []byte
-	var r internship.Privilege
-	if err := s.DB.QueryRow("select firstname, lastname, tel, password, role from users where email=$1", email).Scan(&fn, &ln, &tel, &p, &r); err != nil {
+	if err := s.DB.QueryRow("select password from users where email=$1", email).Scan(&p); err != nil {
 		return []byte{}, internship.ErrCredentials
 	}
 	if err := bcrypt.CompareHashAndPassword(p, password); err != nil {
@@ -28,7 +21,7 @@ func (s *Service) Registered(email string, password []byte) ([]byte, error) {
 	}
 	//token
 	token := randomBytes(32)
-	err = SingleUpdate(s.DB, internship.ErrUnknownUser, "insert into sessions(email, token, last) values ($1,$2,$3)", email, token, time.Now().Add(time.Hour*24)) //1 day
+	err = SingleUpdate(s.DB, internship.ErrUnknownUser, "insert into sessions(email, token, expire) values ($1,$2,$3)", email, token, time.Now().Add(time.Hour*24)) //1 day
 	if err != nil {
 		return []byte{}, err
 	}
@@ -37,7 +30,7 @@ func (s *Service) Registered(email string, password []byte) ([]byte, error) {
 
 func (s *Service) OpenedSession(email, token string) error {
 	var last time.Time
-	err := s.DB.QueryRow("select last from sessions where email=$1 and token=$2", email, token).Scan(&last)
+	err := s.DB.QueryRow("select expire from sessions where email=$1 and token=$2", email, token).Scan(&last)
 	if err != nil {
 		return internship.ErrCredentials
 	}
@@ -47,21 +40,6 @@ func (s *Service) OpenedSession(email, token string) error {
 	return err
 }
 
-func (s *Service) Sessions() (map[string]time.Time, error) {
-	r, err := s.DB.Query("select email, last from sessions")
-	if err != nil {
-		return nil, err
-	}
-	defer r.Close()
-	res := make(map[string]time.Time)
-	for r.Next() {
-		var email string
-		var last time.Time
-		r.Scan(&email, &last)
-		res[email] = last.Add(time.Hour * -24)
-	}
-	return res, err
-}
 func (s *Service) Logout(email, token string) error {
 	err := SingleUpdate(s.DB, internship.ErrUnknownUser, "update sessions set token=$3 where email=$1 and token=$2", token, email, randomBytes(32)) //unknown token (to remind last visit)
 	return err
@@ -88,16 +66,6 @@ func (s *Service) NewTutor(p internship.User) ([]byte, error) {
 	return token, err
 }
 
-func (s *Service) User(email string) (internship.User, error) {
-	var fn, ln, tel string
-	var role internship.Privilege
-	err := s.DB.QueryRow("select firstname, lastname, tel, role from users where email=$1", email).Scan(&fn, &ln, &tel, &role)
-	if err != nil {
-		return internship.User{}, internship.ErrUnknownUser
-	}
-	return internship.User{Firstname: fn, Lastname: ln, Email: email, Tel: tel, Role: role}, nil
-}
-
 func (s *Service) RmUser(email string) error {
 	err := SingleUpdate(s.DB, internship.ErrUnknownUser, "DELETE FROM users where email=$1", email)
 	if e, ok := err.(*pq.Error); ok {
@@ -109,7 +77,7 @@ func (s *Service) RmUser(email string) error {
 }
 
 func (s *Service) Users() ([]internship.User, error) {
-	rows, err := s.DB.Query("select firstname, lastname, email, tel, role from users")
+	rows, err := s.DB.Query("select firstname, lastname, email, tel, role, lastVisit from users")
 	users := make([]internship.User, 0, 0)
 	if err != nil {
 		return users, err
@@ -118,8 +86,12 @@ func (s *Service) Users() ([]internship.User, error) {
 	for rows.Next() {
 		var fn, ln, email, tel string
 		var role internship.Privilege
-		rows.Scan(&fn, &ln, &email, &tel, &role)
+		var last pq.NullTime
+		rows.Scan(&fn, &ln, &email, &tel, &role, &last)
 		u := internship.User{Firstname: fn, Lastname: ln, Email: email, Tel: tel, Role: role}
+		if last.Valid {
+			u.LastLogin = last.Value()
+		}
 		//Get the role if exists
 		users = append(users, u)
 	}
@@ -187,3 +159,4 @@ func (s *Service) ResetPassword(email string) ([]byte, error) {
 	}
 	return token, err
 }
+*/

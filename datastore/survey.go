@@ -1,13 +1,6 @@
 package datastore
 
-import (
-	"encoding/json"
-	"time"
-
-	"github.com/fhermeni/wints/internship"
-	"github.com/lib/pq"
-)
-
+/*
 func (s *Service) SurveyToken(token string) (string, string, error) {
 	var student, kind string
 	err := s.DB.QueryRow("select student, kind from surveys where token=$1", token).Scan(&student, &kind)
@@ -62,3 +55,4 @@ func (s *Service) RequestSurvey(stu, kind string) error {
 	}
 	return nil
 }
+*/

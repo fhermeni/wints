@@ -1,11 +1,6 @@
 package datastore
 
-import (
-	"database/sql"
-
-	"github.com/fhermeni/wints/internship"
-)
-
+/*
 var JuriesStmt *sql.Stmt
 var JuryUsersStmt *sql.Stmt
 var DefStmt *sql.Stmt
@@ -193,3 +188,4 @@ func (srv *Service) SetDefenseGrade(stu string, g int) error {
 	_, err = srv.DB.Exec(sql, stu, g)
 	return err
 }
+*/

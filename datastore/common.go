@@ -3,23 +3,10 @@ package datastore
 import (
 	"crypto/rand"
 	"database/sql"
-)
+	"time"
 
-//SingleUpdate executes a query that aims are affecting only 1 row.
-func SingleUpdate(db *sql.DB, errNoUpdate error, q string, args ...interface{}) error {
-	res, err := db.Exec(q, args...)
-	if err != nil {
-		return err
-	}
-	nb, err := res.RowsAffected()
-	if err != nil {
-		return err
-	}
-	if nb != 1 {
-		return errNoUpdate
-	}
-	return nil
-}
+	"github.com/lib/pq"
+)
 
 func randomBytes(s int) []byte {
 	alphanum := "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
@@ -29,4 +16,19 @@ func randomBytes(s int) []byte {
 		bytes[i] = alphanum[b%byte(len(alphanum))]
 	}
 	return bytes
+}
+
+func nullableTime(t pq.NullTime) *time.Time {
+	if t.Valid {
+		return &t.Time
+	}
+	return nil
+}
+
+func rollback(e error, tx *sql.Tx) error {
+	err := tx.Rollback()
+	if err != nil {
+		return err
+	}
+	return e
 }

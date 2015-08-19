@@ -1,6 +1,9 @@
 package internship
 
-import "strings"
+import (
+	"strings"
+	"time"
+)
 
 //The different level of privileges
 const (
@@ -34,6 +37,7 @@ type User struct {
 	Email     string
 	Tel       string
 	Role      Privilege
+	LastVisit *time.Time `,json:"omitempty"`
 }
 
 //Alumni denotes the basic information for a student future
@@ -43,7 +47,7 @@ type Alumni struct {
 }
 
 type Student struct {
-	U         User
+	User      User
 	Promotion string
 	Major     string
 	Alumni    Alumni

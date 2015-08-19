@@ -51,3 +51,13 @@ sessions()
 password_renewal()
 */
 
+//Convention scanning
+-> fullfill convention table with last convention versions only
+	-> tutor email might not be referring to a user
+
+	-> "skip" means I don't manage this internship
+
+	-> pending convention is those without validated flag
+		validated: tutor student aligned, reports & surveys created
+
+

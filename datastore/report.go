@@ -1,14 +1,6 @@
 package datastore
 
-import (
-	"database/sql"
-	"encoding/base64"
-	"time"
-
-	"github.com/fhermeni/wints/internship"
-	"github.com/lib/pq"
-)
-
+/*
 func (s *Service) PlanReport(email string, r internship.ReportHeader) error {
 	sql := "insert into reports(student, kind, deadline, grade, private) values($1,$2,$3)"
 	return SingleUpdate(s.DB, internship.ErrReportExists, sql, email, r.Kind, r.Deadline, -2, false)
@@ -92,3 +84,4 @@ func (s *Service) SetReportPrivate(kind, email string, p bool) error {
 	sql := "update reports set private=$3 where student=$1 and kind=$2"
 	return SingleUpdate(s.DB, internship.ErrUnknownReport, sql, email, kind, p)
 }
+*/

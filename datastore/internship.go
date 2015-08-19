@@ -1,15 +1,6 @@
 package datastore
 
-import (
-	"database/sql"
-	"encoding/json"
-	"strings"
-	"time"
-
-	"github.com/fhermeni/wints/internship"
-	"github.com/lib/pq"
-)
-
+/*
 var ReportSelectStmt *sql.Stmt
 var SurveySelectStmt *sql.Stmt
 var InternshipStmt *sql.Stmt
@@ -127,23 +118,8 @@ func (srv *Service) SetTitle(stu string, title string) error {
 	return SingleUpdate(srv.DB, internship.ErrUnknownInternship, sql, title, stu)
 }
 
-func (srv *Service) SetMajor(stu, m string) error {
-	for _, x := range srv.majors {
-		if x == m {
-			sql := "update internships set major=$2 where student=$1"
-			return SingleUpdate(srv.DB, internship.ErrUnknownInternship, sql, stu, m)
-		}
-	}
-	return internship.ErrInvalidMajor
-}
-
 func (srv *Service) Majors() []string {
 	return srv.majors
-}
-
-func (srv *Service) SetPromotion(stu, p string) error {
-	sql := "update internships set promotion=$2 where student=$1"
-	return SingleUpdate(srv.DB, internship.ErrUnknownInternship, sql, stu, p)
 }
 
 func (srv *Service) Internship(stu string) (internship.Internship, error) {
@@ -262,8 +238,7 @@ func (srv *Service) appendReports(i *internship.Internship) error {
 			return err
 		}
 	}
-	/*s := "select kind, grade, deadline, delivery, comment, private, toGrade from reports where student=$1 order by deadline"
-	rows, err := srv.DB.Query(s, i.Student.Email)*/
+
 	rows, err := ReportSelectStmt.Query(i.Student.Email)
 	if err != nil {
 		return err
@@ -325,17 +300,4 @@ func (srv *Service) Internships() ([]internship.Internship, error) {
 	}
 	return internships, err
 }
-
-func (v *Service) SetAlumni(student string, a internship.Alumni) error {
-	//check email
-	if !strings.Contains(a.Contact, "@") || strings.Contains(a.Contact, "@unice.fr") || strings.Contains(a.Contact, "polytech") {
-		return internship.ErrInvalidAlumniEmail
-	}
-	sql := "update internships set nextPosition=$1, nextContact=$2 where student=$3"
-	return SingleUpdate(v.DB, internship.ErrUnknownInternship, sql, a.Position, a.Contact, student)
-}
-
-func (v *Service) SetNextPosition(student string, pos int) error {
-	sql := "update internships set nextPosition=$1 where student=$2"
-	return SingleUpdate(v.DB, internship.ErrUnknownInternship, sql, pos, student)
-}
+*/
