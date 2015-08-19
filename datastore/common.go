@@ -32,3 +32,13 @@ func rollback(e error, tx *sql.Tx) error {
 	}
 	return e
 }
+
+func violated(got error, cstr string) bool {
+	if got == nil {
+		return false
+	}
+	if e, ok := got.(*pq.Error); ok {
+		return e.Constraint == cstr
+	}
+	return false
+}

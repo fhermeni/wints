@@ -1,11 +1,35 @@
 package datastore
 
+import (
+	"database/sql"
+	"strings"
+	"time"
+
+	"github.com/fhermeni/wints/internship"
+)
+
+var (
+	AddUser         = "insert into users(firstname, lastname, tel, email, password, role) values ($1,$2,$3,$4,$5,$6)"
+	UpdateLastVisit = "update users set lastVisit=$1 where email=$2"
+)
+
+//addUser add the given user.
+//Every strings are turned into their lower case version
+func (s *Service) addUser(tx *sql.Tx, u internship.User) error {
+	_, err := tx.Exec(AddUser, strings.ToLower(u.Firstname), strings.ToLower(u.Lastname), u.Tel, strings.ToLower(u.Email), randomBytes(32), u.Role)
+	if violated(err, "pk_email") {
+		return internship.ErrUserExists
+	}
+	return err
+}
+
+//Visit writes the current time for the given user
+func (s *Service) Visit(u string) error {
+	return s.singleUpdate(UpdateLastVisit, internship.ErrUnknownUser, time.Now(), u)
+}
+
 //Prepared requests
 /*
-func (s *Service) Visit(u string) error {
-	q := "update users set lastVisit=$1 where email=$2"
-	return SingleUpdate(s.DB, internship.ErrUnknownUser, q, time.Now(), u)
-}
 
 func (s *Service) Login(email string, password []byte) ([]byte, error) {
 	var p []byte

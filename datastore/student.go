@@ -11,14 +11,15 @@ import (
 
 var (
 	AllStudents     = "select firstname, lastname, email, tel, role, lastVisit, promotion, major, nextPosition, nextContact, skip from students inner join users on (students.email=users.email)"
-	InsertStudent   = "insert into students(major, promotion, nextContact, nextPosition, skip) values ($1,$2,$3,$4,$5)"
-	SkipStudent     = "update student set skip=$2 where email=$1"
+	InsertStudent   = "insert into students(major, promotion, skip, nextContact, nextPosition) values ($1,$2,$3,$4,$5)"
+	SkipStudent     = "update students set skip=$2 where email=$1"
 	SetPromotion    = "update students set promotion=$2 where email=$1"
-	SetMajor        = "update internships set major=$2 where email=$1"
+	SetMajor        = "update students set major=$2 where email=$1"
 	SetNextPosition = "update students set nextPosition=$1 where email=$2"
 	SetNextContact  = "update students set nextContact=$1 where email=$2"
 )
 
+//Students list all the registered students
 func (s *Service) Students() ([]internship.Student, error) {
 	rows, err := s.DB.Query(AllStudents)
 
@@ -51,31 +52,37 @@ func (s *Service) Students() ([]internship.Student, error) {
 	return students, err
 }
 
+//AddStudent add a student to the database.
+//The underlying user is declared in prior with a random password
 func (s *Service) AddStudent(st internship.Student) error {
 	tx, err := s.DB.Begin()
 	if err != nil {
 		return rollback(err, tx)
 	}
-	if _, err := s.addUser(tx, st.User); err != nil {
+	if err := s.addUser(tx, st.User); err != nil {
 		return rollback(err, tx)
 	}
-	res, err := tx.Exec(InsertStudent, st.Major, st.Promotion, st.Alumni.Contact, st.Alumni.Position, false)
+	_, err = tx.Exec(InsertStudent, st.Major, st.Promotion, st.Skip, st.Alumni.Contact, st.Alumni.Position)
+	if violated(err, "pk_students_email") {
+		return rollback(internship.ErrStudentExists, tx)
+	}
+	if violated(err, "fk_students_email") {
+		return rollback(internship.ErrUnknownUser, tx)
+	}
 	if err != nil {
 		return rollback(err, tx)
 	}
-	nb, err := res.RowsAffected()
-	if err != nil {
-		return rollback(err, tx)
-	}
-	if nb != 1 {
-		return internship.ErrUnknownUser
-	}
+	return tx.Commit()
 }
 
+//SkipStudent indicates if it is not required for the student to get an internship (an abandom typically)
 func (s *Service) SkipStudent(em string, st bool) error {
 	return s.singleUpdate(SkipStudent, internship.ErrUnknownUser, em, st)
 }
 
+//InsertStudents inserts all the students provided in the given CSV file.
+//Expected format: firstname;lastname;email;tel
+//The other fields are set to the default values
 func (s *Service) InsertStudents(file string) error {
 	in := csv.NewReader(strings.NewReader(file))
 	in.Comma = ';'
@@ -92,31 +99,43 @@ func (s *Service) InsertStudents(file string) error {
 		p := record[3]
 		major := record[4]
 		st := internship.Student{
-			Firstname:  fn,
-			Lastname:   ln,
-			Email:      email,
-			Promotion:  p,
-			Major:      major,
-			Internship: "",
+			User: internship.User{
+				Firstname: fn,
+				Lastname:  ln,
+				Email:     email,
+				Tel:       "not available",
+				Role:      internship.STUDENT,
+			},
+			Promotion: p,
+			Major:     major,
+			Skip:      false,
+			Alumni: internship.Alumni{
+				Contact:  "", //Not available
+				Position: 0,  //Not available
+			},
 		}
 		e2 = s.AddStudent(st)
-		// end-of-file is fitted into err
 	}
 	return nil
 }
 
+//SetPromotion updates the student promotion
 func (s *Service) SetPromotion(stu, p string) error {
 	return s.singleUpdate(SetPromotion, internship.ErrUnknownUser, stu, p)
 }
 
+//SetMajor updates the student major
 func (s *Service) SetMajor(stu, m string) error {
 	return s.singleUpdate(SetMajor, internship.ErrUnknownUser, stu, m)
 }
 
+//SetNextPosition updates the student next position
 func (s *Service) SetNextPosition(student string, pos int) error {
 	return s.singleUpdate(SetNextPosition, internship.ErrUnknownUser, pos, student)
 }
 
+//SetNextContact updates the student next contact email.
+//The email must contains one '@' and must not contains '@unice.fr' or 'polytech' to prevent from incorrect emails
 func (s *Service) SetNextContact(student string, em string) error {
 	if !strings.Contains(em, "@") || strings.Contains(em, "@unice.fr") || strings.Contains(em, "polytech") {
 		return internship.ErrInvalidAlumniEmail

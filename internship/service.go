@@ -106,6 +106,7 @@ type Service interface {
 
 var (
 	ErrUnknownStudent     = errors.New("Unknown student")
+	ErrStudentExists      = errors.New("Student already exists")
 	ErrReportExists       = errors.New("Report already exists")
 	ErrUnknownReport      = errors.New("Unknown report or user")
 	ErrInvalidGrade       = errors.New("The grade must be between 0 and 20 (inclusive)")
