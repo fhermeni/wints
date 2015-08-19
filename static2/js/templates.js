@@ -518,7 +518,6 @@ Handlebars.registerHelper("offset_local", function(from, offset, tz) {
 	} else {
 		d = moment(from);
 	}
-	console.log(d)
 	d = d.add(offset * 30, "minutes")
 	return d.format("dddd D MMMM HH:mm") + "-" + d.add(30, "m").format("HH:mm");
 })

@@ -91,7 +91,7 @@ func NewService(backend internship.Service, mailer mail.Mailer, p string, j jour
 	s.r.HandleFunc("/api/v1/students/{email}/hidden", s.rest(hideStudent)).Methods("POST")
 	s.r.HandleFunc("/api/v1/defenses/", s.rest(getDefenses)).Methods("GET")
 	s.r.HandleFunc("/api/v1/defenses/", s.rest(postDefenses)).Methods("POST")
-	//s.r.HandleFunc("/api/v1/program/", s.mon(getPublicSessions(s.backend))).Methods("GET")
+	s.r.HandleFunc("/api/v1/program/", s.mon(getPublicSessions(s.backend))).Methods("GET")
 	s.r.HandleFunc("/api/v1/internships/{email}/defense", s.rest(getDefense)).Methods("GET")
 	s.r.HandleFunc("/api/v1/internships/{email}/defense/grade", s.rest(setDefenseGrade)).Methods("POST")
 	s.r.HandleFunc("/surveys/{kind}", s.mon(surveyForm)).Methods("GET")
@@ -161,12 +161,12 @@ func statistics(backend internship.Service) http.HandlerFunc {
 	}
 }
 
-/*func getPublicSessions(srv internship.Service) http.HandlerFunc {
+func getPublicSessions(srv internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		sessions, err := srv.PublicDefenseSessions()
+		sessions, err := srv.DefenseSessions()
 		writeJSONIfOk(err, w, r, sessions)
 	}
-}*/
+}
 
 func home(backend internship.Service) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
