@@ -23,6 +23,8 @@ var (
 	UpdateUserPassword           = "update users set password=$2 where email=$1"
 	SelectExpire                 = "select expire from sessions where email=$1 and token=$2"
 	StartPasswordRenewall        = "insert into password_renewal(email,token,deadline) values($1,$2,$3)"
+	NewPasswordReq               = "update users set password=$2 where email=$1"
+	EmailFromRenewableToken      = "select email from password_renewal where token=$1"
 )
 
 type Rollbackable struct {
@@ -30,21 +32,50 @@ type Rollbackable struct {
 	err error
 }
 
+func newRollbackable(db *sql.DB) Rollbackable {
+	tx, err := db.Begin()
+	return Rollbackable{tx: tx, err: err}
+}
+
 func (r *Rollbackable) Done() error {
-	if err != nil {
+	if r.err != nil {
 		return r.tx.Rollback()
 	}
-	r.tx.Commit()
+	return r.tx.Commit()
+}
+
+func (r *Rollbackable) Exec(query string, args ...interface{}) {
+	if r.err != nil {
+		return
+	}
+	_, err := r.tx.Exec(query, args...)
+	if err != nil {
+		r.err = err
+	}
+}
+
+func (r *Rollbackable) Update(query string, args ...interface{}) int64 {
+	if r.err != nil {
+		return -1
+	}
+	res, err := r.tx.Exec(query, args...)
+	if err != nil {
+		r.err = err
+		return -1
+	}
+	nb, err := res.RowsAffected()
+	if err != nil {
+		r.err = err
+		return -1
+	}
+	return nb
 }
 
 //addUser add the given user.
 //Every strings are turned into their lower case version
 func (s *Service) addUser(tx *sql.Tx, u internship.User) error {
 	_, err := tx.Exec(AddUser, strings.ToLower(u.Firstname), strings.ToLower(u.Lastname), u.Tel, strings.ToLower(u.Email), randomBytes(32), u.Role)
-	if violated(err, "pk_email") {
-		return internship.ErrUserExists
-	}
-	return err
+	return violationAsErr(err, "pk_email", internship.ErrUserExists)
 }
 
 //Visit writes the current time for the given user
@@ -100,7 +131,7 @@ func (s *Service) Logout(email, token string) error {
 
 //SetPassword changes the user password if the old one is the current one.
 //Any pending renewable requests are deleted on success
-func (s *Service) SetPassword(email string, oldP, newP []byte) error {
+/*func (s *Service) SetPassword(email string, oldP, newP []byte) error {
 	//Get the password
 	var p []byte
 	st, err := s.stmt(SelectPassword)
@@ -143,6 +174,38 @@ func (s *Service) SetPassword(email string, oldP, newP []byte) error {
 		}
 		return tx.Commit()
 	}
+}*/
+
+func (s *Service) SetPassword(email string, oldP, newP []byte) error {
+	//Get the password
+	var p []byte
+	st, err := s.stmt(SelectPassword)
+	if err != nil {
+		return err
+	}
+
+	hash, err := bcrypt.GenerateFromPassword(newP, bcrypt.MinCost)
+	if err != nil {
+		return err
+	}
+
+	if err := st.QueryRow(email).Scan(&p); err != nil {
+		if err == sql.ErrNoRows {
+			return internship.ErrCredentials //hide unknown user
+		}
+		return err
+	}
+	if bcrypt.CompareHashAndPassword(p, oldP) != nil {
+		return internship.ErrCredentials
+	}
+
+	rb := newRollbackable(s.DB)
+	rb.Exec(DeletePasswordRenewalRequest, email)
+	nb := rb.Update(UpdateUserPassword, email, hash)
+	if rb.err == nil && nb != 1 {
+		rb.err = internship.ErrUnknownUser
+	}
+	return rb.Done()
 }
 
 //OpenedSession check if a session is currently open for the user and is not expired
@@ -168,7 +231,7 @@ func (s *Service) OpenedSession(email, token string) error {
 
 //ResetPassword initiates a password renewable request
 //The request token is returned upon success
-func (s *Service) ResetPassword(email string) ([]byte, error) {
+/*func (s *Service) ResetPassword(email string) ([]byte, error) {
 	//In case a request already exists
 	token := randomBytes(32)
 	d, _ := time.ParseDuration("48h")
@@ -192,10 +255,40 @@ func (s *Service) ResetPassword(email string) ([]byte, error) {
 		return []byte{}, err
 	}
 	return token, nil
+}*/
+
+func (s *Service) ResetPassword(email string) ([]byte, error) {
+	//In case a request already exists
+	token := randomBytes(32)
+	d, _ := time.ParseDuration("48h")
+
+	rb := newRollbackable(s.DB)
+	rb.Exec(DeletePasswordRenewalRequest, email)
+	rb.Exec(StartPasswordRenewall, email, token, d)
+	rb.err = violationAsErr(rb.err, "fk_password_renewal_email", internship.ErrUnknownUser)
+	return token, rb.Done()
 }
 
-//Prepared requests
-/*
+func (s *Service) NewPassword(token, newP []byte) (string, error) {
+	//Delete possible renew requests
+	var email string
+	err := s.DB.QueryRow(EmailFromRenewableToken, token).Scan(&email)
+	if err != nil {
+		return "", internship.ErrNoPendingRequests
+	}
+	//Make the new one
+	hash, err := hash(newP)
+	if err != nil {
+		return "", err
+	}
+	rb := newRollbackable(s.DB)
+	nb := rb.Update(NewPasswordReq, email, hash)
+	if nb != 1 && rb.err == nil {
+		rb.err = internship.ErrUnknownUser
+	}
+	rb.Exec(DeletePasswordRenewalRequest, token)
+	return email, rb.Done()
+}
 
 func (s *Service) Login(email string, password []byte) ([]byte, error) {
 	var p []byte
@@ -217,6 +310,10 @@ func (s *Service) Login(email string, password []byte) ([]byte, error) {
 	}
 	return token, err
 }
+
+/*
+
+
 
 func (s *Service) NewTutor(p internship.User) ([]byte, error) {
 	tx, err := s.DB.Begin()
@@ -247,27 +344,5 @@ func (s *Service) RmUser(email string) error {
 		}
 	}
 	return err
-}
-
-
-
-
-func (s *Service) NewPassword(token, newP []byte) (string, error) {
-	//Delete possible renew requests
-	var email string
-	err := s.DB.QueryRow("select email from password_renewal where token=$1", token).Scan(&email)
-	if err != nil {
-		return "", internship.ErrNoPendingRequests
-	}
-	//Make the new one
-	hash, err := hash(newP)
-	if err != nil {
-		return "", err
-	}
-	if err := SingleUpdate(s.DB, internship.ErrUnknownUser, "update users set password=$2 where email=$1", email, hash); err != nil {
-		return "", err
-	}
-	_, err = s.DB.Exec("delete from password_renewal where token=$1", token)
-	return email, err
 }
 */

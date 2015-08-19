@@ -54,10 +54,10 @@ func (s *Service) Students() ([]internship.Student, error) {
 
 //AddStudent add a student to the database.
 //The underlying user is declared in prior with a random password
-func (s *Service) AddStudent(st internship.Student) error {
+/*func (s *Service) AddStudent(st internship.Student) error {
 	tx, err := s.DB.Begin()
 	if err != nil {
-		return rollback(err, tx)
+		return err
 	}
 	if err := s.addUser(tx, st.User); err != nil {
 		return rollback(err, tx)
@@ -73,6 +73,15 @@ func (s *Service) AddStudent(st internship.Student) error {
 		return rollback(err, tx)
 	}
 	return tx.Commit()
+}*/
+
+func (s *Service) AddStudent(st internship.Student) error {
+	rb := newRollbackable(s.DB)
+	rb.err = s.addUser(rb.tx, st.User)
+	rb.Exec(InsertStudent, st.Major, st.Promotion, st.Skip, st.Alumni.Contact, st.Alumni.Position)
+	rb.err = violationAsErr(rb.err, "pk_students_email", internship.ErrStudentExists)
+	rb.err = violationAsErr(rb.err, "fk_students_email", internship.ErrUnknownUser)
+	return rb.Done()
 }
 
 //SkipStudent indicates if it is not required for the student to get an internship (an abandom typically)

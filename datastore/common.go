@@ -42,3 +42,15 @@ func violated(got error, cstr string) bool {
 	}
 	return false
 }
+
+func violationAsErr(got error, cstr string, with error) error {
+	if got == nil {
+		return got
+	}
+	if e, ok := got.(*pq.Error); ok {
+		if e.Constraint == cstr {
+			return with
+		}
+	}
+	return got
+}
