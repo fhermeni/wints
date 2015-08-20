@@ -32,45 +32,48 @@ function sortByMajor(a, b) {
 }
 
 function showDefenses() {
-	users(function(data) {
-		teachers = [];
-		data.filter(function(u) {
-			if (u.Role != 0) {
-				teachers.push(u);
-			}
-		});
-		students = interns.slice()
-		students.sort(sortByMajor);
-		defenses(function(defs) {
-			var html = Handlebars.getTemplate("defense-editor")();
-			var root = $("#cnt");
-			root.html(html);
-
-			//prepare the modal
-			var html = Handlebars.getTemplate("defenseSessionEditor")({
-				Room: "TBA"
+	internships(function(all) {
+		interns = all;
+		users(function(data) {
+			teachers = [];
+			data.filter(function(u) {
+				if (u.Role != 0) {
+					teachers.push(u);
+				}
 			});
-			$('.date').datetimepicker();
-			root.find(".date").datepicker({
-				format: 'd M yyyy',
-				autoclose: true,
-				minViewMode: 0,
-				weekStart: 1
-			}).on("changeDate", function(e) {
-				setDefenseDay(id, e.date)
-			})
-			var root = $("#modal");
-			root.html(html)
-			load(defs)
+			students = interns.slice()
 			students.sort(sortByMajor);
-			$('#student-selecter').html(Handlebars.helpers.studentSelecter(students).string)
-			$("#cnt").find("ul.students").sortable({
-				connectWith: "sortable"
-			}).bind('sortupdate', updateSessionOrder);
-			if (active) {
-				$('#jury-selecter').html(Handlebars.helpers.jurySelecter(availableTeachers(active)).string)
-			}
-		})
+			defenses(function(defs) {
+				var html = Handlebars.getTemplate("defense-editor")();
+				var root = $("#cnt");
+				root.html(html);
+
+				//prepare the modal
+				var html = Handlebars.getTemplate("defenseSessionEditor")({
+					Room: "TBA"
+				});
+				$('.date').datetimepicker();
+				root.find(".date").datepicker({
+					format: 'd M yyyy',
+					autoclose: true,
+					minViewMode: 0,
+					weekStart: 1
+				}).on("changeDate", function(e) {
+					setDefenseDay(id, e.date)
+				})
+				var root = $("#modal");
+				root.html(html)
+				load(defs)
+				students.sort(sortByMajor);
+				$('#student-selecter').html(Handlebars.helpers.studentSelecter(students).string)
+				$("#cnt").find("ul.students").sortable({
+					connectWith: "sortable"
+				}).bind('sortupdate', updateSessionOrder);
+				if (active) {
+					$('#jury-selecter').html(Handlebars.helpers.jurySelecter(availableTeachers(active)).string)
+				}
+			})
+		});
 	});
 }
 
@@ -176,7 +179,6 @@ function saveDefenseSession() {
 	if (hash(oldSession) != hash(newSession) && $("#" + hash(newSession)).length > 0) {
 		//new ID but it already exists
 		$("#room").closest(".form-group").addClass("has-error");
-		console.log("no way")
 		return
 	}
 	$("#room").closest(".form-group").removeClass("has-error");
@@ -188,8 +190,7 @@ function saveDefenseSession() {
 		rmSession(oldSession)
 		drawSession(newSession)
 	} else {
-		console.log("new stuff")
-			//Just the room change,         
+		//Just the room change,         
 		var d = $("#" + active);
 		d.find(".room").html(newRoom)
 		d.find(".date").html(newDate.format("D MMM - HH:mm"))
@@ -289,7 +290,7 @@ function drawStudent(em) {
 	if (def.Private) {
 		glyphPrivate = "glyphicon-eye-close text-danger"
 	}
-	var html = "<li>" +
+	var html = "<li data-email='" + em + "'>" +
 		"<input type='checkbox' data-email='" + em + "'>" +
 		" <a class='fn' onclick='showInternship(\"" + em + "\")'>" + Handlebars.helpers.abbrvFullname(i.Student) + " (" + i.Major + ")</a>" +
 		" <i class='glyphicon " + glyphRemote + "' onclick='toggleRemote(this, \"" + em + "\")'></i> <i class='glyphicon " + glyphPrivate + "' onclick='togglePrivate(this,\"" + em + "\")'></i>" +
@@ -411,28 +412,42 @@ function availableTeachers(sid) {
 function save() {
 	ss = [];
 	defenseSessions.forEach(function(session) {
-		s = {
-			Room: session.Room,
-			Date: session.Date.toDate(),
-			Defenses: [],
-			Juries: []
-		}
-		session.Juries.forEach(function(j) {
-			s.Juries.push({
-					Email: j
-				}) //Only the email is usefull
-		})
-		session.Students.forEach(function(stu) {
-			if (stu) {
-				d = allDefenses[stu]
-				d["Student"] = {
-					Email: stu
-				}
-				s.Defenses.push(d)
+			s = {
+				Room: session.Room,
+				Date: session.Date.toDate(),
+				Defenses: [],
+				Juries: []
 			}
+			session.Juries.forEach(function(j) {
+				s.Juries.push({
+						Email: j
+					}) //Only the email is usefull
+			})
+			var h = hash(session)
+			$("#" + h + " .students li").each(function(i, stu) {
+					var em = $(stu).data("email")
+					if (em) {
+						d = allDefenses[em]
+						d["Offset"] = i
+						d["Student"] = {
+							Email: em
+						}
+						s.Defenses.push(d)
+					}
+				})
+				/*session.Students.forEach(function(stu) {
+					if (stu) {
+						d = allDefenses[stu]
+						d["Student"] = {
+							Email: stu
+						}
+						s.Defenses.push(d)
+					}
+				})*/
+			ss.push(s)
 		})
-		ss.push(s)
-	})
+		//console.log(ss)
+		//debugger
 	postDefenses(ss)
 }
 
