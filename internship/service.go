@@ -53,7 +53,7 @@ type Service interface {
 
 	//Create a new user
 	//Returns the resulting password
-	NewTutor(p User) ([]byte, error)
+	AddUser(p User) error
 
 	//Delete the user if it is not tutoring anyone
 	RmUser(email string) error

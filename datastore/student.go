@@ -76,12 +76,12 @@ func (s *Service) Students() ([]internship.Student, error) {
 }*/
 
 func (s *Service) AddStudent(st internship.Student) error {
-	rb := newRollbackable(s.DB)
-	rb.err = s.addUser(rb.tx, st.User)
-	rb.Exec(InsertStudent, st.Major, st.Promotion, st.Skip, st.Alumni.Contact, st.Alumni.Position)
-	rb.err = violationAsErr(rb.err, "pk_students_email", internship.ErrStudentExists)
-	rb.err = violationAsErr(rb.err, "fk_students_email", internship.ErrUnknownUser)
-	return rb.Done()
+	tx := newTxErr(s.DB)
+	s.addUser(tx, st.User)
+	tx.Exec(InsertStudent, st.Major, st.Promotion, st.Skip, st.Alumni.Contact, st.Alumni.Position)
+	tx.err = violationAsErr(tx.err, "pk_students_email", internship.ErrStudentExists)
+	tx.err = violationAsErr(tx.err, "fk_students_email", internship.ErrUnknownUser)
+	return tx.Done()
 }
 
 //SkipStudent indicates if it is not required for the student to get an internship (an abandom typically)
