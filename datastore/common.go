@@ -2,7 +2,6 @@ package datastore
 
 import (
 	"crypto/rand"
-	"database/sql"
 	"time"
 
 	"github.com/lib/pq"
@@ -23,24 +22,6 @@ func nullableTime(t pq.NullTime) *time.Time {
 		return &t.Time
 	}
 	return nil
-}
-
-func rollback(e error, tx *sql.Tx) error {
-	err := tx.Rollback()
-	if err != nil {
-		return err
-	}
-	return e
-}
-
-func violated(got error, cstr string) bool {
-	if got == nil {
-		return false
-	}
-	if e, ok := got.(*pq.Error); ok {
-		return e.Constraint == cstr
-	}
-	return false
 }
 
 func violationAsErr(got error, cstr string, with error) error {
