@@ -58,7 +58,7 @@ type Service interface {
 	NewConvention(c Convention) error
 	Conventions() ([]Convention, error)
 	//I don't manage it
-	SkipConvention(student string, skip bool) error
+	SkippableConvention(student string, skip bool) error
 
 	//Turns the convention to an internship
 	//align student & tutor. Tutor must exists. Send student credentials, instantiate reports, surveys
@@ -97,6 +97,8 @@ type Service interface {
 	DefenseSession(student string) (DefenseSession, error)
 	//SetDefenseGrade Set the grade for a given defense
 	SetDefenseGrade(student string, g int) error
+	SetDefensePrivacy(student string, private bool) error
+	SetDefenseLocality(student string, local bool) error
 }
 
 var (

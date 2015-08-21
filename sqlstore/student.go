@@ -3,6 +3,7 @@ package sqlstore
 import (
 	"encoding/csv"
 	"io"
+	"strconv"
 	"strings"
 
 	"github.com/fhermeni/wints/internship"
@@ -10,8 +11,8 @@ import (
 )
 
 var (
-	AllStudents     = "select firstname, lastname, email, tel, role, lastVisit, promotion, major, nextPosition, nextContact, skip from students inner join users on (students.email=users.email)"
-	InsertStudent   = "insert into students(major, promotion, skip, nextContact, nextPosition) values ($1,$2,$3,$4,$5)"
+	AllStudents     = "select male, firstname, lastname, email, tel, role, lastVisit, promotion, major, nextPosition, nextContact, skip from students inner join users on (students.email=users.email)"
+	InsertStudent   = "insert into students(male, major, promotion, skip, nextContact, nextPosition) values ($1,$2,$3,$4,$5,$6)"
 	SkipStudent     = "update students set skip=$2 where email=$1"
 	SetPromotion    = "update students set promotion=$2 where email=$1"
 	SetMajor        = "update students set major=$2 where email=$1"
@@ -37,6 +38,7 @@ func (s *Service) Students() ([]internship.Student, error) {
 			Alumni: internship.Alumni{},
 		}
 		rows.Scan(
+			&s.Male,
 			&s.User.Person.Firstname,
 			&s.User.Person.Lastname,
 			&s.User.Person.Email,
@@ -62,7 +64,7 @@ func (s *Service) Students() ([]internship.Student, error) {
 func (s *Service) AddStudent(st internship.Student) error {
 	tx := newTxErr(s.DB)
 	s.addUser(tx, st.User)
-	tx.Exec(InsertStudent, st.Major, st.Promotion, st.Skip, st.Alumni.Contact, st.Alumni.Position)
+	tx.Exec(InsertStudent, st.Male, st.Major, st.Promotion, st.Skip, st.Alumni.Contact, st.Alumni.Position)
 	return tx.Done()
 }
 
@@ -84,8 +86,12 @@ func (s *Service) InsertStudents(file string) error {
 		if e2 == io.EOF {
 			break
 		}
-		fn := record[1]
+		male, err := strconv.ParseBool(record[0])
+		if err != nil {
+			male = true
+		}
 		ln := record[0]
+		fn := record[1]
 		email := record[2]
 		p := record[3]
 		major := record[4]
@@ -106,6 +112,7 @@ func (s *Service) InsertStudents(file string) error {
 				Contact:  "", //Not available
 				Position: 0,  //Not available
 			},
+			Male: male,
 		}
 		e2 = s.AddStudent(st)
 	}

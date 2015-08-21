@@ -57,6 +57,7 @@ type Student struct {
 	Major     string
 	Alumni    Alumni
 	Skip      bool
+	Male      bool
 }
 
 //Fullname provides the user fullname, starting with its firstname

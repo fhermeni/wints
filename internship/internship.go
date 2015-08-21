@@ -11,7 +11,6 @@ type Company struct {
 }
 
 type Convention struct {
-	Male       bool
 	Creation   time.Time
 	Student    Student
 	Tutor      User

@@ -1,5 +1,20 @@
 package sqlstore
 
+import "github.com/fhermeni/wints/internship"
+
+var (
+	updateDefensePrivacy  = "update defenses set private=$1 where student=$2"
+	updateDefenseLocality = "update defenses set local=$1 where student=$2"
+)
+
+func (s *Service) SetDefensePrivacy(student string, private bool) error {
+	return s.singleUpdate(updateDefensePrivacy, internship.ErrUnknownStudent, private, student)
+}
+
+func (s *Service) SetDefenseLocality(student string, local bool) error {
+	return s.singleUpdate(updateDefenseLocality, internship.ErrUnknownStudent, local, student)
+}
+
 /*
 var JuriesStmt *sql.Stmt
 var JuryUsersStmt *sql.Stmt

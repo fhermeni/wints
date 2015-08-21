@@ -1,5 +1,44 @@
 package sqlstore
 
+import (
+	"time"
+
+	"github.com/fhermeni/wints/internship"
+)
+
+var (
+	UpdateConventionSkip = "update conventions set skip=$1 where student=$2"
+	updateSupervisor     = "update conventions set supervisorFn=$1, supervisorLn=$2, supervisorTel=$3, supervisorEmail=$4 where student=$5"
+	updateTutor          = "update conventions set tutor=$1 where student=$2"
+	updateCompany        = "update conventions set companyWWW=$1, company=$2 where student=$3"
+	updateTitle          = "update conventions set title=$1 where student=$2"
+)
+
+func (s *Service) SkippableConvention(student string, skip bool) error {
+	return s.singleUpdate(UpdateConventionSkip, internship.ErrUnknownStudent, skip, student)
+}
+
+func (s *Service) SetSupervisor(stu string, t internship.Person) error {
+	return s.singleUpdate(updateSupervisor, internship.ErrUnknownInternship, t.Firstname, t.Lastname, t.Tel, t.Email, stu)
+}
+
+func (s *Service) SetTutor(stu string, t string) error {
+	return s.singleUpdate(updateTutor, internship.ErrUnknownInternship, t, stu)
+}
+
+func (s *Service) SetCompany(stu string, c internship.Company) error {
+	return s.singleUpdate(updateCompany, internship.ErrUnknownInternship, c.WWW, c.Name, stu)
+}
+
+func (s *Service) SetTitle(stu string, title string) error {
+	return s.singleUpdate(updateTutor, internship.ErrUnknownInternship, title, stu)
+}
+
+//New convention, the student and the tutor must already be registrered
+func (s *Service) NewConvention(student, tutor string, creation time.Time, sup internship.Person, cpy internship.Company, begin, end time.Time, title string, foreign, lab bool, gratification int) {
+
+}
+
 /*
 func (srv *Service) NewConvention(c internship.Convention) error {
 	sql := "insert into conventions(male, creation, studentEmail, studentFn, studentLn, studentTel, promotion, tutorEmail, tutorFn, tutorLn, tutorTel, supervisorEmail, supervisorFn, supervisorLn, supervisorTel, startTime, endTime, title, company, companyWWW, skip, gratification, foreignCountry, lab) values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24)"

@@ -122,7 +122,7 @@ create table defenses(
     student text,
     grade integer,
     private bool,
-    remote bool,
+    local bool,
     constraint pk_defenses_student PRIMARY KEY(student),
     constraint fk_defenses_student FOREIGN KEY(student) REFERENCES students(email) on delete cascade on update cascade,
     constraint fk_defenses_session FOREIGN KEY(date, room) REFERENCES defenseSessions(date, room) on delete cascade on update cascade
