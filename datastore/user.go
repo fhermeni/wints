@@ -1,7 +1,6 @@
 package datastore
 
 import (
-	"database/sql"
 	"errors"
 	"strings"
 	"time"
@@ -32,7 +31,6 @@ var (
 //Every strings are turned into their lower case version
 func (s *Service) addUser(tx TxErr, u internship.User) {
 	tx.Exec(AddUser, strings.ToLower(u.Firstname), strings.ToLower(u.Lastname), u.Tel, strings.ToLower(u.Email), randomBytes(32), u.Role)
-	tx.err = violationAsErr(tx.err, "pk_email", internship.ErrUserExists)
 }
 
 //Visit writes the current time for the given user
@@ -91,32 +89,20 @@ func (s *Service) Logout(email string) error {
 func (s *Service) SetPassword(email string, oldP, newP []byte) error {
 	//Get the password
 	var p []byte
-	st, err := s.stmt(SelectPassword)
-	if err != nil {
-		return err
-	}
-
 	hash, err := bcrypt.GenerateFromPassword(newP, bcrypt.MinCost)
 	if err != nil {
 		return err
 	}
 
-	if err := st.QueryRow(email).Scan(&p); err != nil {
-		if err == sql.ErrNoRows {
-			return internship.ErrCredentials //hide unknown user
-		}
-		return err
-	}
-	if bcrypt.CompareHashAndPassword(p, oldP) != nil {
-		return internship.ErrCredentials
-	}
-
 	tx := newTxErr(s.DB)
-	tx.Exec(DeletePasswordRenewalRequest, email)
-	nb := tx.Update(UpdateUserPassword, email, hash)
-	if tx.err == nil && nb != 1 {
-		tx.err = internship.ErrUnknownUser
+	tx.err = tx.tx.QueryRow(SelectPassword, email).Scan(&p)
+	tx.err = noRowsTo(tx.err, internship.ErrCredentials)
+	if bcrypt.CompareHashAndPassword(p, oldP) != nil {
+		tx.err = internship.ErrCredentials
 	}
+	tx.Exec(DeletePasswordRenewalRequest, email)
+	tx.Update(UpdateUserPassword, email, hash)
+	//no need to check update, we know the user exists in the transaction context
 	return tx.Done()
 }
 
@@ -128,12 +114,9 @@ func (s *Service) OpenedSession(email, token string) error {
 		return err
 	}
 	err = st.QueryRow(email, token).Scan(&last)
+	err = noRowsTo(err, internship.ErrCredentials)
 	if err != nil {
-		if err == sql.ErrNoRows {
-			return internship.ErrCredentials
-		}
 		return err
-
 	}
 	if time.Now().After(last) {
 		return internship.ErrSessionExpired
@@ -151,7 +134,6 @@ func (s *Service) ResetPassword(email string) ([]byte, error) {
 	tx := newTxErr(s.DB)
 	tx.Exec(DeletePasswordRenewalRequest, email)
 	tx.Exec(StartPasswordRenewall, email, token, d)
-	tx.err = violationAsErr(tx.err, "fk_password_renewal_email", internship.ErrUnknownUser)
 	return token, tx.Done()
 }
 
@@ -160,20 +142,19 @@ func (s *Service) ResetPassword(email string) ([]byte, error) {
 func (s *Service) NewPassword(token, newP []byte) (string, error) {
 	//Delete possible renew requests
 	var email string
-	err := s.DB.QueryRow(EmailFromRenewableToken, token).Scan(&email)
-	if err != nil {
-		return "", internship.ErrNoPendingRequests
+	tx := newTxErr(s.DB)
+	tx.err = tx.tx.QueryRow(EmailFromRenewableToken, token).Scan(&email)
+	tx.err = noRowsTo(tx.err, internship.ErrNoPendingRequests)
+	if tx.err != nil {
+		return "", tx.Done()
 	}
 	//Make the new one
 	hash, err := hash(newP)
 	if err != nil {
 		return "", err
 	}
-	tx := newTxErr(s.DB)
-	nb := tx.Update(UpdateUserPassword, email, hash)
-	if nb != 1 && tx.err == nil {
-		tx.err = internship.ErrUnknownUser
-	}
+	tx.Update(UpdateUserPassword, email, hash)
+	//no need to check updated rows as it is sure the user exists in the tx context
 	tx.Exec(DeletePasswordRenewalRequest, token)
 	return email, tx.Done()
 }

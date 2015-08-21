@@ -74,10 +74,7 @@ func (s *Service) SetReportContent(kind, email string, cnt []byte) error {
 	var delivery, reviewed pq.NullTime
 	tx := newTxErr(s.DB)
 	tx.err = tx.tx.QueryRow(SelectReport, email, kind).Scan(&deadline, &delivery, &reviewed)
-	tx.err = violationAsErr(tx.err, "fk_surveys_student", internship.ErrUnknownUser)
-	if tx.err == sql.ErrNoRows {
-		tx.err = internship.ErrUnknownReport
-	}
+	tx.err = noRowsTo(tx.err, internship.ErrUnknownReport)
 	if tx.err != nil {
 		return tx.Done()
 	}

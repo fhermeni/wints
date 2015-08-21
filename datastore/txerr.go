@@ -19,7 +19,11 @@ func newTxErr(db *sql.DB) TxErr {
 //It is committed if err == nil. Rollbacked otherwise.
 func (r *TxErr) Done() error {
 	if r.err != nil {
-		return r.tx.Rollback()
+		if err := r.tx.Rollback(); err != nil {
+			return err
+		}
+		return r.err
+
 	}
 	return r.tx.Commit()
 }
@@ -29,9 +33,8 @@ func (r *TxErr) Exec(query string, args ...interface{}) {
 	if r.err != nil {
 		return
 	}
-	_, err := r.tx.Exec(query, args...)
-	if err != nil {
-		r.err = err
+	if _, err := r.tx.Exec(query, args...); err != nil {
+		r.err = mapCstrToError(err)
 	}
 }
 
@@ -43,7 +46,7 @@ func (r *TxErr) Update(query string, args ...interface{}) int64 {
 	}
 	res, err := r.tx.Exec(query, args...)
 	if err != nil {
-		r.err = err
+		r.err = mapCstrToError(err)
 		return -1
 	}
 	nb, err := res.RowsAffected()

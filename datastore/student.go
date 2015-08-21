@@ -58,8 +58,6 @@ func (s *Service) AddStudent(st internship.Student) error {
 	tx := newTxErr(s.DB)
 	s.addUser(tx, st.User)
 	tx.Exec(InsertStudent, st.Major, st.Promotion, st.Skip, st.Alumni.Contact, st.Alumni.Position)
-	tx.err = violationAsErr(tx.err, "pk_students_email", internship.ErrStudentExists)
-	tx.err = violationAsErr(tx.err, "fk_students_email", internship.ErrUnknownUser)
 	return tx.Done()
 }
 
