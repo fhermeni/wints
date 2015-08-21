@@ -54,27 +54,6 @@ func (s *Service) Students() ([]internship.Student, error) {
 
 //AddStudent add a student to the database.
 //The underlying user is declared in prior with a random password
-/*func (s *Service) AddStudent(st internship.Student) error {
-	tx, err := s.DB.Begin()
-	if err != nil {
-		return err
-	}
-	if err := s.addUser(tx, st.User); err != nil {
-		return rollback(err, tx)
-	}
-	_, err = tx.Exec(InsertStudent, st.Major, st.Promotion, st.Skip, st.Alumni.Contact, st.Alumni.Position)
-	if violated(err, "pk_students_email") {
-		return rollback(internship.ErrStudentExists, tx)
-	}
-	if violated(err, "fk_students_email") {
-		return rollback(internship.ErrUnknownUser, tx)
-	}
-	if err != nil {
-		return rollback(err, tx)
-	}
-	return tx.Commit()
-}*/
-
 func (s *Service) AddStudent(st internship.Student) error {
 	tx := newTxErr(s.DB)
 	s.addUser(tx, st.User)

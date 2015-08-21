@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"database/sql"
+	"errors"
 	"strings"
 	"time"
 
@@ -13,19 +14,18 @@ import (
 
 var (
 	AddUser                      = "insert into users(firstname, lastname, tel, email, password, role) values ($1,$2,$3,$4,$5,$6)"
+	StartPasswordRenewall        = "insert into password_renewal(email,token,deadline) values($1,$2,$3)"
+	NewSession                   = "insert into sessions(email, token, expire) values ($1,$2,$3)"
 	UpdateLastVisit              = "update users set lastVisit=$1 where email=$2"
-	AllUsers                     = "select firstname, lastname, email, tel, role, lastVisit from users"
 	UpdateUserProfile            = "update users set firstname=$1, lastname=$2, tel=$3 where email=$4"
 	UpdateUserRole               = "update users set role=$2 where email=$1"
-	DeleteSession                = "delete from sessions where email=$1"
-	SelectPassword               = "select password from users where email=$1"
-	DeletePasswordRenewalRequest = "delete from password_renewal where user=$1"
 	UpdateUserPassword           = "update users set password=$2 where email=$1"
+	DeleteSession                = "delete from sessions where email=$1"
+	DeletePasswordRenewalRequest = "delete from password_renewal where user=$1"
+	AllUsers                     = "select firstname, lastname, email, tel, role, lastVisit from users"
+	SelectPassword               = "select password from users where email=$1"
 	SelectExpire                 = "select expire from sessions where email=$1 and token=$2"
-	StartPasswordRenewall        = "insert into password_renewal(email,token,deadline) values($1,$2,$3)"
-	NewPasswordReq               = "update users set password=$2 where email=$1"
 	EmailFromRenewableToken      = "select email from password_renewal where token=$1"
-	NewSession                   = "insert into sessions(email, token, expire) values ($1,$2,$3)"
 )
 
 //addUser add the given user.
@@ -170,7 +170,7 @@ func (s *Service) NewPassword(token, newP []byte) (string, error) {
 		return "", err
 	}
 	tx := newTxErr(s.DB)
-	nb := tx.Update(NewPasswordReq, email, hash)
+	nb := tx.Update(UpdateUserPassword, email, hash)
 	if nb != 1 && tx.err == nil {
 		tx.err = internship.ErrUnknownUser
 	}
@@ -206,14 +206,12 @@ func (s *Service) AddUser(u internship.User) error {
 	return tx.Done()
 }
 
-/*
 func (s *Service) RmUser(email string) error {
-	err := SingleUpdate(s.DB, internship.ErrUnknownUser, "DELETE FROM users where email=$1", email)
+	/*err := SingleUpdate(s.DB, internship.ErrUnknownUser, "DELETE FROM users where email=$1", email)
 	if e, ok := err.(*pq.Error); ok {
 		if e.Constraint == "internships_tutor_fkey" {
 			return internship.ErrUserTutoring
 		}
-	}
-	return err
+	}*/
+	return errors.New("Unsupported")
 }
-*/

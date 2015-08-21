@@ -9,6 +9,40 @@ import (
 //Service specifies the core methods to manage student internships
 type Service interface {
 
+	//Create a new user
+	//Returns the resulting password
+	AddUser(p User) error
+
+	//Delete the user if it is not tutoring anyone
+	RmUser(email string) error
+
+	//List the users
+	Users() ([]User, error)
+
+	Visit(u string) error
+	//Change the user password
+	SetPassword(email string, oldP, newP []byte) error
+	//Change user profile
+	SetUserProfile(email, fn, ln, tel string) error
+
+	//Change user role
+	SetUserRole(email string, priv Privilege) error
+
+	//Test if the credentials match a user, return a session token
+	Login(email string, password []byte) ([]byte, error)
+	//Destroy a session
+	Logout(email, token string) error
+
+	//Check if a session is opened for a given user and token
+	OpenedSession(email, token string) error
+
+	//Ask for a password reset.
+	//Return a token used to declare the new password (see NewPassword)
+	ResetPassword(email string) ([]byte, error)
+
+	//Declare the new password using an authentication token
+	NewPassword(token, newP []byte) (string, error)
+
 	//Students that have to make an internship
 	InsertStudents(csv string) error
 	AddStudent(s Student) error
@@ -38,55 +72,16 @@ type Service interface {
 	SetCompany(stu string, c Company) error
 	SetTitle(stu string, title string) error
 
-	//Get the possible majors
-	Majors() []string
-
-	//User management
-
-	//Test if the credentials match a user, return a session token
-	Login(email string, password []byte) ([]byte, error)
-	//Destroy a session
-	Logout(email, token string) error
-
-	//Check if a session is opened for a given user and token
-	OpenedSession(email, token string) error
-
-	//Create a new user
-	//Returns the resulting password
-	AddUser(p User) error
-
-	//Delete the user if it is not tutoring anyone
-	RmUser(email string) error
-
-	//List the users
-	Users() ([]User, error)
-
-	Visit(u string) error
-	//Change the user password
-	SetPassword(email string, oldP, newP []byte) error
-	//Change user profile
-	SetUserProfile(email, fn, ln, tel string) error
-
-	//Change user role
-	SetUserRole(email string, priv Privilege) error
-
-	//Ask for a password reset.
-	//Return a token used to declare the new password (see NewPassword)
-	ResetPassword(email string) ([]byte, error)
-
-	//Declare the new password using an authentication token
-	NewPassword(token, newP []byte) (string, error)
-
 	//Reports management
 
-	PlanReport(student string, r ReportHeader) error
-	ReportDefs() []ReportDef
+	//PlanReport(student string, r ReportHeader) error
+	//ReportDefs() []ReportDef
 	Report(kind, email string) (ReportHeader, error)
 	ReportContent(kind, email string) ([]byte, error)
 	SetReportContent(kind, email string, cnt []byte) error
 	SetReportGrade(kind, email string, r int, comment string) error
 	SetReportDeadline(kind, email string, t time.Time) error
-	SetReportPrivate(kind, email string, p bool) error
+	SetReportPrivacy(kind, email string, p bool) error
 
 	//Survey management
 	SurveyToken(kind string) (string, string, error)
