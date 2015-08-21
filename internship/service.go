@@ -87,8 +87,8 @@ type Service interface {
 	SurveyToken(kind string) (string, string, error)
 	Survey(student, kind string) (Survey, error)
 	SetSurveyContent(token string, cnt map[string]string) error
-	SurveyDefs() []SurveyDef
-	RequestSurvey(stu, kind string) error
+	//SurveyDefs() []SurveyDef
+	//RequestSurvey(stu, kind string) error
 
 	//DefenseSessions returns all the registered defense sessions
 	DefenseSessions() ([]DefenseSession, error)

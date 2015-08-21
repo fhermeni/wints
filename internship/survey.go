@@ -33,6 +33,7 @@ func (def *SurveyDef) Instantiate(from time.Time) (time.Time, error) {
 
 //SurveyHeader provides the metadata associated to a student survey
 type Survey struct {
+	Kind string
 	//The deadline to submit
 	Deadline time.Time
 	//The moment the survey was committed
