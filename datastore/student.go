@@ -30,12 +30,17 @@ func (s *Service) Students() ([]internship.Student, error) {
 	defer rows.Close()
 	for rows.Next() {
 		var lastVisit pq.NullTime
-		s := internship.Student{User: internship.User{}, Alumni: internship.Alumni{}}
+		s := internship.Student{
+			User: internship.User{
+				Person: internship.Person{},
+			},
+			Alumni: internship.Alumni{},
+		}
 		rows.Scan(
-			&s.User.Firstname,
-			&s.User.Lastname,
-			&s.User.Email,
-			&s.User.Tel,
+			&s.User.Person.Firstname,
+			&s.User.Person.Lastname,
+			&s.User.Person.Email,
+			&s.User.Person.Tel,
 			&s.User.Role,
 			&lastVisit,
 			&s.Promotion,
@@ -86,11 +91,13 @@ func (s *Service) InsertStudents(file string) error {
 		major := record[4]
 		st := internship.Student{
 			User: internship.User{
-				Firstname: fn,
-				Lastname:  ln,
-				Email:     email,
-				Tel:       "not available",
-				Role:      internship.STUDENT,
+				Person: internship.Person{
+					Firstname: fn,
+					Lastname:  ln,
+					Email:     email,
+					Tel:       "not available",
+				},
+				Role: internship.STUDENT,
 			},
 			Promotion: p,
 			Major:     major,

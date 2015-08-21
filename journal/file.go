@@ -39,7 +39,7 @@ func FileBacked(p string) (*File, error) {
 //UserLog stores the event emitted by a logged user into the file.
 func (f *File) UserLog(u internship.User, msg string, err error) {
 	go func() {
-		f.log(EventLog, "[%s] %s (%s) - %s: %s\n", time.Now().Format(TimeFmt), u.Email, u.Role.String(), msg, status(err))
+		f.log(EventLog, "[%s] %s (%s) - %s: %s\n", time.Now().Format(TimeFmt), u.Person.Email, u.Role.String(), msg, status(err))
 	}()
 }
 

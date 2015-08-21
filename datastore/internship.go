@@ -1,10 +1,31 @@
 package datastore
 
-/*
-var ReportSelectStmt *sql.Stmt
-var SurveySelectStmt *sql.Stmt
-var InternshipStmt *sql.Stmt
+import "github.com/fhermeni/wints/internship"
 
+var (
+	updateSupervisor = "update internships set supervisorFn=$1, supervisorLn=$2, supervisorTel=$3, supervisorEmail=$4 where student=$5"
+	updateTutor      = "update internships set tutor=$1 where student=$2"
+	updateCompany    = "update internships set companyWWW=$1, company=$2 where student=$3"
+	updateTitle      = "update internships set title=$1 where student=$2"
+)
+
+func (s *Service) SetSupervisor(stu string, t internship.Person) error {
+	return s.singleUpdate(updateSupervisor, internship.ErrUnknownInternship, t.Firstname, t.Lastname, t.Tel, t.Email, stu)
+}
+
+func (s *Service) SetTutor(stu string, t string) error {
+	return s.singleUpdate(updateTutor, internship.ErrUnknownInternship, t, stu)
+}
+
+func (s *Service) SetCompany(stu string, c internship.Company) error {
+	return s.singleUpdate(updateCompany, internship.ErrUnknownInternship, c.WWW, c.Name, stu)
+}
+
+func (s *Service) SetTitle(stu string, title string) error {
+	return s.singleUpdate(updateTutor, internship.ErrUnknownInternship, title, stu)
+}
+
+/*
 func rollback(e error, tx *sql.Tx) error {
 	err := tx.Rollback()
 	if err != nil {
@@ -96,26 +117,6 @@ func (srv *Service) InstallSurveys(i internship.Internship) error {
 		}
 	}
 	return nil
-}
-
-func (srv *Service) SetSupervisor(stu string, t internship.Person) error {
-	sql := "update internships set supervisorFn=$1, supervisorLn=$2, supervisorTel=$3, supervisorEmail=$4 where student=$5"
-	return SingleUpdate(srv.DB, internship.ErrUnknownInternship, sql, t.Firstname, t.Lastname, t.Tel, t.Email, stu)
-}
-
-func (srv *Service) SetTutor(stu string, t string) error {
-	sql := "update internships set tutor=$1 where student=$2"
-	return SingleUpdate(srv.DB, internship.ErrUnknownInternship, sql, t, stu)
-}
-
-func (srv *Service) SetCompany(stu string, c internship.Company) error {
-	sql := "update internships set companyWWW=$1, company=$2 where student=$3"
-	return SingleUpdate(srv.DB, internship.ErrUnknownInternship, sql, c.WWW, c.Name, stu)
-}
-
-func (srv *Service) SetTitle(stu string, title string) error {
-	sql := "update internships set title=$1 where student=$2"
-	return SingleUpdate(srv.DB, internship.ErrUnknownInternship, sql, title, stu)
 }
 
 func (srv *Service) Majors() []string {

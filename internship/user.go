@@ -30,12 +30,17 @@ func (p Privilege) String() string {
 	return Privileges[p]
 }
 
-//User just gather informations to contact someone. He may have an account on the platform
-type User struct {
+//Person just gathers contact information for someone.
+type Person struct {
 	Firstname string
 	Lastname  string
 	Email     string
 	Tel       string
+}
+
+//User is a person with an account on the platform
+type User struct {
+	Person    Person
 	Role      Privilege
 	LastVisit *time.Time `,json:"omitempty"`
 }
@@ -54,12 +59,22 @@ type Student struct {
 	Skip      bool
 }
 
-//Returns the user fullname plus the email in parenthesis
-func (p User) String() string {
-	return p.Fullname() + " (" + p.Email + ")"
+//Fullname provides the user fullname, starting with its firstname
+func (p Person) Fullname() string {
+	return strings.Title(p.Firstname) + " " + strings.Title(p.Lastname)
 }
 
-//Fullname provides the user fullname, starting with its firstname
-func (p User) Fullname() string {
-	return strings.Title(p.Firstname) + " " + strings.Title(p.Lastname)
+//String just pretty the user email
+func (p Person) String() string {
+	return p.Email
+}
+
+//String justs delegates to Person.String()
+func (u User) String() string {
+	return u.Person.String()
+}
+
+//Fullname justs delegates to Person.String()
+func (U User) Fullname() string {
+	return U.Person.Fullname()
 }

@@ -15,7 +15,7 @@ type Convention struct {
 	Creation   time.Time
 	Student    Student
 	Tutor      User
-	Supervisor User
+	Supervisor Person
 	Cpy        Company
 	Begin      time.Time
 	End        time.Time

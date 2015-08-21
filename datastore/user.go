@@ -13,8 +13,8 @@ import (
 
 var (
 	AddUser                      = "insert into users(firstname, lastname, tel, email, password, role) values ($1,$2,$3,$4,$5,$6)"
-	StartPasswordRenewall        = "insert into password_renewal(email,token,deadline) values($1,$2,$3)"
-	NewSession                   = "insert into sessions(email, token, expire) values ($1,$2,$3)"
+	startPasswordRenewall        = "insert into password_renewal(email,token,deadline) values($1,$2,$3)"
+	newSession                   = "insert into sessions(email, token, expire) values ($1,$2,$3)"
 	UpdateLastVisit              = "update users set lastVisit=$1 where email=$2"
 	UpdateUserProfile            = "update users set firstname=$1, lastname=$2, tel=$3 where email=$4"
 	UpdateUserRole               = "update users set role=$2 where email=$1"
@@ -22,15 +22,15 @@ var (
 	DeleteSession                = "delete from sessions where email=$1"
 	DeletePasswordRenewalRequest = "delete from password_renewal where user=$1"
 	AllUsers                     = "select firstname, lastname, email, tel, role, lastVisit from users"
-	SelectPassword               = "select password from users where email=$1"
-	SelectExpire                 = "select expire from sessions where email=$1 and token=$2"
+	selectPassword               = "select password from users where email=$1"
+	selectExpire                 = "select expire from sessions where email=$1 and token=$2"
 	EmailFromRenewableToken      = "select email from password_renewal where token=$1"
 )
 
 //addUser add the given user.
 //Every strings are turned into their lower case version
 func (s *Service) addUser(tx TxErr, u internship.User) {
-	tx.Exec(AddUser, strings.ToLower(u.Firstname), strings.ToLower(u.Lastname), u.Tel, strings.ToLower(u.Email), randomBytes(32), u.Role)
+	tx.Exec(AddUser, strings.ToLower(u.Person.Firstname), strings.ToLower(u.Person.Lastname), u.Person.Tel, strings.ToLower(u.Person.Email), randomBytes(32), u.Role)
 }
 
 //Visit writes the current time for the given user
@@ -51,13 +51,13 @@ func (s *Service) Users() ([]internship.User, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		u := internship.User{}
+		u := internship.User{Person: internship.Person{}}
 		var last pq.NullTime
 		rows.Scan(
-			&u.Firstname,
-			&u.Lastname,
-			&u.Email,
-			&u.Tel,
+			&u.Person.Firstname,
+			&u.Person.Lastname,
+			&u.Person.Email,
+			&u.Person.Tel,
 			&u.Role,
 			&last)
 		if last.Valid {
@@ -95,7 +95,7 @@ func (s *Service) SetPassword(email string, oldP, newP []byte) error {
 	}
 
 	tx := newTxErr(s.DB)
-	tx.err = tx.tx.QueryRow(SelectPassword, email).Scan(&p)
+	tx.err = tx.tx.QueryRow(selectPassword, email).Scan(&p)
 	tx.err = noRowsTo(tx.err, internship.ErrCredentials)
 	if bcrypt.CompareHashAndPassword(p, oldP) != nil {
 		tx.err = internship.ErrCredentials
@@ -109,7 +109,7 @@ func (s *Service) SetPassword(email string, oldP, newP []byte) error {
 //OpenedSession check if a session is currently open for the user and is not expired
 func (s *Service) OpenedSession(email, token string) error {
 	var last time.Time
-	st, err := s.stmt(SelectExpire)
+	st, err := s.stmt(selectExpire)
 	if err != nil {
 		return err
 	}
@@ -133,7 +133,7 @@ func (s *Service) ResetPassword(email string) ([]byte, error) {
 
 	tx := newTxErr(s.DB)
 	tx.Exec(DeletePasswordRenewalRequest, email)
-	tx.Exec(StartPasswordRenewall, email, token, d)
+	tx.Exec(startPasswordRenewall, email, token, d)
 	return token, tx.Done()
 }
 
@@ -163,7 +163,7 @@ func (s *Service) NewPassword(token, newP []byte) (string, error) {
 //Upon success, it generates a session token that will be valid for the next 24 hours.
 func (s *Service) Login(email string, password []byte) ([]byte, error) {
 	var p []byte
-	if err := s.DB.QueryRow(SelectPassword, email).Scan(&p); err != nil {
+	if err := s.DB.QueryRow(selectPassword, email).Scan(&p); err != nil {
 		return []byte{}, internship.ErrCredentials
 	}
 	if err := bcrypt.CompareHashAndPassword(p, password); err != nil {
@@ -172,7 +172,7 @@ func (s *Service) Login(email string, password []byte) ([]byte, error) {
 	tx := newTxErr(s.DB)
 	tx.Exec(DeleteSession, email)
 	token := randomBytes(32)
-	nb := tx.Update(NewSession, email, token, time.Now().Add(time.Hour*24))
+	nb := tx.Update(newSession, email, token, time.Now().Add(time.Hour*24))
 	if tx.err == nil && nb != 1 {
 		tx.err = internship.ErrUnknownUser
 	}
