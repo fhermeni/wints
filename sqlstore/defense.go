@@ -1,4 +1,4 @@
-package datastore
+package sqlstore
 
 /*
 var JuriesStmt *sql.Stmt

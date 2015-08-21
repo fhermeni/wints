@@ -1,4 +1,4 @@
-package datastore
+package sqlstore
 
 const (
 	create = `drop table if exists users cascade;

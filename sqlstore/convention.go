@@ -1,4 +1,4 @@
-package datastore
+package sqlstore
 
 /*
 func (srv *Service) NewConvention(c internship.Convention) error {

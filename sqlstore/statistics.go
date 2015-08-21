@@ -1,4 +1,4 @@
-package datastore
+package sqlstore
 
 /*
 func (srv *Service) Statistics() ([]internship.Stat, error) {
