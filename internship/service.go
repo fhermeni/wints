@@ -43,6 +43,7 @@ type Service interface {
 	//Declare the new password using an authentication token
 	NewPassword(token, newP []byte) (string, error)
 
+	ReplaceUserWith(src, dst string) error
 	//Students that have to make an internship
 	InsertStudents(csv string) error
 	AddStudent(s Student) error
@@ -58,7 +59,7 @@ type Service interface {
 	NewConvention(c Convention) error
 	Conventions() ([]Convention, error)
 	//I don't manage it
-	SkippableConvention(student string, skip bool) error
+	SetConventionSkippable(student string, skip bool) error
 
 	//Turns the convention to an internship
 	//align student & tutor. Tutor must exists. Send student credentials, instantiate reports, surveys
@@ -103,6 +104,7 @@ type Service interface {
 
 var (
 	ErrUnknownStudent     = errors.New("Unknown student")
+	ErrUnknownConvention  = errors.New("No convention associated to this student")
 	ErrStudentExists      = errors.New("Student already exists")
 	ErrReportExists       = errors.New("Report already exists")
 	ErrUnknownReport      = errors.New("Unknown report or user")

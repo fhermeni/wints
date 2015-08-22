@@ -52,11 +52,11 @@ func (s *Service) stmt(q string) (*sql.Stmt, error) {
 func (s *Service) singleUpdate(q string, errNoUpdate error, args ...interface{}) error {
 	st, err := s.stmt(q)
 	if err != nil {
-		return err
+		return mapCstrToError(err)
 	}
 	res, err := st.Exec(args...)
 	if err != nil {
-		return err
+		return mapCstrToError(err)
 	}
 	nb, err := res.RowsAffected()
 	if err != nil {

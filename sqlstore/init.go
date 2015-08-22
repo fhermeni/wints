@@ -56,7 +56,7 @@ create table conventions(
     male boolean,
     startTime timestamp with time zone,
     endTime timeStamp with time zone,
-    tutor text, -- no references due to non validated conventions
+    tutor text,
     companyName text,
     companyWWW text,
     supervisorFn text,
@@ -72,6 +72,8 @@ create table conventions(
     valid bool,
     constraint pk_conventions_student PRIMARY KEY (student),
     constraint fk_conventions_student FOREIGN KEY (student) REFERENCES students(email) on delete cascade on update cascade
+    constraint fk_conventions_tutor FOREIGN KEY (tutor) REFERENCES users(email) on update cascade
+     -- no cascade delete for fk_conventions_tutor because we don't want to loose convention when we remove a duplicated tutor account
 );
 
 create table reports(

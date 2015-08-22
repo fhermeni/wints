@@ -1,7 +1,6 @@
 package sqlstore
 
 import (
-	"errors"
 	"strings"
 	"time"
 
@@ -21,10 +20,13 @@ var (
 	UpdateUserPassword           = "update users set password=$2 where email=$1"
 	DeleteSession                = "delete from sessions where email=$1"
 	DeletePasswordRenewalRequest = "delete from password_renewal where user=$1"
+	deleteUser                   = "DELETE FROM users where email=$1"
 	AllUsers                     = "select firstname, lastname, email, tel, role, lastVisit from users"
 	selectPassword               = "select password from users where email=$1"
 	selectExpire                 = "select expire from sessions where email=$1 and token=$2"
 	EmailFromRenewableToken      = "select email from password_renewal where token=$1"
+	replaceTutorInConventions    = "update conventions set tutor=$2 where tutor=$1"
+	replaceJuryInDefenses        = "update defenseJuries set jury=$2 where tutor=$1"
 )
 
 //addUser add the given user.
@@ -188,11 +190,14 @@ func (s *Service) AddUser(u internship.User) error {
 }
 
 func (s *Service) RmUser(email string) error {
-	/*err := SingleUpdate(s.DB, internship.ErrUnknownUser, "DELETE FROM users where email=$1", email)
-	if e, ok := err.(*pq.Error); ok {
-		if e.Constraint == "internships_tutor_fkey" {
-			return internship.ErrUserTutoring
-		}
-	}*/
-	return errors.New("Unsupported")
+	return s.singleUpdate(deleteUser, internship.ErrUnknownUser, email)
+}
+
+//Replace the account referred by src by the account referred by dst
+func (s *Service) ReplaceUserWith(src, dst string) error {
+	tx := newTxErr(s.DB)
+	tx.Update(replaceTutorInConventions, src, dst)
+	tx.Update(replaceJuryInDefenses, src, dst)
+	tx.Update(deleteUser, src)
+	return tx.Done()
 }

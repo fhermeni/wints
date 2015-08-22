@@ -7,7 +7,7 @@ import (
 
 //The different level of privileges
 const (
-	NONE Privilege = iota
+	NONE Privilege = iota //Not validated. Cannot connect
 	STUDENT
 	TUTOR
 	MAJOR

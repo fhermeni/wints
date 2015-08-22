@@ -11,18 +11,18 @@ import (
 )
 
 var (
-	AllStudents     = "select male, firstname, lastname, email, tel, role, lastVisit, promotion, major, nextPosition, nextContact, skip from students inner join users on (students.email=users.email)"
-	InsertStudent   = "insert into students(male, major, promotion, skip, nextContact, nextPosition) values ($1,$2,$3,$4,$5,$6)"
-	SkipStudent     = "update students set skip=$2 where email=$1"
-	SetPromotion    = "update students set promotion=$2 where email=$1"
-	SetMajor        = "update students set major=$2 where email=$1"
-	SetNextPosition = "update students set nextPosition=$1 where email=$2"
-	SetNextContact  = "update students set nextContact=$1 where email=$2"
+	allStudents     = "select male, firstname, lastname, email, tel, role, lastVisit, promotion, major, nextPosition, nextContact, skip from students inner join users on (students.email=users.email)"
+	insertStudent   = "insert into students(male, major, promotion, skip, nextContact, nextPosition) values ($1,$2,$3,$4,$5,$6)"
+	skipStudent     = "update students set skip=$2 where email=$1"
+	setPromotion    = "update students set promotion=$2 where email=$1"
+	setMajor        = "update students set major=$2 where email=$1"
+	setNextPosition = "update students set nextPosition=$1 where email=$2"
+	setNextContact  = "update students set nextContact=$1 where email=$2"
 )
 
 //Students list all the registered students
 func (s *Service) Students() ([]internship.Student, error) {
-	rows, err := s.DB.Query(AllStudents)
+	rows, err := s.DB.Query(allStudents)
 
 	students := make([]internship.Student, 0, 0)
 	if err != nil {
@@ -64,13 +64,13 @@ func (s *Service) Students() ([]internship.Student, error) {
 func (s *Service) AddStudent(st internship.Student) error {
 	tx := newTxErr(s.DB)
 	s.addUser(tx, st.User)
-	tx.Exec(InsertStudent, st.Male, st.Major, st.Promotion, st.Skip, st.Alumni.Contact, st.Alumni.Position)
+	tx.Exec(insertStudent, st.Male, st.Major, st.Promotion, st.Skip, st.Alumni.Contact, st.Alumni.Position)
 	return tx.Done()
 }
 
 //SkipStudent indicates if it is not required for the student to get an internship (an abandom typically)
 func (s *Service) SkipStudent(em string, st bool) error {
-	return s.singleUpdate(SkipStudent, internship.ErrUnknownUser, em, st)
+	return s.singleUpdate(skipStudent, internship.ErrUnknownUser, em, st)
 }
 
 //InsertStudents inserts all the students provided in the given CSV file.
@@ -121,17 +121,17 @@ func (s *Service) InsertStudents(file string) error {
 
 //SetPromotion updates the student promotion
 func (s *Service) SetPromotion(stu, p string) error {
-	return s.singleUpdate(SetPromotion, internship.ErrUnknownUser, stu, p)
+	return s.singleUpdate(setPromotion, internship.ErrUnknownUser, stu, p)
 }
 
 //SetMajor updates the student major
 func (s *Service) SetMajor(stu, m string) error {
-	return s.singleUpdate(SetMajor, internship.ErrUnknownUser, stu, m)
+	return s.singleUpdate(setMajor, internship.ErrUnknownUser, stu, m)
 }
 
 //SetNextPosition updates the student next position
 func (s *Service) SetNextPosition(student string, pos int) error {
-	return s.singleUpdate(SetNextPosition, internship.ErrUnknownUser, pos, student)
+	return s.singleUpdate(setNextPosition, internship.ErrUnknownUser, pos, student)
 }
 
 //SetNextContact updates the student next contact email.
@@ -140,5 +140,5 @@ func (s *Service) SetNextContact(student string, em string) error {
 	if !strings.Contains(em, "@") || strings.Contains(em, "@unice.fr") || strings.Contains(em, "polytech") {
 		return internship.ErrInvalidAlumniEmail
 	}
-	return s.singleUpdate(SetNextContact, internship.ErrUnknownUser, em, student)
+	return s.singleUpdate(setNextContact, internship.ErrUnknownUser, em, student)
 }

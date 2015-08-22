@@ -60,6 +60,8 @@ func mapCstrToError(err error) error {
 			return internship.ErrConventionExists
 		case "fk_conventions_student", "fk_reports_student", "fk_surveys_student", "fk_defenses_student":
 			return internship.ErrUnknownStudent
+		case "fk_conventions_tutor":
+			return internship.ErrUserTutoring
 		}
 	}
 	return err
