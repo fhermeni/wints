@@ -3,6 +3,7 @@ package sqlstore
 import (
 	"time"
 
+	"github.com/fhermeni/wints/config"
 	"github.com/fhermeni/wints/internship"
 )
 
@@ -24,6 +25,9 @@ var (
 		" inner join students on (students.email = conventions.student) " +
 		" inner join users as stup on (stup.email = conventions.student)  " +
 		" inner join users as tutp on (tutp.email = conventions.tutor)  "
+	insertReport       = "insert into reports(student, kind, deadline, private, toGrade) values($1,$2,$3,$4,$5)"
+	insertSurvey       = "insert into surveys(student, kind, token, deadline) values($1,$2,$3,$4)"
+	validateConvention = "update conventions set valid=$2 where student=$1"
 )
 
 func (s *Service) SetConventionSkippable(student string, skip bool) error {
@@ -144,4 +148,60 @@ func (s *Service) Conventions() ([]internship.Convention, error) {
 		conventions = append(conventions, c)
 	}
 	return conventions, nil
+}
+
+func prepareReports(tx *TxErr, student string, reports map[string]config.Report) error {
+	st, err := tx.tx.Prepare(insertReport)
+	if err != nil {
+		return err
+	}
+	for kind, report := range reports {
+		_, tx.err = st.Exec(student, kind, report.Deadline, false, report.Grade)
+	}
+	return tx.Done()
+}
+
+func prepareSurveys(tx *TxErr, student string, surveys map[string]config.Survey) error {
+	st, err := tx.tx.Prepare(insertSurvey)
+	if err != nil {
+		return err
+	}
+	for kind, survey := range surveys {
+		token := randomBytes(16)
+		_, tx.err = st.Exec(student, kind, token, survey.Deadline)
+	}
+	return tx.Done()
+}
+
+func (s *Service) ValidateConvention(student string, cfg config.Config) error {
+	tx := newTxErr(s.DB)
+	prepareReports(&tx, student, cfg.Reports)
+	prepareSurveys(&tx, student, cfg.Surveys)
+	//The prepare* makes sure there is a student. No need to check update
+	tx.Update(validateConvention, student, true)
+	return tx.Done()
+}
+
+func (s *Service) Internships() ([]internship.Internship, error) {
+	res := make([]internship.Internship, 0, 0)
+	tx := newTxErr(s.DB)
+	conventions, err := s.Conventions()
+	if err != nil {
+		return res, err
+	}
+	for _, c := range conventions {
+		i := internship.Internship{
+			Convention: c,
+		}
+		i.Reports, err = s.Reports(c.Student.User.Person.Email)
+		if err != nil {
+			return res, err
+		}
+		i.Surveys, err = s.Surveys(c.Student.User.Person.Email)
+		if err != nil {
+			return res, err
+		}
+		res = append(res, i)
+	}
+	return res, tx.Done()
 }

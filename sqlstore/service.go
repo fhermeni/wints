@@ -3,7 +3,6 @@ package sqlstore
 import (
 	"database/sql"
 
-	"github.com/fhermeni/wints/internship"
 	"github.com/fhermeni/wints/journal"
 
 	"code.google.com/p/go.crypto/bcrypt"
@@ -11,18 +10,16 @@ import (
 
 //Service allows to communicate with a database
 type Service struct {
-	DB         *sql.DB
-	reportDefs []internship.ReportDef
-	surveyDefs []internship.SurveyDef
-	majors     []string
-	j          journal.Journal
+	DB     *sql.DB
+	majors []string
+	j      journal.Journal
 	//mailer     mail.Mailer
 	stmts map[string]*sql.Stmt
 }
 
 //NewService initiate the storage servive
-func NewService(db *sql.DB, reportDefs []internship.ReportDef, surveyDefs []internship.SurveyDef, majors []string, j journal.Journal /*, m mail.Mailer*/) (*Service, error) {
-	s := Service{DB: db, reportDefs: reportDefs, surveyDefs: surveyDefs, majors: majors, j: j /*, mailer: m, */, stmts: make(map[string]*sql.Stmt)}
+func NewService(db *sql.DB, majors []string, j journal.Journal /*, m mail.Mailer*/) (*Service, error) {
+	s := Service{DB: db, majors: majors, j: j /*, mailer: m, */, stmts: make(map[string]*sql.Stmt)}
 	return &s, nil
 }
 

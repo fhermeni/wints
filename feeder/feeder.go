@@ -11,7 +11,7 @@ import (
 
 //Importer imports data into the system
 type Importer interface {
-	Import(s *internship.Service) error
+	Import(s internship.Adder) error
 }
 
 //ConventionReader interfaces the source where to read conventions

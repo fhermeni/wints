@@ -9,10 +9,6 @@ import (
 //Service specifies the core methods to manage student internships
 type Service interface {
 
-	//Create a new user
-	//Returns the resulting password
-	NewUser(fn, ln, tel, email string) error
-
 	//Delete the user if it is not tutoring anyone
 	RmUser(email string) error
 
@@ -45,10 +41,6 @@ type Service interface {
 
 	ReplaceUserWith(src, dst string) error
 
-	//Students that have to make an internship
-	//	InsertStudents(csv string) error
-	//AddStudent(s Student) error
-	ToStudent(email, major, promotion string, male bool) error
 	//Student that left ?
 	SkipStudent(em string, st bool) error
 	Students() ([]Student, error)
@@ -56,9 +48,8 @@ type Service interface {
 	SetNextPosition(student string, pos int) error
 	SetMajor(stu string, m string) error
 	SetPromotion(stu string, p string) error
+	//SetMale states a student gender
 	SetMale(stu string, male bool) error
-	//Convention inserted from outside. True if updated
-	NewConvention(student string, startTime, endTime time.Time, tutor string, cpy Company, sup Person, title string, creation time.Time, foreignCountry, lab bool, gratification int) (bool, error)
 	Conventions() ([]Convention, error)
 	SetSupervisor(stu string, sup User) error
 	SetTutor(stu string, t string) error
@@ -103,6 +94,25 @@ type Service interface {
 	SetDefenseGrade(student string, g int) error
 	SetDefensePrivacy(student string, private bool) error
 	SetDefenseLocality(student string, local bool) error
+}
+
+//Adder abstracts the definition of new users or conventions.
+//Things that are usually imported from external sourfces
+type Adder interface {
+
+	//NewUser creates a new user
+	//By default, the user has no privileges
+	NewUser(fn, ln, tel, email string) error
+
+	//ToStudent casts the given user to a student
+	ToStudent(email, major, promotion string, male bool) error
+
+	//NewConvention adds a convention
+	//The student and the tutor must have an account despite it is not required to be a valid one
+	NewConvention(student string, startTime, endTime time.Time, tutor string, cpy Company, sup Person, title string, creation time.Time, foreignCountry, lab bool, gratification int) (bool, error)
+
+	//SetMale states a student gender
+	SetMale(stu string, male bool) error
 }
 
 var (

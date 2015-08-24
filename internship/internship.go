@@ -29,7 +29,7 @@ type Convention struct {
 
 //Internship is the core type to specify required data related to an internship
 type Internship struct {
-	C Convention
+	Convention Convention
 	//The headers for each
 	Reports map[string]ReportHeader
 	//The surveys

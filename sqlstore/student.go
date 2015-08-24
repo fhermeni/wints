@@ -69,52 +69,6 @@ func (s *Service) SkipStudent(em string, st bool) error {
 	return s.singleUpdate(skipStudent, internship.ErrUnknownUser, em, st)
 }
 
-//InsertStudents inserts all the students provided in the given CSV file.
-//Expected format: firstname;lastname;email;tel
-//The other fields are set to the default values
-/*func (s *Service) InsertStudents(file string) error {
-	in := csv.NewReader(strings.NewReader(file))
-	in.Comma = ';'
-	//Get rid of the header
-	in.Read()
-	for {
-		record, e2 := in.Read()
-		if e2 == io.EOF {
-			break
-		}
-		male, err := strconv.ParseBool(record[0])
-		if err != nil {
-			male = true
-		}
-		ln := record[0]
-		fn := record[1]
-		email := record[2]
-		p := record[3]
-		major := record[4]
-		st := internship.Student{
-			User: internship.User{
-				Person: internship.Person{
-					Firstname: fn,
-					Lastname:  ln,
-					Email:     email,
-					Tel:       "not available",
-				},
-				Role: internship.STUDENT,
-			},
-			Promotion: p,
-			Major:     major,
-			Skip:      false,
-			Alumni: internship.Alumni{
-				Contact:  "", //Not available
-				Position: 0,  //Not available
-			},
-			Male: male,
-		}
-		e2 = s.AddStudent(st)
-	}
-	return nil
-}*/
-
 //SetPromotion updates the student promotion
 func (s *Service) SetPromotion(stu, p string) error {
 	return s.singleUpdate(setPromotion, internship.ErrUnknownStudent, stu, p)

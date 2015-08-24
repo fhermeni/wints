@@ -14,13 +14,13 @@ type CsvStudents struct {
 
 //NewCsvStudents creates a new parser from a given source
 func NewCsvStudents(r StudentReader) *CsvStudents {
-	return CsvStudents{reader: r}
+	return &CsvStudents{reader: r}
 }
 
 //Import inserts all the students provided in the given CSV file.
 //Expected format: firstname;lastname;email;tel;
 //The other fields are set to the default values
-func (c *CsvStudents) Import(s internship.Service) error {
+func (c *CsvStudents) Import(s internship.Adder) error {
 	r, err := c.reader.Reader()
 	if err != nil {
 		return err

@@ -32,7 +32,7 @@ var (
 
 //addUser add the given user.
 //Every strings are turned into their lower case version
-func (s *Service) addUser(tx TxErr, u internship.User) {
+func (s *Service) addUser(tx *TxErr, u internship.User) {
 	tx.Exec(AddUser, strings.ToLower(u.Person.Firstname), strings.ToLower(u.Person.Lastname), u.Person.Tel, strings.ToLower(u.Person.Email), randomBytes(32), u.Role)
 }
 

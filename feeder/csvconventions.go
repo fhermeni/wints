@@ -102,7 +102,7 @@ func cleanInt(str string) int {
 	}
 	return i
 }
-func (f *CsvConventions) scan(prom string, s internship.Service) error {
+func (f *CsvConventions) scan(prom string, s internship.Adder) error {
 	r, err := f.Reader.Reader(f.Year, prom)
 	if err != nil {
 		return err
@@ -163,7 +163,7 @@ func (f *CsvConventions) scan(prom string, s internship.Service) error {
 }
 
 //Import imports all the conventions by requesting in parallal the conventions for each registered promotions
-func (f *CsvConventions) Import(s internship.Service) error {
+func (f *CsvConventions) Import(s internship.Adder) error {
 	errors := make([]error, len(f.promotions))
 	var wg sync.WaitGroup
 	for i, prom := range f.promotions {
