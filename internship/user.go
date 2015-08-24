@@ -21,12 +21,9 @@ const (
 type Privilege int
 
 //Privileges denotes the string value associated to each level of privilege
-var Privileges = [...]string{"none", "tutor", "major", "admin", "root"}
+var Privileges = [...]string{"none", "student", "tutor", "major", "admin", "root"}
 
 func (p Privilege) String() string {
-	if p < 0 {
-		return "tutor"
-	}
 	return Privileges[p]
 }
 
@@ -38,7 +35,7 @@ type Person struct {
 	Tel       string
 }
 
-//User is a person with an account on the platform
+//User is a person with an account
 type User struct {
 	Person    Person
 	Role      Privilege
@@ -51,13 +48,15 @@ type Alumni struct {
 	Position int
 }
 
+//Student denotes a student that as a promotion, a major.
 type Student struct {
 	User      User
 	Promotion string
 	Major     string
 	Alumni    Alumni
-	Skip      bool
-	Male      bool
+	//Skip indicates we don't care about this student. Might left the school for example
+	Skip bool
+	Male bool
 }
 
 //Fullname provides the user fullname, starting with its firstname
@@ -65,17 +64,17 @@ func (p Person) Fullname() string {
 	return strings.Title(p.Firstname) + " " + strings.Title(p.Lastname)
 }
 
-//String just pretty the user email
+//String returns the person email
 func (p Person) String() string {
 	return p.Email
 }
 
-//String justs delegates to Person.String()
+//String delegates to Person.String()
 func (u User) String() string {
 	return u.Person.String()
 }
 
-//Fullname justs delegates to Person.String()
+//Fullname delegates to Person.String()
 func (U User) Fullname() string {
 	return U.Person.Fullname()
 }

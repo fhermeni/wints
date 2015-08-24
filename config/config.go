@@ -18,7 +18,7 @@ type Feeder struct {
 	Encoding   string
 }
 
-//Mailer configure the mailing service
+//Mailer configures the mailing service
 type Mailer struct {
 	Server   string
 	Login    string

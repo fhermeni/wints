@@ -3,15 +3,12 @@ package feeder
 import (
 	"encoding/csv"
 	"io"
-	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
-	"code.google.com/p/go-charset/charset"
-	_ "code.google.com/p/go-charset/data"
 	"github.com/fhermeni/wints/internship"
 	"github.com/fhermeni/wints/journal"
 )
@@ -42,17 +39,28 @@ const (
 	tutorTel        = 70
 )
 
-type HTTPFeeder struct {
-	url        string
-	login      string
-	password   string
-	promotions []string
-	encoding   string
+var (
+	//Integer is a regex to express the integer part for a possible real number.
+	//We just ignore the floating part
+	Integer = regexp.MustCompile(`^(\d+)`)
+)
+
+//CsvConventions parses conventions from CSV files
+type CsvConventions struct {
 	j          journal.Journal
+	Reader     ConventionReader
+	Year       int
+	promotions []string
 }
 
-func NewHTTPFeeder(j journal.Journal, url, login, password string, promotions []string, enc string) *HTTPFeeder {
-	return &HTTPFeeder{j: j, url: url, login: login, password: password, promotions: promotions, encoding: enc}
+//NewCsvConventions creates an importer from a given reader
+//By default, the parsed year is the current year
+func NewCsvConventions(r ConventionReader, j journal.Journal, promotions []string) *CsvConventions {
+	return &CsvConventions{
+		Reader:     r,
+		j:          j,
+		promotions: promotions,
+		Year:       time.Now().Year()}
 }
 
 func cleanPerson(fn, ln, email, tel string) internship.Person {
@@ -78,12 +86,13 @@ func clean(str string) string {
 	return strings.ToLower(strings.TrimSpace(str))
 }
 
-func (f *HTTPFeeder) log(msg string, err error) {
+func (f *CsvConventions) log(msg string, err error) {
 	f.j.Log("feeder", msg, err)
 }
+
 func cleanInt(str string) int {
 	s := strings.Replace(str, " ", "", -1)
-	m := regexp.MustCompile(`^(\d+)`).FindSubmatch([]byte(s))
+	m := Integer.FindSubmatch([]byte(s))
 	if m == nil || len(m) == 0 {
 		return -1
 	}
@@ -93,20 +102,8 @@ func cleanInt(str string) int {
 	}
 	return i
 }
-func (f *HTTPFeeder) scan(year int, prom string, s internship.Service) error {
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", f.url+"?action=down&filiere="+prom+"&annee="+strconv.Itoa(year), nil)
-	if err != nil {
-		return err
-	}
-	req.SetBasicAuth(f.login, f.password)
-
-	res, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	//Convert to utf8
-	r, err := charset.NewReader(f.encoding, res.Body)
+func (f *CsvConventions) scan(prom string, s internship.Service) error {
+	r, err := f.Reader.Reader(f.Year, prom)
 	if err != nil {
 		return err
 	}
@@ -165,32 +162,17 @@ func (f *HTTPFeeder) scan(year int, prom string, s internship.Service) error {
 	return err
 }
 
-func (f *HTTPFeeder) InjectOnePromotion(s internship.Service, y int, p string) error {
-	return f.scan(y, p, s)
-}
-
-func (f *HTTPFeeder) InjectConventions(s internship.Service) {
-	year := time.Now().Year()
-	type empty struct{}
+//Import imports all the conventions by requesting in parallal the conventions for each registered promotions
+func (f *CsvConventions) Import(s internship.Service) error {
 	errors := make([]error, len(f.promotions))
 	var wg sync.WaitGroup
 	for i, prom := range f.promotions {
 		wg.Add(1)
 		go func(i int, p string) {
-			err := f.InjectOnePromotion(s, year, p)
+			err := f.scan(p, s)
 			errors[i] = err
 		}(i, prom)
 	}
 	wg.Wait()
-}
-
-func (f *HTTPFeeder) Test() error {
-	client := &http.Client{}
-	req, err := http.NewRequest("GET", f.url, nil)
-	if err != nil {
-		return err
-	}
-	req.SetBasicAuth(f.login, f.password)
-	_, err = client.Do(req)
-	return err
+	return nil
 }

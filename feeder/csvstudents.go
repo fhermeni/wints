@@ -3,16 +3,29 @@ package feeder
 import (
 	"encoding/csv"
 	"io"
-	"strings"
 
 	"github.com/fhermeni/wints/internship"
 )
 
-//InsertStudents inserts all the students provided in the given CSV file.
-//Expected format: firstname;lastname;email;tel
+//CsvStudents embed the parsing of students from a CSV file
+type CsvStudents struct {
+	reader StudentReader
+}
+
+//NewCsvStudents creates a new parser from a given source
+func NewCsvStudents(r StudentReader) *CsvStudents {
+	return CsvStudents{reader: r}
+}
+
+//Import inserts all the students provided in the given CSV file.
+//Expected format: firstname;lastname;email;tel;
 //The other fields are set to the default values
-func InjectStudents(file string, s internship.Service) error {
-	in := csv.NewReader(strings.NewReader(file))
+func (c *CsvStudents) Import(s internship.Service) error {
+	r, err := c.reader.Reader()
+	if err != nil {
+		return err
+	}
+	in := csv.NewReader(r)
 	in.Comma = ';'
 	//Get rid of the header
 	in.Read()
