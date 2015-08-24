@@ -59,12 +59,8 @@ func scanReport(rows *sql.Rows) (internship.ReportHeader, error) {
 	if comment.Valid {
 		hdr.Comment = comment.String
 	}
-	if delivery.Valid {
-		hdr.Delivery = &delivery.Time
-	}
-	if reviewed.Valid {
-		hdr.Reviewed = &reviewed.Time
-	}
+	hdr.Delivery = nullableTime(delivery)
+	hdr.Reviewed = nullableTime(reviewed)
 	if grade.Valid {
 		hdr.Grade = int(grade.Int64)
 	}

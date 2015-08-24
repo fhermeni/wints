@@ -163,7 +163,7 @@ func (s *Service) NewPassword(token, newP []byte) (string, error) {
 //Upon success, it generates a session token that will be valid for the next 24 hours.
 func (s *Service) Login(email string, password []byte) ([]byte, error) {
 	var p []byte
-	if err := s.DB.QueryRow(selectPassword, email).Scan(&p); err != nil {
+	if err := s.DB.QueryRow(selectPassword, strings.ToLower(email)).Scan(&p); err != nil {
 		return []byte{}, internship.ErrCredentials
 	}
 	if err := bcrypt.CompareHashAndPassword(p, password); err != nil {

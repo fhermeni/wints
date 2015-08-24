@@ -6,6 +6,7 @@ var (
 	updateDefensePrivacy  = "update defenses set private=$1 where student=$2"
 	updateDefenseLocality = "update defenses set local=$1 where student=$2"
 	selectDefense         = "select date, room, grade, private, local from defenses where student=$1"
+	updateDefenseGrade    = "update defenses set grade=$2 where student=$1"
 )
 
 func (s *Service) SetDefensePrivacy(student string, private bool) error {
@@ -14,6 +15,13 @@ func (s *Service) SetDefensePrivacy(student string, private bool) error {
 
 func (s *Service) SetDefenseLocality(student string, local bool) error {
 	return s.singleUpdate(updateDefenseLocality, internship.ErrUnknownStudent, local, student)
+}
+
+func (s *Service) SetDefenseGrade(student string, g int) error {
+	if g < 0 || g > 20 {
+		return internship.ErrInvalidGrade
+	}
+	return s.singleUpdate(updateDefenseGrade, internship.ErrUnknownDefense, student, g)
 }
 
 func (s *Service) Defense(student string) (internship.Defense, error) {
