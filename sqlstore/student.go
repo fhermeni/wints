@@ -1,9 +1,6 @@
 package sqlstore
 
 import (
-	"encoding/csv"
-	"io"
-	"strconv"
 	"strings"
 
 	"github.com/fhermeni/wints/internship"
@@ -12,10 +9,11 @@ import (
 
 var (
 	allStudents     = "select male, firstname, lastname, email, tel, role, lastVisit, promotion, major, nextPosition, nextContact, skip from students inner join users on (students.email=users.email)"
-	insertStudent   = "insert into students(male, major, promotion, skip, nextContact, nextPosition) values ($1,$2,$3,$4,$5,$6)"
+	insertStudent   = "insert into students(email, male, major, promotion, skip) values ($1,$2,$3,$4,$5)"
 	skipStudent     = "update students set skip=$2 where email=$1"
 	setPromotion    = "update students set promotion=$2 where email=$1"
 	setMajor        = "update students set major=$2 where email=$1"
+	updateMale      = "update students set male=$2 where email=$1"
 	setNextPosition = "update students set nextPosition=$1 where email=$2"
 	setNextContact  = "update students set nextContact=$1 where email=$2"
 )
@@ -59,12 +57,10 @@ func (s *Service) Students() ([]internship.Student, error) {
 	return students, err
 }
 
-//AddStudent add a student to the database.
-//The underlying user is declared in prior with a random password
-func (s *Service) AddStudent(st internship.Student) error {
+func (s *Service) ToStudent(email, major, promotion string, male bool) error {
 	tx := newTxErr(s.DB)
-	s.addUser(tx, st.User)
-	tx.Exec(insertStudent, st.Male, st.Major, st.Promotion, st.Skip, st.Alumni.Contact, st.Alumni.Position)
+	tx.Update(insertStudent, email, male, major, promotion, false)
+	tx.Update(updateUserRole, email, internship.STUDENT)
 	return tx.Done()
 }
 
@@ -76,7 +72,7 @@ func (s *Service) SkipStudent(em string, st bool) error {
 //InsertStudents inserts all the students provided in the given CSV file.
 //Expected format: firstname;lastname;email;tel
 //The other fields are set to the default values
-func (s *Service) InsertStudents(file string) error {
+/*func (s *Service) InsertStudents(file string) error {
 	in := csv.NewReader(strings.NewReader(file))
 	in.Comma = ';'
 	//Get rid of the header
@@ -117,16 +113,20 @@ func (s *Service) InsertStudents(file string) error {
 		e2 = s.AddStudent(st)
 	}
 	return nil
-}
+}*/
 
 //SetPromotion updates the student promotion
 func (s *Service) SetPromotion(stu, p string) error {
-	return s.singleUpdate(setPromotion, internship.ErrUnknownUser, stu, p)
+	return s.singleUpdate(setPromotion, internship.ErrUnknownStudent, stu, p)
 }
 
 //SetMajor updates the student major
 func (s *Service) SetMajor(stu, m string) error {
-	return s.singleUpdate(setMajor, internship.ErrUnknownUser, stu, m)
+	return s.singleUpdate(setMajor, internship.ErrUnknownStudent, stu, m)
+}
+
+func (s *Service) SetMale(stu, m bool) error {
+	return s.singleUpdate(updateMale, internship.ErrUnknownStudent, stu, m)
 }
 
 //SetNextPosition updates the student next position

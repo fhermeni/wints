@@ -3,6 +3,6 @@ package feeder
 import "github.com/fhermeni/wints/internship"
 
 type Feeder interface {
-	InjectConventions(s internship.Service)
+	InjectConventions(s *internship.Service)
 	Test() error
 }

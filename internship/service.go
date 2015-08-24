@@ -11,7 +11,7 @@ type Service interface {
 
 	//Create a new user
 	//Returns the resulting password
-	AddUser(p User) error
+	NewUser(fn, ln, tel, email string) error
 
 	//Delete the user if it is not tutoring anyone
 	RmUser(email string) error
@@ -44,9 +44,11 @@ type Service interface {
 	NewPassword(token, newP []byte) (string, error)
 
 	ReplaceUserWith(src, dst string) error
+
 	//Students that have to make an internship
-	InsertStudents(csv string) error
-	AddStudent(s Student) error
+	//	InsertStudents(csv string) error
+	//AddStudent(s Student) error
+	ToStudent(email, major, promotion string, male bool) error
 	//Student that left ?
 	SkipStudent(em string, st bool) error
 	Students() ([]Student, error)
@@ -54,24 +56,25 @@ type Service interface {
 	SetNextPosition(student string, pos int) error
 	SetMajor(stu string, m string) error
 	SetPromotion(stu string, p string) error
-
-	//Convention inserted from outside
-	NewConvention(c Convention) error
+	SetMale(stu string, male bool) error
+	//Convention inserted from outside. True if updated
+	NewConvention(student string, startTime, endTime time.Time, tutor string, cpy Company, sup Person, title string, creation time.Time, foreignCountry, lab bool, gratification int) (bool, error)
 	Conventions() ([]Convention, error)
+	SetSupervisor(stu string, sup User) error
+	SetTutor(stu string, t string) error
+	SetCompany(stu string, c Company) error
+	SetTitle(stu string, title string) error
+
 	//I don't manage it
 	SetConventionSkippable(student string, skip bool) error
 
 	//Turns the convention to an internship
 	//align student & tutor. Tutor must exists. Send student credentials, instantiate reports, surveys
-	ValidateInternship(c Convention) ([]byte, error)
+	ValidateConvention(stu string) error
 
 	//Internship management
 	Internships() ([]Internship, error)
 	Internship(stu string) (Internship, error)
-	SetSupervisor(stu string, sup User) error
-	SetTutor(stu string, t string) error
-	SetCompany(stu string, c Company) error
-	SetTitle(stu string, title string) error
 
 	//Reports management
 

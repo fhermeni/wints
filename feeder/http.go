@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"code.google.com/p/go-charset/charset"
@@ -92,23 +93,22 @@ func cleanInt(str string) int {
 	}
 	return i
 }
-func (f *HTTPFeeder) scan(year int, prom string) ([]internship.Convention, error) {
+func (f *HTTPFeeder) scan(year int, prom string, s internship.Service) error {
 	client := &http.Client{}
-	conventions := make([]internship.Convention, 0, 0)
 	req, err := http.NewRequest("GET", f.url+"?action=down&filiere="+prom+"&annee="+strconv.Itoa(year), nil)
 	if err != nil {
-		return conventions, err
+		return err
 	}
 	req.SetBasicAuth(f.login, f.password)
 
 	res, err := client.Do(req)
 	if err != nil {
-		return conventions, err
+		return err
 	}
 	//Convert to utf8
 	r, err := charset.NewReader(f.encoding, res.Body)
 	if err != nil {
-		return conventions, err
+		return err
 	}
 	in := csv.NewReader(r)
 	in.Comma = ';'
@@ -122,10 +122,9 @@ func (f *HTTPFeeder) scan(year int, prom string) ([]internship.Convention, error
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			return conventions, err
+			return err
 		}
 		student := cleanPerson(record[stuFn], record[stuLn], record[stuEmail], record[stuTel])
-		prom := clean(record[stuPromotion])
 		supervisor := cleanPerson(record[supervisorFn], record[supervisorLn], record[supervisorEmail], record[supervisorTel])
 		tutor := cleanPerson(record[tutorFn], record[tutorLn], record[tutorEmail], record[tutorTel])
 		cpy := cleanCompany(record[company], record[companyWWW])
@@ -136,78 +135,53 @@ func (f *HTTPFeeder) scan(year int, prom string) ([]internship.Convention, error
 		gratif := cleanInt(record[gratification])
 		ts, err := time.Parse("2006-01-02 15:04", clean(record[timestamp]))
 		if err != nil {
-			return conventions, err
+			return err
 		}
 		startTime, err := time.Parse("02/01/2006", clean(record[begin]))
 		if err != nil {
-			return conventions, err
+			return err
 		}
 		endTime, err := time.Parse("02/01/2006", clean(record[end]))
 		if err != nil {
-			return conventions, err
+			return err
 		}
-		c := internship.Convention{
-			Male:           male,
-			Creation:       ts,
-			Student:        student,
-			Supervisor:     supervisor,
-			Tutor:          tutor,
-			Promotion:      prom,
-			Cpy:            cpy,
-			Begin:          startTime,
-			End:            endTime,
-			Title:          title,
-			Skip:           false,
-			Gratification:  gratif,
-			ForeignCountry: foreign,
-			Lab:            inLab,
-		}
-		conventions = append(conventions, c)
+		//The to-valid users
+		s.NewUser(tutor.Firstname, tutor.Lastname, tutor.Tel, tutor.Email)
+		s.NewUser(student.Firstname, student.Lastname, student.Tel, student.Email)
+		s.SetMale(student.Email, male)
+		s.NewConvention(student.Email,
+			startTime,
+			endTime,
+			tutor.Email,
+			cpy,
+			supervisor,
+			title,
+			ts,
+			foreign,
+			inLab,
+			gratif,
+		)
 	}
-	return conventions, err
+	return err
 }
 
-func (f *HTTPFeeder) InjectOnePromotion(s internship.Service, y int, p string) (int, error) {
-	nb := 0
-	conventions, err := f.scan(y, p)
-	if err != nil {
-		f.log("Scanning promotion '"+p+"'", err)
-		return nb, err
-	}
-	for _, c := range conventions {
-		_, err := s.Internship(c.Student.Email)
-		if err != nil {
-			err = s.NewConvention(c)
-			if err == nil {
-				nb++
-			} else if err != internship.ErrConventionExists {
-				f.log("Unable to insert convention '"+c.Student.Fullname()+"'", err)
-				return nb, err
-			}
-		}
-	}
-	return nb, err
+func (f *HTTPFeeder) InjectOnePromotion(s internship.Service, y int, p string) error {
+	return f.scan(y, p, s)
 }
 
 func (f *HTTPFeeder) InjectConventions(s internship.Service) {
 	year := time.Now().Year()
 	type empty struct{}
-	res := make([]int, len(f.promotions))
 	errors := make([]error, len(f.promotions))
-	sem := make(chan empty, len(f.promotions)) // semaphore pattern
-
+	var wg sync.WaitGroup
 	for i, prom := range f.promotions {
+		wg.Add(1)
 		go func(i int, p string) {
-			nb, err := f.InjectOnePromotion(s, year, p)
-			res[i] = nb
+			err := f.InjectOnePromotion(s, year, p)
 			errors[i] = err
-			sem <- empty{}
 		}(i, prom)
 	}
-	// wait for goroutines to finish
-	for i := 0; i < len(f.promotions); i++ {
-		<-sem
-	}
+	wg.Wait()
 }
 
 func (f *HTTPFeeder) Test() error {

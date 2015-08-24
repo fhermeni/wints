@@ -32,17 +32,6 @@ func noRowsTo(got error, with error) error {
 	}
 	return got
 }
-func violationAsErr(got error, cstr string, with error) error {
-	if got == nil {
-		return got
-	}
-	if e, ok := got.(*pq.Error); ok {
-		if e.Constraint == cstr {
-			return with
-		}
-	}
-	return got
-}
 
 func mapCstrToError(err error) error {
 	if err == nil {

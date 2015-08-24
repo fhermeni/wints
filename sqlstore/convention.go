@@ -13,7 +13,7 @@ var (
 	updateCompany            = "update conventions set companyWWW=$1, company=$2 where student=$3"
 	updateTitle              = "update conventions set title=$1 where student=$2"
 	insertConvention         = "insert into conventions(student, male, startTime, endTime, tutor, companyName, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, creation, foreignCountry, lab, gratification, skip, valid) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18"
-	updateConvention         = "update conventions set male=$2, startTime=$3, endTime=$4, tutor=$5, companyName=$6, companyWWW=$7, supervisorFn=$8, supervisorLn=$9, supervisorEmail=$10, supervisorTel=$11, title=$12, creation=$13, foreignCountry=$14, lab=$15, gratification=$16, where student=$1"
+	updateConvention         = "update conventions set startTime=$2, endTime=$3, tutor=$4, companyName=$5, companyWWW=$6, supervisorFn=$7, supervisorLn=$8, supervisorEmail=$9, supervisorTel=$10, title=$11, creation=$12, foreignCountry=$13, lab=$14, gratification=$15, where student=$1"
 	selectConventionCreation = "select creation from conventions where student=$1"
 	selectConventions        = "select stup.firstname, stup.lastname, stup.tel, stup.email, stup.lastVisit" +
 		"students.male, students.promotion, students.major, students.nextPosition, students.nextContact, students.skip," +
@@ -48,49 +48,24 @@ func (s *Service) SetTitle(stu string, title string) error {
 
 //New convention, the student and the tutor must already be registered
 //If a convention already exists for that student but the new data refer to a fresher convention, it is updated
-func (s *Service) NewConvention(student string, male bool,
-	startTime, endTime time.Time,
-	tutor string,
-	cpy internship.Company,
-	sup internship.Person,
-	title string,
-	creation time.Time,
-	foreignCountry, lab bool,
-	gratification int) error {
-	err := s.singleUpdate(insertConvention, internship.ErrUnknownStudent,
-		student,
-		male,
-		startTime,
-		endTime,
-		cpy.Name,
-		cpy.WWW,
-		sup.Firstname,
-		sup.Lastname,
-		sup.Email,
-		sup.Tel,
-		title,
-		creation,
-		foreignCountry,
-		lab,
-		gratification,
-		false,
-		false)
+func (s *Service) NewConvention(student string, startTime, endTime time.Time, tutor string, cpy internship.Company, sup internship.Person, title string, creation time.Time, foreignCountry, lab bool, gratification int) (bool, error) {
+	err := s.singleUpdate(insertConvention, internship.ErrUnknownStudent, student, startTime, endTime, tutor, cpy.Name, cpy.WWW, sup.Firstname, sup.Lastname, sup.Email, sup.Tel, title, creation, foreignCountry, lab, gratification, false, false)
 	if err == internship.ErrConventionExists {
 		//Has it been updated ?
 		var last time.Time
 		st, err := s.stmt(selectConventionCreation)
 		if err != nil {
-			return err
+			return false, err
 		}
 		if err := st.QueryRow(student).Scan(&last); err != nil {
-			return err
+			return false, err
 		}
 		if creation.After(last) {
-			return s.singleUpdate(updateConvention, internship.ErrUnknownConvention,
+			return true, s.singleUpdate(updateConvention, internship.ErrUnknownConvention,
 				student,
-				male,
 				startTime,
 				endTime,
+				tutor,
 				cpy.Name,
 				cpy.WWW,
 				sup.Firstname,
@@ -103,10 +78,8 @@ func (s *Service) NewConvention(student string, male bool,
 				lab,
 				gratification)
 		}
-
 	}
-	return err
-
+	return false, err
 }
 
 func (s *Service) Conventions() ([]internship.Convention, error) {
@@ -172,9 +145,3 @@ func (s *Service) Conventions() ([]internship.Convention, error) {
 	}
 	return conventions, nil
 }
-
-/*
-func (srv *Service) DeleteConvention(student string) error {
-	sql := "delete from conventions where studentEmail=$1"
-	return SingleUpdate(srv.DB, internship.ErrUnknownUser, sql, student)
-}*/

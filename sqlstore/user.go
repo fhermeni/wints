@@ -12,11 +12,12 @@ import (
 
 var (
 	AddUser                      = "insert into users(firstname, lastname, tel, email, password, role) values ($1,$2,$3,$4,$5,$6)"
+	insertUser                   = "insert into users(firstname, lastname, tel, email, role) values ($1,$2,$3,$4,$5)"
 	startPasswordRenewall        = "insert into password_renewal(email,token,deadline) values($1,$2,$3)"
 	newSession                   = "insert into sessions(email, token, expire) values ($1,$2,$3)"
 	UpdateLastVisit              = "update users set lastVisit=$1 where email=$2"
 	UpdateUserProfile            = "update users set firstname=$1, lastname=$2, tel=$3 where email=$4"
-	UpdateUserRole               = "update users set role=$2 where email=$1"
+	updateUserRole               = "update users set role=$2 where email=$1"
 	UpdateUserPassword           = "update users set password=$2 where email=$1"
 	DeleteSession                = "delete from sessions where email=$1"
 	DeletePasswordRenewalRequest = "delete from password_renewal where user=$1"
@@ -78,7 +79,7 @@ func (s *Service) SetUserProfile(email, fn, ln, tel string) error {
 
 //SetUserRole updates the user privilege
 func (s *Service) SetUserRole(email string, priv internship.Privilege) error {
-	return s.singleUpdate(UpdateUserRole, internship.ErrUnknownUser, email, priv)
+	return s.singleUpdate(updateUserRole, internship.ErrUnknownUser, email, priv)
 }
 
 //Logout destroy the current user session if exists
@@ -183,10 +184,8 @@ func (s *Service) Login(email string, password []byte) ([]byte, error) {
 
 //AddUser add a user
 //Basically, calls addUser
-func (s *Service) AddUser(u internship.User) error {
-	tx := newTxErr(s.DB)
-	s.addUser(tx, u)
-	return tx.Done()
+func (s *Service) NewUser(fn, ln, tel, email string) error {
+	return s.singleUpdate(insertUser, internship.ErrUserExists, fn, ln, tel, email, internship.NONE)
 }
 
 func (s *Service) RmUser(email string) error {

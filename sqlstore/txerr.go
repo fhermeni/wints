@@ -20,12 +20,12 @@ func newTxErr(db *sql.DB) TxErr {
 func (r *TxErr) Done() error {
 	if r.err != nil {
 		if err := r.tx.Rollback(); err != nil {
-			return err
+			return mapCstrToError(err)
 		}
-		return r.err
+		return mapCstrToError(r.err)
 
 	}
-	return r.tx.Commit()
+	return mapCstrToError(r.tx.Commit())
 }
 
 //Exec executes the query and store the resulting error variable
@@ -51,7 +51,7 @@ func (r *TxErr) Update(query string, args ...interface{}) int64 {
 	}
 	nb, err := res.RowsAffected()
 	if err != nil {
-		r.err = err
+		r.err = mapCstrToError(err)
 		return -1
 	}
 	return nb

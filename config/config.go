@@ -1,26 +1,25 @@
-//Package config aggregate the necessary material to configure the wints daemon
+//Package config aggregates the necessary material to configure the wints daemon
 package config
 
-import (
-	"encoding/json"
-	"fmt"
-	"io/ioutil"
-
-	"github.com/fhermeni/wints/internship"
+var (
+	//DateTimeLayout expresses the expected format for a date + time
+	DateTimeLayout = "02/01/2006 15:04"
+	//DateLayout expresses the expected format for a date
+	DateLayout = "02/01/2006"
 )
 
-//PullerConfig allows to configure the puller that browse the convention database
-type PullerConfig struct {
+//Feeder configures the feeder than scan conventions
+type Feeder struct {
 	Login      string
 	Password   string
 	URL        string
-	Period     string
+	Frequency  Duration
 	Promotions []string
 	Encoding   string
 }
 
-//MailerConfig allows to configure the mailing service
-type MailerConfig struct {
+//Mailer configure the mailing service
+type Mailer struct {
 	Server   string
 	Login    string
 	Password string
@@ -28,94 +27,46 @@ type MailerConfig struct {
 	Path     string
 }
 
-//DbConfig allows to configure the access to the wints database
-type DbConfig struct {
-	URL string
+//Db configures the database connection string
+type Db struct {
+	ConnectionString string
 }
 
-//HTTPConfig allows to configure the Http endpoint
-type HTTPConfig struct {
-	WWW         string
-	Listen      string
-	Certificate string
-	PrivateKey  string
-	Path        string
+//EndPoint configures the rest endpoint
+type EndPoint struct {
+	WWW                    string
+	Listen                 string
+	Certificate            string
+	PrivateKey             string
+	Assets                 string
+	SessionLifeTime        Duration
+	RenewalRequestLifetime Duration
 }
 
-type JournalConfig struct {
+//Journal configures the logging system
+type Journal struct {
 	Path string
+}
+
+//Report configures a report definition
+type Report struct {
+	Deadline Deadline
+	Grade    bool
+}
+
+//Survey configures a survey definition
+type Survey struct {
+	Deadline Deadline
 }
 
 //Config aggregates all the subcomponents configuration parameters
 type Config struct {
-	Puller  PullerConfig
-	Reports []internship.ReportDef
-	Surveys []internship.SurveyDef
-	DB      DbConfig
-	Mailer  MailerConfig
-	HTTP    HTTPConfig
-	Logfile string
-	Majors  []string
-	Journal JournalConfig
-}
-
-//Load allows to parse a configuration for a JSON message
-func Load(path string) (Config, error) {
-	var c Config
-	cnt, err := ioutil.ReadFile(path)
-	if err != nil {
-		return c, err
-	}
-	err = json.Unmarshal(cnt, &c)
-	return c, err
-}
-
-func Blank() error {
-	puller := PullerConfig{Login: "****",
-		Password:   "******",
-		URL:        "http://conventions.polytech.unice.fr/admin/admin.cgi",
-		Promotions: []string{"Master%20IFI", "Master%20IMAFA", "MAM%205", "SI%205", "Master%202%20SSTIM-images"},
-		Period:     "1h",
-		Encoding:   "windows-1252",
-	}
-	mailer := MailerConfig{Server: "*******",
-		Login:    "******",
-		Password: "*******",
-		Sender:   "******",
-		Path:     "static/mails",
-	}
-	db := DbConfig{URL: "user=******* dbname=wints host=localhost sslmode=disable"}
-	http := HTTPConfig{Listen: ":8080",
-		WWW:         "https://localhost:8080",
-		Certificate: "cert.pem",
-		PrivateKey:  "key.pem",
-		Path:        "static",
-	}
-	reports := []internship.ReportDef{
-		internship.ReportDef{Name: "DoW", Deadline: "relative", Value: "504h", ToGrade: false},
-		internship.ReportDef{Name: "Midterm", Deadline: "relative", Value: "1440h", ToGrade: true},
-		internship.ReportDef{Name: "Final", Deadline: "absolute", Value: "01/09/2015 23:59", ToGrade: true},
-	}
-
-	surveys := []internship.SurveyDef{
-		internship.SurveyDef{Name: "midterm", Deadline: "relative", Value: "1440h"},
-		internship.SurveyDef{Name: "final", Deadline: "absolute", Value: "01/09/2015 23:59"},
-	}
-	journal := JournalConfig{Path: "logs"}
-	cfg := Config{
-		Puller:  puller,
-		Reports: reports,
-		Surveys: surveys,
-		DB:      db,
-		Mailer:  mailer,
-		HTTP:    http,
-		Majors:  []string{},
-		Journal: journal,
-	}
-	out, err := json.MarshalIndent(cfg, "", "  ")
-	if err != nil {
-		return err
-	}
-	fmt.Printf("%s\n", out)
-	return err
+	Feeder   Feeder
+	Reports  map[string]Report
+	Surveys  map[string]Survey
+	Db       Db
+	Mailer   Mailer
+	EndPoint EndPoint
+	Majors   []string
+	Journal  Journal
 }
