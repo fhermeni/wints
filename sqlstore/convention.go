@@ -41,29 +41,29 @@ var (
 	validateConvention = "update conventions set valid=$2 where student=$1"
 )
 
-func (s *Service) SetConventionSkippable(student string, skip bool) error {
+func (s *Store) SetConventionSkippable(student string, skip bool) error {
 	return s.singleUpdate(updateConventionSkip, internship.ErrUnknownStudent, skip, student)
 }
 
-func (s *Service) SetSupervisor(stu string, t internship.Person) error {
+func (s *Store) SetSupervisor(stu string, t internship.Person) error {
 	return s.singleUpdate(updateSupervisor, internship.ErrUnknownInternship, t.Firstname, t.Lastname, t.Tel, t.Email, stu)
 }
 
-func (s *Service) SetTutor(stu string, t string) error {
+func (s *Store) SetTutor(stu string, t string) error {
 	return s.singleUpdate(updateTutor, internship.ErrUnknownInternship, t, stu)
 }
 
-func (s *Service) SetCompany(stu string, c internship.Company) error {
+func (s *Store) SetCompany(stu string, c internship.Company) error {
 	return s.singleUpdate(updateCompany, internship.ErrUnknownInternship, c.WWW, c.Name, stu)
 }
 
-func (s *Service) SetTitle(stu string, title string) error {
+func (s *Store) SetTitle(stu string, title string) error {
 	return s.singleUpdate(updateTutor, internship.ErrUnknownInternship, title, stu)
 }
 
 //New convention, the student and the tutor must already be registered
 //If a convention already exists for that student but the new data refer to a fresher convention, it is updated
-func (s *Service) NewConvention(student string, startTime, endTime time.Time, tutor string, cpy internship.Company, sup internship.Person, title string, creation time.Time, foreignCountry, lab bool, gratification int) (bool, error) {
+func (s *Store) NewConvention(student string, startTime, endTime time.Time, tutor string, cpy internship.Company, sup internship.Person, title string, creation time.Time, foreignCountry, lab bool, gratification int) (bool, error) {
 	err := s.singleUpdate(insertConvention, internship.ErrUnknownStudent, student, startTime, endTime, tutor, cpy.Name, cpy.WWW, sup.Firstname, sup.Lastname, sup.Email, sup.Tel, title, creation, foreignCountry, lab, gratification, false, false)
 	if err == internship.ErrConventionExists {
 		//Has it been updated ?
@@ -97,7 +97,7 @@ func (s *Service) NewConvention(student string, startTime, endTime time.Time, tu
 	return false, err
 }
 
-func (s *Service) Conventions() ([]internship.Convention, error) {
+func (s *Store) Conventions() ([]internship.Convention, error) {
 	conventions := make([]internship.Convention, 0, 0)
 	st, err := s.stmt(selectConventions)
 	if err != nil {
@@ -141,7 +141,7 @@ func prepareSurveys(tx *TxErr, student string, surveys map[string]config.Survey)
 	return tx.Done()
 }
 
-func (s *Service) ValidateConvention(student string, cfg config.Config) error {
+func (s *Store) ValidateConvention(student string, cfg config.Config) error {
 	tx := newTxErr(s.db)
 	prepareReports(&tx, student, cfg.Reports)
 	prepareSurveys(&tx, student, cfg.Surveys)
@@ -150,7 +150,7 @@ func (s *Service) ValidateConvention(student string, cfg config.Config) error {
 	return tx.Done()
 }
 
-func (s *Service) Internships() ([]internship.Internship, error) {
+func (s *Store) Internships() ([]internship.Internship, error) {
 	res := make([]internship.Internship, 0, 0)
 	conventions, err := s.Conventions()
 	if err != nil {
@@ -167,7 +167,7 @@ func (s *Service) Internships() ([]internship.Internship, error) {
 	return res, err
 }
 
-func (s *Service) Internship(student string) (internship.Internship, error) {
+func (s *Store) Internship(student string) (internship.Internship, error) {
 	i := internship.Internship{}
 	st, err := s.stmt(selectConvention)
 	if err != nil {
@@ -185,7 +185,7 @@ func (s *Service) Internship(student string) (internship.Internship, error) {
 	return s.toInternship(c)
 }
 
-func (s *Service) toInternship(c internship.Convention) (internship.Internship, error) {
+func (s *Store) toInternship(c internship.Convention) (internship.Internship, error) {
 	stu := c.Student.User.Person.Email
 	r, err := s.Reports(stu)
 	if err != nil {

@@ -7,13 +7,14 @@ import (
 	"bytes"
 	"database/sql"
 	"database/sql/driver"
-	"github.com/lib/pq/oid"
 	"io"
 	"net"
 	"strconv"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/lib/pq/oid"
 )
 
 var (
@@ -43,7 +44,7 @@ func benchQuery(b *testing.B, query string, result interface{}) {
 	}
 }
 
-func benchQueryLoop(b *testing.B, db *sql.DB, query string, result interface{}) {
+func benchQueryLoop(b *testing.B, db *sql.db, query string, result interface{}) {
 	rows, err := db.Query(query)
 	if err != nil {
 		b.Fatal(err)
@@ -196,7 +197,7 @@ func benchPreparedQuery(b *testing.B, query string, result interface{}) {
 	}
 }
 
-func benchPreparedQueryLoop(b *testing.B, db *sql.DB, stmt *sql.Stmt, result interface{}) {
+func benchPreparedQueryLoop(b *testing.B, db *sql.db, stmt *sql.Stmt, result interface{}) {
 	rows, err := stmt.Query()
 	if err != nil {
 		b.Fatal(err)

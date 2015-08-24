@@ -19,7 +19,7 @@ var (
 )
 
 //Students list all the registered students
-func (s *Service) Students() ([]internship.Student, error) {
+func (s *Store) Students() ([]internship.Student, error) {
 	rows, err := s.db.Query(allStudents)
 
 	students := make([]internship.Student, 0, 0)
@@ -57,7 +57,7 @@ func (s *Service) Students() ([]internship.Student, error) {
 	return students, err
 }
 
-func (s *Service) ToStudent(email, major, promotion string, male bool) error {
+func (s *Store) ToStudent(email, major, promotion string, male bool) error {
 	tx := newTxErr(s.db)
 	tx.Update(insertStudent, email, male, major, promotion, false)
 	tx.Update(updateUserRole, email, internship.STUDENT)
@@ -65,32 +65,32 @@ func (s *Service) ToStudent(email, major, promotion string, male bool) error {
 }
 
 //SkipStudent indicates if it is not required for the student to get an internship (an abandom typically)
-func (s *Service) SkipStudent(em string, st bool) error {
+func (s *Store) SkipStudent(em string, st bool) error {
 	return s.singleUpdate(skipStudent, internship.ErrUnknownUser, em, st)
 }
 
 //SetPromotion updates the student promotion
-func (s *Service) SetPromotion(stu, p string) error {
+func (s *Store) SetPromotion(stu, p string) error {
 	return s.singleUpdate(setPromotion, internship.ErrUnknownStudent, stu, p)
 }
 
 //SetMajor updates the student major
-func (s *Service) SetMajor(stu, m string) error {
+func (s *Store) SetMajor(stu, m string) error {
 	return s.singleUpdate(setMajor, internship.ErrUnknownStudent, stu, m)
 }
 
-func (s *Service) SetMale(stu string, m bool) error {
+func (s *Store) SetMale(stu string, m bool) error {
 	return s.singleUpdate(updateMale, internship.ErrUnknownStudent, stu, m)
 }
 
 //SetNextPosition updates the student next position
-func (s *Service) SetNextPosition(student string, pos int) error {
+func (s *Store) SetNextPosition(student string, pos int) error {
 	return s.singleUpdate(setNextPosition, internship.ErrUnknownUser, pos, student)
 }
 
 //SetNextContact updates the student next contact email.
 //The email must contains one '@' and must not contains '@unice.fr' or 'polytech' to prevent from incorrect emails
-func (s *Service) SetNextContact(student string, em string) error {
+func (s *Store) SetNextContact(student string, em string) error {
 	if !strings.Contains(em, "@") || strings.Contains(em, "@unice.fr") || strings.Contains(em, "polytech") {
 		return internship.ErrInvalidAlumniEmail
 	}

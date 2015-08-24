@@ -16,7 +16,7 @@ type Fatalistic interface {
 	Fatal(args ...interface{})
 }
 
-func openTestConnConninfo(conninfo string) (*sql.DB, error) {
+func openTestConnConninfo(conninfo string) (*sql.db, error) {
 	datname := os.Getenv("PGDATABASE")
 	sslmode := os.Getenv("PGSSLMODE")
 	timeout := os.Getenv("PGCONNECT_TIMEOUT")
@@ -36,7 +36,7 @@ func openTestConnConninfo(conninfo string) (*sql.DB, error) {
 	return sql.Open("postgres", conninfo)
 }
 
-func openTestConn(t Fatalistic) *sql.DB {
+func openTestConn(t Fatalistic) *sql.db {
 	conn, err := openTestConnConninfo("")
 	if err != nil {
 		t.Fatal(err)
@@ -45,7 +45,7 @@ func openTestConn(t Fatalistic) *sql.DB {
 	return conn
 }
 
-func getServerVersion(t *testing.T, db *sql.DB) int {
+func getServerVersion(t *testing.T, db *sql.db) int {
 	var version int
 	err := db.QueryRow("SHOW server_version_num").Scan(&version)
 	if err != nil {

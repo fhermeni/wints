@@ -25,11 +25,11 @@ mechanism to avoid polling the database while waiting for more work to arrive.
         "time"
     )
 
-    func doWork(db *sql.DB, work int64) {
+    func doWork(db *sql.db, work int64) {
         // work here
     }
 
-    func getWork(db *sql.DB) {
+    func getWork(db *sql.db) {
         for {
             // get work from the database here
             var work sql.NullInt64

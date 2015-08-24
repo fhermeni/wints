@@ -2,16 +2,17 @@ package hstore
 
 import (
 	"database/sql"
-	_ "github.com/lib/pq"
 	"os"
 	"testing"
+
+	_ "github.com/lib/pq"
 )
 
 type Fatalistic interface {
 	Fatal(args ...interface{})
 }
 
-func openTestConn(t Fatalistic) *sql.DB {
+func openTestConn(t Fatalistic) *sql.db {
 	datname := os.Getenv("PGDATABASE")
 	sslmode := os.Getenv("PGSSLMODE")
 

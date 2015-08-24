@@ -132,5 +132,5 @@ func TestLoadConfig(t *testing.T) {
 	assert.Equal(t, expected.Mailer, cfg.Mailer)
 	assert.Equal(t, expected.Feeder, cfg.Feeder)
 	assert.Equal(t, expected.EndPoint, cfg.EndPoint)
-	assert.Equal(t, expected.Db, cfg.Db)
+	assert.Equal(t, expected.db, cfg.db)
 }

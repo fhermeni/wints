@@ -54,7 +54,7 @@ func newJournal(cfg config.Config) journal.Journal {
 
 func newServices(cfg config.Config, j journal.Journal, m mail.Mailer) *datastore.Service {
 
-	DB, err := sql.Open("postgres", cfg.DB.URL)
+	DB, err := sql.Open("postgres", cfg.db.URL)
 	if err != nil {
 		log.Fatalln("Unable to connect to the Database: " + err.Error())
 	}
@@ -155,7 +155,7 @@ func main() {
 	mailer := newMailer(cfg, j, *fakeMailer)
 	puller := newFeeder(cfg, j)
 	ds := newServices(cfg, j, mailer)
-	defer ds.DB.Close()
+	defer ds.db.Close()
 
 	if *install && confirm("This will erase any data in the database. Confirm ?") {
 		err := ds.Install()

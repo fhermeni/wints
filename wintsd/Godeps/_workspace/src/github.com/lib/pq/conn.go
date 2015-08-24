@@ -9,7 +9,6 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"github.com/lib/pq/oid"
 	"io"
 	"net"
 	"os"
@@ -18,6 +17,8 @@ import (
 	"strings"
 	"time"
 	"unicode"
+
+	"github.com/lib/pq/oid"
 )
 
 // Common error types
@@ -940,7 +941,7 @@ func (st *stmt) exec(v []driver.Value) {
 		}
 	}
 
-	// Work around a bug in sql.DB.QueryRow: in Go 1.2 and earlier it ignores
+	// Work around a bug in sql.db.QueryRow: in Go 1.2 and earlier it ignores
 	// any errors from rows.Next, which masks errors that happened during the
 	// execution of the query.  To avoid the problem in common cases, we wait
 	// here for one more message from the database.  If it's not an error the

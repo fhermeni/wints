@@ -19,7 +19,7 @@ var (
 	setReportPrivacy  = "update reports set private=$3 where student=$1 and kind=$2"
 )
 
-func (s *Service) Reports(email string) (map[string]internship.ReportHeader, error) {
+func (s *Store) Reports(email string) (map[string]internship.ReportHeader, error) {
 	res := make(map[string]internship.ReportHeader)
 	st, err := s.stmt(selectReports)
 	if err != nil {
@@ -67,7 +67,7 @@ func scanReport(rows *sql.Rows) (internship.ReportHeader, error) {
 	return hdr, mapCstrToError(err)
 }
 
-func (s *Service) Report(k, email string) (internship.ReportHeader, error) {
+func (s *Store) Report(k, email string) (internship.ReportHeader, error) {
 	hdr := internship.ReportHeader{Grade: -1}
 
 	st, err := s.stmt(selectReport)
@@ -82,7 +82,7 @@ func (s *Service) Report(k, email string) (internship.ReportHeader, error) {
 	return scanReport(rows)
 }
 
-func (s *Service) ReportContent(kind, email string) ([]byte, error) {
+func (s *Store) ReportContent(kind, email string) ([]byte, error) {
 	var cnt []byte
 	var delivery pq.NullTime
 	st, err := s.stmt(selectReportCnt)
@@ -98,7 +98,7 @@ func (s *Service) ReportContent(kind, email string) ([]byte, error) {
 	return base64.StdEncoding.DecodeString(string(cnt))
 }
 
-func (s *Service) SetReportContent(kind, email string, cnt []byte) error {
+func (s *Store) SetReportContent(kind, email string, cnt []byte) error {
 	var deadline time.Time
 	var delivery, reviewed pq.NullTime
 	tx := newTxErr(s.db)
@@ -124,17 +124,17 @@ func (s *Service) SetReportContent(kind, email string, cnt []byte) error {
 
 }
 
-func (s *Service) SetReportGrade(kind, email string, g int, comment string) error {
+func (s *Store) SetReportGrade(kind, email string, g int, comment string) error {
 	if g < 0 || g > 20 {
 		return internship.ErrInvalidGrade
 	}
 	return s.singleUpdate(setGrade, internship.ErrUnknownReport, email, kind, g, comment, time.Now())
 }
 
-func (s *Service) SetReportDeadline(kind, email string, t time.Time) error {
+func (s *Store) SetReportDeadline(kind, email string, t time.Time) error {
 	return s.singleUpdate(setReportDeadline, internship.ErrUnknownReport, email, kind, t)
 }
 
-func (s *Service) SetReportPrivacy(kind, email string, p bool) error {
+func (s *Store) SetReportPrivacy(kind, email string, p bool) error {
 	return s.singleUpdate(setReportPrivacy, internship.ErrUnknownReport, email, kind, p)
 }

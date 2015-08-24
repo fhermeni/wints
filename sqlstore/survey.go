@@ -16,7 +16,7 @@ var (
 	updateSurveyContent   = "update surveys set answers=$1, timestamp=$2 where token=$3"
 )
 
-func (s *Service) SurveyToken(token string) (string, string, error) {
+func (s *Store) SurveyToken(token string) (string, string, error) {
 	student := ""
 	kind := ""
 	st, err := s.stmt(selectSurveyFromToken)
@@ -49,7 +49,7 @@ func scanSurvey(rows *sql.Rows) (internship.SurveyHeader, error) {
 	return survey, err
 }
 
-func (s *Service) Surveys(student string) (map[string]internship.SurveyHeader, error) {
+func (s *Store) Surveys(student string) (map[string]internship.SurveyHeader, error) {
 	res := make(map[string]internship.SurveyHeader)
 	st, err := s.stmt(selectSurveys)
 	if err != nil {
@@ -70,7 +70,7 @@ func (s *Service) Surveys(student string) (map[string]internship.SurveyHeader, e
 	return res, nil
 }
 
-func (s *Service) Survey(student, kind string) (internship.SurveyHeader, error) {
+func (s *Store) Survey(student, kind string) (internship.SurveyHeader, error) {
 	st, err := s.stmt(selectSurvey)
 	if err != nil {
 		return internship.SurveyHeader{}, err
@@ -83,7 +83,7 @@ func (s *Service) Survey(student, kind string) (internship.SurveyHeader, error) 
 	return scanSurvey(rows)
 }
 
-func (s *Service) SetSurveyContent(token string, cnt map[string]string) error {
+func (s *Store) SetSurveyContent(token string, cnt map[string]string) error {
 	now := time.Now()
 	if len(cnt) > 1000 {
 		return internship.ErrInvalidSurvey
