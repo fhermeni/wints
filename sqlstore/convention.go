@@ -142,7 +142,7 @@ func prepareSurveys(tx *TxErr, student string, surveys map[string]config.Survey)
 }
 
 func (s *Service) ValidateConvention(student string, cfg config.Config) error {
-	tx := newTxErr(s.DB)
+	tx := newTxErr(s.db)
 	prepareReports(&tx, student, cfg.Reports)
 	prepareSurveys(&tx, student, cfg.Surveys)
 	//The prepare* makes sure there is a student. No need to check update

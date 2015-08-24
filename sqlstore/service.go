@@ -8,14 +8,16 @@ import (
 
 //Service allows to communicate with a database
 type Service struct {
-	DB *sql.DB
+	db *sql.DB
 	//mailer     mail.Mailer
 	stmts map[string]*sql.Stmt
 }
 
 //NewService initiate the storage servive
-func NewService(db *sql.DB) (*Service, error) {
-	s := Service{DB: db, stmts: make(map[string]*sql.Stmt)}
+func NewService(d *sql.DB) (*Service, error) {
+	s := Service{db: d,
+		stmts: make(map[string]*sql.Stmt),
+	}
 	return &s, nil
 }
 
@@ -25,14 +27,14 @@ func hash(buf []byte) ([]byte, error) {
 
 //Install the tables on the database
 func (s *Service) Install() error {
-	_, err := s.DB.Exec(create)
+	_, err := s.db.Exec(create)
 	return err
 }
 
 func (s *Service) stmt(q string) (*sql.Stmt, error) {
 	st, ok := s.stmts[q]
 	if !ok {
-		st, err := s.DB.Prepare(q) //Bad, loss prepare failure
+		st, err := s.db.Prepare(q) //Bad, loss prepare failure
 		if err != nil {
 			return nil, err
 		}

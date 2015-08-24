@@ -53,7 +53,7 @@ type Service interface {
 	//SetMale states a student gender
 	SetMale(stu string, male bool) error
 	Conventions() ([]Convention, error)
-	SetSupervisor(stu string, sup User) error
+	SetSupervisor(stu string, sup Person) error
 	SetTutor(stu string, t string) error
 	SetCompany(stu string, c Company) error
 	SetTitle(stu string, title string) error
@@ -90,8 +90,8 @@ type Service interface {
 	//DefenseSessions returns all the registered defense sessions
 	DefenseSessions() ([]DefenseSession, error)
 	//SetDefenseSessions saves all the defense sessions
-	SetDefenseSessions(defs []DefenseSession) error
-	DefenseSession(student string) (DefenseSession, error)
+	//SetDefenseSessions(defs []DefenseSession) error
+	Defense(student string) (Defense, error)
 	//SetDefenseGrade Set the grade for a given defense
 	SetDefenseGrade(student string, g int) error
 	SetDefensePrivacy(student string, private bool) error

@@ -40,6 +40,11 @@ func (s *Service) Defense(student string) (internship.Defense, error) {
 	return d, err
 }
 
+func (s *Service) DefenseSessions() ([]internship.DefenseSession, error) {
+	ss := make([]internship.DefenseSession, 0, 0)
+	return ss, nil
+}
+
 /*
 var JuriesStmt *sql.Stmt
 var JuryUsersStmt *sql.Stmt
@@ -53,7 +58,7 @@ func (srv *Service) DefenseSession(student string) (internship.DefenseSession, e
 	session := internship.DefenseSession{}
 	def := internship.Defense{}
 	if DefStmt == nil {
-		if DefStmt, err = srv.DB.Prepare("select firstname, lastname, tel, email,major, promotion,company, companyWWW, title, date,room,rank,private,remote,defenseGrades.grade from defenses inner join users on (defenses.student=users.email) inner join internships on (defenses.student=internships.student) left outer join defenseGrades on (defenses.student=defenseGrades.student) where defenses.student=$1"); err != nil {
+		if DefStmt, err = srv.db.Prepare("select firstname, lastname, tel, email,major, promotion,company, companyWWW, title, date,room,rank,private,remote,defenseGrades.grade from defenses inner join users on (defenses.student=users.email) inner join internships on (defenses.student=internships.student) left outer join defenseGrades on (defenses.student=defenseGrades.student) where defenses.student=$1"); err != nil {
 			return session, err
 		}
 	}
@@ -91,7 +96,7 @@ func (srv *Service) DefenseSessions() ([]internship.DefenseSession, error) {
 	sessions := make([]internship.DefenseSession, 0, 0)
 	var err error
 	if SessionsStmt == nil {
-		if SessionsStmt, err = srv.DB.Prepare("select date,room from defenseSessions"); err != nil {
+		if SessionsStmt, err = srv.db.Prepare("select date,room from defenseSessions"); err != nil {
 			return sessions, err
 		}
 	}
@@ -120,7 +125,7 @@ func (srv *Service) appendDefenses(s *internship.DefenseSession) error {
 	s.Defenses = make([]internship.Defense, 0, 0)
 	var err error
 	if DefsStmt == nil {
-		if DefsStmt, err = srv.DB.Prepare("select firstname, lastname, tel, email,major, promotion,company, companyWWW, title, rank,private,remote,defenseGrades.grade, nextPosition from defenses inner join users on (defenses.student=users.email) inner join internships on (defenses.student=internships.student) left outer join defenseGrades on (defenses.student=defenseGrades.student) where date=$1 and room=$2 order by rank"); err != nil {
+		if DefsStmt, err = srv.db.Prepare("select firstname, lastname, tel, email,major, promotion,company, companyWWW, title, rank,private,remote,defenseGrades.grade, nextPosition from defenses inner join users on (defenses.student=users.email) inner join internships on (defenses.student=internships.student) left outer join defenseGrades on (defenses.student=defenseGrades.student) where date=$1 and room=$2 order by rank"); err != nil {
 			return err
 		}
 	}
@@ -159,7 +164,7 @@ func (srv *Service) appendDefenses(s *internship.DefenseSession) error {
 func (srv *Service) appendJuries(s *internship.DefenseSession) error {
 	if JuriesStmt == nil {
 		var err error
-		JuriesStmt, err = srv.DB.Prepare("select firstname,lastname,tel,email from users inner join defenseJuries on users.email = defenseJuries.jury where date=$1 and room=$2")
+		JuriesStmt, err = srv.db.Prepare("select firstname,lastname,tel,email from users inner join defenseJuries on users.email = defenseJuries.jury where date=$1 and room=$2")
 		if err != nil {
 			return err
 		}
@@ -183,7 +188,7 @@ func (srv *Service) appendJuries(s *internship.DefenseSession) error {
 
 //SetDefenseSessions saves all the defense sessions
 func (srv *Service) SetDefenseSessions(sessions []internship.DefenseSession) error {
-	tx, err := srv.DB.Begin()
+	tx, err := srv.db.Begin()
 	if err != nil {
 		return err
 	}
@@ -213,7 +218,7 @@ func (srv *Service) SetDefenseGrade(stu string, g int) error {
 	if g < 0 || g > 20 {
 		return internship.ErrInvalidGrade
 	}
-	res, err := srv.DB.Exec(sql, stu, g)
+	res, err := srv.db.Exec(sql, stu, g)
 	if err != nil {
 		return err
 	}
@@ -225,7 +230,7 @@ func (srv *Service) SetDefenseGrade(stu string, g int) error {
 		return nil
 	}
 	sql = "insert into defenseGrades(student, grade) values($1,$2)"
-	_, err = srv.DB.Exec(sql, stu, g)
+	_, err = srv.db.Exec(sql, stu, g)
 	return err
 }
 */

@@ -82,7 +82,7 @@ func (s *Service) SetUserRole(email string, priv internship.Privilege) error {
 }
 
 //Logout destroy the current user session if exists
-func (s *Service) Logout(email string) error {
+func (s *Service) Logout(email, token string) error {
 	return s.singleUpdate(deleteSession, internship.ErrUnknownUser, email)
 }
 
@@ -96,7 +96,7 @@ func (s *Service) SetPassword(email string, oldP, newP []byte) error {
 		return err
 	}
 
-	tx := newTxErr(s.DB)
+	tx := newTxErr(s.db)
 	tx.err = tx.tx.QueryRow(selectPassword, email).Scan(&p)
 	tx.err = noRowsTo(tx.err, internship.ErrCredentials)
 	if bcrypt.CompareHashAndPassword(p, oldP) != nil {
@@ -131,7 +131,7 @@ func (s *Service) ResetPassword(email string, d time.Duration) ([]byte, error) {
 	//In case a request already exists
 	token := randomBytes(32)
 
-	tx := newTxErr(s.DB)
+	tx := newTxErr(s.db)
 	tx.Exec(deletePasswordRenewalRequest, email)
 	tx.Exec(startPasswordRenewall, email, token, time.Now().Add(d))
 	return token, tx.Done()
@@ -142,7 +142,7 @@ func (s *Service) ResetPassword(email string, d time.Duration) ([]byte, error) {
 func (s *Service) NewPassword(token, newP []byte) (string, error) {
 	//Delete possible renew requests
 	var email string
-	tx := newTxErr(s.DB)
+	tx := newTxErr(s.db)
 	tx.err = tx.tx.QueryRow(emailFromRenewableToken, token).Scan(&email)
 	tx.err = noRowsTo(tx.err, internship.ErrNoPendingRequests)
 	if tx.err != nil {
@@ -163,13 +163,13 @@ func (s *Service) NewPassword(token, newP []byte) (string, error) {
 //Upon success, it generates a session token that will be valid for the next 24 hours.
 func (s *Service) Login(email string, password []byte) ([]byte, error) {
 	var p []byte
-	if err := s.DB.QueryRow(selectPassword, strings.ToLower(email)).Scan(&p); err != nil {
+	if err := s.db.QueryRow(selectPassword, strings.ToLower(email)).Scan(&p); err != nil {
 		return []byte{}, internship.ErrCredentials
 	}
 	if err := bcrypt.CompareHashAndPassword(p, password); err != nil {
 		return []byte{}, internship.ErrCredentials
 	}
-	tx := newTxErr(s.DB)
+	tx := newTxErr(s.db)
 	tx.Exec(deleteSession, email)
 	token := randomBytes(32)
 	nb := tx.Update(newSession, email, token, time.Now().Add(time.Hour*24))
@@ -192,7 +192,7 @@ func (s *Service) RmUser(email string) error {
 
 //Replace the account referred by src by the account referred by dst
 func (s *Service) ReplaceUserWith(src, dst string) error {
-	tx := newTxErr(s.DB)
+	tx := newTxErr(s.db)
 	tx.Update(replaceTutorInConventions, src, dst)
 	tx.Update(replaceJuryInDefenses, src, dst)
 	tx.Update(deleteUser, src)

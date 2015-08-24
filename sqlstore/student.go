@@ -20,7 +20,7 @@ var (
 
 //Students list all the registered students
 func (s *Service) Students() ([]internship.Student, error) {
-	rows, err := s.DB.Query(allStudents)
+	rows, err := s.db.Query(allStudents)
 
 	students := make([]internship.Student, 0, 0)
 	if err != nil {
@@ -58,7 +58,7 @@ func (s *Service) Students() ([]internship.Student, error) {
 }
 
 func (s *Service) ToStudent(email, major, promotion string, male bool) error {
-	tx := newTxErr(s.DB)
+	tx := newTxErr(s.db)
 	tx.Update(insertStudent, email, male, major, promotion, false)
 	tx.Update(updateUserRole, email, internship.STUDENT)
 	return tx.Done()
@@ -79,7 +79,7 @@ func (s *Service) SetMajor(stu, m string) error {
 	return s.singleUpdate(setMajor, internship.ErrUnknownStudent, stu, m)
 }
 
-func (s *Service) SetMale(stu, m bool) error {
+func (s *Service) SetMale(stu string, m bool) error {
 	return s.singleUpdate(updateMale, internship.ErrUnknownStudent, stu, m)
 }
 

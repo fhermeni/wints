@@ -101,7 +101,7 @@ func (s *Service) ReportContent(kind, email string) ([]byte, error) {
 func (s *Service) SetReportContent(kind, email string, cnt []byte) error {
 	var deadline time.Time
 	var delivery, reviewed pq.NullTime
-	tx := newTxErr(s.DB)
+	tx := newTxErr(s.db)
 	tx.err = tx.tx.QueryRow(selectReport, email, kind).Scan(&deadline, &delivery, &reviewed)
 	tx.err = noRowsTo(tx.err, internship.ErrUnknownReport)
 	if tx.err != nil {
