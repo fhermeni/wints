@@ -35,7 +35,7 @@ create table sessions(
 create table password_renewal(
     email text,
     deadline timestamp,
-    token text UNIQUE,
+    token text unique,
     constraint pk_password_renewal_email PRIMARY KEY(email),
     constraint fk_password_renewal_email FOREIGN KEY(email) REFERENCES users(email) on delete cascade on update cascade
 );
@@ -71,7 +71,7 @@ create table conventions(
     skip bool,
     valid bool,
     constraint pk_conventions_student PRIMARY KEY (student),
-    constraint fk_conventions_student FOREIGN KEY (student) REFERENCES students(email) on delete cascade on update cascade
+    constraint fk_conventions_student FOREIGN KEY (student) REFERENCES students(email) on delete cascade on update cascade,
     constraint fk_conventions_tutor FOREIGN KEY (tutor) REFERENCES users(email) on update cascade
      -- no cascade delete for fk_conventions_tutor because we don't want to loose convention when we remove a duplicated tutor account
 );

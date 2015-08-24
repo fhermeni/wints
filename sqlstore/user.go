@@ -1,6 +1,7 @@
 package sqlstore
 
 import (
+	"errors"
 	"strings"
 	"time"
 
@@ -19,7 +20,7 @@ var (
 	updateUserRole               = "update users set role=$2 where email=$1"
 	updateUserPassword           = "update users set password=$2 where email=$1"
 	deleteSession                = "delete from sessions where email=$1"
-	deletePasswordRenewalRequest = "delete from password_renewal where user=$1"
+	deletePasswordRenewalRequest = "delete from password_renewal where email=$1"
 	deleteUser                   = "DELETE FROM users where email=$1"
 	allUsers                     = "select firstname, lastname, email, tel, role, lastVisit from users"
 	selectPassword               = "select password from users where email=$1"
@@ -82,7 +83,7 @@ func (s *Store) SetUserRole(email string, priv internship.Privilege) error {
 }
 
 //Logout destroy the current user session if exists
-func (s *Store) Logout(email, token string) error {
+func (s *Store) Logout(email string, token []byte) error {
 	return s.singleUpdate(deleteSession, internship.ErrUnknownUser, email)
 }
 
@@ -109,7 +110,7 @@ func (s *Store) SetPassword(email string, oldP, newP []byte) error {
 }
 
 //OpenedSession check if a session is currently open for the user and is not expired
-func (s *Store) OpenedSession(email, token string) error {
+func (s *Store) OpenedSession(email string, token []byte) error {
 	var last time.Time
 	st, err := s.stmt(selectExpire)
 	if err != nil {
@@ -140,22 +141,20 @@ func (s *Store) ResetPassword(email string, d time.Duration) ([]byte, error) {
 //NewPassword commits a password renewall request.
 //From a request token and a new password, it returns upon success the target user email
 func (s *Store) NewPassword(token, newP []byte) (string, error) {
-	//Delete possible renew requests
-	var email string
-	tx := newTxErr(s.db)
-	tx.err = tx.tx.QueryRow(emailFromRenewableToken, token).Scan(&email)
-	tx.err = noRowsTo(tx.err, internship.ErrNoPendingRequests)
-	if tx.err != nil {
-		return "", tx.Done()
-	}
-	//Make the new one
 	hash, err := hash(newP)
 	if err != nil {
 		return "", err
 	}
+	var email string
+	tx := newTxErr(s.db)
+	tx.err = tx.tx.QueryRow(emailFromRenewableToken, token).Scan(&email)
+	tx.err = noRowsTo(tx.err, internship.ErrNoPendingRequests)
 	tx.Update(updateUserPassword, email, hash)
 	//no need to check updated rows as it is sure the user exists in the tx context
-	tx.Exec(deletePasswordRenewalRequest, token)
+	nb := tx.Update(deletePasswordRenewalRequest, email)
+	if tx.err == nil && nb != 1 {
+		tx.err = errors.New("Unable to clean the password renewable request of " + email)
+	}
 	return email, tx.Done()
 }
 

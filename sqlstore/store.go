@@ -20,7 +20,7 @@ type Store struct {
 }
 
 //NewService initiate the storage servive
-func NewService(d *sql.DB) (*Store, error) {
+func NewStore(d *sql.DB) (*Store, error) {
 	s := Store{db: d,
 		stmts: make(map[string]*sql.Stmt),
 	}
@@ -39,8 +39,9 @@ func (s *Store) Install() error {
 
 func (s *Store) stmt(q string) (*sql.Stmt, error) {
 	st, ok := s.stmts[q]
+	var err error
 	if !ok {
-		st, err := s.db.Prepare(q) //Bad, loss prepare failure
+		st, err = s.db.Prepare(q)
 		if err != nil {
 			return nil, err
 		}

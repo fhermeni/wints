@@ -29,7 +29,7 @@ type Service interface {
 	//Test if the credentials match a user, return a session token
 	Login(email string, password []byte) ([]byte, error)
 	//Destroy a session
-	Logout(email, token string) error
+	Logout(email string, token []byte) error
 
 	//Check if a session is opened for a given user and token
 	OpenedSession(email, token string) error
