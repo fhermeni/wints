@@ -75,6 +75,6 @@ func (u User) String() string {
 }
 
 //Fullname delegates to Person.String()
-func (U User) Fullname() string {
-	return U.Person.Fullname()
+func (u User) Fullname() string {
+	return u.Person.Fullname()
 }

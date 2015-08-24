@@ -2,7 +2,7 @@ package internship
 
 import "time"
 
-//Company is just a composite to store meaningful information for a company hosting a student.
+//Company stores meaningful information for a company hosting a student.
 type Company struct {
 	//The company name
 	Name string
@@ -10,6 +10,7 @@ type Company struct {
 	WWW string
 }
 
+//Convention declares a student convention
 type Convention struct {
 	Creation   time.Time
 	Student    Student
@@ -19,7 +20,7 @@ type Convention struct {
 	Begin      time.Time
 	End        time.Time
 	Title      string
-	//Ignore this convention
+	//Ignore this convention (don't managed by wints if true)
 	Skip           bool
 	Valid          bool
 	ForeignCountry bool
@@ -33,7 +34,7 @@ type Internship struct {
 	//The headers for each
 	Reports map[string]ReportHeader
 	//The surveys
-	Surveys map[string]Survey
+	Surveys map[string]SurveyHeader
 	//Defense
-	Defense DefenseSession
+	Defense Defense
 }

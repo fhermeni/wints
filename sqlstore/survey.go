@@ -10,16 +10,16 @@ import (
 )
 
 var (
-	SelectSurveyFromToken = "select student, kind from surveys where token=$1"
-	SelectSurvey          = "select kind, deadline, timestamp, answers, token from surveys where student=$1 and kind=$2"
+	selectSurveyFromToken = "select student, kind from surveys where token=$1"
+	selectSurvey          = "select kind, deadline, timestamp, answers, token from surveys where student=$1 and kind=$2"
 	selectSurveys         = "select kind, deadline, timestamp, answers, token from surveys where student=$1"
-	UpdateSurveyContent   = "update surveys set answers=$1, timestamp=$2 where token=$3"
+	updateSurveyContent   = "update surveys set answers=$1, timestamp=$2 where token=$3"
 )
 
 func (s *Service) SurveyToken(token string) (string, string, error) {
 	student := ""
 	kind := ""
-	st, err := s.stmt(SelectSurveyFromToken)
+	st, err := s.stmt(selectSurveyFromToken)
 	if err != nil {
 		return student, kind, err
 	}
@@ -27,8 +27,8 @@ func (s *Service) SurveyToken(token string) (string, string, error) {
 	return student, kind, mapCstrToError(err)
 }
 
-func scanSurvey(rows *sql.Rows) (internship.Survey, error) {
-	survey := internship.Survey{}
+func scanSurvey(rows *sql.Rows) (internship.SurveyHeader, error) {
+	survey := internship.SurveyHeader{}
 	var delivery pq.NullTime
 	var buf []byte
 
@@ -49,8 +49,8 @@ func scanSurvey(rows *sql.Rows) (internship.Survey, error) {
 	return survey, err
 }
 
-func (s *Service) Surveys(student string) (map[string]internship.Survey, error) {
-	res := make(map[string]internship.Survey)
+func (s *Service) Surveys(student string) (map[string]internship.SurveyHeader, error) {
+	res := make(map[string]internship.SurveyHeader)
 	st, err := s.stmt(selectSurveys)
 	if err != nil {
 		return res, err
@@ -70,14 +70,14 @@ func (s *Service) Surveys(student string) (map[string]internship.Survey, error) 
 	return res, nil
 }
 
-func (s *Service) Survey(student, kind string) (internship.Survey, error) {
-	st, err := s.stmt(SelectSurvey)
+func (s *Service) Survey(student, kind string) (internship.SurveyHeader, error) {
+	st, err := s.stmt(selectSurvey)
 	if err != nil {
-		return internship.Survey{}, err
+		return internship.SurveyHeader{}, err
 	}
 	rows, err := st.Query(student, kind)
 	if err != nil {
-		return internship.Survey{}, err
+		return internship.SurveyHeader{}, err
 	}
 	defer rows.Close()
 	return scanSurvey(rows)
@@ -92,5 +92,5 @@ func (s *Service) SetSurveyContent(token string, cnt map[string]string) error {
 	if err != nil {
 		return internship.ErrInvalidSurvey
 	}
-	return s.singleUpdate(UpdateSurveyContent, internship.ErrUnknownSurvey, buf, now, token)
+	return s.singleUpdate(updateSurveyContent, internship.ErrUnknownSurvey, buf, now, token)
 }

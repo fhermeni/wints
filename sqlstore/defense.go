@@ -5,6 +5,7 @@ import "github.com/fhermeni/wints/internship"
 var (
 	updateDefensePrivacy  = "update defenses set private=$1 where student=$2"
 	updateDefenseLocality = "update defenses set local=$1 where student=$2"
+	selectDefense         = "select date, room, grade, private, local from defenses where student=$1"
 )
 
 func (s *Service) SetDefensePrivacy(student string, private bool) error {
@@ -13,6 +14,22 @@ func (s *Service) SetDefensePrivacy(student string, private bool) error {
 
 func (s *Service) SetDefenseLocality(student string, local bool) error {
 	return s.singleUpdate(updateDefenseLocality, internship.ErrUnknownStudent, local, student)
+}
+
+func (s *Service) Defense(student string) (internship.Defense, error) {
+	d := internship.Defense{}
+	st, err := s.stmt(selectDefense)
+	if err != nil {
+		return d, err
+	}
+	err = st.QueryRow(student).Scan(
+		&d.Time,
+		&d.Room,
+		&d.Grade,
+		&d.Private,
+		&d.Local,
+	)
+	return d, err
 }
 
 /*

@@ -2,22 +2,22 @@ package internship
 
 import "time"
 
-//Defense
+//Defense depicts the defense of a student
 type Defense struct {
-	Student User
 	Private bool
-	Remote  bool
+	Local   bool
 	Grade   int
-	Offset  int
+	Time    time.Time
+	Room    string
 }
 
+//DefenseSession groups all the defenses that occurs during a session
 type DefenseSession struct {
-	Date     time.Time
-	Room     string
 	Juries   []User
-	Defenses []Defense
+	Defenses map[string]Defense
 }
 
+//InJury check if a user is a part of a jury
 func (s DefenseSession) InJury(em string) bool {
 	for _, j := range s.Juries {
 		if j.Person.Email == em {

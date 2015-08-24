@@ -1,6 +1,7 @@
 package sqlstore
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/fhermeni/wints/config"
@@ -8,7 +9,7 @@ import (
 )
 
 var (
-	UpdateConventionSkip     = "update conventions set skip=$1 where student=$2"
+	updateConventionSkip     = "update conventions set skip=$1 where student=$2"
 	updateSupervisor         = "update conventions set supervisorFn=$1, supervisorLn=$2, supervisorTel=$3, supervisorEmail=$4 where student=$5"
 	updateTutor              = "update conventions set tutor=$1 where student=$2"
 	updateCompany            = "update conventions set companyWWW=$1, company=$2 where student=$3"
@@ -25,13 +26,23 @@ var (
 		" inner join students on (students.email = conventions.student) " +
 		" inner join users as stup on (stup.email = conventions.student)  " +
 		" inner join users as tutp on (tutp.email = conventions.tutor)  "
+	selectConvention = "select stup.firstname, stup.lastname, stup.tel, stup.email, stup.lastVisit" +
+		"students.male, students.promotion, students.major, students.nextPosition, students.nextContact, students.skip," +
+		"tutp.firstname, tutp.lastname, tutp.tel, tutp.email, tutp.lastVisit, tutp.role" +
+		"startTime, endTime, companyName, companyWWW, title, creation, foreignCountry, lab, gratification, skip, valid," +
+		"supervisorFn, supervisorLn, supervisorEmail, supervisorTel " +
+		"from conventions " +
+		" inner join students on (students.email = conventions.student) " +
+		" inner join users as stup on (stup.email = conventions.student)  " +
+		" inner join users as tutp on (tutp.email = conventions.tutor)  " +
+		" where stup.email=$1"
 	insertReport       = "insert into reports(student, kind, deadline, private, toGrade) values($1,$2,$3,$4,$5)"
 	insertSurvey       = "insert into surveys(student, kind, token, deadline) values($1,$2,$3,$4)"
 	validateConvention = "update conventions set valid=$2 where student=$1"
 )
 
 func (s *Service) SetConventionSkippable(student string, skip bool) error {
-	return s.singleUpdate(UpdateConventionSkip, internship.ErrUnknownStudent, skip, student)
+	return s.singleUpdate(updateConventionSkip, internship.ErrUnknownStudent, skip, student)
 }
 
 func (s *Service) SetSupervisor(stu string, t internship.Person) error {
@@ -98,53 +109,10 @@ func (s *Service) Conventions() ([]internship.Convention, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		c := internship.Convention{
-			Student: internship.Student{
-				User: internship.User{
-					Person: internship.Person{},
-				},
-				Alumni: internship.Alumni{},
-			},
-			Tutor: internship.User{
-				Person: internship.Person{},
-			},
-			Supervisor: internship.Person{},
-			Cpy:        internship.Company{},
+		c, err := scanConvention(rows)
+		if err != nil {
+			return conventions, err
 		}
-		rows.Scan(
-			&c.Student.User.Person.Firstname,
-			&c.Student.User.Person.Lastname,
-			&c.Student.User.Person.Tel,
-			&c.Student.User.Person.Email,
-			&c.Student.User.LastVisit,
-			&c.Student.Male,
-			&c.Student.Promotion,
-			&c.Student.Major,
-			&c.Student.Alumni.Position,
-			&c.Student.Alumni.Contact,
-			&c.Student.Skip,
-			&c.Tutor.Person.Firstname,
-			&c.Tutor.Person.Lastname,
-			&c.Tutor.Person.Tel,
-			&c.Tutor.Person.Email,
-			&c.Tutor.LastVisit,
-			&c.Tutor.Role,
-			&c.Begin,
-			&c.End,
-			&c.Cpy.Name,
-			&c.Cpy.WWW,
-			&c.Title,
-			&c.Creation,
-			&c.ForeignCountry,
-			&c.Lab,
-			&c.Gratification,
-			&c.Skip,
-			&c.Valid,
-			&c.Supervisor.Firstname,
-			&c.Supervisor.Lastname,
-			&c.Supervisor.Email,
-			&c.Supervisor.Tel,
-		)
 		conventions = append(conventions, c)
 	}
 	return conventions, nil
@@ -184,24 +152,103 @@ func (s *Service) ValidateConvention(student string, cfg config.Config) error {
 
 func (s *Service) Internships() ([]internship.Internship, error) {
 	res := make([]internship.Internship, 0, 0)
-	tx := newTxErr(s.DB)
 	conventions, err := s.Conventions()
 	if err != nil {
 		return res, err
 	}
 	for _, c := range conventions {
-		i := internship.Internship{
-			Convention: c,
-		}
-		i.Reports, err = s.Reports(c.Student.User.Person.Email)
-		if err != nil {
-			return res, err
-		}
-		i.Surveys, err = s.Surveys(c.Student.User.Person.Email)
+
+		i, err := s.toInternship(c)
 		if err != nil {
 			return res, err
 		}
 		res = append(res, i)
 	}
-	return res, tx.Done()
+	return res, err
+}
+
+func (s *Service) Internship(student string) (internship.Internship, error) {
+	i := internship.Internship{}
+	st, err := s.stmt(selectConvention)
+	if err != nil {
+		return i, err
+	}
+	rows, err := st.Query(student)
+	if err != nil {
+		return i, err
+	}
+	defer rows.Close()
+	c, err := scanConvention(rows)
+	if err != nil {
+		return i, err
+	}
+	return s.toInternship(c)
+}
+
+func (s *Service) toInternship(c internship.Convention) (internship.Internship, error) {
+	stu := c.Student.User.Person.Email
+	r, err := s.Reports(stu)
+	if err != nil {
+		return internship.Internship{}, err
+	}
+	surveys, err := s.Surveys(stu)
+	if err != nil {
+		return internship.Internship{}, err
+	}
+	d, err := s.Defense(stu)
+	if err != nil {
+		return internship.Internship{}, err
+	}
+	return internship.Internship{Convention: c, Reports: r, Surveys: surveys, Defense: d}, err
+}
+
+func scanConvention(rows *sql.Rows) (internship.Convention, error) {
+	c := internship.Convention{
+		Student: internship.Student{
+			User: internship.User{
+				Person: internship.Person{},
+			},
+			Alumni: internship.Alumni{},
+		},
+		Tutor: internship.User{
+			Person: internship.Person{},
+		},
+		Supervisor: internship.Person{},
+		Cpy:        internship.Company{},
+	}
+	err := rows.Scan(
+		&c.Student.User.Person.Firstname,
+		&c.Student.User.Person.Lastname,
+		&c.Student.User.Person.Tel,
+		&c.Student.User.Person.Email,
+		&c.Student.User.LastVisit,
+		&c.Student.Male,
+		&c.Student.Promotion,
+		&c.Student.Major,
+		&c.Student.Alumni.Position,
+		&c.Student.Alumni.Contact,
+		&c.Student.Skip,
+		&c.Tutor.Person.Firstname,
+		&c.Tutor.Person.Lastname,
+		&c.Tutor.Person.Tel,
+		&c.Tutor.Person.Email,
+		&c.Tutor.LastVisit,
+		&c.Tutor.Role,
+		&c.Begin,
+		&c.End,
+		&c.Cpy.Name,
+		&c.Cpy.WWW,
+		&c.Title,
+		&c.Creation,
+		&c.ForeignCountry,
+		&c.Lab,
+		&c.Gratification,
+		&c.Skip,
+		&c.Valid,
+		&c.Supervisor.Firstname,
+		&c.Supervisor.Lastname,
+		&c.Supervisor.Email,
+		&c.Supervisor.Tel,
+	)
+	return c, err
 }

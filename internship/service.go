@@ -4,6 +4,8 @@ package internship
 import (
 	"errors"
 	"time"
+
+	"github.com/fhermeni/wints/config"
 )
 
 //Service specifies the core methods to manage student internships
@@ -34,7 +36,7 @@ type Service interface {
 
 	//Ask for a password reset.
 	//Return a token used to declare the new password (see NewPassword)
-	ResetPassword(email string) ([]byte, error)
+	ResetPassword(email string, d time.Duration) ([]byte, error)
 
 	//Declare the new password using an authentication token
 	NewPassword(token, newP []byte) (string, error)
@@ -61,7 +63,7 @@ type Service interface {
 
 	//Turns the convention to an internship
 	//align student & tutor. Tutor must exists. Send student credentials, instantiate reports, surveys
-	ValidateConvention(stu string) error
+	ValidateConvention(stu string, cfg config.Config) error
 
 	//Internship management
 	Internships() ([]Internship, error)
@@ -80,7 +82,7 @@ type Service interface {
 
 	//Survey management
 	SurveyToken(kind string) (string, string, error)
-	Survey(student, kind string) (Survey, error)
+	Survey(student, kind string) (SurveyHeader, error)
 	SetSurveyContent(token string, cnt map[string]string) error
 	//SurveyDefs() []SurveyDef
 	//RequestSurvey(stu, kind string) error

@@ -16,12 +16,12 @@ type ReportHeader struct {
 	ToGrade bool
 }
 
-//Graded indicates if a report has been graded by its tutor or not
+//Graded indicates if a report has been graded
 func (m *ReportHeader) Graded() bool {
 	return m.Reviewed != nil
 }
 
-//Graded indicates if a report has been graded by its tutor or not
+//In indicates if a report has been uploaded
 func (m *ReportHeader) In() bool {
 	return m.Delivery != nil
 }

@@ -11,21 +11,20 @@ import (
 )
 
 var (
-	AddUser                      = "insert into users(firstname, lastname, tel, email, password, role) values ($1,$2,$3,$4,$5,$6)"
-	insertUser                   = "insert into users(firstname, lastname, tel, email, role) values ($1,$2,$3,$4,$5)"
+	insertUser                   = "insert into users(firstname, lastname, tel, email, role, password) values ($1,$2,$3,$4,$5,$6)"
 	startPasswordRenewall        = "insert into password_renewal(email,token,deadline) values($1,$2,$3)"
 	newSession                   = "insert into sessions(email, token, expire) values ($1,$2,$3)"
-	UpdateLastVisit              = "update users set lastVisit=$1 where email=$2"
-	UpdateUserProfile            = "update users set firstname=$1, lastname=$2, tel=$3 where email=$4"
+	updateLastVisit              = "update users set lastVisit=$1 where email=$2"
+	updateUserProfile            = "update users set firstname=$1, lastname=$2, tel=$3 where email=$4"
 	updateUserRole               = "update users set role=$2 where email=$1"
-	UpdateUserPassword           = "update users set password=$2 where email=$1"
-	DeleteSession                = "delete from sessions where email=$1"
-	DeletePasswordRenewalRequest = "delete from password_renewal where user=$1"
+	updateUserPassword           = "update users set password=$2 where email=$1"
+	deleteSession                = "delete from sessions where email=$1"
+	deletePasswordRenewalRequest = "delete from password_renewal where user=$1"
 	deleteUser                   = "DELETE FROM users where email=$1"
-	AllUsers                     = "select firstname, lastname, email, tel, role, lastVisit from users"
+	allUsers                     = "select firstname, lastname, email, tel, role, lastVisit from users"
 	selectPassword               = "select password from users where email=$1"
 	selectExpire                 = "select expire from sessions where email=$1 and token=$2"
-	EmailFromRenewableToken      = "select email from password_renewal where token=$1"
+	emailFromRenewableToken      = "select email from password_renewal where token=$1"
 	replaceTutorInConventions    = "update conventions set tutor=$2 where tutor=$1"
 	replaceJuryInDefenses        = "update defenseJuries set jury=$2 where tutor=$1"
 )
@@ -33,18 +32,18 @@ var (
 //addUser add the given user.
 //Every strings are turned into their lower case version
 func (s *Service) addUser(tx *TxErr, u internship.User) {
-	tx.Exec(AddUser, strings.ToLower(u.Person.Firstname), strings.ToLower(u.Person.Lastname), u.Person.Tel, strings.ToLower(u.Person.Email), randomBytes(32), u.Role)
+	tx.Exec(insertUser, strings.ToLower(u.Person.Firstname), strings.ToLower(u.Person.Lastname), u.Person.Tel, strings.ToLower(u.Person.Email), u.Role, randomBytes(32))
 }
 
 //Visit writes the current time for the given user
 func (s *Service) Visit(u string) error {
-	return s.singleUpdate(UpdateLastVisit, internship.ErrUnknownUser, time.Now(), u)
+	return s.singleUpdate(updateLastVisit, internship.ErrUnknownUser, time.Now(), u)
 }
 
 //Users list all the registered users
 func (s *Service) Users() ([]internship.User, error) {
 	users := make([]internship.User, 0, 0)
-	st, err := s.stmt(AllUsers)
+	st, err := s.stmt(allUsers)
 	if err != nil {
 		return users, err
 	}
@@ -74,7 +73,7 @@ func (s *Service) Users() ([]internship.User, error) {
 
 //SetUserProfile changes the user profile if exists
 func (s *Service) SetUserProfile(email, fn, ln, tel string) error {
-	return s.singleUpdate(UpdateUserProfile, internship.ErrUnknownUser, fn, ln, tel, email)
+	return s.singleUpdate(updateUserProfile, internship.ErrUnknownUser, fn, ln, tel, email)
 }
 
 //SetUserRole updates the user privilege
@@ -84,7 +83,7 @@ func (s *Service) SetUserRole(email string, priv internship.Privilege) error {
 
 //Logout destroy the current user session if exists
 func (s *Service) Logout(email string) error {
-	return s.singleUpdate(DeleteSession, internship.ErrUnknownUser, email)
+	return s.singleUpdate(deleteSession, internship.ErrUnknownUser, email)
 }
 
 //SetPassword changes the user password if the old one is the current one.
@@ -103,8 +102,8 @@ func (s *Service) SetPassword(email string, oldP, newP []byte) error {
 	if bcrypt.CompareHashAndPassword(p, oldP) != nil {
 		tx.err = internship.ErrCredentials
 	}
-	tx.Exec(DeletePasswordRenewalRequest, email)
-	tx.Update(UpdateUserPassword, email, hash)
+	tx.Exec(deletePasswordRenewalRequest, email)
+	tx.Update(updateUserPassword, email, hash)
 	//no need to check update, we know the user exists in the transaction context
 	return tx.Done()
 }
@@ -127,16 +126,14 @@ func (s *Service) OpenedSession(email, token string) error {
 	return err
 }
 
-//ResetPassword starts a reset procedure
-//Upon success, it generates a token that will be valid for the next 48h.
-func (s *Service) ResetPassword(email string) ([]byte, error) {
+//ResetPassword starts a reset procedure, valid for a given period
+func (s *Service) ResetPassword(email string, d time.Duration) ([]byte, error) {
 	//In case a request already exists
 	token := randomBytes(32)
-	d, _ := time.ParseDuration("48h")
 
 	tx := newTxErr(s.DB)
-	tx.Exec(DeletePasswordRenewalRequest, email)
-	tx.Exec(startPasswordRenewall, email, token, d)
+	tx.Exec(deletePasswordRenewalRequest, email)
+	tx.Exec(startPasswordRenewall, email, token, time.Now().Add(d))
 	return token, tx.Done()
 }
 
@@ -146,7 +143,7 @@ func (s *Service) NewPassword(token, newP []byte) (string, error) {
 	//Delete possible renew requests
 	var email string
 	tx := newTxErr(s.DB)
-	tx.err = tx.tx.QueryRow(EmailFromRenewableToken, token).Scan(&email)
+	tx.err = tx.tx.QueryRow(emailFromRenewableToken, token).Scan(&email)
 	tx.err = noRowsTo(tx.err, internship.ErrNoPendingRequests)
 	if tx.err != nil {
 		return "", tx.Done()
@@ -156,9 +153,9 @@ func (s *Service) NewPassword(token, newP []byte) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	tx.Update(UpdateUserPassword, email, hash)
+	tx.Update(updateUserPassword, email, hash)
 	//no need to check updated rows as it is sure the user exists in the tx context
-	tx.Exec(DeletePasswordRenewalRequest, token)
+	tx.Exec(deletePasswordRenewalRequest, token)
 	return email, tx.Done()
 }
 
@@ -173,7 +170,7 @@ func (s *Service) Login(email string, password []byte) ([]byte, error) {
 		return []byte{}, internship.ErrCredentials
 	}
 	tx := newTxErr(s.DB)
-	tx.Exec(DeleteSession, email)
+	tx.Exec(deleteSession, email)
 	token := randomBytes(32)
 	nb := tx.Update(newSession, email, token, time.Now().Add(time.Hour*24))
 	if tx.err == nil && nb != 1 {
@@ -185,9 +182,10 @@ func (s *Service) Login(email string, password []byte) ([]byte, error) {
 //AddUser add a user
 //Basically, calls addUser
 func (s *Service) NewUser(fn, ln, tel, email string) error {
-	return s.singleUpdate(insertUser, internship.ErrUserExists, fn, ln, tel, email, internship.NONE)
+	return s.singleUpdate(insertUser, internship.ErrUserExists, fn, ln, tel, email, internship.NONE, randomBytes(32))
 }
 
+//RmUser removes a user from the database
 func (s *Service) RmUser(email string) error {
 	return s.singleUpdate(deleteUser, internship.ErrUnknownUser, email)
 }
