@@ -34,7 +34,7 @@ type Service interface {
 	Logout(email string, token []byte) error
 
 	//Check if a session is opened for a given user and token
-	OpenedSession(email, token string) error
+	Session(token string) (Session, error)
 
 	//Ask for a password reset.
 	//Return a token used to declare the new password (see NewPassword)

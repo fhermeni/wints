@@ -26,7 +26,7 @@ var (
 	deleteUser                   = "DELETE FROM users where email=$1"
 	allUsers                     = "select firstname, lastname, email, tel, role, lastVisit from users"
 	selectPassword               = "select password from users where email=$1"
-	selectExpire                 = "select expire from sessions where token=$1"
+	selectSession                = "select email, token, expire from sessions where token=$1"
 	emailFromRenewableToken      = "select email from password_renewal where token=$1"
 	replaceTutorInConventions    = "update conventions set tutor=$2 where tutor=$1"
 	replaceJuryInDefenses        = "update defenseJuries set jury=$2 where tutor=$1"
@@ -134,19 +134,12 @@ func (s *Store) SetPassword(email string, oldP, newP []byte) error {
 	return tx.Done()
 }
 
-//OpenedSession check if a session is currently open for the user and is not expired
-func (s *Store) OpenedSession(token []byte) error {
-	var last time.Time
-	st := s.stmt(selectExpire)
-	err := st.QueryRow(token).Scan(&last)
-	err = noRowsTo(err, internship.ErrCredentials)
-	if err != nil {
-		return err
-	}
-	if time.Now().After(last) {
-		return internship.ErrSessionExpired
-	}
-	return err
+//Session check if a session is currently open for the user and is not expired
+func (s *Store) Session(token []byte) (internship.Session, error) {
+	st := s.stmt(selectSession)
+	ss := internship.Session{}
+	err := st.QueryRow(token).Scan(&ss.Email, &ss.Token, &ss.Expire)
+	return ss, noRowsTo(err, internship.ErrCredentials)
 }
 
 //ResetPassword starts a reset procedure, valid for a given period
