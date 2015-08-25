@@ -16,13 +16,13 @@ import (
 type Store struct {
 	db *sql.DB
 	//mailer     mail.Mailer
-	stmts map[string]*sql.Stmt
+	stmts map[string]*stmtErr
 }
 
 //NewService initiate the storage servive
 func NewStore(d *sql.DB) (*Store, error) {
 	s := Store{db: d,
-		stmts: make(map[string]*sql.Stmt),
+		stmts: make(map[string]*stmtErr),
 	}
 	return &s, nil
 }
@@ -37,25 +37,19 @@ func (s *Store) Install() error {
 	return err
 }
 
-func (s *Store) stmt(q string) (*sql.Stmt, error) {
+func (s *Store) stmt(q string) *stmtErr {
 	st, ok := s.stmts[q]
-	var err error
 	if !ok {
-		st, err = s.db.Prepare(q)
-		if err != nil {
-			return nil, err
-		}
+		x, err := s.db.Prepare(q)
+		st = &stmtErr{err: err, st: x}
 		s.stmts[q] = st
 	}
-	return st, nil
+	return st
 }
 
 //SingleUpdate executes a query that aims are affecting only 1 row.
 func (s *Store) singleUpdate(q string, errNoUpdate error, args ...interface{}) error {
-	st, err := s.stmt(q)
-	if err != nil {
-		return mapCstrToError(err)
-	}
+	st := s.stmt(q)
 	res, err := st.Exec(args...)
 	if err != nil {
 		return mapCstrToError(err)
@@ -85,6 +79,13 @@ func nullableTime(t pq.NullTime) *time.Time {
 		return &t.Time
 	}
 	return nil
+}
+
+func nullableInt(t sql.NullInt64, def int) int {
+	if t.Valid {
+		return int(t.Int64)
+	}
+	return def
 }
 
 func noRowsTo(got error, with error) error {

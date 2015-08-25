@@ -1,8 +1,6 @@
 package sqlstore
 
 import (
-	"strings"
-
 	"github.com/fhermeni/wints/internship"
 	"github.com/lib/pq"
 )
@@ -48,10 +46,7 @@ func (s *Store) Students() ([]internship.Student, error) {
 			&s.Alumni.Position,
 			&s.Alumni.Contact,
 			&s.Skip)
-
-		if lastVisit.Valid {
-			s.User.LastVisit = &lastVisit.Time
-		}
+		s.User.LastVisit = nullableTime(lastVisit)
 		students = append(students, s)
 	}
 	return students, err
@@ -91,8 +86,5 @@ func (s *Store) SetNextPosition(student string, pos int) error {
 //SetNextContact updates the student next contact email.
 //The email must contains one '@' and must not contains '@unice.fr' or 'polytech' to prevent from incorrect emails
 func (s *Store) SetNextContact(student string, em string) error {
-	if !strings.Contains(em, "@") || strings.Contains(em, "@unice.fr") || strings.Contains(em, "polytech") {
-		return internship.ErrInvalidAlumniEmail
-	}
 	return s.singleUpdate(setNextContact, internship.ErrUnknownUser, em, student)
 }

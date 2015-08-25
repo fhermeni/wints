@@ -1,3 +1,4 @@
+// +build integration
 package sqlstore
 
 import (
@@ -19,6 +20,16 @@ import (
 //SetPromotion
 
 var store *Store
+var u1 = internship.User{
+	Person: internship.Person{
+		Firstname: "foo",
+		Lastname:  "bar",
+		Tel:       "baz",
+		Email:     "foo@bar.com",
+	},
+	Role:      internship.NONE,
+	LastVisit: nil,
+}
 
 func init() {
 	conn := "user=fhermeni dbname=wints_test host=localhost sslmode=disable"
@@ -93,8 +104,7 @@ func TestUserManagement(t *testing.T) {
 	assert.Equal(t, internship.ErrCredentials, err)
 	_, err = store.Login("foo@baz.com", []byte("foo"))
 	assert.Equal(t, internship.ErrCredentials, err)
-	assert.Equal(t, internship.ErrCredentials, store.OpenedSession("foo@bar.com", []byte{}))
-	assert.Equal(t, internship.ErrCredentials, store.OpenedSession("foo@baz.com", []byte{}))
+	assert.Equal(t, internship.ErrCredentials, store.OpenedSession([]byte("ff")))
 
 	//Reset the password
 	d, _ := time.ParseDuration("1h")
@@ -105,28 +115,33 @@ func TestUserManagement(t *testing.T) {
 
 	em, err := store.NewPassword([]byte("dd"), []byte("lkjpp"))
 	assert.Equal(t, internship.ErrNoPendingRequests, err)
-	em, err = store.NewPassword(tok, []byte("lkjpp"))
+
+	passwd := []byte("foobabb")
+	em, err = store.NewPassword(tok, passwd)
 	assert.Nil(t, err)
 	assert.Equal(t, "foo@bar.com", em)
-	_, err = store.NewPassword(tok, []byte("lkjpp"))
+	_, err = store.NewPassword(tok, passwd)
 	assert.Equal(t, internship.ErrNoPendingRequests, err)
 
 	//login
-	token, err := store.Login("foo@bar.com", []byte("lkjpp"))
+	token, err := store.Login("foo@bar.com", passwd)
 	assert.Nil(t, err)
 	//opened session
-	assert.Nil(t, store.OpenedSession("foo@bar.com", token))
+	assert.Nil(t, store.OpenedSession(token.Token))
 	//logout
-	assert.Nil(t, store.Logout("foo@bar.com", token))
-	assert.NotNil(t, store.Logout("foo@bar.com", token))
-	assert.NotNil(t, store.OpenedSession("foo@bar.com", token))
+	assert.Nil(t, store.Logout(token.Token))
+	assert.NotNil(t, store.Logout(token.Token))
+	assert.NotNil(t, store.OpenedSession(token.Token))
 
 	//changePassword
-	assert.Nil(t, store.SetPassword("foo@bar.com", []byte("lkjpp"), []byte("1111")))
+	passwd2 := []byte("jlkl")
+	assert.Nil(t, store.SetPassword("foo@bar.com", passwd, passwd2))
 	//login
-	token, err = store.Login("foo@bar.com", []byte("1111"))
+	_, err = store.Login("foo@bar.com", passwd)
+	assert.Equal(t, internship.ErrCredentials, err)
+	token, err = store.Login("foo@bar.com", passwd2)
 	assert.Nil(t, err)
-	assert.Nil(t, store.Logout("foo@bar.com", token))
+	assert.Nil(t, store.Logout(token.Token))
 	//logout
 
 	//profile

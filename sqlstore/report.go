@@ -2,7 +2,6 @@ package sqlstore
 
 import (
 	"database/sql"
-	"encoding/base64"
 	"time"
 
 	"github.com/fhermeni/wints/internship"
@@ -21,10 +20,7 @@ var (
 
 func (s *Store) Reports(email string) (map[string]internship.ReportHeader, error) {
 	res := make(map[string]internship.ReportHeader)
-	st, err := s.stmt(selectReports)
-	if err != nil {
-		return res, nil
-	}
+	st := s.stmt(selectReports)
 	rows, err := st.Query(email)
 	if err != nil {
 		return res, nil
@@ -70,10 +66,7 @@ func scanReport(rows *sql.Rows) (internship.ReportHeader, error) {
 func (s *Store) Report(k, email string) (internship.ReportHeader, error) {
 	hdr := internship.ReportHeader{Grade: -1}
 
-	st, err := s.stmt(selectReport)
-	if err != nil {
-		return hdr, mapCstrToError(err)
-	}
+	st := s.stmt(selectReport)
 	rows, err := st.Query(email, k)
 	if err != nil {
 		return hdr, mapCstrToError(err)
@@ -84,50 +77,16 @@ func (s *Store) Report(k, email string) (internship.ReportHeader, error) {
 
 func (s *Store) ReportContent(kind, email string) ([]byte, error) {
 	var cnt []byte
-	var delivery pq.NullTime
-	st, err := s.stmt(selectReportCnt)
-	if err != nil {
-		return cnt, err
-	}
-	if err := st.QueryRow(email, kind).Scan(&cnt, &delivery); err != nil {
-		return []byte{}, mapCstrToError(err)
-	}
-	if !delivery.Valid {
-		return []byte{}, mapCstrToError(err)
-	}
-	return base64.StdEncoding.DecodeString(string(cnt))
+	st := s.stmt(selectReportCnt)
+	err := st.QueryRow(email, kind).Scan(&cnt)
+	return cnt, err
 }
 
 func (s *Store) SetReportContent(kind, email string, cnt []byte) error {
-	var deadline time.Time
-	var delivery, reviewed pq.NullTime
-	tx := newTxErr(s.db)
-	tx.err = tx.tx.QueryRow(selectReport, email, kind).Scan(&deadline, &delivery, &reviewed)
-	tx.err = noRowsTo(tx.err, internship.ErrUnknownReport)
-	if tx.err != nil {
-		return tx.Done()
-	}
-	if time.Now().After(deadline) {
-		//We allow 1 delivery once the deadline passed
-		if delivery.Valid {
-			//You had your chance
-			tx.err = internship.ErrDeadlinePassed
-			return tx.Done()
-		}
-	}
-	if reviewed.Valid {
-		tx.err = internship.ErrGradedReport
-	}
-	tx.Update(setReportCnt, email, kind, base64.StdEncoding.EncodeToString(cnt), time.Now())
-	//No need to check if nb == 1, ensured by the transaction context
-	return tx.Done()
-
+	return s.singleUpdate(setReportCnt, internship.ErrUnknownReport, email, kind, cnt, time.Now())
 }
 
 func (s *Store) SetReportGrade(kind, email string, g int, comment string) error {
-	if g < 0 || g > 20 {
-		return internship.ErrInvalidGrade
-	}
 	return s.singleUpdate(setGrade, internship.ErrUnknownReport, email, kind, g, comment, time.Now())
 }
 

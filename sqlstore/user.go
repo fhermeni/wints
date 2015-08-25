@@ -20,11 +20,12 @@ var (
 	updateUserRole               = "update users set role=$2 where email=$1"
 	updateUserPassword           = "update users set password=$2 where email=$1"
 	deleteSession                = "delete from sessions where email=$1"
+	deleteSessionFromToken       = "delete from sessions where token=$1"
 	deletePasswordRenewalRequest = "delete from password_renewal where email=$1"
 	deleteUser                   = "DELETE FROM users where email=$1"
 	allUsers                     = "select firstname, lastname, email, tel, role, lastVisit from users"
 	selectPassword               = "select password from users where email=$1"
-	selectExpire                 = "select expire from sessions where email=$1 and token=$2"
+	selectExpire                 = "select expire from sessions where token=$1"
 	emailFromRenewableToken      = "select email from password_renewal where token=$1"
 	replaceTutorInConventions    = "update conventions set tutor=$2 where tutor=$1"
 	replaceJuryInDefenses        = "update defenseJuries set jury=$2 where tutor=$1"
@@ -33,7 +34,14 @@ var (
 //addUser add the given user.
 //Every strings are turned into their lower case version
 func (s *Store) addUser(tx *TxErr, u internship.User) {
-	tx.Exec(insertUser, strings.ToLower(u.Person.Firstname), strings.ToLower(u.Person.Lastname), u.Person.Tel, strings.ToLower(u.Person.Email), u.Role, randomBytes(32))
+	tx.Exec(insertUser,
+		strings.ToLower(u.Person.Firstname),
+		strings.ToLower(u.Person.Lastname),
+		u.Person.Tel,
+		strings.ToLower(u.Person.Email),
+		u.Role,
+		randomBytes(32),
+	)
 }
 
 //Visit writes the current time for the given user
@@ -44,10 +52,7 @@ func (s *Store) Visit(u string) error {
 //Users list all the registered users
 func (s *Store) Users() ([]internship.User, error) {
 	users := make([]internship.User, 0, 0)
-	st, err := s.stmt(allUsers)
-	if err != nil {
-		return users, err
-	}
+	st := s.stmt(allUsers)
 	rows, err := st.Query()
 	if err != nil {
 		return users, err
@@ -62,10 +67,9 @@ func (s *Store) Users() ([]internship.User, error) {
 			&u.Person.Email,
 			&u.Person.Tel,
 			&u.Role,
-			&last)
-		if last.Valid {
-			u.LastVisit = &last.Time
-		}
+			&last,
+		)
+		u.LastVisit = nullableTime(last)
 		//Get the role if exists
 		users = append(users, u)
 	}
@@ -82,25 +86,21 @@ func (s *Store) SetUserRole(email string, priv internship.Privilege) error {
 	return s.singleUpdate(updateUserRole, internship.ErrUnknownUser, email, priv)
 }
 
-//Logout destroy the current user session if exists
-func (s *Store) Logout(email string, token []byte) error {
-	return s.singleUpdate(deleteSession, internship.ErrUnknownUser, email)
-}
-
-//SetPassword changes the user password if the old one is the current one.
+//SetPassword changes the user password
 //Any pending renewable requests are deleted on success
 func (s *Store) SetPassword(email string, oldP, newP []byte) error {
-	//Get the password
-	var p []byte
-	hash, err := bcrypt.GenerateFromPassword(newP, bcrypt.MinCost)
+	hash, err := hash(newP)
 	if err != nil {
 		return err
 	}
-
 	tx := newTxErr(s.db)
-	tx.err = tx.tx.QueryRow(selectPassword, email).Scan(&p)
+	var p []byte
+	tx.err = tx.tx.QueryRow(selectPassword, strings.ToLower(email)).Scan(&p)
 	tx.err = noRowsTo(tx.err, internship.ErrCredentials)
-	if bcrypt.CompareHashAndPassword(p, oldP) != nil {
+	if tx.err != nil {
+		return tx.Done()
+	}
+	if err := bcrypt.CompareHashAndPassword(p, oldP); err != nil {
 		tx.err = internship.ErrCredentials
 	}
 	tx.Exec(deletePasswordRenewalRequest, email)
@@ -110,13 +110,10 @@ func (s *Store) SetPassword(email string, oldP, newP []byte) error {
 }
 
 //OpenedSession check if a session is currently open for the user and is not expired
-func (s *Store) OpenedSession(email string, token []byte) error {
+func (s *Store) OpenedSession(token []byte) error {
 	var last time.Time
-	st, err := s.stmt(selectExpire)
-	if err != nil {
-		return err
-	}
-	err = st.QueryRow(email, token).Scan(&last)
+	st := s.stmt(selectExpire)
+	err := st.QueryRow(token).Scan(&last)
 	err = noRowsTo(err, internship.ErrCredentials)
 	if err != nil {
 		return err
@@ -145,6 +142,7 @@ func (s *Store) NewPassword(token, newP []byte) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	var email string
 	tx := newTxErr(s.db)
 	tx.err = tx.tx.QueryRow(emailFromRenewableToken, token).Scan(&email)
@@ -160,25 +158,36 @@ func (s *Store) NewPassword(token, newP []byte) (string, error) {
 
 //Login log a user.
 //Upon success, it generates a session token that will be valid for the next 24 hours.
-func (s *Store) Login(email string, password []byte) ([]byte, error) {
+func (s *Store) Login(email string, password []byte) (internship.Session, error) {
 	var p []byte
-	if err := s.db.QueryRow(selectPassword, strings.ToLower(email)).Scan(&p); err != nil {
-		return []byte{}, internship.ErrCredentials
-	}
-	if err := bcrypt.CompareHashAndPassword(p, password); err != nil {
-		return []byte{}, internship.ErrCredentials
+	ss := internship.Session{
+		Email:  email,
+		Token:  randomBytes(32),
+		Expire: time.Now().Add(time.Hour * 24),
 	}
 	tx := newTxErr(s.db)
+	tx.err = tx.tx.QueryRow(selectPassword, strings.ToLower(email)).Scan(&p)
+	tx.err = noRowsTo(tx.err, internship.ErrCredentials)
+	if tx.err != nil {
+		return ss, tx.Done()
+	}
+	if err := bcrypt.CompareHashAndPassword(p, password); err != nil {
+		tx.err = internship.ErrCredentials
+	}
 	tx.Exec(deleteSession, email)
-	token := randomBytes(32)
-	nb := tx.Update(newSession, email, token, time.Now().Add(time.Hour*24))
+	nb := tx.Update(newSession, ss.Email, ss.Token, ss.Expire)
 	if tx.err == nil && nb != 1 {
 		tx.err = internship.ErrUnknownUser
 	}
-	return token, tx.Done()
+	return ss, tx.Done()
 }
 
-//AddUser add a user
+//Logout destroy the current user session if exists
+func (s *Store) Logout(token []byte) error {
+	return s.singleUpdate(deleteSessionFromToken, internship.ErrUnknownUser, token)
+}
+
+//NewUser add a user
 //Basically, calls addUser
 func (s *Store) NewUser(fn, ln, tel, email string) error {
 	return s.singleUpdate(insertUser, internship.ErrUserExists, fn, ln, tel, email, internship.NONE, randomBytes(32))
@@ -189,7 +198,7 @@ func (s *Store) RmUser(email string) error {
 	return s.singleUpdate(deleteUser, internship.ErrUnknownUser, email)
 }
 
-//Replace the account referred by src by the account referred by dst
+//ReplaceUserWith the account referred by src by the account referred by dst
 func (s *Store) ReplaceUserWith(src, dst string) error {
 	tx := newTxErr(s.db)
 	tx.Update(replaceTutorInConventions, src, dst)

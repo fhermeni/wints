@@ -68,10 +68,7 @@ func (s *Store) NewConvention(student string, startTime, endTime time.Time, tuto
 	if err == internship.ErrConventionExists {
 		//Has it been updated ?
 		var last time.Time
-		st, err := s.stmt(selectConventionCreation)
-		if err != nil {
-			return false, err
-		}
+		st := s.stmt(selectConventionCreation)
 		if err := st.QueryRow(student).Scan(&last); err != nil {
 			return false, err
 		}
@@ -99,10 +96,7 @@ func (s *Store) NewConvention(student string, startTime, endTime time.Time, tuto
 
 func (s *Store) Conventions() ([]internship.Convention, error) {
 	conventions := make([]internship.Convention, 0, 0)
-	st, err := s.stmt(selectConventions)
-	if err != nil {
-		return conventions, err
-	}
+	st := s.stmt(selectConventions)
 	rows, err := st.Query()
 	if err != nil {
 		return conventions, err
@@ -132,7 +126,7 @@ func prepareReports(tx *TxErr, student string, reports map[string]config.Report)
 func prepareSurveys(tx *TxErr, student string, surveys map[string]config.Survey) error {
 	st, err := tx.tx.Prepare(insertSurvey)
 	if err != nil {
-		return err
+		return tx.Done()
 	}
 	for kind, survey := range surveys {
 		token := randomBytes(16)
@@ -169,10 +163,7 @@ func (s *Store) Internships() ([]internship.Internship, error) {
 
 func (s *Store) Internship(student string) (internship.Internship, error) {
 	i := internship.Internship{}
-	st, err := s.stmt(selectConvention)
-	if err != nil {
-		return i, err
-	}
+	st := s.stmt(selectConvention)
 	rows, err := st.Query(student)
 	if err != nil {
 		return i, err

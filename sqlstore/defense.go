@@ -18,19 +18,13 @@ func (s *Store) SetDefenseLocality(student string, local bool) error {
 }
 
 func (s *Store) SetDefenseGrade(student string, g int) error {
-	if g < 0 || g > 20 {
-		return internship.ErrInvalidGrade
-	}
 	return s.singleUpdate(updateDefenseGrade, internship.ErrUnknownDefense, student, g)
 }
 
 func (s *Store) Defense(student string) (internship.Defense, error) {
 	d := internship.Defense{}
-	st, err := s.stmt(selectDefense)
-	if err != nil {
-		return d, err
-	}
-	err = st.QueryRow(student).Scan(
+	st := s.stmt(selectDefense)
+	err := st.QueryRow(student).Scan(
 		&d.Time,
 		&d.Room,
 		&d.Grade,

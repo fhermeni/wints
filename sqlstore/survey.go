@@ -2,7 +2,6 @@ package sqlstore
 
 import (
 	"database/sql"
-	"encoding/json"
 	"time"
 
 	"github.com/fhermeni/wints/internship"
@@ -19,42 +18,32 @@ var (
 func (s *Store) SurveyToken(token string) (string, string, error) {
 	student := ""
 	kind := ""
-	st, err := s.stmt(selectSurveyFromToken)
-	if err != nil {
-		return student, kind, err
-	}
-	err = st.QueryRow(token).Scan(&student, &kind)
+	st := s.stmt(selectSurveyFromToken)
+	err := st.QueryRow(token).Scan(&student, &kind)
 	return student, kind, mapCstrToError(err)
 }
 
 func scanSurvey(rows *sql.Rows) (internship.SurveyHeader, error) {
 	survey := internship.SurveyHeader{}
 	var delivery pq.NullTime
-	var buf []byte
 
 	err := rows.Scan(
 		&survey.Kind,
 		&survey.Deadline,
 		delivery,
-		&buf,
+		&survey.Answers,
 		&survey.Token)
 	err = mapCstrToError(err)
 	if err != nil {
 		return survey, err
 	}
-	if delivery.Valid {
-		survey.Delivery = &delivery.Time
-		err = json.Unmarshal(buf, &survey.Answers)
-	}
+	survey.Delivery = nullableTime(delivery)
 	return survey, err
 }
 
 func (s *Store) Surveys(student string) (map[string]internship.SurveyHeader, error) {
 	res := make(map[string]internship.SurveyHeader)
-	st, err := s.stmt(selectSurveys)
-	if err != nil {
-		return res, err
-	}
+	st := s.stmt(selectSurveys)
 	rows, err := st.Query(student)
 	if err != nil {
 		return res, err
@@ -71,26 +60,16 @@ func (s *Store) Surveys(student string) (map[string]internship.SurveyHeader, err
 }
 
 func (s *Store) Survey(student, kind string) (internship.SurveyHeader, error) {
-	st, err := s.stmt(selectSurvey)
-	if err != nil {
-		return internship.SurveyHeader{}, err
-	}
+	st := s.stmt(selectSurvey)
 	rows, err := st.Query(student, kind)
 	if err != nil {
 		return internship.SurveyHeader{}, err
 	}
+	rows.Next()
 	defer rows.Close()
 	return scanSurvey(rows)
 }
 
-func (s *Store) SetSurveyContent(token string, cnt map[string]string) error {
-	now := time.Now()
-	if len(cnt) > 1000 {
-		return internship.ErrInvalidSurvey
-	}
-	buf, err := json.Marshal(cnt)
-	if err != nil {
-		return internship.ErrInvalidSurvey
-	}
-	return s.singleUpdate(updateSurveyContent, internship.ErrUnknownSurvey, buf, now, token)
+func (s *Store) SetSurveyContent(token string, cnt []byte) error {
+	return s.singleUpdate(updateSurveyContent, internship.ErrUnknownSurvey, cnt, time.Now(), token)
 }

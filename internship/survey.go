@@ -12,5 +12,5 @@ type SurveyHeader struct {
 	//The token to access in write mode
 	Token string
 	//Supervisor answers
-	Answers map[string]string
+	Answers []byte
 }

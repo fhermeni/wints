@@ -35,6 +35,12 @@ type Person struct {
 	Tel       string
 }
 
+type Session struct {
+	Email  string
+	Token  []byte
+	Expire time.Time
+}
+
 //User is a person with an account
 type User struct {
 	Person    Person
