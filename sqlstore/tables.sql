@@ -16,7 +16,7 @@ create table users(
     tel text,
     password text,
     role integer,
-    lastLogin timestamp with time zone,
+    lastVisit timestamp with time zone,
     constraint pk_email PRIMARY KEY(email)
 );
 
@@ -32,7 +32,7 @@ create table sessions(
 create table password_renewal(
     email text,
     deadline timestamp,
-    token text UNIQUE,
+    token text unique,
     constraint pk_password_renewal_email PRIMARY KEY(email),
     constraint fk_password_renewal_email FOREIGN KEY(email) REFERENCES users(email) on delete cascade on update cascade
 );
@@ -43,6 +43,7 @@ create table students(
     promotion text,
     nextPosition int,
     nextContact text,
+    skip boolean,
     constraint pk_students_email PRIMARY KEY(email),
     constraint fk_students_email FOREIGN KEY (email) REFERENCES users(email) on delete cascade on update cascade
 );
@@ -52,7 +53,7 @@ create table conventions(
     male boolean,
     startTime timestamp with time zone,
     endTime timeStamp with time zone,
-    tutor text, -- no references due to non validated conventions
+    tutor text,
     companyName text,
     companyWWW text,
     supervisorFn text,
@@ -67,7 +68,9 @@ create table conventions(
     skip bool,
     valid bool,
     constraint pk_conventions_student PRIMARY KEY (student),
-    constraint fk_conventions_student FOREIGN KEY (student) REFERENCES students(email) on delete cascade on update cascade
+    constraint fk_conventions_student FOREIGN KEY (student) REFERENCES students(email) on delete cascade on update cascade,
+    constraint fk_conventions_tutor FOREIGN KEY (tutor) REFERENCES users(email) on update cascade
+     -- no cascade delete for fk_conventions_tutor because we don't want to loose convention when we remove a duplicated tutor account
 );
 
 create table reports(
@@ -90,7 +93,7 @@ create table surveys(
     kind text,
     deadline timestamp with time zone,
     delivery timestamp with time zone,
-    answers json,
+    answers bytea,
     token text UNIQUE,
     constraint pk_surveys_student PRIMARY KEY(student, kind),
     constraint fk_surveys_student FOREIGN KEY(student) REFERENCES students(email) on delete cascade on update cascade
@@ -118,7 +121,7 @@ create table defenses(
     student text,
     grade integer,
     private bool,
-    remote bool,
+    local bool,
     constraint pk_defenses_student PRIMARY KEY(student),
     constraint fk_defenses_student FOREIGN KEY(student) REFERENCES students(email) on delete cascade on update cascade,
     constraint fk_defenses_session FOREIGN KEY(date, room) REFERENCES defenseSessions(date, room) on delete cascade on update cascade

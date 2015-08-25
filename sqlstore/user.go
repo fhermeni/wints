@@ -1,8 +1,8 @@
 package sqlstore
 
 import (
+	"database/sql"
 	"errors"
-	"strings"
 	"time"
 
 	"code.google.com/p/go.crypto/bcrypt"
@@ -12,6 +12,7 @@ import (
 )
 
 var (
+	selectUser                   = "select firstname, lastname, email, tel, role, lastVisit from users where email=$1"
 	insertUser                   = "insert into users(firstname, lastname, tel, email, role, password) values ($1,$2,$3,$4,$5,$6)"
 	startPasswordRenewal         = "insert into password_renewal(email,token,deadline) values($1,$2,$3)"
 	newSession                   = "insert into sessions(email, token, expire) values ($1,$2,$3)"
@@ -35,10 +36,10 @@ var (
 //Every strings are turned into their lower case version
 func (s *Store) addUser(tx *TxErr, u internship.User) {
 	tx.Exec(insertUser,
-		strings.ToLower(u.Person.Firstname),
-		strings.ToLower(u.Person.Lastname),
+		u.Person.Firstname,
+		u.Person.Lastname,
 		u.Person.Tel,
-		strings.ToLower(u.Person.Email),
+		u.Person.Email,
 		u.Role,
 		randomBytes(32),
 	)
@@ -47,6 +48,30 @@ func (s *Store) addUser(tx *TxErr, u internship.User) {
 //Visit writes the current time for the given user
 func (s *Store) Visit(u string) error {
 	return s.singleUpdate(updateLastVisit, internship.ErrUnknownUser, time.Now(), u)
+}
+
+func scanUser(row *sql.Rows) (internship.User, error) {
+	u := internship.User{Person: internship.Person{}}
+	var last pq.NullTime
+	err := row.Scan(
+		&u.Person.Firstname,
+		&u.Person.Lastname,
+		&u.Person.Email,
+		&u.Person.Tel,
+		&u.Role,
+		&last,
+	)
+	u.LastVisit = nullableTime(last)
+	return u, err
+}
+func (s *Store) User(email string) (internship.User, error) {
+	st := s.stmt(selectUser)
+	rows, err := st.Query(email)
+	if err != nil {
+		return internship.User{}, err
+	}
+	rows.Next()
+	return scanUser(rows)
 }
 
 //Users list all the registered users
@@ -89,13 +114,13 @@ func (s *Store) SetUserRole(email string, priv internship.Privilege) error {
 //SetPassword changes the user password
 //Any pending renewable requests are deleted on success
 func (s *Store) SetPassword(email string, oldP, newP []byte) error {
-	hash, err := hash(newP)
+	hash, err := bcrypt.GenerateFromPassword(newP, bcrypt.MinCost)
 	if err != nil {
 		return err
 	}
 	tx := newTxErr(s.db)
 	var p []byte
-	tx.err = tx.tx.QueryRow(selectPassword, strings.ToLower(email)).Scan(&p)
+	tx.QueryRow(selectPassword, email).Scan(&p)
 	tx.err = noRowsTo(tx.err, internship.ErrCredentials)
 	if tx.err != nil {
 		return tx.Done()
@@ -138,14 +163,14 @@ func (s *Store) ResetPassword(email string, d time.Duration) ([]byte, error) {
 //NewPassword commits a password renewall request.
 //From a request token and a new password, it returns upon success the target user email
 func (s *Store) NewPassword(token, newP []byte) (string, error) {
-	hash, err := hash(newP)
+	hash, err := bcrypt.GenerateFromPassword(newP, bcrypt.MinCost)
 	if err != nil {
 		return "", err
 	}
 
 	var email string
 	tx := newTxErr(s.db)
-	tx.err = tx.tx.QueryRow(emailFromRenewableToken, token).Scan(&email)
+	tx.err = tx.QueryRow(emailFromRenewableToken, token).Scan(&email)
 	tx.err = noRowsTo(tx.err, internship.ErrNoPendingRequests)
 	tx.Update(updateUserPassword, email, hash)
 	//no need to check updated rows as it is sure the user exists in the tx context
@@ -166,7 +191,7 @@ func (s *Store) Login(email string, password []byte) (internship.Session, error)
 		Expire: time.Now().Add(time.Hour * 24),
 	}
 	tx := newTxErr(s.db)
-	tx.err = tx.tx.QueryRow(selectPassword, strings.ToLower(email)).Scan(&p)
+	tx.err = tx.QueryRow(selectPassword, email).Scan(&p)
 	tx.err = noRowsTo(tx.err, internship.ErrCredentials)
 	if tx.err != nil {
 		return ss, tx.Done()

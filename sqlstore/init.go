@@ -102,7 +102,6 @@ create table surveys(
     constraint fk_surveys_student FOREIGN KEY(student) REFERENCES students(email) on delete cascade on update cascade
 );
 
--- defense management
 create table defenseSessions(
     date timestamp with time zone,
     room text,    

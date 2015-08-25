@@ -8,8 +8,6 @@ import (
 	"github.com/lib/pq"
 
 	"crypto/rand"
-
-	"code.google.com/p/go.crypto/bcrypt"
 )
 
 //Service allows to communicate with a database
@@ -25,10 +23,6 @@ func NewStore(d *sql.DB) (*Store, error) {
 		stmts: make(map[string]*stmtErr),
 	}
 	return &s, nil
-}
-
-func hash(buf []byte) ([]byte, error) {
-	return bcrypt.GenerateFromPassword(buf, bcrypt.MinCost)
 }
 
 //Install the tables on the database

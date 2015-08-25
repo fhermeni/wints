@@ -17,6 +17,8 @@ type Service interface {
 	//List the users
 	Users() ([]User, error)
 
+	User(email string) (User, error)
+
 	Visit(u string) error
 	//Change the user password
 	SetPassword(email string, oldP, newP []byte) error

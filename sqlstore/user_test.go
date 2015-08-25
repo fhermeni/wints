@@ -12,24 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-//Adduser
-//ToStudent
-//SetMale
-//Skip
-//SetMajor
-//SetPromotion
-
 var store *Store
-var u1 = internship.User{
-	Person: internship.Person{
-		Firstname: "foo",
-		Lastname:  "bar",
-		Tel:       "baz",
-		Email:     "foo@bar.com",
-	},
-	Role:      internship.NONE,
-	LastVisit: nil,
-}
 
 func init() {
 	conn := "user=fhermeni dbname=wints_test host=localhost sslmode=disable"
@@ -45,15 +28,9 @@ func init() {
 }
 
 func user(t *testing.T, email string) internship.User {
-	us, err := store.Users()
+	u, err := store.User(email)
 	assert.Nil(t, err)
-	for _, u := range us {
-		if u.Person.Email == email {
-			return u
-		}
-	}
-	assert.Fail(t, "")
-	return internship.User{}
+	return u
 }
 
 func TestUserManagement(t *testing.T) {
@@ -142,9 +119,6 @@ func TestUserManagement(t *testing.T) {
 	token, err = store.Login("foo@bar.com", passwd2)
 	assert.Nil(t, err)
 	assert.Nil(t, store.Logout(token.Token))
-	//logout
-
-	//profile
 
 	//rmUser
 

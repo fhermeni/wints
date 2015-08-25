@@ -112,33 +112,16 @@ func (s *Store) Conventions() ([]internship.Convention, error) {
 	return conventions, nil
 }
 
-func prepareReports(tx *TxErr, student string, reports map[string]config.Report) error {
-	st, err := tx.tx.Prepare(insertReport)
-	if err != nil {
-		return err
-	}
-	for kind, report := range reports {
-		_, tx.err = st.Exec(student, kind, report.Deadline, false, report.Grade)
-	}
-	return tx.Done()
-}
-
-func prepareSurveys(tx *TxErr, student string, surveys map[string]config.Survey) error {
-	st, err := tx.tx.Prepare(insertSurvey)
-	if err != nil {
-		return tx.Done()
-	}
-	for kind, survey := range surveys {
-		token := randomBytes(16)
-		_, tx.err = st.Exec(student, kind, token, survey.Deadline)
-	}
-	return tx.Done()
-}
-
 func (s *Store) ValidateConvention(student string, cfg config.Config) error {
 	tx := newTxErr(s.db)
-	prepareReports(&tx, student, cfg.Reports)
-	prepareSurveys(&tx, student, cfg.Surveys)
+	for kind, report := range cfg.Reports {
+		tx.Exec(insertReport, student, kind, report.Deadline, false, report.Grade)
+	}
+
+	for kind, survey := range cfg.Surveys {
+		token := randomBytes(16)
+		tx.Exec(insertSurvey, student, kind, token, survey.Deadline)
+	}
 	//The prepare* makes sure there is a student. No need to check update
 	tx.Update(validateConvention, student, true)
 	return tx.Done()
