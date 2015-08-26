@@ -15,18 +15,14 @@ var (
 	selectUser                   = "select firstname, lastname, email, tel, role, lastVisit from users where email=$1"
 	insertUser                   = "insert into users(firstname, lastname, tel, email, role, password) values ($1,$2,$3,$4,$5,$6)"
 	startPasswordRenewal         = "insert into password_renewal(email,token,deadline) values($1,$2,$3)"
-	newSession                   = "insert into sessions(email, token, expire) values ($1,$2,$3)"
 	updateLastVisit              = "update users set lastVisit=$1 where email=$2"
 	updateUserProfile            = "update users set firstname=$1, lastname=$2, tel=$3 where email=$4"
 	updateUserRole               = "update users set role=$2 where email=$1"
 	updateUserPassword           = "update users set password=$2 where email=$1"
-	deleteSession                = "delete from sessions where email=$1"
-	deleteSessionFromToken       = "delete from sessions where token=$1"
 	deletePasswordRenewalRequest = "delete from password_renewal where email=$1"
 	deleteUser                   = "DELETE FROM users where email=$1"
 	allUsers                     = "select firstname, lastname, email, tel, role, lastVisit from users"
 	selectPassword               = "select password from users where email=$1"
-	selectSession                = "select email, token, expire from sessions where token=$1"
 	emailFromRenewableToken      = "select email from password_renewal where token=$1"
 	replaceTutorInConventions    = "update conventions set tutor=$2 where tutor=$1"
 	replaceJuryInDefenses        = "update defenseJuries set jury=$2 where tutor=$1"
@@ -64,13 +60,17 @@ func scanUser(row *sql.Rows) (internship.User, error) {
 	u.LastVisit = nullableTime(last)
 	return u, err
 }
+
+//User returns the given user account
 func (s *Store) User(email string) (internship.User, error) {
 	st := s.stmt(selectUser)
 	rows, err := st.Query(email)
 	if err != nil {
 		return internship.User{}, err
 	}
-	rows.Next()
+	if !rows.Next() {
+		return internship.User{}, internship.ErrUnknownUser
+	}
 	return scanUser(rows)
 }
 
@@ -101,9 +101,9 @@ func (s *Store) Users() ([]internship.User, error) {
 	return users, nil
 }
 
-//SetUserProfile changes the user profile if exists
-func (s *Store) SetUserProfile(email, fn, ln, tel string) error {
-	return s.singleUpdate(updateUserProfile, internship.ErrUnknownUser, fn, ln, tel, email)
+//SetUserPerson changes the user profile if exists
+func (s *Store) SetUserPerson(p internship.Person) error {
+	return s.singleUpdate(updateUserProfile, internship.ErrUnknownUser, p.Firstname, p.Lastname, p.Tel, p.Email)
 }
 
 //SetUserRole updates the user privilege
@@ -132,14 +132,6 @@ func (s *Store) SetPassword(email string, oldP, newP []byte) error {
 	tx.Update(updateUserPassword, email, hash)
 	//no need to check update, we know the user exists in the transaction context
 	return tx.Done()
-}
-
-//Session check if a session is currently open for the user and is not expired
-func (s *Store) Session(token []byte) (internship.Session, error) {
-	st := s.stmt(selectSession)
-	ss := internship.Session{}
-	err := st.QueryRow(token).Scan(&ss.Email, &ss.Token, &ss.Expire)
-	return ss, noRowsTo(err, internship.ErrCredentials)
 }
 
 //ResetPassword starts a reset procedure, valid for a given period
@@ -174,41 +166,10 @@ func (s *Store) NewPassword(token, newP []byte) (string, error) {
 	return email, tx.Done()
 }
 
-//Login log a user.
-//Upon success, it generates a session token that will be valid for the next 24 hours.
-func (s *Store) Login(email string, password []byte) (internship.Session, error) {
-	var p []byte
-	ss := internship.Session{
-		Email:  email,
-		Token:  randomBytes(32),
-		Expire: time.Now().Add(time.Hour * 24),
-	}
-	tx := newTxErr(s.db)
-	tx.err = tx.QueryRow(selectPassword, email).Scan(&p)
-	tx.err = noRowsTo(tx.err, internship.ErrCredentials)
-	if tx.err != nil {
-		return ss, tx.Done()
-	}
-	if err := bcrypt.CompareHashAndPassword(p, password); err != nil {
-		tx.err = internship.ErrCredentials
-	}
-	tx.Exec(deleteSession, email)
-	nb := tx.Update(newSession, ss.Email, ss.Token, ss.Expire)
-	if tx.err == nil && nb != 1 {
-		tx.err = internship.ErrUnknownUser
-	}
-	return ss, tx.Done()
-}
-
-//Logout destroy the current user session if exists
-func (s *Store) Logout(token []byte) error {
-	return s.singleUpdate(deleteSessionFromToken, internship.ErrUnknownUser, token)
-}
-
 //NewUser add a user
 //Basically, calls addUser
-func (s *Store) NewUser(fn, ln, tel, email string) error {
-	return s.singleUpdate(insertUser, internship.ErrUserExists, fn, ln, tel, email, internship.NONE, randomBytes(32))
+func (s *Store) NewUser(p internship.Person) error {
+	return s.singleUpdate(insertUser, internship.ErrUserExists, p.Firstname, p.Lastname, p.Tel, p.Email, internship.NONE, randomBytes(32))
 }
 
 //RmUser removes a user from the database

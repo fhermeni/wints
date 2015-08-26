@@ -35,6 +35,7 @@ type Person struct {
 	Tel       string
 }
 
+//Session denotes a user session
 type Session struct {
 	Email  string
 	Token  []byte

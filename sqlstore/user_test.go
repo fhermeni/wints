@@ -1,4 +1,5 @@
 // +build integration
+
 package sqlstore
 
 import (
@@ -34,92 +35,37 @@ func user(t *testing.T, email string) internship.User {
 }
 
 func TestUserManagement(t *testing.T) {
-	us, err := store.Users()
+	p, passwd := preparePerson(t)
+
+	//User()
+	u, err := store.User(p.Email)
 	assert.Nil(t, err)
-	assert.Equal(t, 0, len(us))
-
-	assert.Nil(t, store.NewUser("foo", "bar", "baz", "foo@bar.com"))
-	assert.Equal(t, internship.ErrUserExists, store.NewUser("foo", "bar", "baz", "foo@bar.com"))
-
-	//Add the user
-	us, err = store.Users()
-	assert.Nil(t, err)
-	assert.Equal(t, 1, len(us))
-	u := internship.User{
-		Person: internship.Person{
-			Firstname: "foo",
-			Lastname:  "bar",
-			Tel:       "baz",
-			Email:     "foo@bar.com",
-		},
-		Role:      internship.NONE,
-		LastVisit: nil,
-	}
-	assert.Equal(t, u, us[0])
-
-	//Change Role
-	assert.Equal(t, internship.ErrUnknownUser, store.SetUserRole("", internship.STUDENT))
-	assert.Nil(t, store.SetUserRole("foo@bar.com", internship.STUDENT))
-
-	//Change profile
-	assert.Equal(t, internship.ErrUnknownUser, store.SetUserProfile("", "", "", ""))
-	assert.Nil(t, store.SetUserProfile("foo@bar.com", "aa", "bb", "cc"))
-	u.Person.Firstname = "aa"
-	u.Person.Lastname = "bb"
-	u.Person.Tel = "cc"
-	u.Role = internship.STUDENT
-	assert.Equal(t, u, user(t, "foo@bar.com"))
+	assert.Equal(t, internship.NONE, u.Role)
+	assert.Nil(t, u.LastVisit)
+	_, err = store.User(string(randomBytes(10)))
+	assert.Equal(t, internship.ErrUnknownUser, err)
 
 	//Visit
-	assert.Nil(t, store.Visit("foo@bar.com"))
-	assert.Equal(t, internship.ErrUnknownUser, store.Visit(""))
-	assert.NotNil(t, user(t, "foo@bar.com").LastVisit)
+	assert.Nil(t, store.Visit(p.Email))
+	assert.Equal(t, internship.ErrUnknownUser, store.Visit(string(randomBytes(10))))
+	assert.NotNil(t, user(t, p.Email).LastVisit)
 
-	//Login stuff
-	//Test if the credentials match a user, return a session token
-	_, err = store.Login("foo@bar.com", []byte("foo"))
+	//Person update
+	p2 := internship.Person{Email: p.Email}
+	assert.Nil(t, store.SetUserPerson(p2))
+	u2 := user(t, p2.Email)
+	assert.Equal(t, p2, u2.Person)
+
+	//Change Role
+	assert.Equal(t, internship.ErrUnknownUser, store.SetUserRole(string(randomBytes(10)), internship.STUDENT))
+	assert.Nil(t, store.SetUserRole(p.Email, internship.STUDENT))
+
+	//SetPassword
+	passwd2 := randomBytes(10)
+	assert.Equal(t, internship.ErrCredentials, store.SetPassword(string(randomBytes(10)), passwd, passwd2))
+	assert.Nil(t, store.SetPassword(p.Email, passwd, passwd2))
+	_, err = store.NewSession(p.Email, passwd2, time.Hour)
+	assert.Nil(t, err)
+	_, err = store.NewSession(p.Email, passwd, time.Hour)
 	assert.Equal(t, internship.ErrCredentials, err)
-	_, err = store.Login("foo@baz.com", []byte("foo"))
-	assert.Equal(t, internship.ErrCredentials, err)
-	assert.Equal(t, internship.ErrCredentials, store.OpenedSession([]byte("ff")))
-
-	//Reset the password
-	d, _ := time.ParseDuration("1h")
-	_, err = store.ResetPassword("foo@baz.com", d)
-	assert.Equal(t, internship.ErrUnknownUser, err)
-	tok, err := store.ResetPassword("foo@bar.com", d)
-	assert.Nil(t, err)
-
-	em, err := store.NewPassword([]byte("dd"), []byte("lkjpp"))
-	assert.Equal(t, internship.ErrNoPendingRequests, err)
-
-	passwd := []byte("foobabb")
-	em, err = store.NewPassword(tok, passwd)
-	assert.Nil(t, err)
-	assert.Equal(t, "foo@bar.com", em)
-	_, err = store.NewPassword(tok, passwd)
-	assert.Equal(t, internship.ErrNoPendingRequests, err)
-
-	//login
-	token, err := store.Login("foo@bar.com", passwd)
-	assert.Nil(t, err)
-	//opened session
-	assert.Nil(t, store.OpenedSession(token.Token))
-	//logout
-	assert.Nil(t, store.Logout(token.Token))
-	assert.NotNil(t, store.Logout(token.Token))
-	assert.NotNil(t, store.OpenedSession(token.Token))
-
-	//changePassword
-	passwd2 := []byte("jlkl")
-	assert.Nil(t, store.SetPassword("foo@bar.com", passwd, passwd2))
-	//login
-	_, err = store.Login("foo@bar.com", passwd)
-	assert.Equal(t, internship.ErrCredentials, err)
-	token, err = store.Login("foo@bar.com", passwd2)
-	assert.Nil(t, err)
-	assert.Nil(t, store.Logout(token.Token))
-
-	//rmUser
-
 }

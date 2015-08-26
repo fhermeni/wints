@@ -11,6 +11,6 @@ type SurveyHeader struct {
 	Delivery *time.Time `,json:"omitempty"`
 	//The token to access in write mode
 	Token string
-	//Supervisor answers
-	Answers []byte
+	//Survey content
+	Cnt []byte
 }

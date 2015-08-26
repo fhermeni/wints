@@ -38,14 +38,15 @@ func (r *TxErr) Exec(query string, args ...interface{}) {
 	}
 }
 
-func (tx *TxErr) QueryRow(query string, args ...interface{}) *rowErr {
-	if tx.err == nil {
-		return &rowErr{err: tx.err, row: tx.tx.QueryRow(query, args...)}
+//QueryRow execute the query that must returns one row if the transaction is not in a failed state
+func (r *TxErr) QueryRow(query string, args ...interface{}) *rowErr {
+	if r.err == nil {
+		return &rowErr{err: r.err, row: r.tx.QueryRow(query, args...)}
 	}
-	return &rowErr{err: tx.err, row: nil}
+	return &rowErr{err: r.err, row: nil}
 }
 
-//Exec executes the update query, store the resulting error variable and returns
+//Update executes the update query, store the resulting error variable and returns
 //the number of updated rows
 func (r *TxErr) Update(query string, args ...interface{}) int64 {
 	if r.err != nil {

@@ -34,7 +34,7 @@ create table sessions(
 
 create table password_renewal(
     email text,
-    deadline timestamp,
+    deadline timestamp with time zone,
     token text unique,
     constraint pk_password_renewal_email PRIMARY KEY(email),
     constraint fk_password_renewal_email FOREIGN KEY(email) REFERENCES users(email) on delete cascade on update cascade
@@ -96,7 +96,7 @@ create table surveys(
     kind text,
     deadline timestamp with time zone,
     delivery timestamp with time zone,
-    answers bytea,
+    cnt bytea,
     token text UNIQUE,
     constraint pk_surveys_student PRIMARY KEY(student, kind),
     constraint fk_surveys_student FOREIGN KEY(student) REFERENCES students(email) on delete cascade on update cascade

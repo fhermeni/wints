@@ -52,6 +52,7 @@ func (s *Store) Students() ([]internship.Student, error) {
 	return students, err
 }
 
+//ToStudent convert a user account to a student account
 func (s *Store) ToStudent(email, major, promotion string, male bool) error {
 	tx := newTxErr(s.db)
 	tx.Update(insertStudent, email, male, major, promotion, false)
@@ -74,6 +75,7 @@ func (s *Store) SetMajor(stu, m string) error {
 	return s.singleUpdate(setMajor, internship.ErrUnknownStudent, stu, m)
 }
 
+//SetMale stores the student gender
 func (s *Store) SetMale(stu string, m bool) error {
 	return s.singleUpdate(updateMale, internship.ErrUnknownStudent, stu, m)
 }
@@ -84,7 +86,6 @@ func (s *Store) SetNextPosition(student string, pos int) error {
 }
 
 //SetNextContact updates the student next contact email.
-//The email must contains one '@' and must not contains '@unice.fr' or 'polytech' to prevent from incorrect emails
 func (s *Store) SetNextContact(student string, em string) error {
 	return s.singleUpdate(setNextContact, internship.ErrUnknownUser, em, student)
 }

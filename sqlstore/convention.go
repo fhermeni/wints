@@ -41,27 +41,32 @@ var (
 	validateConvention = "update conventions set valid=$2 where student=$1"
 )
 
+//SetConventionSkippable stores the skipable status for a student convention
 func (s *Store) SetConventionSkippable(student string, skip bool) error {
 	return s.singleUpdate(updateConventionSkip, internship.ErrUnknownStudent, skip, student)
 }
 
+//SetSupervisor updates the student supervisor
 func (s *Store) SetSupervisor(stu string, t internship.Person) error {
 	return s.singleUpdate(updateSupervisor, internship.ErrUnknownInternship, t.Firstname, t.Lastname, t.Tel, t.Email, stu)
 }
 
+//SetTutor updates the student tutor
 func (s *Store) SetTutor(stu string, t string) error {
 	return s.singleUpdate(updateTutor, internship.ErrUnknownInternship, t, stu)
 }
 
+//SetCompany updates the student company
 func (s *Store) SetCompany(stu string, c internship.Company) error {
 	return s.singleUpdate(updateCompany, internship.ErrUnknownInternship, c.WWW, c.Name, stu)
 }
 
+//SetTitle updates the student internship title
 func (s *Store) SetTitle(stu string, title string) error {
 	return s.singleUpdate(updateTutor, internship.ErrUnknownInternship, title, stu)
 }
 
-//New convention, the student and the tutor must already be registered
+//NewConvention establishes a new convention for a registered student and tutor
 //If a convention already exists for that student but the new data refer to a fresher convention, it is updated
 func (s *Store) NewConvention(student string, startTime, endTime time.Time, tutor string, cpy internship.Company, sup internship.Person, title string, creation time.Time, foreignCountry, lab bool, gratification int) (bool, error) {
 	err := s.singleUpdate(insertConvention, internship.ErrUnknownStudent, student, startTime, endTime, tutor, cpy.Name, cpy.WWW, sup.Firstname, sup.Lastname, sup.Email, sup.Tel, title, creation, foreignCountry, lab, gratification, false, false)
@@ -94,6 +99,7 @@ func (s *Store) NewConvention(student string, startTime, endTime time.Time, tuto
 	return false, err
 }
 
+//Conventions lists all the registered conventions
 func (s *Store) Conventions() ([]internship.Convention, error) {
 	conventions := make([]internship.Convention, 0, 0)
 	st := s.stmt(selectConventions)
@@ -112,6 +118,8 @@ func (s *Store) Conventions() ([]internship.Convention, error) {
 	return conventions, nil
 }
 
+//ValidateConvention instantiates the reports and the surveys related to the convention
+//and set the valid flag to true
 func (s *Store) ValidateConvention(student string, cfg config.Config) error {
 	tx := newTxErr(s.db)
 	for kind, report := range cfg.Reports {
@@ -127,6 +135,7 @@ func (s *Store) ValidateConvention(student string, cfg config.Config) error {
 	return tx.Done()
 }
 
+//Internships returns all the internships. Not necessarily validated
 func (s *Store) Internships() ([]internship.Internship, error) {
 	res := make([]internship.Internship, 0, 0)
 	conventions, err := s.Conventions()
@@ -144,6 +153,7 @@ func (s *Store) Internships() ([]internship.Internship, error) {
 	return res, err
 }
 
+//Internship returns the internship for a given student
 func (s *Store) Internship(student string) (internship.Internship, error) {
 	i := internship.Internship{}
 	st := s.stmt(selectConvention)

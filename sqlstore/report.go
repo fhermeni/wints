@@ -18,6 +18,7 @@ var (
 	setReportPrivacy  = "update reports set private=$3 where student=$1 and kind=$2"
 )
 
+//Reports returns all the reports for a given student
 func (s *Store) Reports(email string) (map[string]internship.ReportHeader, error) {
 	res := make(map[string]internship.ReportHeader)
 	st := s.stmt(selectReports)
@@ -26,11 +27,11 @@ func (s *Store) Reports(email string) (map[string]internship.ReportHeader, error
 		return res, nil
 	}
 	for rows.Next() {
-		if hdr, err := scanReport(rows); err != nil {
+		var hdr internship.ReportHeader
+		if hdr, err = scanReport(rows); err != nil {
 			return res, nil
-		} else {
-			res[hdr.Kind] = hdr
 		}
+		res[hdr.Kind] = hdr
 	}
 	return res, nil
 
@@ -63,6 +64,7 @@ func scanReport(rows *sql.Rows) (internship.ReportHeader, error) {
 	return hdr, mapCstrToError(err)
 }
 
+//Report returns the given report
 func (s *Store) Report(k, email string) (internship.ReportHeader, error) {
 	hdr := internship.ReportHeader{Grade: -1}
 
@@ -75,6 +77,7 @@ func (s *Store) Report(k, email string) (internship.ReportHeader, error) {
 	return scanReport(rows)
 }
 
+//ReportContent returns the content of a given report
 func (s *Store) ReportContent(kind, email string) ([]byte, error) {
 	var cnt []byte
 	st := s.stmt(selectReportCnt)
@@ -82,18 +85,22 @@ func (s *Store) ReportContent(kind, email string) ([]byte, error) {
 	return cnt, err
 }
 
+//SetReportContent saves the content of a given report
 func (s *Store) SetReportContent(kind, email string, cnt []byte) error {
 	return s.singleUpdate(setReportCnt, internship.ErrUnknownReport, email, kind, cnt, time.Now())
 }
 
+//SetReportGrade stores the given report grade
 func (s *Store) SetReportGrade(kind, email string, g int, comment string) error {
 	return s.singleUpdate(setGrade, internship.ErrUnknownReport, email, kind, g, comment, time.Now())
 }
 
+//SetReportDeadline change a report deadline
 func (s *Store) SetReportDeadline(kind, email string, t time.Time) error {
 	return s.singleUpdate(setReportDeadline, internship.ErrUnknownReport, email, kind, t)
 }
 
+//SetReportPrivacy changes the privacy level of a report
 func (s *Store) SetReportPrivacy(kind, email string, p bool) error {
 	return s.singleUpdate(setReportPrivacy, internship.ErrUnknownReport, email, kind, p)
 }

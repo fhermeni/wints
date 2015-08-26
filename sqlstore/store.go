@@ -10,14 +10,14 @@ import (
 	"crypto/rand"
 )
 
-//Service allows to communicate with a database
+//Store allows to communicate with a database
 type Store struct {
 	db *sql.DB
 	//mailer     mail.Mailer
 	stmts map[string]*stmtErr
 }
 
-//NewService initiate the storage servive
+//NewStore initiate the storage servive
 func NewStore(d *sql.DB) (*Store, error) {
 	s := Store{db: d,
 		stmts: make(map[string]*stmtErr),

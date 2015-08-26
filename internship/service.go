@@ -22,17 +22,16 @@ type Service interface {
 	Visit(u string) error
 	//Change the user password
 	SetPassword(email string, oldP, newP []byte) error
-	//Change user profile
-	SetUserProfile(email, fn, ln, tel string) error
+	//SetUserPerson updates the user profile
+	SetUserPerson(p Person) error
 
 	//Change user role
 	SetUserRole(email string, priv Privilege) error
 
-	//Test if the credentials match a user, return a session token
-	Login(email string, password []byte) ([]byte, error)
-	//Destroy a session
-	Logout(email string, token []byte) error
-
+	//NewSession creates a new session if the email and the password matches a user
+	NewSession(email string, password []byte, expire time.Duration) (Session, error)
+	//RmSession destroys a session
+	RmSession(token []byte) error
 	//Check if a session is opened for a given user and token
 	Session(token string) (Session, error)
 
@@ -106,7 +105,7 @@ type Adder interface {
 
 	//NewUser creates a new user
 	//By default, the user has no privileges
-	NewUser(fn, ln, tel, email string) error
+	NewUser(p Person) error
 
 	//ToStudent casts the given user to a student
 	ToStudent(email, major, promotion string, male bool) error
