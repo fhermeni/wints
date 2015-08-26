@@ -7,7 +7,7 @@ import (
 
 	"code.google.com/p/go.crypto/bcrypt"
 
-	"github.com/fhermeni/wints/internship"
+	"github.com/fhermeni/wints/schema"
 	"github.com/lib/pq"
 )
 
@@ -30,7 +30,7 @@ var (
 
 //addUser add the given user.
 //Every strings are turned into their lower case version
-func (s *Store) addUser(tx *TxErr, u internship.User) {
+func (s *Store) addUser(tx *TxErr, u schema.User) {
 	tx.Exec(insertUser,
 		u.Person.Firstname,
 		u.Person.Lastname,
@@ -43,11 +43,11 @@ func (s *Store) addUser(tx *TxErr, u internship.User) {
 
 //Visit writes the current time for the given user
 func (s *Store) Visit(u string) error {
-	return s.singleUpdate(updateLastVisit, internship.ErrUnknownUser, time.Now(), u)
+	return s.singleUpdate(updateLastVisit, schema.ErrUnknownUser, time.Now(), u)
 }
 
-func scanUser(row *sql.Rows) (internship.User, error) {
-	u := internship.User{Person: internship.Person{}}
+func scanUser(row *sql.Rows) (schema.User, error) {
+	u := schema.User{Person: schema.Person{}}
 	var last pq.NullTime
 	err := row.Scan(
 		&u.Person.Firstname,
@@ -62,21 +62,21 @@ func scanUser(row *sql.Rows) (internship.User, error) {
 }
 
 //User returns the given user account
-func (s *Store) User(email string) (internship.User, error) {
+func (s *Store) User(email string) (schema.User, error) {
 	st := s.stmt(selectUser)
 	rows, err := st.Query(email)
 	if err != nil {
-		return internship.User{}, err
+		return schema.User{}, err
 	}
 	if !rows.Next() {
-		return internship.User{}, internship.ErrUnknownUser
+		return schema.User{}, schema.ErrUnknownUser
 	}
 	return scanUser(rows)
 }
 
 //Users list all the registered users
-func (s *Store) Users() ([]internship.User, error) {
-	users := make([]internship.User, 0, 0)
+func (s *Store) Users() ([]schema.User, error) {
+	users := make([]schema.User, 0, 0)
 	st := s.stmt(allUsers)
 	rows, err := st.Query()
 	if err != nil {
@@ -84,7 +84,7 @@ func (s *Store) Users() ([]internship.User, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		u := internship.User{Person: internship.Person{}}
+		u := schema.User{Person: schema.Person{}}
 		var last pq.NullTime
 		rows.Scan(
 			&u.Person.Firstname,
@@ -102,13 +102,13 @@ func (s *Store) Users() ([]internship.User, error) {
 }
 
 //SetUserPerson changes the user profile if exists
-func (s *Store) SetUserPerson(p internship.Person) error {
-	return s.singleUpdate(updateUserProfile, internship.ErrUnknownUser, p.Firstname, p.Lastname, p.Tel, p.Email)
+func (s *Store) SetUserPerson(p schema.Person) error {
+	return s.singleUpdate(updateUserProfile, schema.ErrUnknownUser, p.Firstname, p.Lastname, p.Tel, p.Email)
 }
 
 //SetUserRole updates the user privilege
-func (s *Store) SetUserRole(email string, priv internship.Privilege) error {
-	return s.singleUpdate(updateUserRole, internship.ErrUnknownUser, email, priv)
+func (s *Store) SetUserRole(email string, priv schema.Privilege) error {
+	return s.singleUpdate(updateUserRole, schema.ErrUnknownUser, email, priv)
 }
 
 //SetPassword changes the user password
@@ -121,12 +121,12 @@ func (s *Store) SetPassword(email string, oldP, newP []byte) error {
 	tx := newTxErr(s.db)
 	var p []byte
 	tx.QueryRow(selectPassword, email).Scan(&p)
-	tx.err = noRowsTo(tx.err, internship.ErrCredentials)
+	tx.err = noRowsTo(tx.err, schema.ErrCredentials)
 	if tx.err != nil {
 		return tx.Done()
 	}
 	if err := bcrypt.CompareHashAndPassword(p, oldP); err != nil {
-		tx.err = internship.ErrCredentials
+		tx.err = schema.ErrCredentials
 	}
 	tx.Exec(deletePasswordRenewalRequest, email)
 	tx.Update(updateUserPassword, email, hash)
@@ -156,7 +156,7 @@ func (s *Store) NewPassword(token, newP []byte) (string, error) {
 	var email string
 	tx := newTxErr(s.db)
 	tx.err = tx.QueryRow(emailFromRenewableToken, token).Scan(&email)
-	tx.err = noRowsTo(tx.err, internship.ErrNoPendingRequests)
+	tx.err = noRowsTo(tx.err, schema.ErrNoPendingRequests)
 	tx.Update(updateUserPassword, email, hash)
 	//no need to check updated rows as it is sure the user exists in the tx context
 	nb := tx.Update(deletePasswordRenewalRequest, email)
@@ -168,13 +168,13 @@ func (s *Store) NewPassword(token, newP []byte) (string, error) {
 
 //NewUser add a user
 //Basically, calls addUser
-func (s *Store) NewUser(p internship.Person) error {
-	return s.singleUpdate(insertUser, internship.ErrUserExists, p.Firstname, p.Lastname, p.Tel, p.Email, internship.NONE, randomBytes(32))
+func (s *Store) NewUser(p schema.Person) error {
+	return s.singleUpdate(insertUser, schema.ErrUserExists, p.Firstname, p.Lastname, p.Tel, p.Email, schema.NONE, randomBytes(32))
 }
 
 //RmUser removes a user from the database
 func (s *Store) RmUser(email string) error {
-	return s.singleUpdate(deleteUser, internship.ErrUnknownUser, email)
+	return s.singleUpdate(deleteUser, schema.ErrUnknownUser, email)
 }
 
 //ReplaceUserWith the account referred by src by the account referred by dst

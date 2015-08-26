@@ -6,13 +6,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/fhermeni/wints/internship"
+	"github.com/fhermeni/wints/schema"
 	"github.com/stretchr/testify/assert"
 )
 
-func preparePerson(t *testing.T) (internship.Person, []byte) {
+func preparePerson(t *testing.T) (schema.Person, []byte) {
 	//Preparation
-	p := internship.Person{
+	p := schema.Person{
 		Firstname: string(randomBytes(12)),
 		Lastname:  string(randomBytes(12)),
 		Tel:       string(randomBytes(12)),
@@ -35,7 +35,7 @@ func TestSessions(t *testing.T) {
 	p, password := preparePerson(t)
 	//New session
 	_, err := store.NewSession(string(randomBytes(12)), randomBytes(12), time.Hour)
-	assert.Equal(t, internship.ErrCredentials, err)
+	assert.Equal(t, schema.ErrCredentials, err)
 
 	s, err := store.NewSession(p.Email, password, time.Hour)
 	assert.Nil(t, err)
@@ -44,9 +44,9 @@ func TestSessions(t *testing.T) {
 	/*s2, err := store.Session(s.Token)
 	assert.Equal(t, s, s2)*/
 	_, err = store.Session(randomBytes(12))
-	assert.Equal(t, internship.ErrCredentials, err)
+	assert.Equal(t, schema.ErrCredentials, err)
 
 	//Delete the session
 	assert.Nil(t, store.RmSession(s.Token))
-	assert.Equal(t, internship.ErrUnknownUser, store.RmSession(s.Token))
+	assert.Equal(t, schema.ErrUnknownUser, store.RmSession(s.Token))
 }

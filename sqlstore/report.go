@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/fhermeni/wints/internship"
+	"github.com/fhermeni/wints/schema"
 	"github.com/lib/pq"
 )
 
@@ -19,15 +19,15 @@ var (
 )
 
 //Reports returns all the reports for a given student
-func (s *Store) Reports(email string) (map[string]internship.ReportHeader, error) {
-	res := make(map[string]internship.ReportHeader)
+func (s *Store) Reports(email string) (map[string]schema.ReportHeader, error) {
+	res := make(map[string]schema.ReportHeader)
 	st := s.stmt(selectReports)
 	rows, err := st.Query(email)
 	if err != nil {
 		return res, nil
 	}
 	for rows.Next() {
-		var hdr internship.ReportHeader
+		var hdr schema.ReportHeader
 		if hdr, err = scanReport(rows); err != nil {
 			return res, nil
 		}
@@ -37,8 +37,8 @@ func (s *Store) Reports(email string) (map[string]internship.ReportHeader, error
 
 }
 
-func scanReport(rows *sql.Rows) (internship.ReportHeader, error) {
-	hdr := internship.ReportHeader{Grade: -1}
+func scanReport(rows *sql.Rows) (schema.ReportHeader, error) {
+	hdr := schema.ReportHeader{Grade: -1}
 	var comment sql.NullString
 	var delivery, reviewed pq.NullTime
 	var grade sql.NullInt64
@@ -65,8 +65,8 @@ func scanReport(rows *sql.Rows) (internship.ReportHeader, error) {
 }
 
 //Report returns the given report
-func (s *Store) Report(k, email string) (internship.ReportHeader, error) {
-	hdr := internship.ReportHeader{Grade: -1}
+func (s *Store) Report(k, email string) (schema.ReportHeader, error) {
+	hdr := schema.ReportHeader{Grade: -1}
 
 	st := s.stmt(selectReport)
 	rows, err := st.Query(email, k)
@@ -75,7 +75,7 @@ func (s *Store) Report(k, email string) (internship.ReportHeader, error) {
 	}
 	defer rows.Close()
 	if !rows.Next() {
-		return hdr, internship.ErrUnknownStudent
+		return hdr, schema.ErrUnknownStudent
 	}
 	return scanReport(rows)
 }
@@ -85,25 +85,25 @@ func (s *Store) ReportContent(kind, email string) ([]byte, error) {
 	var cnt []byte
 	st := s.stmt(selectReportCnt)
 	err := st.QueryRow(email, kind).Scan(&cnt)
-	return cnt, noRowsTo(err, internship.ErrUnknownReport)
+	return cnt, noRowsTo(err, schema.ErrUnknownReport)
 }
 
 //SetReportContent saves the content of a given report
 func (s *Store) SetReportContent(kind, email string, cnt []byte) error {
-	return s.singleUpdate(setReportCnt, internship.ErrUnknownReport, email, kind, cnt, time.Now())
+	return s.singleUpdate(setReportCnt, schema.ErrUnknownReport, email, kind, cnt, time.Now())
 }
 
 //SetReportGrade stores the given report grade
 func (s *Store) SetReportGrade(kind, email string, g int, comment string) error {
-	return s.singleUpdate(setGrade, internship.ErrUnknownReport, email, kind, g, comment, time.Now())
+	return s.singleUpdate(setGrade, schema.ErrUnknownReport, email, kind, g, comment, time.Now())
 }
 
 //SetReportDeadline change a report deadline
 func (s *Store) SetReportDeadline(kind, email string, t time.Time) error {
-	return s.singleUpdate(setReportDeadline, internship.ErrUnknownReport, email, kind, t)
+	return s.singleUpdate(setReportDeadline, schema.ErrUnknownReport, email, kind, t)
 }
 
 //SetReportPrivacy changes the privacy level of a report
 func (s *Store) SetReportPrivacy(kind, email string, p bool) error {
-	return s.singleUpdate(setReportPrivacy, internship.ErrUnknownReport, email, kind, p)
+	return s.singleUpdate(setReportPrivacy, schema.ErrUnknownReport, email, kind, p)
 }

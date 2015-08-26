@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"code.google.com/p/go.crypto/bcrypt"
-	"github.com/fhermeni/wints/internship"
+	"github.com/fhermeni/wints/schema"
 )
 
 var (
@@ -15,39 +15,39 @@ var (
 )
 
 //Session get the token related session
-func (s *Store) Session(token []byte) (internship.Session, error) {
+func (s *Store) Session(token []byte) (schema.Session, error) {
 	st := s.stmt(selectSession)
-	ss := internship.Session{}
+	ss := schema.Session{}
 	err := st.QueryRow(token).Scan(&ss.Email, &ss.Token, &ss.Expire)
-	return ss, noRowsTo(err, internship.ErrCredentials)
+	return ss, noRowsTo(err, schema.ErrCredentials)
 }
 
 //NewSession creates a new session if the email and the password matches a user
-func (s *Store) NewSession(email string, password []byte, expire time.Duration) (internship.Session, error) {
+func (s *Store) NewSession(email string, password []byte, expire time.Duration) (schema.Session, error) {
 	var p []byte
-	ss := internship.Session{
+	ss := schema.Session{
 		Email:  email,
 		Token:  randomBytes(32),
 		Expire: time.Now().Add(expire).Truncate(time.Minute),
 	}
 	tx := newTxErr(s.db)
 	tx.err = tx.QueryRow(selectPassword, email).Scan(&p)
-	tx.err = noRowsTo(tx.err, internship.ErrCredentials)
+	tx.err = noRowsTo(tx.err, schema.ErrCredentials)
 	if tx.err != nil {
 		return ss, tx.Done()
 	}
 	if err := bcrypt.CompareHashAndPassword(p, password); err != nil {
-		tx.err = internship.ErrCredentials
+		tx.err = schema.ErrCredentials
 	}
 	tx.Exec(deleteSession, email)
 	nb := tx.Update(newSession, ss.Email, ss.Token, ss.Expire)
 	if tx.err == nil && nb != 1 {
-		tx.err = internship.ErrUnknownUser
+		tx.err = schema.ErrUnknownUser
 	}
 	return ss, tx.Done()
 }
 
 //RmSession destroy the current user session if exists
 func (s *Store) RmSession(token []byte) error {
-	return s.singleUpdate(deleteSessionFromToken, internship.ErrUnknownUser, token)
+	return s.singleUpdate(deleteSessionFromToken, schema.ErrUnknownUser, token)
 }

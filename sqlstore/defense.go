@@ -1,6 +1,6 @@
 package sqlstore
 
-import "github.com/fhermeni/wints/internship"
+import "github.com/fhermeni/wints/schema"
 
 var (
 	updateDefensePrivacy  = "update defenses set private=$1 where student=$2"
@@ -11,22 +11,22 @@ var (
 
 //SetDefensePrivacy indicates if the defense is private or public
 func (s *Store) SetDefensePrivacy(student string, private bool) error {
-	return s.singleUpdate(updateDefensePrivacy, internship.ErrUnknownStudent, private, student)
+	return s.singleUpdate(updateDefensePrivacy, schema.ErrUnknownStudent, private, student)
 }
 
 //SetDefenseLocality indicates if the defense is done in live or by visio
 func (s *Store) SetDefenseLocality(student string, local bool) error {
-	return s.singleUpdate(updateDefenseLocality, internship.ErrUnknownStudent, local, student)
+	return s.singleUpdate(updateDefenseLocality, schema.ErrUnknownStudent, local, student)
 }
 
 //SetDefenseGrade set the defense grade
 func (s *Store) SetDefenseGrade(student string, g int) error {
-	return s.singleUpdate(updateDefenseGrade, internship.ErrUnknownDefense, student, g)
+	return s.singleUpdate(updateDefenseGrade, schema.ErrUnknownDefense, student, g)
 }
 
 //Defense get the defense of a student
-func (s *Store) Defense(student string) (internship.Defense, error) {
-	d := internship.Defense{}
+func (s *Store) Defense(student string) (schema.Defense, error) {
+	d := schema.Defense{}
 	st := s.stmt(selectDefense)
 	err := st.QueryRow(student).Scan(
 		&d.Time,
@@ -39,7 +39,7 @@ func (s *Store) Defense(student string) (internship.Defense, error) {
 }
 
 //DefenseSessions get all the defense sessions
-func (s *Store) DefenseSessions() ([]internship.DefenseSession, error) {
-	ss := make([]internship.DefenseSession, 0, 0)
+func (s *Store) DefenseSessions() ([]schema.DefenseSession, error) {
+	ss := make([]schema.DefenseSession, 0, 0)
 	return ss, nil
 }

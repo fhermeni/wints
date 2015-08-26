@@ -6,12 +6,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/fhermeni/wints/internship"
+	"github.com/fhermeni/wints/schema"
 	"github.com/stretchr/testify/assert"
 )
 
-func prepareStudent(t *testing.T, student internship.User) internship.Student {
-	stu := internship.Student{
+func prepareStudent(t *testing.T, student schema.User) schema.Student {
+	stu := schema.Student{
 		User:      student,
 		Major:     string(randomBytes(3)),
 		Promotion: string(randomBytes(3)),
@@ -21,12 +21,12 @@ func prepareStudent(t *testing.T, student internship.User) internship.Student {
 	return stu
 }
 
-func prepareConvention(t *testing.T, student internship.Student, tutor internship.User) internship.Convention {
+func prepareConvention(t *testing.T, student schema.Student, tutor schema.User) schema.Convention {
 	creation := time.Now()
-	c := internship.Convention{
+	c := schema.Convention{
 		Student: student,
 		Tutor:   tutor,
-		Supervisor: internship.Person{
+		Supervisor: schema.Person{
 			Firstname: string(randomBytes(10)),
 			Lastname:  string(randomBytes(10)),
 			Email:     string(randomBytes(10)),
@@ -41,7 +41,7 @@ func prepareConvention(t *testing.T, student internship.Student, tutor internshi
 		ForeignCountry: true,
 		Skip:           false, //default value
 		Valid:          false, //default value
-		Company: internship.Company{
+		Company: schema.Company{
 			Name: string(randomBytes(10)),
 			WWW:  string(randomBytes(10)),
 		},
@@ -63,7 +63,7 @@ func prepareConvention(t *testing.T, student internship.Student, tutor internshi
 	return c
 }
 
-func convention(t *testing.T, p internship.Person) internship.Convention {
+func convention(t *testing.T, p schema.Person) schema.Convention {
 	c2, err := store.Convention(p.Email)
 	assert.Nil(t, err)
 	return c2
@@ -82,9 +82,9 @@ func TestConvention(t *testing.T) {
 	//assert.Equal(t, c, c2)
 
 	//The setters
-	cpy := internship.Company{}
+	cpy := schema.Company{}
 	title := string(randomBytes(10))
-	sup := internship.Person{}
+	sup := schema.Person{}
 	pTut2, _ := preparePerson(t)
 	tut2 := user(t, pTut2.Email)
 	assert.Nil(t, store.SetCompany(pStudent.Email, cpy))

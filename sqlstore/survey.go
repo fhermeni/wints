@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/fhermeni/wints/internship"
+	"github.com/fhermeni/wints/schema"
 	"github.com/lib/pq"
 )
 
@@ -24,8 +24,8 @@ func (s *Store) SurveyToken(token string) (string, string, error) {
 	return student, kind, mapCstrToError(err)
 }
 
-func scanSurvey(rows *sql.Rows) (internship.SurveyHeader, error) {
-	survey := internship.SurveyHeader{}
+func scanSurvey(rows *sql.Rows) (schema.SurveyHeader, error) {
+	survey := schema.SurveyHeader{}
 	var delivery pq.NullTime
 
 	err := rows.Scan(
@@ -43,8 +43,8 @@ func scanSurvey(rows *sql.Rows) (internship.SurveyHeader, error) {
 }
 
 //Surveys returns all the survey related to a student
-func (s *Store) Surveys(student string) (map[string]internship.SurveyHeader, error) {
-	res := make(map[string]internship.SurveyHeader)
+func (s *Store) Surveys(student string) (map[string]schema.SurveyHeader, error) {
+	res := make(map[string]schema.SurveyHeader)
 	st := s.stmt(selectSurveys)
 	rows, err := st.Query(student)
 	if err != nil {
@@ -62,11 +62,11 @@ func (s *Store) Surveys(student string) (map[string]internship.SurveyHeader, err
 }
 
 //Survey returns the required survey
-func (s *Store) Survey(student, kind string) (internship.SurveyHeader, error) {
+func (s *Store) Survey(student, kind string) (schema.SurveyHeader, error) {
 	st := s.stmt(selectSurvey)
 	rows, err := st.Query(student, kind)
 	if err != nil {
-		return internship.SurveyHeader{}, err
+		return schema.SurveyHeader{}, err
 	}
 	rows.Next()
 	defer rows.Close()
@@ -75,5 +75,5 @@ func (s *Store) Survey(student, kind string) (internship.SurveyHeader, error) {
 
 //SetSurveyContent stores the survey answers
 func (s *Store) SetSurveyContent(token string, cnt []byte) error {
-	return s.singleUpdate(updateSurveyContent, internship.ErrUnknownSurvey, cnt, time.Now(), token)
+	return s.singleUpdate(updateSurveyContent, schema.ErrUnknownSurvey, cnt, time.Now(), token)
 }

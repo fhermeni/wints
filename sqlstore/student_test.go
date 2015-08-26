@@ -5,7 +5,7 @@ package sqlstore
 import (
 	"testing"
 
-	"github.com/fhermeni/wints/internship"
+	"github.com/fhermeni/wints/schema"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -17,7 +17,7 @@ func TestStudents(t *testing.T) {
 	student, err := store.Student(pStudent.Email)
 	assert.Nil(t, err)
 	assert.Equal(t, user(t, pStudent.Email), student.User)
-	assert.Equal(t, internship.STUDENT, student.User.Role)
+	assert.Equal(t, schema.STUDENT, student.User.Role)
 	assert.Equal(t, "ma1", student.Major)
 	assert.Equal(t, "p1", student.Promotion)
 	assert.Equal(t, true, student.Male)

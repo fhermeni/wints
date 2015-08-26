@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/fhermeni/wints/internship"
+	"github.com/fhermeni/wints/schema"
 	"github.com/lib/pq"
 
 	"crypto/rand"
@@ -103,17 +103,17 @@ func mapCstrToError(err error) error {
 	if e, ok := err.(*pq.Error); ok {
 		switch e.Constraint {
 		case "pk_email":
-			return internship.ErrUserExists
+			return schema.ErrUserExists
 		case "fk_sessions_email", "fk_student_email", "fk_password_renewal_email":
-			return internship.ErrUnknownUser
+			return schema.ErrUnknownUser
 		case "pk_students_email":
-			return internship.ErrStudentExists
+			return schema.ErrStudentExists
 		case "pk_conventions_student":
-			return internship.ErrConventionExists
+			return schema.ErrConventionExists
 		case "fk_conventions_student", "fk_reports_student", "fk_surveys_student", "fk_defenses_student":
-			return internship.ErrUnknownStudent
+			return schema.ErrUnknownStudent
 		case "fk_conventions_tutor":
-			return internship.ErrUserTutoring
+			return schema.ErrUserTutoring
 		}
 	}
 	return err

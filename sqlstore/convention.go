@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/fhermeni/wints/config"
-	"github.com/fhermeni/wints/internship"
+	"github.com/fhermeni/wints/schema"
 )
 
 var (
@@ -43,34 +43,34 @@ var (
 
 //SetConventionSkippable stores the skipable status for a student convention
 func (s *Store) SetConventionSkippable(student string, skip bool) error {
-	return s.singleUpdate(updateConventionSkip, internship.ErrUnknownStudent, skip, student)
+	return s.singleUpdate(updateConventionSkip, schema.ErrUnknownStudent, skip, student)
 }
 
 //SetSupervisor updates the student supervisor
-func (s *Store) SetSupervisor(stu string, t internship.Person) error {
-	return s.singleUpdate(updateSupervisor, internship.ErrUnknownInternship, t.Firstname, t.Lastname, t.Tel, t.Email, stu)
+func (s *Store) SetSupervisor(stu string, t schema.Person) error {
+	return s.singleUpdate(updateSupervisor, schema.ErrUnknownInternship, t.Firstname, t.Lastname, t.Tel, t.Email, stu)
 }
 
 //SetTutor updates the student tutor
 func (s *Store) SetTutor(stu string, t string) error {
-	return s.singleUpdate(updateTutor, internship.ErrUnknownInternship, t, stu)
+	return s.singleUpdate(updateTutor, schema.ErrUnknownInternship, t, stu)
 }
 
 //SetCompany updates the student company
-func (s *Store) SetCompany(stu string, c internship.Company) error {
-	return s.singleUpdate(updateCompany, internship.ErrUnknownInternship, c.WWW, c.Name, stu)
+func (s *Store) SetCompany(stu string, c schema.Company) error {
+	return s.singleUpdate(updateCompany, schema.ErrUnknownInternship, c.WWW, c.Name, stu)
 }
 
 //SetTitle updates the student internship title
 func (s *Store) SetTitle(stu string, title string) error {
-	return s.singleUpdate(updateTitle, internship.ErrUnknownInternship, title, stu)
+	return s.singleUpdate(updateTitle, schema.ErrUnknownInternship, title, stu)
 }
 
 //NewConvention establishes a new convention for a registered student and tutor
 //If a convention already exists for that student but the new data refer to a fresher convention, it is updated
-func (s *Store) NewConvention(student string, startTime, endTime time.Time, tutor string, cpy internship.Company, sup internship.Person, title string, creation time.Time, foreignCountry, lab bool, gratification int) (bool, error) {
-	err := s.singleUpdate(insertConvention, internship.ErrUnknownStudent, student, startTime, endTime, tutor, cpy.Name, cpy.WWW, sup.Firstname, sup.Lastname, sup.Email, sup.Tel, title, creation, foreignCountry, lab, gratification, false, false)
-	if err == internship.ErrConventionExists {
+func (s *Store) NewConvention(student string, startTime, endTime time.Time, tutor string, cpy schema.Company, sup schema.Person, title string, creation time.Time, foreignCountry, lab bool, gratification int) (bool, error) {
+	err := s.singleUpdate(insertConvention, schema.ErrUnknownStudent, student, startTime, endTime, tutor, cpy.Name, cpy.WWW, sup.Firstname, sup.Lastname, sup.Email, sup.Tel, title, creation, foreignCountry, lab, gratification, false, false)
+	if err == schema.ErrConventionExists {
 		//Has it been updated ?
 		var last time.Time
 		st := s.stmt(selectConventionCreation)
@@ -78,7 +78,7 @@ func (s *Store) NewConvention(student string, startTime, endTime time.Time, tuto
 			return false, err
 		}
 		if creation.After(last) {
-			return true, s.singleUpdate(updateConvention, internship.ErrUnknownConvention,
+			return true, s.singleUpdate(updateConvention, schema.ErrUnknownConvention,
 				student,
 				startTime,
 				endTime,
@@ -100,21 +100,21 @@ func (s *Store) NewConvention(student string, startTime, endTime time.Time, tuto
 }
 
 //Convention returns the convention of a given student
-func (s *Store) Convention(student string) (internship.Convention, error) {
+func (s *Store) Convention(student string) (schema.Convention, error) {
 	st := s.stmt(selectConvention)
 	rows, err := st.Query(student)
 	if err != nil {
-		return internship.Convention{}, err
+		return schema.Convention{}, err
 	}
 	if !rows.Next() {
-		return internship.Convention{}, internship.ErrUnknownConvention
+		return schema.Convention{}, schema.ErrUnknownConvention
 	}
 	return scanConvention(rows)
 }
 
 //Conventions lists all the registered conventions
-func (s *Store) Conventions() ([]internship.Convention, error) {
-	conventions := make([]internship.Convention, 0, 0)
+func (s *Store) Conventions() ([]schema.Convention, error) {
+	conventions := make([]schema.Convention, 0, 0)
 	st := s.stmt(selectConventions)
 	rows, err := st.Query()
 	if err != nil {
@@ -149,8 +149,8 @@ func (s *Store) ValidateConvention(student string, cfg config.Config) error {
 }
 
 //Internships returns all the internships. Not necessarily validated
-func (s *Store) Internships() ([]internship.Internship, error) {
-	res := make([]internship.Internship, 0, 0)
+func (s *Store) Internships() ([]schema.Internship, error) {
+	res := make([]schema.Internship, 0, 0)
 	conventions, err := s.Conventions()
 	if err != nil {
 		return res, err
@@ -167,8 +167,8 @@ func (s *Store) Internships() ([]internship.Internship, error) {
 }
 
 //Internship returns the internship for a given student
-func (s *Store) Internship(student string) (internship.Internship, error) {
-	i := internship.Internship{}
+func (s *Store) Internship(student string) (schema.Internship, error) {
+	i := schema.Internship{}
 	st := s.stmt(selectConvention)
 	rows, err := st.Query(student)
 	if err != nil {
@@ -182,39 +182,39 @@ func (s *Store) Internship(student string) (internship.Internship, error) {
 	return s.toInternship(c)
 }
 
-func (s *Store) toInternship(c internship.Convention) (internship.Internship, error) {
+func (s *Store) toInternship(c schema.Convention) (schema.Internship, error) {
 	stu := c.Student.User.Person.Email
 	r, err := s.Reports(stu)
 	if err != nil {
-		return internship.Internship{}, err
+		return schema.Internship{}, err
 	}
 	surveys, err := s.Surveys(stu)
 	if err != nil {
-		return internship.Internship{}, err
+		return schema.Internship{}, err
 	}
 	d, err := s.Defense(stu)
 	if err != nil {
-		return internship.Internship{}, err
+		return schema.Internship{}, err
 	}
-	return internship.Internship{Convention: c, Reports: r, Surveys: surveys, Defense: d}, err
+	return schema.Internship{Convention: c, Reports: r, Surveys: surveys, Defense: d}, err
 }
 
-func scanConvention(rows *sql.Rows) (internship.Convention, error) {
+func scanConvention(rows *sql.Rows) (schema.Convention, error) {
 	var nextContact sql.NullString
 	var nextPosition sql.NullInt64
 
-	c := internship.Convention{
-		Student: internship.Student{
-			User: internship.User{
-				Person: internship.Person{},
+	c := schema.Convention{
+		Student: schema.Student{
+			User: schema.User{
+				Person: schema.Person{},
 			},
-			Alumni: internship.Alumni{},
+			Alumni: schema.Alumni{},
 		},
-		Tutor: internship.User{
-			Person: internship.Person{},
+		Tutor: schema.User{
+			Person: schema.Person{},
 		},
-		Supervisor: internship.Person{},
-		Company:    internship.Company{},
+		Supervisor: schema.Person{},
+		Company:    schema.Company{},
 	}
 	err := rows.Scan(
 		&c.Student.User.Person.Firstname,
