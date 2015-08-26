@@ -74,6 +74,9 @@ func (s *Store) Report(k, email string) (internship.ReportHeader, error) {
 		return hdr, mapCstrToError(err)
 	}
 	defer rows.Close()
+	if !rows.Next() {
+		return hdr, internship.ErrUnknownStudent
+	}
 	return scanReport(rows)
 }
 
@@ -82,7 +85,7 @@ func (s *Store) ReportContent(kind, email string) ([]byte, error) {
 	var cnt []byte
 	st := s.stmt(selectReportCnt)
 	err := st.QueryRow(email, kind).Scan(&cnt)
-	return cnt, err
+	return cnt, noRowsTo(err, internship.ErrUnknownReport)
 }
 
 //SetReportContent saves the content of a given report

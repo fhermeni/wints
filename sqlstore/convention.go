@@ -12,24 +12,24 @@ var (
 	updateConventionSkip     = "update conventions set skip=$1 where student=$2"
 	updateSupervisor         = "update conventions set supervisorFn=$1, supervisorLn=$2, supervisorTel=$3, supervisorEmail=$4 where student=$5"
 	updateTutor              = "update conventions set tutor=$1 where student=$2"
-	updateCompany            = "update conventions set companyWWW=$1, company=$2 where student=$3"
+	updateCompany            = "update conventions set companyWWW=$1, companyName=$2 where student=$3"
 	updateTitle              = "update conventions set title=$1 where student=$2"
-	insertConvention         = "insert into conventions(student, male, startTime, endTime, tutor, companyName, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, creation, foreignCountry, lab, gratification, skip, valid) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18"
+	insertConvention         = "insert into conventions(student, startTime, endTime, tutor, companyName, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, creation, foreignCountry, lab, gratification, skip, valid) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)"
 	updateConvention         = "update conventions set startTime=$2, endTime=$3, tutor=$4, companyName=$5, companyWWW=$6, supervisorFn=$7, supervisorLn=$8, supervisorEmail=$9, supervisorTel=$10, title=$11, creation=$12, foreignCountry=$13, lab=$14, gratification=$15, where student=$1"
 	selectConventionCreation = "select creation from conventions where student=$1"
-	selectConventions        = "select stup.firstname, stup.lastname, stup.tel, stup.email, stup.lastVisit" +
+	selectConventions        = "select stup.firstname, stup.lastname, stup.tel, stup.email, stup.lastVisit, " +
 		"students.male, students.promotion, students.major, students.nextPosition, students.nextContact, students.skip," +
-		"tutp.firstname, tutp.lastname, tutp.tel, tutp.email, tutp.lastVisit, tutp.role" +
+		"tutp.firstname, tutp.lastname, tutp.tel, tutp.email, tutp.lastVisit, tutp.role, " +
 		"startTime, endTime, companyName, companyWWW, title, creation, foreignCountry, lab, gratification, skip, valid," +
 		"supervisorFn, supervisorLn, supervisorEmail, supervisorTel " +
 		"from conventions " +
 		" inner join students on (students.email = conventions.student) " +
 		" inner join users as stup on (stup.email = conventions.student)  " +
 		" inner join users as tutp on (tutp.email = conventions.tutor)  "
-	selectConvention = "select stup.firstname, stup.lastname, stup.tel, stup.email, stup.lastVisit" +
-		"students.male, students.promotion, students.major, students.nextPosition, students.nextContact, students.skip," +
-		"tutp.firstname, tutp.lastname, tutp.tel, tutp.email, tutp.lastVisit, tutp.role" +
-		"startTime, endTime, companyName, companyWWW, title, creation, foreignCountry, lab, gratification, skip, valid," +
+	selectConvention = "select stup.firstname, stup.lastname, stup.tel, stup.email, stup.lastVisit, " +
+		"students.male, students.promotion, students.major, students.nextPosition, students.nextContact, students.skip, " +
+		"tutp.firstname, tutp.lastname, tutp.tel, tutp.email, tutp.lastVisit, tutp.role, " +
+		"startTime, endTime, companyName, companyWWW, title, creation, foreignCountry, lab, gratification, conventions.skip, valid," +
 		"supervisorFn, supervisorLn, supervisorEmail, supervisorTel " +
 		"from conventions " +
 		" inner join students on (students.email = conventions.student) " +
@@ -63,7 +63,7 @@ func (s *Store) SetCompany(stu string, c internship.Company) error {
 
 //SetTitle updates the student internship title
 func (s *Store) SetTitle(stu string, title string) error {
-	return s.singleUpdate(updateTutor, internship.ErrUnknownInternship, title, stu)
+	return s.singleUpdate(updateTitle, internship.ErrUnknownInternship, title, stu)
 }
 
 //NewConvention establishes a new convention for a registered student and tutor
@@ -97,6 +97,19 @@ func (s *Store) NewConvention(student string, startTime, endTime time.Time, tuto
 		}
 	}
 	return false, err
+}
+
+//Convention returns the convention of a given student
+func (s *Store) Convention(student string) (internship.Convention, error) {
+	st := s.stmt(selectConvention)
+	rows, err := st.Query(student)
+	if err != nil {
+		return internship.Convention{}, err
+	}
+	if !rows.Next() {
+		return internship.Convention{}, internship.ErrUnknownConvention
+	}
+	return scanConvention(rows)
 }
 
 //Conventions lists all the registered conventions
@@ -187,6 +200,9 @@ func (s *Store) toInternship(c internship.Convention) (internship.Internship, er
 }
 
 func scanConvention(rows *sql.Rows) (internship.Convention, error) {
+	var nextContact sql.NullString
+	var nextPosition sql.NullInt64
+
 	c := internship.Convention{
 		Student: internship.Student{
 			User: internship.User{
@@ -198,7 +214,7 @@ func scanConvention(rows *sql.Rows) (internship.Convention, error) {
 			Person: internship.Person{},
 		},
 		Supervisor: internship.Person{},
-		Cpy:        internship.Company{},
+		Company:    internship.Company{},
 	}
 	err := rows.Scan(
 		&c.Student.User.Person.Firstname,
@@ -209,8 +225,8 @@ func scanConvention(rows *sql.Rows) (internship.Convention, error) {
 		&c.Student.Male,
 		&c.Student.Promotion,
 		&c.Student.Major,
-		&c.Student.Alumni.Position,
-		&c.Student.Alumni.Contact,
+		&nextPosition,
+		&nextContact,
 		&c.Student.Skip,
 		&c.Tutor.Person.Firstname,
 		&c.Tutor.Person.Lastname,
@@ -220,8 +236,8 @@ func scanConvention(rows *sql.Rows) (internship.Convention, error) {
 		&c.Tutor.Role,
 		&c.Begin,
 		&c.End,
-		&c.Cpy.Name,
-		&c.Cpy.WWW,
+		&c.Company.Name,
+		&c.Company.WWW,
 		&c.Title,
 		&c.Creation,
 		&c.ForeignCountry,
@@ -234,5 +250,7 @@ func scanConvention(rows *sql.Rows) (internship.Convention, error) {
 		&c.Supervisor.Email,
 		&c.Supervisor.Tel,
 	)
+	c.Student.Alumni.Position = nullableInt(nextPosition, 0)
+	c.Student.Alumni.Contact = nullableString(nextContact)
 	return c, err
 }

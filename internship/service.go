@@ -10,70 +10,51 @@ import (
 
 //Service specifies the core methods to manage student internships
 type Service interface {
-
-	//Delete the user if it is not tutoring anyone
 	RmUser(email string) error
 
-	//List the users
 	Users() ([]User, error)
 
 	User(email string) (User, error)
 
 	Visit(u string) error
-	//Change the user password
 	SetPassword(email string, oldP, newP []byte) error
-	//SetUserPerson updates the user profile
 	SetUserPerson(p Person) error
 
-	//Change user role
 	SetUserRole(email string, priv Privilege) error
 
-	//NewSession creates a new session if the email and the password matches a user
 	NewSession(email string, password []byte, expire time.Duration) (Session, error)
-	//RmSession destroys a session
 	RmSession(token []byte) error
-	//Check if a session is opened for a given user and token
 	Session(token string) (Session, error)
 
-	//Ask for a password reset.
-	//Return a token used to declare the new password (see NewPassword)
 	ResetPassword(email string, d time.Duration) ([]byte, error)
 
-	//Declare the new password using an authentication token
 	NewPassword(token, newP []byte) (string, error)
 
 	ReplaceUserWith(src, dst string) error
 
-	//Student that left ?
-	SkipStudent(em string, st bool) error
+	SetStudentSkippable(em string, st bool) error
 	Students() ([]Student, error)
+	Student(email string) (Student, error)
 	SetNextContact(student string, em string) error
 	SetNextPosition(student string, pos int) error
 	SetMajor(stu string, m string) error
 	SetPromotion(stu string, p string) error
-	//SetMale states a student gender
 	SetMale(stu string, male bool) error
+
+	Convention(student string) (Convention, error)
 	Conventions() ([]Convention, error)
 	SetSupervisor(stu string, sup Person) error
 	SetTutor(stu string, t string) error
 	SetCompany(stu string, c Company) error
 	SetTitle(stu string, title string) error
-
-	//I don't manage it
 	SetConventionSkippable(student string, skip bool) error
 
-	//Turns the convention to an internship
-	//align student & tutor. Tutor must exists. Send student credentials, instantiate reports, surveys
 	ValidateConvention(stu string, cfg config.Config) error
 
-	//Internship management
 	Internships() ([]Internship, error)
 	Internship(stu string) (Internship, error)
 
-	//Reports management
-
-	//PlanReport(student string, r ReportHeader) error
-	//ReportDefs() []ReportDef
+	Reports(email string) (map[string]ReportHeader, error)
 	Report(kind, email string) (ReportHeader, error)
 	ReportContent(kind, email string) ([]byte, error)
 	SetReportContent(kind, email string, cnt []byte) error
@@ -123,7 +104,7 @@ var (
 	ErrUnknownConvention  = errors.New("No convention associated to this student")
 	ErrStudentExists      = errors.New("Student already exists")
 	ErrReportExists       = errors.New("Report already exists")
-	ErrUnknownReport      = errors.New("Unknown report or user")
+	ErrUnknownReport      = errors.New("Unknown report")
 	ErrInvalidGrade       = errors.New("The grade must be between 0 and 20 (inclusive)")
 	ErrReportConflict     = errors.New("The report has not been uploaded")
 	ErrInternshipExists   = errors.New("Internship already exists")

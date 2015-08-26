@@ -13,9 +13,9 @@ import (
 func preparePerson(t *testing.T) (internship.Person, []byte) {
 	//Preparation
 	p := internship.Person{
-		Firstname: "foo",
-		Lastname:  "bar",
-		Tel:       "baz",
+		Firstname: string(randomBytes(12)),
+		Lastname:  string(randomBytes(12)),
+		Tel:       string(randomBytes(12)),
 		Email:     string(randomBytes(12)),
 	}
 	password := randomBytes(32)
@@ -41,8 +41,8 @@ func TestSessions(t *testing.T) {
 	assert.Nil(t, err)
 
 	//Get the session
-	/*	s2, err := store.Session(s.Token)
-		assert.Equal(t, s, s2)*/
+	/*s2, err := store.Session(s.Token)
+	assert.Equal(t, s, s2)*/
 	_, err = store.Session(randomBytes(12))
 	assert.Equal(t, internship.ErrCredentials, err)
 

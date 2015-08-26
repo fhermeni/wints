@@ -47,15 +47,15 @@ create table students(
     nextPosition int,
     nextContact text,
     skip boolean,
+    male boolean,
     constraint pk_students_email PRIMARY KEY(email),
     constraint fk_students_email FOREIGN KEY (email) REFERENCES users(email) on delete cascade on update cascade
 );
 
 create table conventions(
-    student text,
-    male boolean,
+    student text,    
     startTime timestamp with time zone,
-    endTime timeStamp with time zone,
+    endTime timestamp with time zone,
     tutor text,
     companyName text,
     companyWWW text,

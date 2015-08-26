@@ -28,7 +28,7 @@ func (s *Store) NewSession(email string, password []byte, expire time.Duration) 
 	ss := internship.Session{
 		Email:  email,
 		Token:  randomBytes(32),
-		Expire: time.Now().Add(expire),
+		Expire: time.Now().Add(expire).Truncate(time.Minute),
 	}
 	tx := newTxErr(s.db)
 	tx.err = tx.QueryRow(selectPassword, email).Scan(&p)

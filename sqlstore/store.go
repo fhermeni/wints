@@ -82,6 +82,13 @@ func nullableInt(t sql.NullInt64, def int) int {
 	return def
 }
 
+func nullableString(t sql.NullString) string {
+	if t.Valid {
+		return t.String
+	}
+	return ""
+}
+
 func noRowsTo(got error, with error) error {
 	if got == sql.ErrNoRows {
 		return with
