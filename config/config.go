@@ -33,9 +33,10 @@ type Db struct {
 }
 
 //EndPoint configures the rest endpoints
-type EndPoints struct {
+type Rest struct {
 	SessionLifeTime        Duration
 	RenewalRequestLifetime Duration
+	Prefix                 string
 }
 
 //HTTPd configures the http daemon
@@ -45,7 +46,7 @@ type HTTPd struct {
 	Listen      string
 	Certificate string
 	PrivateKey  string
-	EndPoints   EndPoints
+	Rest        Rest
 }
 
 //Journal configures the logging system

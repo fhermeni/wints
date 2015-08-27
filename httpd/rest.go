@@ -4,6 +4,7 @@ package httpd
 import (
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/dimfeld/httptreemux"
@@ -24,9 +25,12 @@ type EndPoints struct {
 func NewEndPoints(prefix string) EndPoints {
 	ed := EndPoints{
 		router: httptreemux.New(),
-		prefix: prefix,
+		prefix: strings.TrimSuffix(prefix, "/"),
 	}
-
+	ed.router.NotFoundHandler = func(w http.ResponseWriter, r *http.Request) {
+		log.Println("rest call not found: " + r.URL.String())
+		http.Error(w, "", http.StatusNotFound)
+	}
 	//Set the endpoints
 	ed.get("/users/", users)
 	ed.post("/users/", newUser)
