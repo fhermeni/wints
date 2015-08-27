@@ -99,25 +99,18 @@ func (ed *EndPoints) openSession(w http.ResponseWriter, r *http.Request) (sessio
 
 func (ed *EndPoints) wrap(fn EndPoint) httptreemux.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request, ps map[string]string) {
-		start := time.Now()
-		myRw := NewMyResponseWriter(w)
-
 		//Create a session
 		s, err := ed.openSession(w, r)
 		if err != nil {
-			status(myRw, err)
+			status(w, err)
 		}
-
 		ex := Exchange{
-			w:  myRw,
+			w:  w,
 			r:  r,
 			ps: ps,
 			s:  s,
 		}
-		defer func() {
-			log.Printf("%s %s %d %d", r.Method, r.URL.String(), myRw.Status(), int(time.Since(start).Nanoseconds()/1000000))
-		}()
-		status(myRw, fn(ex))
+		status(w, fn(ex))
 	}
 }
 
