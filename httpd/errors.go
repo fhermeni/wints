@@ -18,7 +18,7 @@ func status(w http.ResponseWriter, e error) {
 	case schema.ErrReportExists, schema.ErrUserExists, schema.ErrInternshipExists, schema.ErrCredentials, schema.ErrUserTutoring:
 		http.Error(w, e.Error(), http.StatusConflict)
 		return
-	case schema.ErrInvalidSurvey, schema.ErrInvalidAlumniEmail, schema.ErrDeadlinePassed, schema.ErrInvalidGrade, schema.ErrInvalidMajor, schema.ErrInvalidPeriod, schema.ErrGradedReport:
+	case ErrMalformedJSON, schema.ErrInvalidSurvey, schema.ErrInvalidAlumniEmail, schema.ErrDeadlinePassed, schema.ErrInvalidGrade, schema.ErrInvalidMajor, schema.ErrInvalidPeriod, schema.ErrGradedReport:
 		http.Error(w, e.Error(), http.StatusBadRequest)
 		return
 	case session.ErrPermission, session.ErrConfidentialReport:

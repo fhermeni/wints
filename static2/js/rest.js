@@ -99,7 +99,7 @@ function reportError(msg) {
 	})
 }
 
-var ROOT_API = "/api/v1";
+var ROOT_API = "/api/v2";
 
 //Profile management
 

@@ -1,24 +1,14 @@
-.container-fluid {
-	margin-top: 5em;
+.container {
+	margin-top: 7em;
 }
 
 .row {
 	margin-bottom: 2em; 
 }
-/*.login-icon {		
-	padding: 10px;
-	width: 96px;
-}*/
-.login-screen {
-padding: 25px;
-background-color: #edeff1;
-border-radius: 6px;
-}
 
-body {
-	background: #37BC9B;
+.well {
+	margin-bottom: 0px;
 }
-
 .alert {
     display: none;    
 }
