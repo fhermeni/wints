@@ -1,0 +1,32 @@
+package schema
+
+import "errors"
+
+var (
+	ErrUnknownStudent     = errors.New("Unknown student")
+	ErrUnknownConvention  = errors.New("No convention associated to this student")
+	ErrStudentExists      = errors.New("Student already exists")
+	ErrReportExists       = errors.New("Report already exists")
+	ErrUnknownReport      = errors.New("Unknown report")
+	ErrInvalidGrade       = errors.New("The grade must be between 0 and 20 (inclusive)")
+	ErrReportConflict     = errors.New("The report has not been uploaded")
+	ErrInternshipExists   = errors.New("Internship already exists")
+	ErrUnknownInternship  = errors.New("Unknown internship")
+	ErrUserExists         = errors.New("User already exists")
+	ErrUnknownUser        = errors.New("User not found")
+	ErrUserTutoring       = errors.New("The user is tutoring students")
+	ErrCredentials        = errors.New("Incorrect credentials")
+	ErrNoPendingRequests  = errors.New("No password renewable request pending")
+	ErrInvalidPeriod      = errors.New("invalid internship period")
+	ErrConventionExists   = errors.New("convention already scanned")
+	ErrInvalidMajor       = errors.New("Invalid major")
+	ErrDeadlinePassed     = errors.New("Deadline passed")
+	ErrGradedReport       = errors.New("Report already graded")
+	ErrSessionExpired     = errors.New("Session expired")
+	ErrInvalidToken       = errors.New("Invalid session")
+	ErrUnknownSurvey      = errors.New("Unknown survey")
+	ErrInvalidSurvey      = errors.New("Invalid answers")
+	ErrUnknownAlumni      = errors.New("No informations for future alumni")
+	ErrInvalidAlumniEmail = errors.New("Invalid email. It must not be served by polytech' or unice")
+	ErrUnknownDefense     = errors.New("Unknown defense")
+)

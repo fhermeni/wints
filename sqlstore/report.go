@@ -95,6 +95,9 @@ func (s *Store) SetReportContent(kind, email string, cnt []byte) error {
 
 //SetReportGrade stores the given report grade
 func (s *Store) SetReportGrade(kind, email string, g int, comment string) error {
+	if g < 0 || g > 20 {
+		return schema.ErrInvalidGrade
+	}
 	return s.singleUpdate(setGrade, schema.ErrUnknownReport, email, kind, g, comment, time.Now())
 }
 

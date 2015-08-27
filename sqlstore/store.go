@@ -12,14 +12,14 @@ import (
 
 //Store allows to communicate with a database
 type Store struct {
-	db *sql.DB
-	//mailer     mail.Mailer
+	db    *sql.DB
 	stmts map[string]*stmtErr
 }
 
 //NewStore initiate the storage servive
 func NewStore(d *sql.DB) (*Store, error) {
-	s := Store{db: d,
+	s := Store{
+		db:    d,
 		stmts: make(map[string]*stmtErr),
 	}
 	return &s, nil

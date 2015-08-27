@@ -1,11 +1,6 @@
 package mail
 
-import (
-	"time"
-
-	"github.com/fhermeni/wints/internship"
-)
-
+/*
 type Mailer interface {
 	SendAdminInvitation(u internship.User, token []byte)
 	SendStudentInvitation(u internship.User, token []byte)
@@ -23,3 +18,4 @@ type Mailer interface {
 	SendSurveyRequest(i internship.Internship, kind string)
 	Fake(bool)
 }
+*/

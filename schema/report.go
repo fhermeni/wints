@@ -1,4 +1,4 @@
-package internship
+package schema
 
 import "time"
 

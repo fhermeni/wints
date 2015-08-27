@@ -9,19 +9,24 @@ import (
 )
 
 var (
-	selectSurveyFromToken = "select student, kind from surveys where token=$1"
+	selectSurveyFromToken = "select kind, deadline, timestamp, cnt, token from surveys where token=$1"
 	selectSurvey          = "select kind, deadline, timestamp, cnt, token from surveys where student=$1 and kind=$2"
 	selectSurveys         = "select kind, deadline, timestamp, cnt, token from surveys where student=$1"
 	updateSurveyContent   = "update surveys set cnt=$1, timestamp=$2 where token=$3"
 )
 
-//SurveyToken returns a given survey identifier
-func (s *Store) SurveyToken(token string) (string, string, error) {
-	student := ""
-	kind := ""
+//SurveyFromToken returns a given survey identifier
+func (s *Store) SurveyFromToken(token string) (schema.SurveyHeader, error) {
 	st := s.stmt(selectSurveyFromToken)
-	err := st.QueryRow(token).Scan(&student, &kind)
-	return student, kind, mapCstrToError(err)
+	rows, err := st.Query(token)
+	if err != nil {
+		return schema.SurveyHeader{}, err
+	}
+	defer rows.Close()
+	if !rows.Next() {
+		return schema.SurveyHeader{}, schema.ErrUnknownSurvey
+	}
+	return scanSurvey(rows)
 }
 
 func scanSurvey(rows *sql.Rows) (schema.SurveyHeader, error) {

@@ -1,18 +1,6 @@
 package mail
 
-import (
-	"bytes"
-	"crypto/tls"
-	"log"
-	"net"
-	"net/smtp"
-	"text/template"
-	"time"
-
-	"github.com/fhermeni/wints/internship"
-	"github.com/fhermeni/wints/journal"
-)
-
+/*
 type SMTP struct {
 	server string
 	sender string
@@ -327,3 +315,5 @@ func (m *SMTP) SendTest(s string) error {
 func (m *SMTP) Fake(b bool) {
 	m.fake = b
 }
+
+*/

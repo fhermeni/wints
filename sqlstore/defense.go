@@ -21,6 +21,9 @@ func (s *Store) SetDefenseLocality(student string, local bool) error {
 
 //SetDefenseGrade set the defense grade
 func (s *Store) SetDefenseGrade(student string, g int) error {
+	if g < 0 || g > 20 {
+		return schema.ErrInvalidGrade
+	}
 	return s.singleUpdate(updateDefenseGrade, schema.ErrUnknownDefense, student, g)
 }
 

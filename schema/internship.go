@@ -1,4 +1,4 @@
-package internship
+package schema
 
 import "time"
 
@@ -37,4 +37,25 @@ type Internship struct {
 	Surveys map[string]SurveyHeader
 	//Defense
 	Defense Defense
+}
+
+//Internships aliases slices of internship to exhibit filtering methods
+type Internships []Internship
+
+//Filter returns the internships that pass the given filter
+func (ss Internships) Filter(filter func(Internship) bool) Internships {
+	res := make(Internships, 0)
+	for _, i := range ss {
+		if filter(i) {
+			res = append(res, i)
+		}
+	}
+	return res
+}
+
+//Tutoring is a filter that keep only the internships tutored by the given user
+func Tutoring(tut string) func(Internship) bool {
+	return func(i Internship) bool {
+		return i.Convention.Tutor.Person.Email == tut
+	}
 }

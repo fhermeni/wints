@@ -1,5 +1,6 @@
 package journal
 
+/*
 import (
 	"fmt"
 	"log"
@@ -80,3 +81,4 @@ func (f *File) Access(method, url string, statusCode, latency int) {
 		f.log(AccessLog, "[%s] \"%s %s\" %d %d\n", time.Now().Format(TimeFmt), method, url, statusCode, latency)
 	}()
 }
+*/

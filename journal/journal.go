@@ -1,6 +1,7 @@
 //Package journal allows to store events related to the internship management.
 package journal
 
+/*
 import "github.com/fhermeni/wints/internship"
 
 //Journal is the interface that allows to store an event into the journal
@@ -19,3 +20,4 @@ type Journal interface {
 	//Access notify an access to a Rest endPoint. The latency is in milliseconds
 	Access(method, url string, statusCode, latency int)
 }
+*/

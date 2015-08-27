@@ -1,12 +1,6 @@
 package mail
 
-import (
-	"log"
-	"time"
-
-	"github.com/fhermeni/wints/internship"
-)
-
+/*
 type Mock struct{}
 
 func NewMock() *Mock {
@@ -68,3 +62,4 @@ func (m *Mock) SendTest(e string) error {
 	log.Println("Test mail to %s\n", e)
 	return nil
 }
+*/

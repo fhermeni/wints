@@ -9,15 +9,14 @@ import (
 )
 
 var (
-	updateConventionSkip     = "update conventions set skip=$1 where student=$2"
-	updateSupervisor         = "update conventions set supervisorFn=$1, supervisorLn=$2, supervisorTel=$3, supervisorEmail=$4 where student=$5"
-	updateTutor              = "update conventions set tutor=$1 where student=$2"
-	updateCompany            = "update conventions set companyWWW=$1, companyName=$2 where student=$3"
-	updateTitle              = "update conventions set title=$1 where student=$2"
-	insertConvention         = "insert into conventions(student, startTime, endTime, tutor, companyName, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, creation, foreignCountry, lab, gratification, skip, valid) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)"
-	updateConvention         = "update conventions set startTime=$2, endTime=$3, tutor=$4, companyName=$5, companyWWW=$6, supervisorFn=$7, supervisorLn=$8, supervisorEmail=$9, supervisorTel=$10, title=$11, creation=$12, foreignCountry=$13, lab=$14, gratification=$15, where student=$1"
-	selectConventionCreation = "select creation from conventions where student=$1"
-	selectConventions        = "select stup.firstname, stup.lastname, stup.tel, stup.email, stup.lastVisit, " +
+	updateConventionSkip = "update conventions set skip=$1 where student=$2"
+	updateSupervisor     = "update conventions set supervisorFn=$1, supervisorLn=$2, supervisorTel=$3, supervisorEmail=$4 where student=$5"
+	updateTutor          = "update conventions set tutor=$1 where student=$2"
+	updateCompany        = "update conventions set companyWWW=$1, companyName=$2 where student=$3"
+	updateTitle          = "update conventions set title=$1 where student=$2"
+	insertConvention     = "insert into conventions(student, startTime, endTime, tutor, companyName, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, creation, foreignCountry, lab, gratification, skip, valid) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17)"
+	updateConvention     = "update conventions set startTime=$2, endTime=$3, tutor=$4, companyName=$5, companyWWW=$6, supervisorFn=$7, supervisorLn=$8, supervisorEmail=$9, supervisorTel=$10, title=$11, creation=$12, foreignCountry=$13, lab=$14, gratification=$15, where student=$1 and creation < $12"
+	selectConventions    = "select stup.firstname, stup.lastname, stup.tel, stup.email, stup.lastVisit, " +
 		"students.male, students.promotion, students.major, students.nextPosition, students.nextContact, students.skip," +
 		"tutp.firstname, tutp.lastname, tutp.tel, tutp.email, tutp.lastVisit, tutp.role, " +
 		"startTime, endTime, companyName, companyWWW, title, creation, foreignCountry, lab, gratification, skip, valid," +
@@ -69,32 +68,27 @@ func (s *Store) SetTitle(stu string, title string) error {
 //NewConvention establishes a new convention for a registered student and tutor
 //If a convention already exists for that student but the new data refer to a fresher convention, it is updated
 func (s *Store) NewConvention(student string, startTime, endTime time.Time, tutor string, cpy schema.Company, sup schema.Person, title string, creation time.Time, foreignCountry, lab bool, gratification int) (bool, error) {
+	if startTime.After(endTime) {
+		return false, schema.ErrInvalidPeriod
+	}
 	err := s.singleUpdate(insertConvention, schema.ErrUnknownStudent, student, startTime, endTime, tutor, cpy.Name, cpy.WWW, sup.Firstname, sup.Lastname, sup.Email, sup.Tel, title, creation, foreignCountry, lab, gratification, false, false)
 	if err == schema.ErrConventionExists {
-		//Has it been updated ?
-		var last time.Time
-		st := s.stmt(selectConventionCreation)
-		if err := st.QueryRow(student).Scan(&last); err != nil {
-			return false, err
-		}
-		if creation.After(last) {
-			return true, s.singleUpdate(updateConvention, schema.ErrUnknownConvention,
-				student,
-				startTime,
-				endTime,
-				tutor,
-				cpy.Name,
-				cpy.WWW,
-				sup.Firstname,
-				sup.Lastname,
-				sup.Email,
-				sup.Tel,
-				title,
-				creation,
-				foreignCountry,
-				lab,
-				gratification)
-		}
+		return true, s.singleUpdate(updateConvention, schema.ErrUnknownConvention,
+			student,
+			startTime,
+			endTime,
+			tutor,
+			cpy.Name,
+			cpy.WWW,
+			sup.Firstname,
+			sup.Lastname,
+			sup.Email,
+			sup.Tel,
+			title,
+			creation,
+			foreignCountry,
+			lab,
+			gratification)
 	}
 	return false, err
 }
@@ -149,14 +143,13 @@ func (s *Store) ValidateConvention(student string, cfg config.Config) error {
 }
 
 //Internships returns all the internships. Not necessarily validated
-func (s *Store) Internships() ([]schema.Internship, error) {
+func (s *Store) Internships() (schema.Internships, error) {
 	res := make([]schema.Internship, 0, 0)
 	conventions, err := s.Conventions()
 	if err != nil {
 		return res, err
 	}
 	for _, c := range conventions {
-
 		i, err := s.toInternship(c)
 		if err != nil {
 			return res, err
@@ -175,6 +168,9 @@ func (s *Store) Internship(student string) (schema.Internship, error) {
 		return i, err
 	}
 	defer rows.Close()
+	if !rows.Next() {
+		return i, schema.ErrUnknownInternship
+	}
 	c, err := scanConvention(rows)
 	if err != nil {
 		return i, err
