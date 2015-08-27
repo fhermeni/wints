@@ -2,6 +2,7 @@
 package httpd
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"strings"
@@ -19,13 +20,15 @@ type EndPoints struct {
 	router *httptreemux.TreeMux
 	prefix string
 	store  *sqlstore.Store
+	cfg    config.Rest
 }
 
 //NewEndPoints creates new prefixed endpoints
-func NewEndPoints(prefix string) EndPoints {
+func NewEndPoints(cfg config.Rest) EndPoints {
 	ed := EndPoints{
 		router: httptreemux.New(),
-		prefix: strings.TrimSuffix(prefix, "/"),
+		prefix: strings.TrimSuffix(cfg.Prefix, "/"),
+		cfg:    cfg,
 	}
 	ed.router.NotFoundHandler = func(w http.ResponseWriter, r *http.Request) {
 		log.Println("rest call not found: " + r.URL.String())
@@ -38,6 +41,7 @@ func NewEndPoints(prefix string) EndPoints {
 	ed.post("/users/:u/person", setUserPerson)
 	ed.post("/users/:u/role", setUserRole)
 	ed.del("/users/:u", delUser)
+	ed.post("/users/:u/session", ed.delSession)
 	ed.post("/students/:s/major", setMajor)
 	ed.post("/students/:s/promotion", setPromotion)
 	ed.post("/students/:s/male", setMale)
@@ -63,6 +67,7 @@ func NewEndPoints(prefix string) EndPoints {
 	ed.post("/conventions/:s/tutor", setTutor)
 	ed.post("/conventions/:s/valid", validateConvention)
 
+	ed.router.POST(ed.prefix+"/signin", ed.signin)
 	return ed
 }
 
@@ -293,4 +298,27 @@ func validateConvention(ex Exchange) error {
 	var b bool
 	ex.inJSON(&b)
 	return ex.s.ValidateConvention(ex.V("s"), config.Config{})
+}
+
+func (ed *EndPoints) delSession(ex Exchange) error {
+	return ed.store.RmSession([]byte(ex.r.Header.Get("X-Wints-Token")))
+}
+
+func (ed *EndPoints) signin(w http.ResponseWriter, r *http.Request, ps map[string]string) {
+	var cred struct {
+		Login    string
+		Password []byte
+	}
+	if err := json.NewDecoder(r.Body).Decode(&cred); err != nil {
+		status(w, ErrMalformedJSON)
+		return
+	}
+	s, err := ed.store.NewSession(cred.Login,
+		cred.Password,
+		ed.cfg.SessionLifeTime.Duration)
+	if err != nil {
+		status(w, err)
+		return
+	}
+	status(w, json.NewEncoder(w).Encode(s))
 }
