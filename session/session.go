@@ -20,9 +20,14 @@ var (
 //to its role and or relationships
 type Session struct {
 	my    schema.User
-	store sqlstore.Store
+	store *sqlstore.Store
 	//log    journal.Journal
 	//mailer mail.Mailer
+}
+
+//NewSession creates a new session
+func NewSession(u schema.User, store *sqlstore.Store) Session {
+	return Session{my: u, store: store}
 }
 
 //Role returns the current user role

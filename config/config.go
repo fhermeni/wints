@@ -32,15 +32,20 @@ type Db struct {
 	ConnectionString string
 }
 
-//EndPoint configures the rest endpoint
-type EndPoint struct {
-	WWW                    string
-	Listen                 string
-	Certificate            string
-	PrivateKey             string
-	Assets                 string
+//EndPoint configures the rest endpoints
+type EndPoints struct {
 	SessionLifeTime        Duration
 	RenewalRequestLifetime Duration
+}
+
+//HTTPd configures the http daemon
+type HTTPd struct {
+	WWW         string
+	Assets      string
+	Listen      string
+	Certificate string
+	PrivateKey  string
+	EndPoints   EndPoints
 }
 
 //Journal configures the logging system
@@ -61,12 +66,12 @@ type Survey struct {
 
 //Config aggregates all the subcomponents configuration parameters
 type Config struct {
-	Feeder   Feeder
-	Reports  map[string]Report
-	Surveys  map[string]Survey
-	Db       Db
-	Mailer   Mailer
-	EndPoint EndPoint
-	Majors   []string
-	Journal  Journal
+	Feeder  Feeder
+	Reports map[string]Report
+	Surveys map[string]Survey
+	Db      Db
+	Mailer  Mailer
+	HTTPd   HTTPd
+	Majors  []string
+	Journal Journal
 }
