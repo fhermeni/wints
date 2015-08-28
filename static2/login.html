@@ -12,26 +12,26 @@
                 <div class="row">
                     <div class="col-md-4">
                         <img class="img-responsive" src="/img/logo.png"/>
-                        <h4 class="text-center">Welcome to <small>Wints</small></h4>
+                        <h4 class="text-center text-warning">Welcome to <small>Wints</small></h4>
                     </div>
                 <div class="col-md-8">
                 <div id="login-diag" class="well well-sm">
                     <div class="form-horizontal">
                         <fieldset>        
                             <div class="form-group">
-                                <label for="inputEmail" class="col-lg-2 control-label">Email</label>
+                                <label for="loginEmail" class="col-lg-2 control-label">Email</label>
                                 <div class="col-lg-10">
-                                    <input type="text" class="form-control" id="inputEmail" placeholder="Email">
+                                    <input data-placement="right" data-container="body" data-toggle="popover" type="text" class="form-control" id="loginEmail" placeholder="Email">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="inputPassword" class="col-lg-2 control-label">Password</label>
+                                <label for="loginPassword" class="col-lg-2 control-label">Password</label>
                                 <div class="col-lg-10">
-                                    <input type="password" class="form-control" id="inputPassword" placeholder="Password">
+                                    <input type="password" class="form-control" id="loginPassword" placeholder="Password">
                                 </div>
                             </div>
                             <div class="text-right">
-                                <input type="submit" class="btn btn-primary" value="Log in">
+                            <a class="btn btn-primary" onclick="login()">Log in</a>
                             </div>
                             <div class="text-right">
                                 <a onclick="flipForm('login-diag','reset-diag')">lost password ?</a>
@@ -45,13 +45,13 @@
                     <div class="form-horizontal">
                         <fieldset>        
                             <div class="form-group">
-                                <label for="inputEmail" class="col-lg-2 control-label">Email</label>
+                                <label for="lostEmail" class="col-lg-2 control-label">Email</label>
                                 <div class="col-lg-10">
-                                    <input type="text" class="form-control" id="inputEmail" placeholder="Email">
+                                    <input type="text" class="form-control" id="lostEmail" placeholder="Email">
                                 </div>
                             </div>
                             <div class="text-right">
-                                <a class="btn btn-primary">Reset</a>
+                                <a class="btn btn-primary" onclick="passwordLost()">Reset</a>
                                 <a class="btn btn-default" onclick="flipForm('reset-diag','login-diag')">Cancel</a>
                             </div>
                         </fieldset>
@@ -62,52 +62,13 @@
                 </div>
             </div>
     </div>
-    </div>
-<!--                    <input type="submit" class="btn btn-info btn-lg btn-block" value="Log in">
-                    <a class="login-link" onclick="flipForm('login-diag','reset-diag')">lost your password ?</a>
-                </form>
-            </div>
-                <div id="reset-diag" style="display: none">
-                    <div class="form-group">
-                        <input id="email" name="email" class="form-control login-field" placeholder="Email" type="text"/>
-                        <label class="login-field-icon fui-user"></label>
-                    </div>
-                    <div class="text-center">
-                    <a onclick="passwordLost()" class="btn btn-danger btn-lg btn-block">Reset my password</a>
-                    <a class="login-link" onclick="flipForm('reset-diag','login-diag')">Cancel</a>
-                    </div>
-                </div>
-            </div>
-        </div>               
-    </div>
-    </div>
-    <div class="row text-center">
-        <div class="col-md-offset-3 col-md-2"> 
-        <a class="btn btn-block btn-info" href="static/about.pdf">
-        <img src="/img/about.png" alt="about" style="width:96px"/>
-        <h6>About the internships</h6>
-        </a>
-        </div>    
-        <div class="col-md-2">
-        <a class="btn btn-block btn-info" href="statistics">
-        <img src="/img/statistics.png" alt="statistics" style="width:96px"/>
-        <h6>Statistics</h6>
-        </a>
-        </div>        
-        <div class="col-md-2">
-        <a class="btn btn-block btn-info" href="defense-program">
-        <img src="/img/agenda.png" alt="defense program" style="width:96px"/>
-        <h6>Defense program</h6>
-        </a>
-        </div>
-    </div>
-</div>    
+    </div>  
             <!-- Bootstrap -->
             <script src="/js/jquery-1.11.3.min.js"></script>
-            <script src="static/js/bootstrap.min.js"></script>            
+            <script src="/js/bootstrap.min.js"></script>            
 
-            <script src="static/js/notify.min.js"></script>
-            <script src="static/js/rest.js"></script>
+            <!--<script src="/js/notify.min.js"></script>-->
+            <script src="/js/rest.js"></script>
             <script src="/js/login.js"></script>
             <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){

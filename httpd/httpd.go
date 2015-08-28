@@ -17,7 +17,7 @@ type HTTPd struct {
 }
 
 //NewHTTPd makes a new HTTP daemon
-func NewHTTPd(cfg config.HTTPd) HTTPd {
+func NewHTTPd(store *sqlstore.Store, cfg config.HTTPd) HTTPd {
 
 	//The assets
 	fs := http.Dir(cfg.Assets + "/")
@@ -25,11 +25,12 @@ func NewHTTPd(cfg config.HTTPd) HTTPd {
 	http.Handle("/", Mon(httpgzip.NewHandler(fileHandler).ServeHTTP))
 
 	//The rest endpoints
-	rest := NewEndPoints(cfg.Rest)
+	rest := NewEndPoints(store, cfg.Rest)
 	http.Handle(cfg.Rest.Prefix, Mon(rest.router.ServeHTTP))
 
 	return HTTPd{
-		cfg: cfg,
+		cfg:   cfg,
+		store: store,
 	}
 }
 

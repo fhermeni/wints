@@ -24,8 +24,9 @@ type EndPoints struct {
 }
 
 //NewEndPoints creates new prefixed endpoints
-func NewEndPoints(cfg config.Rest) EndPoints {
+func NewEndPoints(store *sqlstore.Store, cfg config.Rest) EndPoints {
 	ed := EndPoints{
+		store:  store,
 		router: httptreemux.New(),
 		prefix: strings.TrimSuffix(cfg.Prefix, "/"),
 		cfg:    cfg,
@@ -68,6 +69,7 @@ func NewEndPoints(cfg config.Rest) EndPoints {
 	ed.post("/conventions/:s/valid", validateConvention)
 
 	ed.router.POST(ed.prefix+"/signin", ed.signin)
+	ed.router.POST(ed.prefix+"/resetPassword", ed.resetPassword)
 	return ed
 }
 
@@ -307,15 +309,31 @@ func (ed *EndPoints) delSession(ex Exchange) error {
 func (ed *EndPoints) signin(w http.ResponseWriter, r *http.Request, ps map[string]string) {
 	var cred struct {
 		Login    string
-		Password []byte
+		Password string
 	}
 	if err := json.NewDecoder(r.Body).Decode(&cred); err != nil {
+		log.Println(err.Error())
 		status(w, ErrMalformedJSON)
 		return
 	}
 	s, err := ed.store.NewSession(cred.Login,
-		cred.Password,
+		[]byte(cred.Password),
 		ed.cfg.SessionLifeTime.Duration)
+	if err != nil {
+		status(w, err)
+		return
+	}
+	status(w, json.NewEncoder(w).Encode(s))
+}
+
+func (ed *EndPoints) resetPassword(w http.ResponseWriter, r *http.Request, ps map[string]string) {
+	var email string
+	if err := json.NewDecoder(r.Body).Decode(&email); err != nil {
+		log.Println(err.Error())
+		status(w, ErrMalformedJSON)
+		return
+	}
+	s, err := ed.store.ResetPassword(email, ed.cfg.RenewalRequestLifetime.Duration)
 	if err != nil {
 		status(w, err)
 		return

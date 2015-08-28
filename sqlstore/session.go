@@ -32,7 +32,7 @@ func (s *Store) NewSession(email string, password []byte, expire time.Duration) 
 	}
 	tx := newTxErr(s.db)
 	tx.err = tx.QueryRow(selectPassword, email).Scan(&p)
-	tx.err = noRowsTo(tx.err, schema.ErrCredentials)
+	tx.err = noRowsTo(tx.err, schema.ErrUnknownUser)
 	if tx.err != nil {
 		return ss, tx.Done()
 	}

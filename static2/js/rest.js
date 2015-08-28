@@ -37,8 +37,7 @@ function restError(no) {
 				no(jqr)
 			} else {
 				$.notify(jqr.responseText, {
-					autoHideDelay: 2000,
-					className: "error",
+					className: "danger",
 					globalPosition: "top center"
 				})
 			}
@@ -99,16 +98,16 @@ function reportError(msg) {
 	})
 }
 
-var ROOT_API = "/api/v2";
+var ROOT_API = "/api/v2/";
 
 //Profile management
 
-function post(URL, data, ok, no) {
+function post(URL, data) {
 	return $.ajax({
 		method: "POST",
 		data: JSON.stringify(data),
 		url: ROOT_API + URL,
-	}).done(noCb(ok)).fail(restError(no));
+	})
 }
 
 function put(URL, data, ok, no) {
@@ -133,7 +132,17 @@ function del(URL, ok, no) {
 	}).done(noCb(ok)).fail(restError(no));
 }
 
-function user(email, ok, no) {
+function signin(login, password) {
+	return post("signin", {
+		Login: login,
+		Password: password
+	})
+}
+
+function resetPassword(email) {
+	return post("resetPassword", email)
+}
+/*function user(email, ok, no) {
 	return get("/users/" + email, ok, no);
 }
 
@@ -144,7 +153,6 @@ function users(ok, no) {
 function sessions(ok, no) {
 	return get("/sessions/", ok, no);
 }
-
 
 function newUser(fn, ln, tel, email, role, ok, no) {
 	return post("/users/", {
@@ -348,4 +356,4 @@ function defense(student, ok, no) {
 
 function requestSurvey(student, kind, ok, no) {
 	return get("/internships/" + student + "/surveys/" + kind + "/request", ok, no)
-}
+}*/
