@@ -19,14 +19,16 @@ function flipForm(from, to) {
 }
 
 function empty() {
-	var args = Array.prototype.slice.call(arguments);
-	return args.filter(function(id) {
-		if ($(id).val() == 0) {
-			reportError(id, "required")
-			return true
+	var count = 0;
+	for (var i = 0; i < arguments.length; i++) {
+		if ($(arguments[i]).val() == 0) {
+			reportError(arguments[i], "required");
+			count++;
+		} else {
+			$(arguments[i]).closest(".form-group").removeClass("has-error")
 		}
-		return false
-	}).length == args.length
+	}
+	return count != 0;
 }
 
 function login() {
@@ -49,8 +51,9 @@ function loginFail(xhr) {
 }
 
 function reportError(id, message) {
-	$(id).data("content", message)
-		.popover("show")
+	var popover = $(id).data('bs.popover')
+	popover.options.content = message
+	$(id).popover("show")
 		.closest(".form-group").addClass("has-error");
 }
 
@@ -71,4 +74,5 @@ $(document).ready(function() {
 	if (em && em != "null") {
 		$("#login").val(em);
 	}
+	$('[data-toggle="popover"]').popover()
 });
