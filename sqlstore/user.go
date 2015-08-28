@@ -114,6 +114,9 @@ func (s *Store) SetUserRole(email string, priv schema.Privilege) error {
 //SetPassword changes the user password
 //Any pending renewable requests are deleted on success
 func (s *Store) SetPassword(email string, oldP, newP []byte) error {
+	if len(newP) < 8 {
+		return schema.ErrPasswordTooShort
+	}
 	hash, err := bcrypt.GenerateFromPassword(newP, bcrypt.MinCost)
 	if err != nil {
 		return err
@@ -148,6 +151,9 @@ func (s *Store) ResetPassword(email string, d time.Duration) ([]byte, error) {
 //NewPassword commits a password renewall request.
 //From a request token and a new password, it returns upon success the target user email
 func (s *Store) NewPassword(token, newP []byte) (string, error) {
+	if len(newP) < 8 {
+		return "", schema.ErrPasswordTooShort
+	}
 	hash, err := bcrypt.GenerateFromPassword(newP, bcrypt.MinCost)
 	if err != nil {
 		return "", err

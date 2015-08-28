@@ -2,15 +2,6 @@
  * Created by fhermeni on 06/08/2014.
  */
 
-$.urlParam = function(name) {
-	var results = new RegExp('[\?&]' + name + '=([^&#]*)').exec(window.location.href);
-	if (results == null) {
-		return null;
-	} else {
-		return results[1] || 0;
-	}
-}
-
 function flipForm(from, to) {
 	$('[data-toggle="popover"]').popover('hide').closest(".form-group").removeClass("has-error");
 	$("#" + from).slideToggle(400, function() {
@@ -18,44 +9,28 @@ function flipForm(from, to) {
 	});
 }
 
-function empty() {
-	var count = 0;
-	for (var i = 0; i < arguments.length; i++) {
-		if ($(arguments[i]).val() == 0) {
-			reportError(arguments[i], "required");
-			count++;
-		} else {
-			$(arguments[i]).closest(".form-group").removeClass("has-error")
-		}
-	}
-	return count != 0;
-}
-
 function login() {
 	if (empty("#loginEmail", "#loginPassword")) {
 		return
 	}
 	signin($("#loginEmail").val(), $("#loginPassword").val())
-		.done(function() {
-			console.log("kk")
-		}).fail(loginFail)
+		.done(loginSuccess).fail(loginFail)
 
+}
+
+function loginSuccess(session) {
+	localStorage.setItem("token", session.Token);
+	window.location.href = "/"
 }
 
 function loginFail(xhr) {
 	if (xhr.status == 404) {
 		reportError("#loginEmail", xhr.responseText)
-	} else if (xhr.status == 403) {
+	} else if (xhr.status == 401) {
 		reportError("#loginPassword", xhr.responseText)
 	}
 }
 
-function reportError(id, message) {
-	var popover = $(id).data('bs.popover')
-	popover.options.content = message
-	$(id).popover("show")
-		.closest(".form-group").addClass("has-error");
-}
 
 function passwordLost() {
 	if (empty("#lostEmail")) {
@@ -70,9 +45,9 @@ function passwordLostFail(xhr) {
 }
 
 $(document).ready(function() {
-	var em = decodeURIComponent($.urlParam("email"))
-	if (em && em != "null") {
-		$("#login").val(em);
+	var em = $.urlParam("login")
+	if (em) {
+		$("#loginEmail").val(em);
 	}
 	$('[data-toggle="popover"]').popover()
 });

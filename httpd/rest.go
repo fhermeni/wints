@@ -70,6 +70,7 @@ func NewEndPoints(store *sqlstore.Store, cfg config.Rest) EndPoints {
 
 	ed.router.POST(ed.prefix+"/signin", ed.signin)
 	ed.router.POST(ed.prefix+"/resetPassword", ed.resetPassword)
+	ed.router.POST(ed.prefix+"/newPassword", ed.newPassword)
 	return ed
 }
 
@@ -334,6 +335,24 @@ func (ed *EndPoints) resetPassword(w http.ResponseWriter, r *http.Request, ps ma
 		return
 	}
 	s, err := ed.store.ResetPassword(email, ed.cfg.RenewalRequestLifetime.Duration)
+	if err != nil {
+		status(w, err)
+		return
+	}
+	status(w, json.NewEncoder(w).Encode(s))
+}
+
+func (ed *EndPoints) newPassword(w http.ResponseWriter, r *http.Request, ps map[string]string) {
+	var req struct {
+		Token    string
+		Password string
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		log.Println(err.Error())
+		status(w, ErrMalformedJSON)
+		return
+	}
+	s, err := ed.store.NewPassword([]byte(req.Token), []byte(req.Password))
 	if err != nil {
 		status(w, err)
 		return

@@ -12,13 +12,15 @@ func status(w http.ResponseWriter, e error) {
 	switch e {
 	case schema.ErrInvalidToken, schema.ErrSessionExpired:
 		return
-	case schema.ErrUnknownSurvey, schema.ErrUnknownUser, schema.ErrUnknownReport, schema.ErrUnknownInternship:
+	case schema.ErrUnknownSurvey, schema.ErrUnknownUser, schema.ErrUnknownReport, schema.ErrUnknownInternship, schema.ErrNoPendingRequests:
 		http.Error(w, e.Error(), http.StatusNotFound)
 		return
-	case schema.ErrReportExists, schema.ErrUserExists, schema.ErrInternshipExists, schema.ErrCredentials, schema.ErrUserTutoring:
+	case schema.ErrReportExists, schema.ErrUserExists, schema.ErrInternshipExists, schema.ErrUserTutoring:
 		http.Error(w, e.Error(), http.StatusConflict)
 		return
-	case ErrMalformedJSON, schema.ErrInvalidSurvey, schema.ErrInvalidAlumniEmail, schema.ErrDeadlinePassed, schema.ErrInvalidGrade, schema.ErrInvalidMajor, schema.ErrInvalidPeriod, schema.ErrGradedReport:
+	case schema.ErrCredentials:
+		http.Error(w, e.Error(), http.StatusUnauthorized)
+	case ErrMalformedJSON, schema.ErrInvalidSurvey, schema.ErrInvalidAlumniEmail, schema.ErrDeadlinePassed, schema.ErrInvalidGrade, schema.ErrInvalidMajor, schema.ErrInvalidPeriod, schema.ErrGradedReport, schema.ErrPasswordTooShort:
 		http.Error(w, e.Error(), http.StatusBadRequest)
 		return
 	case session.ErrPermission, session.ErrConfidentialReport:

@@ -12,6 +12,26 @@ $.urlParam = function(name) {
 	}
 }
 
+function empty() {
+	var count = 0;
+	for (var i = 0; i < arguments.length; i++) {
+		if ($(arguments[i]).val() == 0) {
+			reportError(arguments[i], "required");
+			count++;
+		} else {
+			$(arguments[i]).closest(".form-group").removeClass("has-error")
+		}
+	}
+	return count != 0;
+}
+
+function reportError(id, message) {
+	var popover = $(id).data('bs.popover')
+	popover.options.content = message
+	$(id).popover("show")
+		.closest(".form-group").addClass("has-error");
+}
+
 function getCookie(name) {
 	var value = "; " + document.cookie;
 	var parts = value.split("; " + name + "=");
@@ -82,22 +102,6 @@ function equals(f1, f2) {
 	return true;
 }
 
-function reportSuccess(msg) {
-	$.notify(msg, {
-		autoHideDelay: 1000,
-		className: "success",
-		globalPosition: "top center"
-	})
-}
-
-function reportError(msg) {
-	$.notify(msg, {
-		autoHideDelay: 2000,
-		className: "error",
-		globalPosition: "top center"
-	})
-}
-
 var ROOT_API = "/api/v2/";
 
 //Profile management
@@ -141,6 +145,13 @@ function signin(login, password) {
 
 function resetPassword(email) {
 	return post("resetPassword", email)
+}
+
+function newPassword(token, passwd) {
+	return post("newPassword", {
+		Token: token,
+		Password: passwd
+	})
 }
 /*function user(email, ok, no) {
 	return get("/users/" + email, ok, no);
