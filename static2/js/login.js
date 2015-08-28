@@ -12,55 +12,58 @@ $.urlParam = function(name) {
 }
 
 function flipForm(from, to) {
-	$('[data-toggle="popover"]').popover('hide')
+	$('[data-toggle="popover"]').popover('hide').closest(".form-group").removeClass("has-error");
 	$("#" + from).slideToggle(400, function() {
 		$("#" + to).slideToggle();
 	});
 }
 
-function empty(id) {
-	var q = $(id)
-	if (q.val() == 0) {
-		q.closest(".form-group").addClass("has-error")
-		return true
-	}
-	return false
+function empty() {
+	var args = Array.prototype.slice.call(arguments);
+	return args.filter(function(id) {
+		if ($(id).val() == 0) {
+			reportError(id, "required")
+			return true
+		}
+		return false
+	}).length == args.length
 }
 
 function login() {
-	/*	$(function() {
-			$('[data-toggle="popover"]').popover()
-		})*/
-	if (empty("#loginEmail") ||  empty("#loginPassword")) {
+	if (empty("#loginEmail", "#loginPassword")) {
 		return
 	}
 	signin($("#loginEmail").val(), $("#loginPassword").val())
 		.done(function() {
 			console.log("kk")
-		})
-		.fail(function(xhr) {
-			if (xhr.status == 404) {
-				$("#loginEmail").closest(".form-group").addClass("has-error")
-				$("#loginEmail").data("content", xhr.responseText).popover("show")
+		}).fail(loginFail)
 
-			} else if (xhr.status == 403) {
-				$("#loginPassword").closest(".form-group").addClass("has-error")
-				$("#loginPassword").data("content", xhr.responseText).popover("show")
-			}
-		})
+}
 
+function loginFail(xhr) {
+	if (xhr.status == 404) {
+		reportError("#loginEmail", xhr.responseText)
+	} else if (xhr.status == 403) {
+		reportError("#loginPassword", xhr.responseText)
+	}
+}
+
+function reportError(id, message) {
+	$(id).data("content", message)
+		.popover("show")
+		.closest(".form-group").addClass("has-error");
 }
 
 function passwordLost() {
 	if (empty("#lostEmail")) {
 		return
 	}
-	var email = $("#lostEmail").val();
-	resetPassword(email)
-		.fail(function(xhr) {
-			$("#lostEmail").closest(".form-group").addClass("has-error")
-			$("#lostEmail").data("content", xhr.responseText).popover("show")
-		})
+	resetPassword($("#lostEmail").val())
+		.fail(passwordLostFail)
+}
+
+function passwordLostFail(xhr) {
+	reportError("#lostEmail", xhr.responseText)
 }
 
 $(document).ready(function() {
