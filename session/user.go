@@ -1,6 +1,10 @@
 package session
 
-import "github.com/fhermeni/wints/schema"
+import (
+	"log"
+
+	"github.com/fhermeni/wints/schema"
+)
 
 //RmUser removes an account if the emitter is at least an admin
 func (s *Session) RmUser(email string) error {
@@ -16,6 +20,15 @@ func (s *Session) Users() ([]schema.User, error) {
 		return s.store.Users()
 	}
 	return []schema.User{}, ErrPermission
+}
+
+//User returns a given user if the emitter is himself or an admin
+func (s *Session) User(em string) (schema.User, error) {
+	log.Println(s.Myself(em))
+	if s.Myself(em) || s.Role() >= schema.ADMIN {
+		return s.store.User(em)
+	}
+	return schema.User{}, ErrPermission
 }
 
 //SetPassword changes the user password if the emitter is the targeted user

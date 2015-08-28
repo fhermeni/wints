@@ -3,7 +3,6 @@ package httpd
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -32,7 +31,6 @@ func NewEndPoints(store *sqlstore.Store, cfg config.Rest) EndPoints {
 		cfg:    cfg,
 	}
 	ed.router.NotFoundHandler = func(w http.ResponseWriter, r *http.Request) {
-		log.Println("rest call not found: " + r.URL.String())
 		http.Error(w, "", http.StatusNotFound)
 	}
 	//Set the endpoints
@@ -42,6 +40,7 @@ func NewEndPoints(store *sqlstore.Store, cfg config.Rest) EndPoints {
 	ed.post("/users/:u/person", setUserPerson)
 	ed.post("/users/:u/role", setUserRole)
 	ed.del("/users/:u", delUser)
+	ed.get("/users/:u", user)
 	ed.post("/users/:u/session", ed.delSession)
 	ed.post("/students/:s/major", setMajor)
 	ed.post("/students/:s/promotion", setPromotion)
@@ -90,8 +89,8 @@ func (ed *EndPoints) del(path string, handler EndPoint) {
 }
 
 func (ed *EndPoints) openSession(w http.ResponseWriter, r *http.Request) (session.Session, error) {
-	token := r.Header.Get("X-Wints-Token")
-	s, err := ed.store.Session([]byte(token))
+	token, _ := r.Cookie("token")
+	s, err := ed.store.Session([]byte(token.Value))
 	if err != nil {
 		return session.Session{}, err
 	}
@@ -136,6 +135,11 @@ func newUser(ex Exchange) error {
 }
 func delUser(ex Exchange) error {
 	return ex.s.RmUser(ex.V("u"))
+}
+
+func user(ex Exchange) error {
+	u, err := ex.s.User(ex.V("u"))
+	return ex.outJSON(u, err)
 }
 
 func setPassword(ex Exchange) error {
@@ -304,7 +308,23 @@ func validateConvention(ex Exchange) error {
 }
 
 func (ed *EndPoints) delSession(ex Exchange) error {
-	return ed.store.RmSession([]byte(ex.r.Header.Get("X-Wints-Token")))
+	token := &http.Cookie{
+		Name:   "token",
+		Value:  "",
+		Path:   "/",
+		MaxAge: -1,
+	}
+
+	login := &http.Cookie{
+		Name:   "login",
+		Value:  "",
+		Path:   "/",
+		MaxAge: -1,
+	}
+	http.SetCookie(ex.w, token)
+	http.SetCookie(ex.w, login)
+	http.Redirect(ex.w, ex.r, "/", http.StatusTemporaryRedirect)
+	return nil
 }
 
 func (ed *EndPoints) signin(w http.ResponseWriter, r *http.Request, ps map[string]string) {
@@ -313,7 +333,6 @@ func (ed *EndPoints) signin(w http.ResponseWriter, r *http.Request, ps map[strin
 		Password string
 	}
 	if err := json.NewDecoder(r.Body).Decode(&cred); err != nil {
-		log.Println(err.Error())
 		status(w, ErrMalformedJSON)
 		return
 	}
@@ -324,13 +343,26 @@ func (ed *EndPoints) signin(w http.ResponseWriter, r *http.Request, ps map[strin
 		status(w, err)
 		return
 	}
-	status(w, json.NewEncoder(w).Encode(s))
+
+	token := &http.Cookie{
+		Name:  "token",
+		Value: string(s.Token),
+		Path:  "/",
+	}
+	login := &http.Cookie{
+		Name:  "login",
+		Value: string(s.Email),
+		Path:  "/",
+	}
+
+	http.SetCookie(w, token)
+	http.SetCookie(w, login)
+	http.Redirect(w, r, "/", 302)
 }
 
 func (ed *EndPoints) resetPassword(w http.ResponseWriter, r *http.Request, ps map[string]string) {
 	var email string
 	if err := json.NewDecoder(r.Body).Decode(&email); err != nil {
-		log.Println(err.Error())
 		status(w, ErrMalformedJSON)
 		return
 	}
@@ -348,7 +380,6 @@ func (ed *EndPoints) newPassword(w http.ResponseWriter, r *http.Request, ps map[
 		Password string
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		log.Println(err.Error())
 		status(w, ErrMalformedJSON)
 		return
 	}

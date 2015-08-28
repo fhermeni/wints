@@ -61,6 +61,11 @@ moment.locale('fr', {
 	}
 });
 
+$.handlebars({
+	templatePath: '/static/hbs/',
+	templateExtension: 'hbs'
+});
+
 Handlebars.getTemplate = function(name) {
 	if (Handlebars.templates === undefined || Handlebars.templates[name] === undefined) {
 		$.ajax({
@@ -76,7 +81,7 @@ Handlebars.getTemplate = function(name) {
 	}
 	return Handlebars.templates[name];
 };
-
+/*
 Handlebars.registerHelper('fullname', function(p) {
 	return p.Firstname + " " + p.Lastname;
 });
@@ -531,3 +536,5 @@ Handlebars.registerHelper('longDate', function(d) {
 Handlebars.registerHelper('dateFmt', function(d, fmt) {
 	return moment(d).format(fmt)
 });
+
+*/

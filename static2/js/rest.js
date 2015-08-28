@@ -153,6 +153,11 @@ function newPassword(token, passwd) {
 		Password: passwd
 	})
 }
+
+function user(email, ok, no) {
+	return get("/users/" + email, ok, no);
+}
+
 /*function user(email, ok, no) {
 	return get("/users/" + email, ok, no);
 }
