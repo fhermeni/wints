@@ -36,7 +36,11 @@ function loadSuccess(data) {
 }
 
 function showProfileEditor() {
-	$("#modal").render("profileEditor", myself).modal("show")
+	$("#modal").render("profileEditor", myself, showModal)
+}
+
+function showModal() {
+	$("#modal").modal("show")
 }
 
 function showPasswordEditor() {

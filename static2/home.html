@@ -13,25 +13,25 @@
                 <div>
                     <ul id="menu-pages" class="nav navbar-nav navbar-left">
                         <li>
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown"> <i class="glyphicon glyphicon-home"></i>
+                            <a class="dropdown-toggle" data-toggle="dropdown"> <i class="glyphicon glyphicon-home"></i>
                                 <span class="fn" id="fullname"></span> <b class="caret"></b>
                             </a>
                             <span class="dropdown-arrow"></span>
                             <ul class="dropdown-menu" role="menu">
                                 <li>
-                                    <a href="#" onclick="showProfileEditor()">
+                                    <a onclick="showProfileEditor()">
                                         <span class="fui-new"></span>
                                         Edit profile
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" onclick="showPasswordEditor()">
+                                    <a onclick="showPasswordEditor()">
                                         <span class="fui-new"></span>
                                         Edit password
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="api/v1/logout">
+                                    <a api/v1/logout">
                                         <span class="glyphicon glyphicon-log-out"></span>
                                         Logout
                                     </a>
@@ -126,10 +126,9 @@
                 <img src="/static/img/spinner.gif" alt="spinner"/>
             </div>
             <h5 class="text-center">Loading ...</h5>
-        </div>
-
-        <div id="modal" class="modal fade"></div>
+        </div>        
     </div>
+    <div id="modal" class="modal fade"></div>
     <footer>
         <div class="container">
             <p>© University Nice Sophia Antipolis 2014-2015</p>
