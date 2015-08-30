@@ -6,6 +6,7 @@
     <title>Wints dashboard</title>    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">    
     <link rel="stylesheet" href="static/css/bootswatch.min.css">
+    <link rel="stylesheet" href="static/css/error.css">
 <body>
     <div class="container">
         <nav class="navbar navbar-default navbar-embossed navbar-inverse" role="navigation">
@@ -31,7 +32,7 @@
                                     </a>
                                 </li>
                                 <li>
-                                    <a api/v1/logout">
+                                    <a onclick="logout()">
                                         <span class="glyphicon glyphicon-log-out"></span>
                                         Logout
                                     </a>
@@ -128,7 +129,7 @@
             <h5 class="text-center">Loading ...</h5>
         </div>        
     </div>
-    <div id="modal" class="modal fade"></div>
+    <div id="modal" class="modal fade" data-backdrop="static" data-keyboard="false"></div>
     <footer>
         <div class="container">
             <p>© University Nice Sophia Antipolis 2014-2015</p>

@@ -9,6 +9,9 @@ import (
 )
 
 func status(w http.ResponseWriter, e error) {
+	if e != nil {
+		log.Println(e.Error())
+	}
 	switch e {
 	case schema.ErrInvalidToken, schema.ErrSessionExpired:
 		return

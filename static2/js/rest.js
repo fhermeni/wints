@@ -20,6 +20,7 @@ function empty() {
 			count++;
 		} else {
 			$(arguments[i]).closest(".form-group").removeClass("has-error")
+			$(arguments[i]).popover("hide")
 		}
 	}
 	return count != 0;
@@ -27,7 +28,9 @@ function empty() {
 
 function reportError(id, message) {
 	var popover = $(id).data('bs.popover')
-	popover.options.content = message
+	if (popover) {
+		popover.options.content = message
+	}
 	$(id).popover("show")
 		.closest(".form-group").addClass("has-error");
 }
@@ -89,20 +92,14 @@ function isGrade(v) {
 }
 
 function equals(f1, f2) {
-	var v1 = $("#" + f1).val();
-	if (v1.length < 8) {
-		$("#" + f1).notify("Passwords must be 8 characters long minimum");
-		return false;
-	}
-	var v2 = $("#" + f2).val();
-	if (v1 != v2) {
-		$("#" + f2).notify("Password do not match");
+	if ($(f1).val() != $(f2).val()) {
+		reportError(f2, "Password do not match");
 		return false;
 	}
 	return true;
 }
 
-var ROOT_API = "/api/v2/";
+var ROOT_API = "/api/v2";
 
 //Profile management
 
@@ -133,24 +130,35 @@ function del(URL, ok, no) {
 	return $.ajax({
 		method: "DELETE",
 		url: ROOT_API + URL,
-	}).done(noCb(ok)).fail(restError(no));
+	})
 }
 
 function signin(login, password) {
-	return post("signin", {
+	return post("/signin", {
 		Login: login,
 		Password: password
 	})
 }
 
+function delSession() {
+	return del("/users/" + myself.Person.Email + "/session")
+}
+
 function resetPassword(email) {
-	return post("resetPassword", email)
+	return post("/resetPassword", email)
 }
 
 function newPassword(token, passwd) {
-	return post("newPassword", {
+	return post("/newPassword", {
 		Token: token,
 		Password: passwd
+	})
+}
+
+function sendPassword(current, now) {
+	return post("/users/" + myself.Person.Email + "/password", {
+		Current: current,
+		Now: now
 	})
 }
 
@@ -158,6 +166,9 @@ function user(email, ok, no) {
 	return get("/users/" + email, ok, no);
 }
 
+function sendProfile(p) {
+	return post("/users/" + p.Email + "/person", p);
+}
 /*function user(email, ok, no) {
 	return get("/users/" + email, ok, no);
 }

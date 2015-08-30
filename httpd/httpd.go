@@ -2,6 +2,7 @@ package httpd
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"time"
 
@@ -47,11 +48,13 @@ func (ed *HTTPd) page(path string) func(http.ResponseWriter, *http.Request) {
 func (ed *HTTPd) home(w http.ResponseWriter, r *http.Request) {
 	c, err := r.Cookie("token")
 	if err != nil {
+		log.Println("no cookie")
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 		return
 	}
 	s, err := ed.store.Session([]byte(c.Value))
 	if err != nil || s.Expire.Before(time.Now()) {
+		log.Println("expired")
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 		return
 	}

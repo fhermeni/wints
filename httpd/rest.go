@@ -3,6 +3,7 @@ package httpd
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -41,7 +42,7 @@ func NewEndPoints(store *sqlstore.Store, cfg config.Rest) EndPoints {
 	ed.post("/users/:u/role", setUserRole)
 	ed.del("/users/:u", delUser)
 	ed.get("/users/:u", user)
-	ed.post("/users/:u/session", ed.delSession)
+	ed.del("/users/:u/session", ed.delSession)
 	ed.post("/students/:s/major", setMajor)
 	ed.post("/students/:s/promotion", setPromotion)
 	ed.post("/students/:s/male", setMale)
@@ -144,13 +145,14 @@ func user(ex Exchange) error {
 
 func setPassword(ex Exchange) error {
 	var req struct {
-		current []byte
-		now     []byte
+		Current string
+		Now     string
 	}
 	if err := ex.inJSON(&req); err != nil {
 		return err
 	}
-	return ex.s.SetPassword(ex.V("u"), req.current, req.now)
+	log.Println(req)
+	return ex.s.SetPassword(ex.V("u"), []byte(req.Current), []byte(req.Now))
 }
 
 func setUserPerson(ex Exchange) error {
@@ -158,7 +160,7 @@ func setUserPerson(ex Exchange) error {
 	if err := ex.inJSON(&p); err != nil {
 		return err
 	}
-	return ex.s.SetUserPerson(p)
+	return ex.outJSON(p, ex.s.SetUserPerson(p))
 }
 
 func setUserRole(ex Exchange) error {
@@ -253,11 +255,11 @@ func setReportDeadline(ex Exchange) error {
 
 func setReportGrade(ex Exchange) error {
 	var report struct {
-		grade   int
-		comment string
+		Grade   int
+		Comment string
 	}
 	ex.inJSON(&report)
-	return ex.s.SetReportGrade(ex.V("k"), ex.V("s"), report.grade, report.comment)
+	return ex.s.SetReportGrade(ex.V("k"), ex.V("s"), report.Grade, report.Comment)
 }
 
 func setReportPrivacy(ex Exchange) error {
@@ -336,6 +338,7 @@ func (ed *EndPoints) signin(w http.ResponseWriter, r *http.Request, ps map[strin
 		status(w, ErrMalformedJSON)
 		return
 	}
+	log.Println(cred)
 	s, err := ed.store.NewSession(cred.Login,
 		[]byte(cred.Password),
 		ed.cfg.SessionLifeTime.Duration)
@@ -354,7 +357,7 @@ func (ed *EndPoints) signin(w http.ResponseWriter, r *http.Request, ps map[strin
 		Value: string(s.Email),
 		Path:  "/",
 	}
-
+	log.Println(token)
 	http.SetCookie(w, token)
 	http.SetCookie(w, login)
 	http.Redirect(w, r, "/", 302)

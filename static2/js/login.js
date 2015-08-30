@@ -21,6 +21,7 @@ function login() {
 function loginSuccess(session) {
 	localStorage.setItem("token", session.Token);
 	window.location.href = "/"
+	console.log("success, relocation")
 }
 
 function loginFail(xhr) {

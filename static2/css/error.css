@@ -1,0 +1,29 @@
+.has-error input {
+	color: #d9534f;
+}
+
+.popover {
+	padding: 0px;
+	box-shadow: none;
+	font-weight: inherit;
+}
+.popover-content {
+	background-color: #d9534f;
+	color: #fff;
+}
+
+.popover.right>.arrow:after {
+	border-right-color: #d9534f;
+}
+
+.popover.top>.arrow:after {
+	border-top-color: #d9534f;
+}
+
+.popover.bottom>.arrow:after {
+	border-top-color: #d9534f;
+}
+
+.popover.left>.arrow:after {
+	border-top-color: #d9534f;
+}
