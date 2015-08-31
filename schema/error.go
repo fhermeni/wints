@@ -29,5 +29,6 @@ var (
 	ErrInvalidSurvey      = errors.New("Invalid answers")
 	ErrUnknownAlumni      = errors.New("No informations for future alumni")
 	ErrInvalidAlumniEmail = errors.New("Invalid email. It must not be served by polytech' or unice")
+	ErrInvalidEmail       = errors.New("Invalid email")
 	ErrUnknownDefense     = errors.New("Unknown defense")
 )

@@ -23,7 +23,7 @@ func status(w http.ResponseWriter, e error) {
 		return
 	case schema.ErrCredentials:
 		http.Error(w, e.Error(), http.StatusUnauthorized)
-	case ErrMalformedJSON, schema.ErrInvalidSurvey, schema.ErrInvalidAlumniEmail, schema.ErrDeadlinePassed, schema.ErrInvalidGrade, schema.ErrInvalidMajor, schema.ErrInvalidPeriod, schema.ErrGradedReport, schema.ErrPasswordTooShort:
+	case ErrMalformedJSON, schema.ErrInvalidSurvey, schema.ErrInvalidAlumniEmail, schema.ErrInvalidEmail, schema.ErrDeadlinePassed, schema.ErrInvalidGrade, schema.ErrInvalidMajor, schema.ErrInvalidPeriod, schema.ErrGradedReport, schema.ErrPasswordTooShort:
 		http.Error(w, e.Error(), http.StatusBadRequest)
 		return
 	case session.ErrPermission, session.ErrConfidentialReport:

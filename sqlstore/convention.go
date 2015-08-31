@@ -127,7 +127,7 @@ func (s *Store) Conventions() ([]schema.Convention, error) {
 
 //ValidateConvention instantiates the reports and the surveys related to the convention
 //and set the valid flag to true
-func (s *Store) ValidateConvention(student string, cfg config.Config) error {
+func (s *Store) ValidateConvention(student string, cfg config.Internships) error {
 	tx := newTxErr(s.db)
 	for kind, report := range cfg.Reports {
 		tx.Exec(insertReport, student, kind, report.Deadline, false, report.Grade)

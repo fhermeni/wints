@@ -1,4 +1,4 @@
-<h3>{{len this}} internship(s)</h3>
+    <h3>Watched Internship(s)</h3>
 
 <div class="btn-group">
   <button type="button" class="btn dropdown-toggle btn-sm" data-toggle="dropdown" aria-expanded="false"><i class="glyphicon glyphicon-envelope"></i> mail selection <span class="caret"></span>
@@ -21,7 +21,6 @@
   </ul>
 </div>
 
-
 <p>
 As a major leader or an administrator, you can follow the progress of every student:
 <ul>
@@ -41,8 +40,8 @@ As a major leader or an administrator, you can follow the progress of every stud
 <li><span class="color bg-danger"></span>grade &lt; 10</li>
 </ul>
 </div>
-<table class="table table-condensed table-hover tablesorter" id="table-watchlist">
-    <thead>
+<table class="table table-condensed table-hover tablesorter" id="table-conventions">
+            <thead>
     <tr>
         <th class="sorter-false" rowspan="2">
         <input type='checkbox' data-toggle='checkbox' class='icheckbox_flat check_all'/>
@@ -51,22 +50,22 @@ As a major leader or an administrator, you can follow the progress of every stud
         <th rowspan="2">Promotion</th>
         <th rowspan="2">Major</th>
         <th rowspan="2" >Tutor</th>
-        <th class="sorter-false text-center" colspan="{{len Reports}}">Reports</th>
-        <th class="sorter-false text-center" colspan="{{len Surveys}}">Surveys</th>
+        <th class="sorter-false text-center" colspan="{{len Org.Reports}}">Reports</th>
+        <th class="sorter-false text-center" colspan="{{len Org.Surveys}}">Surveys</th>
         <th rowspan="2" >def</th>
         <th rowspan="2">alumni</th>
     </tr>
     <tr>        
-        {{#each Config.Reports}}        
-        <th><small>{{Kind}}</small></th>
+        {{#each Org.Reports}}        
+        <th><small>{{@key}}</small></th>
         {{/each}}        
-        {{#each Config.Surveys}}        
-        <th><small>{{Kind}}</small></th>
+        {{#each Org.Surveys}}        
+        <th><small>{{@key}}</small></th>
         {{/each}}        
     </tr>    
     </thead>
     <tbody>
-    {{#each Internships}}
+        {{#each Internships}}    
         <tr>
             <td>
             <input type='checkbox' class='icheckbox_flat' data-email='{{Student.Email}}'/>  

@@ -54,6 +54,13 @@ type Journal struct {
 	Path string
 }
 
+//Internships declare the internship organization
+type Internships struct {
+	Majors  []string
+	Reports map[string]Report
+	Surveys map[string]Survey
+}
+
 //Report configures a report definition
 type Report struct {
 	Deadline Deadline
@@ -67,12 +74,11 @@ type Survey struct {
 
 //Config aggregates all the subcomponents configuration parameters
 type Config struct {
-	Feeder  Feeder
-	Reports map[string]Report
-	Surveys map[string]Survey
-	Db      Db
-	Mailer  Mailer
-	HTTPd   HTTPd
-	Majors  []string
-	Journal Journal
+	Feeder      Feeder
+	Db          Db
+	Mailer      Mailer
+	HTTPd       HTTPd
+	Majors      []string
+	Journal     Journal
+	Internships Internships
 }

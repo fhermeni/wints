@@ -1,5 +1,6 @@
 .has-error input {
 	color: #d9534f;
+	font-weight: bold;
 }
 
 .popover {
@@ -27,3 +28,8 @@
 .popover.left>.arrow:after {
 	border-top-color: #d9534f;
 }
+
+/*.popover-warning .popover-content {
+	background-color: #f0ad4e;
+}*/
+

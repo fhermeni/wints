@@ -119,11 +119,11 @@ function put(URL, data, ok, no) {
 	}).done(noCb(ok)).fail(restError(no));
 }
 
-function get(URL, ok, no) {
+function get(URL) {
 	return $.ajax({
 		method: "GET",
 		url: ROOT_API + URL,
-	}).done(noCb(ok)).fail(restError(no));
+	});
 }
 
 function del(URL, ok, no) {
@@ -162,13 +162,39 @@ function sendPassword(current, now) {
 	})
 }
 
-function user(email, ok, no) {
-	return get("/users/" + email, ok, no);
+function user(email) {
+	return get("/users/" + email);
 }
 
 function sendProfile(p) {
 	return post("/users/" + p.Email + "/person", p);
 }
+
+function internships() {
+	return get("/internships/");
+}
+
+function config() {
+	return get("/config/");
+}
+
+function users() {
+	return get("/users/");
+}
+
+function postNewUser(u) {
+	return post("/users/", u);
+}
+
+function delUser(email) {
+	return del("/users/" + email)
+}
+
+function postUserRole(email, r) {
+	return post("/users/" + email + "/role", r);
+}
+
+
 /*function user(email, ok, no) {
 	return get("/users/" + email, ok, no);
 }
@@ -181,23 +207,7 @@ function sessions(ok, no) {
 	return get("/sessions/", ok, no);
 }
 
-function newUser(fn, ln, tel, email, role, ok, no) {
-	return post("/users/", {
-		Firstname: fn,
-		Lastname: ln,
-		Tel: tel,
-		Role: role,
-		Email: email
-	}, ok, no);
-}
 
-function rmUser(email, ok, no) {
-	return del("/users/" + email, ok, no)
-}
-
-function setUserRole(email, r, ok, no) {
-	return put("/users/" + email + "/role", r, ok, no);
-}
 
 function setUser(fn, ln, tel, ok, no) {
 	var email = getCookie("session")

@@ -37,6 +37,9 @@ func (ex *Exchange) V(id string) string {
 }
 
 func (ex *Exchange) outJSON(j interface{}, e error) error {
+	if e != nil {
+		ex.err = e
+	}
 	if ex.err != nil {
 		return ex.err
 	}

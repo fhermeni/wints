@@ -2,6 +2,7 @@
  * Created by fhermeni on 03/07/2014.
  */
 
+/*
 moment.locale('fr', {
 	months: "janvier_février_mars_avril_mai_juin_juillet_août_septembre_octobre_novembre_décembre".split("_"),
 	monthsShort: "janv._févr._mars_avr._mai_juin_juil._août_sept._oct._nov._déc.".split("_"),
@@ -50,7 +51,7 @@ moment.locale('fr', {
 	// in case the meridiem units are not separated around 12, then implement
 	// this function (look at locale/id.js for an example)
 	// meridiemHour : function (hour, meridiem) {
-	//     return /* 0-23 hour, given meridiem token and hour 1-12 */
+	//     return  0-23 hour, given meridiem token and hour 1-12 
 	// },
 	meridiem: function(hours, minutes, isLower) {
 		return hours < 12 ? 'PD' : 'MD';
@@ -59,28 +60,50 @@ moment.locale('fr', {
 		dow: 1, // Monday is the first day of the week.
 		doy: 4 // The week that contains Jan 4th is the first week of the year.
 	}
-});
+});*/
 
 $.handlebars({
 	templatePath: '/static/hbs/',
-	templateExtension: 'hbs'
+	templateExtension: 'hbs',
+	partialPath: '/static/hbs',
+	partials: ['users-user']
 });
 
-Handlebars.getTemplate = function(name) {
-	if (Handlebars.templates === undefined || Handlebars.templates[name] === undefined) {
-		$.ajax({
-			url: '/static/tpls/' + name + '.handlebars',
-			success: function(data) {
-				if (Handlebars.templates === undefined) {
-					Handlebars.templates = {};
-				}
-				Handlebars.templates[name] = Handlebars.compile(data);
-			},
-			async: false
+Handlebars.registerHelper('len', function(a) {
+	return a.length
+});
+
+Handlebars.registerHelper('dateFmt', function(d, fmt) {
+	if (!d) {
+		return "-";
+	}
+	return moment(d).format(fmt);
+});
+
+var roles = ["none", "student", "tutor", "major", "admin", "root"];
+
+Handlebars.registerHelper('role', function(r) {
+	return roles[r];
+});
+
+function editableRoles() {
+	var res = [];
+	for (i = 2; i < roles.length; i++) {
+		res.push({
+			"value": i,
+			"text": roles[i]
 		});
 	}
-	return Handlebars.templates[name];
-};
+	return res;
+}
+Handlebars.registerHelper('roleSelect', function(m) {
+	var b = "";
+	for (i = 2; i < roles.length; i++) {
+		b += "<option value='" + i + "'>" + roles[i] + "</option>";
+	}
+	return new Handlebars.SafeString(b);
+});
+
 /*
 Handlebars.registerHelper('fullname', function(p) {
 	return p.Firstname + " " + p.Lastname;

@@ -41,22 +41,25 @@ Password = "barMailer"
 Sender = "myMail"
 Path = "assets/mails"
 
-[Reports.dow]
+[Internships]
+Majors = ["caspar","ubinet","al","web","gmd","iam","ihm","imafa","inum"]
+
+[Internships.Reports.dow]
 Deadline= "504h"
 Grade = false
 
-[Reports.midterm]
+[Internships.Reports.midterm]
 Deadline = "1440h"
 Grade = true
 
-[Reports.final]
+[Internships.Reports.final]
 Deadline = "01/09/2015"
 Grade = true
 
-[Surveys.midterm]
+[Internships.Surveys.midterm]
 Deadline = "1440h"
 
-[Surveys.final]
+[Internships.Surveys.final]
 Deadline = "01/09/2015"
 `
 
@@ -88,14 +91,17 @@ Deadline = "01/09/2015"
 				Prefix: "api/v2",
 			},
 		},
-		Surveys: map[string]Survey{
-			"midterm": {},
-			"final":   {},
-		},
-		Reports: map[string]Report{
-			"dow":     {Grade: false},
-			"midterm": {Grade: true},
-			"final":   {Grade: true},
+		Internships: Internships{
+			Majors: []string{"caspar", "ubinet", "al", "web", "gmd", "iam", "ihm", "imafa", "inum"},
+			Surveys: map[string]Survey{
+				"midterm": {},
+				"final":   {},
+			},
+			Reports: map[string]Report{
+				"dow":     {Grade: false},
+				"midterm": {Grade: true},
+				"final":   {Grade: true},
+			},
 		},
 	}
 )
@@ -111,27 +117,27 @@ func TestLoadConfig(t *testing.T) {
 	expected.HTTPd.Rest.RenewalRequestLifetime.Duration, _ = time.ParseDuration("48h")
 
 	rel, _ := time.ParseDuration("1440h")
-	sm := expected.Surveys["midterm"]
+	sm := expected.Internships.Surveys["midterm"]
 	sm.Deadline.relative = &rel
-	expected.Surveys["midterm"] = sm
+	expected.Internships.Surveys["midterm"] = sm
 
 	abs, _ := time.Parse(DateLayout, "01/09/2015")
-	sf := expected.Surveys["final"]
+	sf := expected.Internships.Surveys["final"]
 	sf.Deadline.absolute = &abs
-	expected.Surveys["final"] = sf
+	expected.Internships.Surveys["final"] = sf
 
 	rel, _ = time.ParseDuration("504h")
-	rd := expected.Reports["dow"]
+	rd := expected.Internships.Reports["dow"]
 	rd.Deadline.relative = &rel
-	expected.Reports["dow"] = rd
+	expected.Internships.Reports["dow"] = rd
 
 	rel, _ = time.ParseDuration("1440h")
-	rm := expected.Reports["midterm"]
+	rm := expected.Internships.Reports["midterm"]
 	rm.Deadline.relative = &rel
 	//expected.Reports["midterm"] = rm
 
 	abs, _ = time.Parse(DateLayout, "01/09/2015")
-	rf := expected.Reports["final"]
+	rf := expected.Internships.Reports["final"]
 	rf.Deadline.absolute = &abs
 	//expected.Reports["final"] = rf
 

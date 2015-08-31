@@ -17,19 +17,21 @@ import (
 
 //EndPoints is a wrapper to embeds a set of Rest endpoints
 type EndPoints struct {
-	router *httptreemux.TreeMux
-	prefix string
-	store  *sqlstore.Store
-	cfg    config.Rest
+	router       *httptreemux.TreeMux
+	prefix       string
+	store        *sqlstore.Store
+	cfg          config.Rest
+	organization config.Internships
 }
 
 //NewEndPoints creates new prefixed endpoints
-func NewEndPoints(store *sqlstore.Store, cfg config.Rest) EndPoints {
+func NewEndPoints(store *sqlstore.Store, cfg config.Rest, org config.Internships) EndPoints {
 	ed := EndPoints{
-		store:  store,
-		router: httptreemux.New(),
-		prefix: strings.TrimSuffix(cfg.Prefix, "/"),
-		cfg:    cfg,
+		store:        store,
+		router:       httptreemux.New(),
+		prefix:       strings.TrimSuffix(cfg.Prefix, "/"),
+		cfg:          cfg,
+		organization: org,
 	}
 	ed.router.NotFoundHandler = func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "", http.StatusNotFound)
@@ -71,6 +73,7 @@ func NewEndPoints(store *sqlstore.Store, cfg config.Rest) EndPoints {
 	ed.router.POST(ed.prefix+"/signin", ed.signin)
 	ed.router.POST(ed.prefix+"/resetPassword", ed.resetPassword)
 	ed.router.POST(ed.prefix+"/newPassword", ed.newPassword)
+	ed.router.GET(ed.prefix+"/config", ed.config)
 	return ed
 }
 
@@ -128,11 +131,11 @@ func users(ex Exchange) error {
 }
 
 func newUser(ex Exchange) error {
-	var p schema.Person
-	if err := ex.inJSON(&p); err != nil {
+	var u schema.User
+	if err := ex.inJSON(&u); err != nil {
 		return err
 	}
-	return ex.s.NewUser(p)
+	return ex.outJSON(u, ex.s.NewUser(u.Person, u.Role))
 }
 func delUser(ex Exchange) error {
 	return ex.s.RmUser(ex.V("u"))
@@ -306,7 +309,7 @@ func setTutor(ex Exchange) error {
 func validateConvention(ex Exchange) error {
 	var b bool
 	ex.inJSON(&b)
-	return ex.s.ValidateConvention(ex.V("s"), config.Config{})
+	return ex.s.ValidateConvention(ex.V("s"), config.Internships{})
 }
 
 func (ed *EndPoints) delSession(ex Exchange) error {
@@ -375,6 +378,10 @@ func (ed *EndPoints) resetPassword(w http.ResponseWriter, r *http.Request, ps ma
 		return
 	}
 	status(w, json.NewEncoder(w).Encode(s))
+}
+
+func (ed *EndPoints) config(w http.ResponseWriter, r *http.Request, ps map[string]string) {
+	status(w, json.NewEncoder(w).Encode(ed.organization))
 }
 
 func (ed *EndPoints) newPassword(w http.ResponseWriter, r *http.Request, ps map[string]string) {

@@ -3,6 +3,7 @@ package sqlstore
 import (
 	"database/sql"
 	"errors"
+	"strings"
 	"time"
 
 	"code.google.com/p/go.crypto/bcrypt"
@@ -174,8 +175,11 @@ func (s *Store) NewPassword(token, newP []byte) (string, error) {
 
 //NewUser add a user
 //Basically, calls addUser
-func (s *Store) NewUser(p schema.Person) error {
-	return s.singleUpdate(insertUser, schema.ErrUserExists, p.Firstname, p.Lastname, p.Tel, p.Email, schema.NONE, randomBytes(32))
+func (s *Store) NewUser(p schema.Person, role schema.Privilege) error {
+	if !strings.Contains(p.Email, "@") {
+		return schema.ErrInvalidEmail
+	}
+	return s.singleUpdate(insertUser, schema.ErrUserExists, p.Firstname, p.Lastname, p.Tel, p.Email, role, randomBytes(32))
 }
 
 //RmUser removes a user from the database

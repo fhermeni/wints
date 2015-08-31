@@ -1,0 +1,21 @@
+	<h3>{{len this}} registered user(s)</h3>
+<button onclick="showNewUser()" data-toggle='modal' class="btn btn-success btn-sm">
+    <span class="glyphicon glyphicon-plus"></span> add user
+</button>    
+<button type="button" class="btn btn-primary btn-sm" onclick="serviceMailing()">
+    <i class="glyphicon glyphicon-envelope"></i> mail selection
+</button>
+<table class="table table-hover tablesorter" id="table-users" data-sortlist="[[1,0]]">
+<thead>
+    <tr>
+        <th class="sorter-false"></th>
+        <th>Lastname</th><th>Firstname</th><th>Email</th>
+        <th>Role</th><th>Last</th><th>Actions</th>
+    </tr>
+</thead>
+<tbody>
+{{#each this}}
+    {{> users-user this}}
+{{/each}}
+</tbody>
+</table>

@@ -6,9 +6,9 @@ import (
 	"github.com/fhermeni/wints/schema"
 )
 
-//RmUser removes an account if the emitter is at least an admin
+//RmUser removes an account if the emitter is at least an admin and not himself
 func (s *Session) RmUser(email string) error {
-	if s.Role() >= schema.ADMIN {
+	if s.Role() >= schema.ADMIN && !s.Myself(email) {
 		return s.store.RmUser(email)
 	}
 	return ErrPermission
@@ -47,18 +47,18 @@ func (s *Session) SetUserPerson(p schema.Person) error {
 	return ErrPermission
 }
 
-//SetUserRole changes the user privileges if the emitter is an admin at minimum
+//SetUserRole changes the user privileges if the emitter is an admin at minimum and not himself
 func (s *Session) SetUserRole(email string, priv schema.Privilege) error {
-	if s.Role() >= schema.ADMIN {
+	if s.Role() >= schema.ADMIN && !s.Myself(email) {
 		return s.store.SetUserRole(email, priv)
 	}
 	return ErrPermission
 }
 
 //NewUser creates a new user account if the emitter is an admin at least
-func (s *Session) NewUser(p schema.Person) error {
+func (s *Session) NewUser(p schema.Person, role schema.Privilege) error {
 	if s.Role() >= schema.ADMIN {
-		return s.store.NewUser(p)
+		return s.store.NewUser(p, role)
 	}
 	return ErrPermission
 }

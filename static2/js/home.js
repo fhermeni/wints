@@ -1,12 +1,13 @@
 $(document).ready(function() {
 	waitingBlock = $("#cnt").clone().html();
 
+
 	$.tablesorter.defaults.widgets = ["uitheme"]
 	$.tablesorter.defaults.theme = 'bootstrap';
 	$.tablesorter.defaults.headerTemplate = '{content} {icon}';
 
-	user(getCookie("login"), loadSuccess, function() {
-		window.location.href = "/login"
+	user(getCookie("login")).done(loadSuccess).fail(function() {
+		window.location.href = "/login";
 	});
 
 	$(document).keydown(function(e) {
@@ -24,6 +25,11 @@ $(document).ready(function() {
 function loadSuccess(data) {
 	myself = data;
 	$("#fullname").html(myself.Person.Firstname + " " + myself.Person.Lastname);
+
+	//my options
+	for (i = 0; i <= myself.Role; i++) {
+		$(".role-" + i).removeClass("hidden");
+	}
 }
 
 function showProfileEditor() {
@@ -70,14 +76,12 @@ function logout() {
 		.done(function() {
 			window.location.href = "/"
 		})
-		.fail(function(xhr) {
-			console.log(xhr.responseText)
-		})
+		.fail(logFail);
 }
 
 function successUpdateProfile(p) {
 	myself.Person = p
-	$("#fullname").html(p.Firstname + " " + p.Lastname); //should redraw 
+	$("#fullname").html(p.Firstname + " " + p.Lastname);
 	hideModal()
 }
 
@@ -86,7 +90,98 @@ function showModal() {
 	$('#modal').find('[data-toggle="popover"]').popover()
 }
 
+function ui() {
+	$("#cnt").find(".tablesorter").tablesorter();
+	$('#cnt').find('[data-toggle="popover"]').popover()
+	$('#cnt').find('[data-toggle="confirmation"]').confirmation()
+}
+
 function hideModal() {
 	$('#modal').find('[data-toggle="popover"]').popover('destroy')
 	$("#modal").modal("hide")
+}
+
+function showWatchlist() {
+	$.when(internships(), config()).then(loadWatchlist);
+}
+
+function loadWatchlist(interns, organization) {
+	$("#cnt").render("watchlist", {
+		Internships: interns[0],
+		Org: organization[0]
+	})
+}
+
+function showUsers() {
+	users().done(loadUsers)
+}
+
+function showNewUser() {
+	$("#modal").render("new-user", {}, showModal)
+}
+
+function newUser() {
+	if (empty("#new-firstname", "#new-lastname", "#new-email")) {
+		return
+	}
+	u = {
+		Person: {
+			Firstname: $("#new-firstname").val().toLowerCase(),
+			Lastname: $("#new-lastname").val().toLowerCase(),
+			Email: $("#new-email").val().toLowerCase(),
+			Tel: $("#new-tel").val().toLowerCase(),
+		},
+		Role: parseInt($("#new-role").val())
+	}
+	postNewUser(u)
+		.done(successNewUser)
+		.fail(failNewUser)
+}
+
+
+function usersUI() {
+	$("#cnt").find(".editable-role").each(function(i, e) {
+		$(e).editable({
+			source: editableRoles(),
+			url: function(p) {
+				return postUserRole($(e).data("user"), parseInt(p.value));
+			}
+		});
+	});
+	ui();
+}
+
+function loadUsers(users) {
+	$("#cnt").render("users-header", users, usersUI);
+}
+
+
+function successNewUser(p) {
+	var row = Handlebars.partials["users-user"](p);
+	var config = $('#table-users')[0].config
+	$.tablesorter.addRows(config, row, true, hideModal);
+	usersUI()
+}
+
+function failNewUser(xhr) {
+	if (xhr.status == 409 || xhr.status == 400) { //user exists or invalid email
+		reportError("#new-email", xhr.responseText)
+	}
+	console.log(xhr.status + " " + xhr.responseText);
+}
+
+function rmUser(em) {
+	delUser(em).done(function() {
+		successDelUser(em)
+	}).fail(logFail)
+}
+
+function successDelUser(em) {
+	var config = $('#table-users')[0].config
+	$("#table-users").find('[data-user="' + em + '"]').closest('tr').remove()
+	$.tablesorter.update(config, false)
+}
+
+function logFail(xhr) {
+	console.log(xhr.status + " " + xhr.responseText)
 }

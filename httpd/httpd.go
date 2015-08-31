@@ -18,13 +18,13 @@ type HTTPd struct {
 }
 
 //NewHTTPd makes a new HTTP daemon
-func NewHTTPd(store *sqlstore.Store, cfg config.HTTPd) HTTPd {
+func NewHTTPd(store *sqlstore.Store, cfg config.HTTPd, org config.Internships) HTTPd {
 
 	//The assets
 	fileHandler := http.FileServer(http.Dir(cfg.Assets))
 	http.Handle("/"+cfg.Assets, http.StripPrefix("/"+cfg.Assets, fileHandler))
 	//The rest endpoints
-	rest := NewEndPoints(store, cfg.Rest)
+	rest := NewEndPoints(store, cfg.Rest, org)
 	http.Handle(cfg.Rest.Prefix, Mon(rest.router.ServeHTTP))
 
 	httpd := HTTPd{

@@ -55,7 +55,7 @@ func (s *Session) SetConventionSkippable(student string, skip bool) error {
 }
 
 //ValidateConvention validates the convention if the emitter is an admin at minimum
-func (s *Session) ValidateConvention(stu string, cfg config.Config) error {
+func (s *Session) ValidateConvention(stu string, cfg config.Internships) error {
 	if s.Role() >= schema.ADMIN {
 		return s.store.ValidateConvention(stu, cfg)
 	}
