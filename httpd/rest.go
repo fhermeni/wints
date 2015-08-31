@@ -3,7 +3,6 @@ package httpd
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -154,7 +153,6 @@ func setPassword(ex Exchange) error {
 	if err := ex.inJSON(&req); err != nil {
 		return err
 	}
-	log.Println(req)
 	return ex.s.SetPassword(ex.V("u"), []byte(req.Current), []byte(req.Now))
 }
 
@@ -341,7 +339,6 @@ func (ed *EndPoints) signin(w http.ResponseWriter, r *http.Request, ps map[strin
 		status(w, ErrMalformedJSON)
 		return
 	}
-	log.Println(cred)
 	s, err := ed.store.NewSession(cred.Login,
 		[]byte(cred.Password),
 		ed.cfg.SessionLifeTime.Duration)
@@ -360,10 +357,10 @@ func (ed *EndPoints) signin(w http.ResponseWriter, r *http.Request, ps map[strin
 		Value: string(s.Email),
 		Path:  "/",
 	}
-	log.Println(token)
 	http.SetCookie(w, token)
 	http.SetCookie(w, login)
 	http.Redirect(w, r, "/", 302)
+	ed.store.Visit(cred.Login)
 }
 
 func (ed *EndPoints) resetPassword(w http.ResponseWriter, r *http.Request, ps map[string]string) {
