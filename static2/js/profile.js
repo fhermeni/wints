@@ -1,55 +1,52 @@
-function showMyServices(r) {
-	for (i = 0; i <= r; i++) {
-		$(".role-" + i).removeClass("hidden")
-	}
-}
-
 function showProfileEditor() {
-	var buf = Handlebars.getTemplate("profileEditor")(myself);
-	$("#modal").html(buf).modal('show')
+	$("#modal").render("profileEditor", myself, showModal)
 }
 
 function showPasswordEditor() {
-	var buf = Handlebars.getTemplate("passwordEditor")(myself);
-	$("#modal").html(buf).modal('show')
-}
-
-
-function updateProfile() {
-	if (missing("lbl-firstname") || missing("lbl-lastname")) {
-		return false
-	}
-	setUser($("#lbl-firstname").val(), $("#lbl-lastname").val(), $("#lbl-tel").val(), updateCb);
+	$("#modal").render("passwordEditor", {}, showModal)
 }
 
 function updatePassword() {
-	var ok = true;
-	if (missing("lbl-old-password") ||  missing("lbl-password1") || missing("lbl-password2")) {
-		return;
-	}
-
-	var p1 = $("#lbl-password1").val();
-	var p2 = $("#lbl-password2").val();
-	if (p1 != p2) {
-		$("#lbl-password2").notify("The passwords do not match", {
-			className: "danger"
-		});
+	if (empty("#password-current", "#password-new", "#password-confirm") || !equals("#password-new", "#password-confirm")) {
 		return
 	}
-	if (p2.length < 8) {
-		$("#lbl-password1").notify("Password must be 8 characters length minimum", {
-			className: "error"
-		})
-		return
-	}
-	setPassword($("#lbl-old-password").val(), $("#lbl-password1").val(), function() {
-		$("#modal").modal('hide');
-		reportSuccess("Password changed successfully");
-	});
+	sendPassword($("#password-current").val(), $("#password-new").val())
+		.done(hideModal)
+		.fail(failUpdatePassword)
 }
 
-function updateCb(data, resp, xhr) {
-	$("#modal").modal('hide');
-	reportSuccess("Profile updated successfully");
-	$("#fullname").html($("#lbl-firstname").val() + " " + $("#lbl-lastname").val());
+function failUpdatePassword(xhr) {
+	if (xhr.status == 401) {
+		reportError("#password-current", xhr.responseText)
+	} else if (xhr.status == 400) {
+		reportError("#password-new", xhr.responseText)
+	}
+}
+
+function updateProfile() {
+	if (empty("#profile-firstname", "#profile-lastname")) {
+		return
+	}
+	p = {
+		Email: myself.Person.Email,
+		Firstname: $("#profile-firstname").val(),
+		Lastname: $("#profile-lastname").val(),
+		Tel: $("#profile-tel").val()
+	}
+	sendProfile(p)
+		.done(successUpdateProfile)
+}
+
+function logout() {
+	delSession()
+		.done(function() {
+			window.location.href = "/"
+		})
+		.fail(logFail);
+}
+
+function successUpdateProfile(p) {
+	myself.Person = p
+	$("#fullname").html(p.Firstname + " " + p.Lastname);
+	hideModal()
 }
