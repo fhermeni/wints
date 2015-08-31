@@ -91,9 +91,15 @@ function showModal() {
 }
 
 function ui() {
+
 	$("#cnt").find(".tablesorter").tablesorter();
 	$('#cnt').find('[data-toggle="popover"]').popover()
 	$('#cnt').find('[data-toggle="confirmation"]').confirmation()
+
+	$("#cnt").find(".shiftSelectable").shiftSelectable();
+	$("#cnt").find("table").bind("sortEnd", function() {
+		$("#cnt").find('.shiftSelectable').shiftSelectable();
+	})
 }
 
 function hideModal() {

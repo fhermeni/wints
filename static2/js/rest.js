@@ -31,6 +31,9 @@ function reportError(id, message) {
 	if (popover) {
 		popover.options.content = message
 	}
+	$(id).popover({
+		template: '<div class="popover popover-error" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>'
+	});
 	$(id).popover("show")
 		.closest(".form-group").addClass("has-error");
 }

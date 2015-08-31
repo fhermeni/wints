@@ -69,6 +69,7 @@ func (s *Store) User(email string) (schema.User, error) {
 	if err != nil {
 		return schema.User{}, err
 	}
+	defer rows.Close()
 	if !rows.Next() {
 		return schema.User{}, schema.ErrUnknownUser
 	}

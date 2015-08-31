@@ -6,7 +6,7 @@
     <td><a data-user="{{Person.Email}}" class="editable-role" data-type="select" data-value="{{Role}}">{{role Role}}</a></td>
     <td>{{dateFmt LastVisit "DD/MM/YY HH:mm"}}</td>
     <td>
-        <a data-toggle="teacher-reinvite" data-user="{{Person.Email}}" class="btn btn-info btn-xs glyphicon glyphicon-refresh" title="re-invite ?"></a> 
-        <a tabindex="0" data-trigger="focus" role="button" data-user="{{Person.Email}}" class="btn btn-xs btn-danger glyphicon glyphicon-remove" data-toggle="confirmation" data-on-confirm='rmUser("{{Person.Email}}")'> </a>       
+        <a data-toggle="teacher-reinvite" data-user="{{Person.Email}}" class="pull-left btn btn-info btn-xs glyphicon glyphicon-refresh" title="re-invite ?"></a> 
+        <a tabindex="0" data-trigger="focus" role="button" data-user="{{Person.Email}}" class="pull-right btn btn-xs btn-danger glyphicon glyphicon-remove" data-toggle="confirmation" data-on-confirm='rmUser("{{Person.Email}}")'> </a>       
     </td>
 </tr>

@@ -89,20 +89,20 @@
 		target: '_self',
 		onConfirm: $.noop,
 		onCancel: $.noop,
-		btnOkClass: 'btn-xs btn-primary',
+		btnOkClass: '', //btn-xs btn-primary',
 		btnOkIcon: 'glyphicon glyphicon-ok',
 		btnOkLabel: 'Yes',
-		btnCancelClass: 'btn-xs btn-default',
+		btnCancelClass: '', //btn-xs btn-default',
 		btnCancelIcon: 'glyphicon glyphicon-remove',
 		btnCancelLabel: 'No',
 		template: '<div class="popover confirmation popover-warning">' +
 			'<div class="arrow"></div>' +
-			'<h3 class="popover-title"></h3>' +
-			'<div class="popover-content text-center">' +
-			'<div class="btn-group">' +
-			'<a class="btn" data-apply="confirmation"></a>' +
-			'<a class="btn" data-dismiss="confirmation"></a>' +
-			'</div>' +
+			//'<h3 class="popover-title"></h3>' +
+			'<div class="popover-content text-center"> Sure ? ' +
+			//'<div class="btn-group">' +
+			'<small><a data-apply="confirmation"></a></small> ' +
+			'- <a data-dismiss="confirmation"></a>' +
+			//'</div>' +
 			'</div>' +
 			'</div>'
 	});
