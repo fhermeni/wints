@@ -51,6 +51,7 @@ func NewEndPoints(store *sqlstore.Store, cfg config.Rest, org config.Internships
 	ed.post("/students/:s/alumni/position", setNextPosition)
 	ed.post("/students/:s/skip", setStudentSkippable)
 	ed.get("/students/", students)
+	ed.post("/students/", newStudent)
 
 	ed.get("/internships/", internships)
 	ed.get("/internships/:s/", internship)
@@ -225,6 +226,18 @@ func students(ex Exchange) error {
 	return ex.outJSON(ss, err)
 }
 
+func newStudent(ex Exchange) error {
+	var s schema.Student
+	if err := ex.inJSON(&s); err != nil {
+		return err
+	}
+	err := ex.s.NewStudent(s.User.Person, s.Major, s.Promotion, s.Male)
+	if err != nil {
+		return err
+	}
+	return ex.outJSON(s, err)
+}
+
 func internships(ex Exchange) error {
 	ss, err := ex.s.Internships()
 	return ex.outJSON(ss, err)
@@ -288,25 +301,33 @@ func setConventionSkippable(ex Exchange) error {
 
 func setSupervisor(ex Exchange) error {
 	var p schema.Person
-	ex.inJSON(&p)
+	if err := ex.inJSON(&p); err != nil {
+		return err
+	}
 	return ex.s.SetSupervisor(ex.V("s"), p)
 }
 
 func setTitle(ex Exchange) error {
 	var t string
-	ex.inJSON(&t)
+	if err := ex.inJSON(&t); err != nil {
+		return err
+	}
 	return ex.s.SetTitle(ex.V("s"), t)
 }
 
 func setTutor(ex Exchange) error {
 	var t string
-	ex.inJSON(&t)
+	if err := ex.inJSON(&t); err != nil {
+		return err
+	}
 	return ex.s.SetTutor(ex.V("s"), t)
 }
 
 func validateConvention(ex Exchange) error {
 	var b bool
-	ex.inJSON(&b)
+	if err := ex.inJSON(&b); err != nil {
+		return err
+	}
 	return ex.s.ValidateConvention(ex.V("s"), config.Internships{})
 }
 
@@ -374,10 +395,12 @@ func (ed *EndPoints) resetPassword(w http.ResponseWriter, r *http.Request, ps ma
 		status(w, err)
 		return
 	}
+	w.Header().Set("Content-type", "application/json; charset=utf-8")
 	status(w, json.NewEncoder(w).Encode(s))
 }
 
 func (ed *EndPoints) config(w http.ResponseWriter, r *http.Request, ps map[string]string) {
+	w.Header().Set("Content-type", "application/json; charset=utf-8")
 	status(w, json.NewEncoder(w).Encode(ed.organization))
 }
 
@@ -395,5 +418,6 @@ func (ed *EndPoints) newPassword(w http.ResponseWriter, r *http.Request, ps map[
 		status(w, err)
 		return
 	}
+	w.Header().Set("Content-type", "application/json; charset=utf-8")
 	status(w, json.NewEncoder(w).Encode(s))
 }

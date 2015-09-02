@@ -1,0 +1,14 @@
+<tr>
+    <td><input type='checkbox' data-email='{{User.Person.Email}}'/></td>
+    <td class="fn">{{User.Person.Lastname}}</td>
+    <td class="fn">{{User.Person.Firstname}}</td>
+    <td><a href="mailto:{{User.Person.Email}}">{{User.Person.Email}}</a></td>
+    <td><a data-email="{{User.Person.Email}}" class="editable-promotion" data-type="select" data-value="{{Promotion}}">{{Promotion}}</a></td>
+    <td><a data-email="{{User.Person.Email}}" class="editable-major" data-type="select" data-value="{{Major}}">{{Major}}</a></td>    
+    <td data-text="{{#if Placed}}0{{else}}1{{/if}}">
+    <i class="glyphicon glyphicon-star{{#unless Placed}}-empty{{/unless}}"></i>
+    </td>
+    <td data-text="{{#if Skip}}0{{else}}1{{/if}}">
+    <i onclick="updateStudentSkipable('{{User.Person.Email}}',{{#if Skip}}true{{else}}false{{/if}})" class="glyphicon glyphicon-eye-{{#if Skip}}close{{else}}open{{/if}}"></i>
+    </td>
+</tr>

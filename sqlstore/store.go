@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"time"
 
+	"github.com/fhermeni/wints/config"
 	"github.com/fhermeni/wints/schema"
 	"github.com/lib/pq"
 
@@ -12,15 +13,17 @@ import (
 
 //Store allows to communicate with a database
 type Store struct {
-	db    *sql.DB
-	stmts map[string]*stmtErr
+	db     *sql.DB
+	stmts  map[string]*stmtErr
+	config config.Internships
 }
 
 //NewStore initiate the storage servive
-func NewStore(d *sql.DB) (*Store, error) {
+func NewStore(d *sql.DB, config config.Internships) (*Store, error) {
 	s := Store{
-		db:    d,
-		stmts: make(map[string]*stmtErr),
+		db:     d,
+		stmts:  make(map[string]*stmtErr),
+		config: config,
 	}
 	return &s, nil
 }

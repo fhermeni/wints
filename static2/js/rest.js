@@ -44,56 +44,6 @@ function getCookie(name) {
 	if (parts.length == 2) return parts.pop().split(";").shift();
 }
 
-function noCb(no) {
-	if (no != undefined) {
-		return no;
-	}
-	return function() {
-		reportSuccess("Operation successful");
-	};
-}
-
-function restError(no) {
-	return function(jqr) {
-		if (jqr.status == 408) {
-			window.location.href = "/login?#sessionExpired"
-		} else {
-
-			if (no != undefined) {
-				no(jqr)
-			} else {
-				$.notify(jqr.responseText, {
-					className: "danger",
-					globalPosition: "top center"
-				})
-			}
-		}
-	}
-}
-
-function missing(id) {
-	var d = $("#" + id);
-	if (d.val() == "") {
-		d.notify("Required", {
-			autoHide: true,
-			autoHideDelay: 2000
-		});
-		return true;
-	}
-	return false;
-}
-
-function isGrade(v) {
-	if (isNaN(v)) {
-		return "number expected";
-	}
-	var x = parseInt(v)
-	if (x < 0 || x > 20) {
-		return "between 0 and 20, inclusive"
-	}
-	return undefined
-}
-
 function equals(f1, f2) {
 	if ($(f1).val() != $(f2).val()) {
 		reportError(f2, "Password do not match");
@@ -111,7 +61,7 @@ function post(URL, data) {
 		method: "POST",
 		data: JSON.stringify(data),
 		url: ROOT_API + URL,
-	})
+	});
 }
 
 function put(URL, data, ok, no) {
@@ -133,36 +83,36 @@ function del(URL, ok, no) {
 	return $.ajax({
 		method: "DELETE",
 		url: ROOT_API + URL,
-	})
+	});
 }
 
 function signin(login, password) {
 	return post("/signin", {
 		Login: login,
 		Password: password
-	})
+	});
 }
 
 function delSession() {
-	return del("/users/" + myself.Person.Email + "/session")
+	return del("/users/" + myself.Person.Email + "/session");
 }
 
 function resetPassword(email) {
-	return post("/resetPassword", email)
+	return post("/resetPassword", email);
 }
 
 function newPassword(token, passwd) {
 	return post("/newPassword", {
 		Token: token,
 		Password: passwd
-	})
+	});
 }
 
 function sendPassword(current, now) {
 	return post("/users/" + myself.Person.Email + "/password", {
 		Current: current,
 		Now: now
-	})
+	});
 }
 
 function user(email) {
@@ -177,7 +127,7 @@ function internships() {
 	return get("/internships/");
 }
 
-function config() {
+function getConfig() {
 	return get("/config/");
 }
 
@@ -190,14 +140,36 @@ function postNewUser(u) {
 }
 
 function delUser(email) {
-	return del("/users/" + email)
+	return del("/users/" + email);
 }
 
 function postUserRole(email, r) {
 	return post("/users/" + email + "/role", r);
 }
 
+function postStudentMajor(email, m) {
+	return post("/students/" + email + "/major", m);
+}
 
+function postStudentPromotion(email, p) {
+	return post("/students/" + email + "/promotion", p);
+}
+
+function students() {
+	return get("/students/");
+}
+
+function conventions() {
+	return get("/conventions/");
+}
+
+function postStudent(p) {
+	return post("/students/", p)
+}
+
+function postStudentSkippable(stu, skip) {
+	return post("/students/" + stu + "/skip", skip)
+}
 /*function user(email, ok, no) {
 	return get("/users/" + email, ok, no);
 }

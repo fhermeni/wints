@@ -1,0 +1,28 @@
+<div class="modal-dialog">
+<div class="modal-content"> 
+    <div class="modal-body">
+        <button type="button" class="close" aria-hidden="true" onclick="hideModal()">×</button>
+        <legend>{{len Errors}} error</legend>   
+        <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Student</th><th>Email</th><th>Promotion</th><th>Major</th><th>Status</th>
+            </tr>
+        </thead>
+        {{#each Errors}}
+            <tr>
+                <td>{{Student.User.Person.Lastname}}, {{Student.User.Person.Firstname}}</td>
+                <td>{{Student.User.Person.Email}}</td>
+                <td>{{Student.Promotion}}</td>
+                <td>{{Student.Major}}</td>
+                <td>{{Reason}}</td>
+            </tr>
+        {{/each}}
+        </table>
+        <div class="text-right form-group">
+            <button type="button" class="btn btn-default" onclick="hideModal()">Close</button>            
+        </div>
+    </div>    
+</div>    
+</div>
+        

@@ -18,7 +18,7 @@ var (
 	startPasswordRenewal         = "insert into password_renewal(email,token,deadline) values($1,$2,$3)"
 	updateLastVisit              = "update users set lastVisit=$1 where email=$2"
 	updateUserProfile            = "update users set firstname=$1, lastname=$2, tel=$3 where email=$4"
-	updateUserRole               = "update users set role=$2 where email=$1"
+	updateUserRole               = "update users set role=$2 where email=$1 and role != 1" //cannot change the role of a student
 	updateUserPassword           = "update users set password=$2 where email=$1"
 	deletePasswordRenewalRequest = "delete from password_renewal where email=$1"
 	deleteUser                   = "DELETE FROM users where email=$1"

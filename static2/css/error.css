@@ -13,20 +13,20 @@
 	color: #fff;
 }
 
-.popover-error .popover.right>.arrow:after {
+.popover.right>.arrow:after {
+	border-left-color: #d9534f;
+}
+
+.popover.top>.arrow:after {
+	border-bottom-color: #d9534f;
+}
+
+.popover.bottom>.arrow:after {
+	border-top-color: #d9534f;
+}
+
+.popover.left>.arrow:after {
 	border-right-color: #d9534f;
-}
-
-.popover-error .popover.top>.arrow:after {
-	border-top-color: #d9534f;
-}
-
-.popover-error .popover.bottom>.arrow:after {
-	border-top-color: #d9534f;
-}
-
-.popover-error .popover.left>.arrow:after {
-	border-top-color: #d9534f;
 }
 
 .popover-warning .popover-content {
@@ -42,9 +42,30 @@
 }
 
 .popover-warning.bottom>.arrow:after {
-	border-top-color: #f0ad4e;
+	border-bottom-color: #f0ad4e;
 }
 
 .popover-warning.left>.arrow:after {
-	border-top-color: #f0ad4e;
+	border-left-color: #f0ad4e;
+}
+
+
+.editable-container .popover-content {
+	background-color: inherit;	
+}
+
+.editable-container.right>.arrow:after {
+	background-color: inherit;	
+}
+
+.editable-container.top>.arrow:after {
+	background-color: inherit;	
+}
+
+.editable-container.bottom>.arrow:after {
+	background-color: inherit;	
+}
+
+.editable-container.left>.arrow:after {
+	background-color: inherit;	
 }

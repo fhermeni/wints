@@ -1,3 +1,5 @@
+var config;
+
 $(document).ready(function() {
 	waitingBlock = $("#cnt").clone().html();
 
@@ -6,6 +8,9 @@ $(document).ready(function() {
 	$.tablesorter.defaults.theme = 'bootstrap';
 	$.tablesorter.defaults.headerTemplate = '{content} {icon}';
 
+	getConfig().done(function(c) {
+		config = c;
+	})
 	user(getCookie("login")).done(loadSuccess).fail(function() {
 		window.location.href = "/login";
 	});
@@ -40,29 +45,56 @@ function showModal() {
 function ui() {
 
 	$("#cnt").find(".tablesorter").tablesorter();
-	$('#cnt').find('[data-toggle="popover"]').popover()
-	$('#cnt').find('[data-toggle="confirmation"]').confirmation()
+	$('#cnt').find('[data-toggle="popover"]').popover();
+	$('#cnt').find('[data-toggle="confirmation"]').confirmation();
 
 	$("#cnt").find(".shiftSelectable").shiftSelectable();
 	$("#cnt").find("table").bind("sortEnd", function() {
 		$("#cnt").find('.shiftSelectable').shiftSelectable();
-	})
+	});
+
+	$("#cnt").find(".editable-role").each(function(i, e) {
+		$(e).editable({
+			source: editableRoles(),
+			url: function(p) {
+				return postUserRole($(e).data("user"), parseInt(p.value));
+			}
+		});
+	});
+
+	$("#cnt").find(".editable-promotion").each(function(i, e) {
+		$(e).editable({
+			source: editablePromotions(),
+			url: function(p) {
+				return postStudentPromotion($(e).data("email"), p.value);
+			}
+		});
+	});
+
+	$("#cnt").find(".editable-major").each(function(i, e) {
+		$(e).editable({
+			source: editableMajors(),
+			url: function(m) {
+				return postStudentMajor($(e).data("email"), m.value);
+			}
+		});
+	});
 }
 
 function hideModal() {
-	$('#modal').find('[data-toggle="popover"]').popover('destroy')
-	$("#modal").modal("hide")
+	$('#modal').find('[data-toggle="popover"]').popover('destroy');
+	$("#modal").modal("hide");
 }
 
 function showWatchlist() {
-	$.when(internships(), config()).then(loadWatchlist);
+	internships().done(loadWatchlist);
 }
 
-function loadWatchlist(interns, organization) {
+function loadWatchlist(interns) {
 	$("#cnt").render("watchlist", {
-		Internships: interns[0],
-		Org: organization[0]
-	})
+		Internships: interns,
+		Org: config
+	});
 }
 
 function logFail(xhr) {

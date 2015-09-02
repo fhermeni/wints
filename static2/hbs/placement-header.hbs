@@ -1,0 +1,23 @@
+<h3>Students(s)</h3>
+
+<span class="btn btn-success btn-sm btn-file">
+    <i class="glyphicon glyphicon-plus"></i> Import <input id="csv-import" type="file">
+</span>
+	<a id="import-status" class="btn btn-danger btn-sm hidden" onclick="showImportError()">Show import errors</a>
+<!--<button type="button" class="btn btn-default btn-sm" onclick="serviceMailing()">
+    <i class="glyphicon glyphicon-envelope"></i> mail selection
+</button>
+-->
+<table class="table table-hover tablesorter" id="table-placement" data-sortlist="[[1,0]]">
+<thead>
+    <tr>
+        <th class="sorter-false"></th>
+        <th>Lastname</th><th>Firstname</th><th>Email</th><th>Promotion</th><th>Major</th><th>Placed ?</th><th>Status</th>
+    </tr>
+</thead>
+<tbody>
+{{#each this}}
+    {{> placement-student this}}
+{{/each}}
+</tbody>
+</table>

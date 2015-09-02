@@ -81,11 +81,20 @@ func (s *Store) Students() ([]schema.Student, error) {
 	return students, err
 }
 
-//ToStudent convert a user account to a student account
-func (s *Store) ToStudent(email, major, promotion string, male bool) error {
+func (s *Store) NewStudent(p schema.Person, major, promotion string, male bool) error {
+	if !s.config.ValidMajor(major) {
+		return schema.ErrInvalidMajor
+	}
+	if !s.config.ValidPromotion(promotion) {
+		return schema.ErrInvalidPromotion
+	}
 	tx := newTxErr(s.db)
-	tx.Update(insertStudent, email, male, major, promotion, false)
-	tx.Update(updateUserRole, email, schema.STUDENT)
+	u := schema.User{
+		Person: p,
+		Role:   schema.STUDENT,
+	}
+	s.addUser(&tx, u)
+	tx.Update(insertStudent, p.Email, male, major, promotion, false)
 	return tx.Done()
 }
 
@@ -96,11 +105,17 @@ func (s *Store) SetStudentSkippable(em string, st bool) error {
 
 //SetPromotion updates the student promotion
 func (s *Store) SetPromotion(stu, p string) error {
+	if !s.config.ValidPromotion(p) {
+		return schema.ErrInvalidPromotion
+	}
 	return s.singleUpdate(setPromotion, schema.ErrUnknownStudent, stu, p)
 }
 
 //SetMajor updates the student major
 func (s *Store) SetMajor(stu, m string) error {
+	if !s.config.ValidMajor(m) {
+		return schema.ErrInvalidMajor
+	}
 	return s.singleUpdate(setMajor, schema.ErrUnknownStudent, stu, m)
 }
 

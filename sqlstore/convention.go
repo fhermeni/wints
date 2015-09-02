@@ -19,7 +19,7 @@ var (
 	selectConventions    = "select stup.firstname, stup.lastname, stup.tel, stup.email, stup.lastVisit, " +
 		"students.male, students.promotion, students.major, students.nextPosition, students.nextContact, students.skip," +
 		"tutp.firstname, tutp.lastname, tutp.tel, tutp.email, tutp.lastVisit, tutp.role, " +
-		"startTime, endTime, companyName, companyWWW, title, creation, foreignCountry, lab, gratification, skip, valid," +
+		"startTime, endTime, companyName, companyWWW, title, creation, foreignCountry, lab, gratification, conventions.skip, valid," +
 		"supervisorFn, supervisorLn, supervisorEmail, supervisorTel " +
 		"from conventions " +
 		" inner join students on (students.email = conventions.student) " +

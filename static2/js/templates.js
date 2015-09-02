@@ -66,7 +66,7 @@ $.handlebars({
 	templatePath: '/static/hbs/',
 	templateExtension: 'hbs',
 	partialPath: '/static/hbs',
-	partials: ['users-user']
+	partials: ['users-user', 'placement-student']
 });
 
 Handlebars.registerHelper('len', function(a) {
@@ -96,12 +96,51 @@ function editableRoles() {
 	}
 	return res;
 }
+
+function editablePromotions() {
+	var res = [];
+	config.Promotions.forEach(function(p) {
+		res.push({
+			"value": p,
+			"text": p
+		});
+	})
+	return res;
+}
+
+function editableMajors() {
+	var res = [];
+	config.Majors.forEach(function(p) {
+		res.push({
+			"value": p,
+			"text": p
+		});
+	})
+	return res;
+}
+
 Handlebars.registerHelper('roleSelect', function(m) {
 	var b = "";
 	for (i = 2; i < roles.length; i++) {
 		b += "<option value='" + i + "'>" + roles[i] + "</option>";
 	}
 	return new Handlebars.SafeString(b);
+});
+
+
+Handlebars.registerHelper('minRole', function(r, opts) {
+	console.log(r)
+	if (myself.Role >= r)
+		return opts.fn(this);
+	else
+		return opts.inverse(this);
+});
+
+Handlebars.registerHelper('student', function(r, opts) {
+	if (r == 1)
+		return opts.fn(this);
+	else
+		return opts.inverse(this);
 });
 
 /*

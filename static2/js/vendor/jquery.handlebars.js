@@ -31,7 +31,8 @@
 
 	function registerPartial(path, name) {
 		$.get(resolvePartialPath(path), function(partial) {
-			Handlebars.registerPartial(name, partial);
+			//console.log(Handlebars.compile(partial))
+			Handlebars.registerPartial(name, Handlebars.compile(partial));
 		}, 'text');
 	}
 

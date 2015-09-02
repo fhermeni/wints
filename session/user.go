@@ -62,3 +62,11 @@ func (s *Session) NewUser(p schema.Person, role schema.Privilege) error {
 	}
 	return ErrPermission
 }
+
+//NewStudent creates a new student account if the emitter is an admin at least
+func (s *Session) NewStudent(p schema.Person, major, promotion string, male bool) error {
+	if s.Role() >= schema.ADMIN {
+		return s.store.NewStudent(p, major, promotion, male)
+	}
+	return ErrPermission
+}

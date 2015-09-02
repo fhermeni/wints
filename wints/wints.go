@@ -47,7 +47,7 @@ func main() {
 	if err != nil {
 		log.Fatalln("Unable to connect to the Database: " + err.Error())
 	}
-	store, _ := sqlstore.NewStore(DB)
+	store, _ := sqlstore.NewStore(DB, cfg.Internships)
 
 	if len(*makeRoot) > 0 {
 		inviteRoot(store, *makeRoot)

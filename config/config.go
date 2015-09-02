@@ -56,9 +56,26 @@ type Journal struct {
 
 //Internships declare the internship organization
 type Internships struct {
-	Majors  []string
-	Reports map[string]Report
-	Surveys map[string]Survey
+	Majors     []string
+	Promotions []string
+	Reports    map[string]Report
+	Surveys    map[string]Survey
+}
+
+func contains(s []string, v string) bool {
+	for _, x := range s {
+		if x == v {
+			return true
+		}
+	}
+	return false
+}
+func (i Internships) ValidMajor(m string) bool {
+	return contains(i.Majors, m)
+}
+
+func (i Internships) ValidPromotion(p string) bool {
+	return contains(i.Promotions, p)
 }
 
 //Report configures a report definition
