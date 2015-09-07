@@ -1,12 +1,14 @@
 package feeder
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 
 	"code.google.com/p/go-charset/charset"
+	_ "code.google.com/p/go-charset/data"
 )
 
 //HTTPConventionReader reads conventions that are made available from the Http server
@@ -37,11 +39,18 @@ func (h *HTTPConventionReader) Reader(year int, promotion string) (io.Reader, er
 		return nil, err
 	}
 	req.SetBasicAuth(h.login, h.password)
-
 	res, err := client.Do(req)
+	if res.StatusCode != 200 {
+		return nil, ErrAuthorization
+	}
 	if err != nil {
 		return nil, err
 	}
 	//Convert to utf8
+	//buf, err := ioutil.ReadAll(res.Body)
+	//log.Println(string(buf))
+	//return res.Body, err
 	return charset.NewReader(h.Encoding, res.Body)
 }
+
+var ErrAuthorization = errors.New("Permission denied")

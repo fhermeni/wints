@@ -26,7 +26,7 @@ var (
 	selectPassword               = "select password from users where email=$1"
 	emailFromRenewableToken      = "select email from password_renewal where token=$1"
 	replaceTutorInConventions    = "update conventions set tutor=$2 where tutor=$1"
-	replaceJuryInDefenses        = "update defenseJuries set jury=$2 where tutor=$1"
+	replaceJuryInDefenses        = "update defenseJuries set jury=$2 where jury=$1"
 )
 
 //addUser add the given user.

@@ -66,7 +66,7 @@ $.handlebars({
 	templatePath: '/static/hbs/',
 	templateExtension: 'hbs',
 	partialPath: '/static/hbs',
-	partials: ['users-user', 'placement-student']
+	partials: ['users-user', 'placement-student', 'conventions-convention']
 });
 
 Handlebars.registerHelper('len', function(a) {
@@ -127,17 +127,8 @@ Handlebars.registerHelper('roleSelect', function(m) {
 	return new Handlebars.SafeString(b);
 });
 
-
-Handlebars.registerHelper('minRole', function(r, opts) {
-	console.log(r)
-	if (myself.Role >= r)
-		return opts.fn(this);
-	else
-		return opts.inverse(this);
-});
-
 Handlebars.registerHelper('student', function(r, opts) {
-	if (r == 1)
+	if (r <= 1)
 		return opts.fn(this);
 	else
 		return opts.inverse(this);

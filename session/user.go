@@ -70,3 +70,10 @@ func (s *Session) NewStudent(p schema.Person, major, promotion string, male bool
 	}
 	return ErrPermission
 }
+
+func (s *Session) ReplaceUserWith(src, dst string) error {
+	if s.Role() >= schema.ADMIN {
+		return s.store.ReplaceUserWith(src, dst)
+	}
+	return ErrPermission
+}

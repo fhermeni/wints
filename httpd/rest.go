@@ -38,6 +38,7 @@ func NewEndPoints(store *sqlstore.Store, cfg config.Rest, org config.Internships
 	//Set the endpoints
 	ed.get("/users/", users)
 	ed.post("/users/", newUser)
+	ed.post("/users/:u/email", replaceUser)
 	ed.post("/users/:u/password", setPassword)
 	ed.post("/users/:u/person", setUserPerson)
 	ed.post("/users/:u/role", setUserRole)
@@ -163,6 +164,14 @@ func setUserPerson(ex Exchange) error {
 		return err
 	}
 	return ex.outJSON(p, ex.s.SetUserPerson(p))
+}
+
+func replaceUser(ex Exchange) error {
+	var em string
+	if err := ex.inJSON(&em); err != nil {
+		return err
+	}
+	return ex.s.ReplaceUserWith(ex.V("u"), em)
 }
 
 func setUserRole(ex Exchange) error {

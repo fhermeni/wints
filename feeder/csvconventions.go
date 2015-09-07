@@ -3,14 +3,16 @@ package feeder
 import (
 	"encoding/csv"
 	"io"
+	"log"
 	"regexp"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/fhermeni/wints/internship"
-	"github.com/fhermeni/wints/journal"
+	//"github.com/fhermeni/wints/journal"
+	"github.com/fhermeni/wints/schema"
+	"github.com/fhermeni/wints/sqlstore"
 )
 
 const (
@@ -47,7 +49,7 @@ var (
 
 //CsvConventions parses conventions from CSV files
 type CsvConventions struct {
-	j          journal.Journal
+	//j          journal.Journal
 	Reader     ConventionReader
 	Year       int
 	promotions []string
@@ -55,16 +57,16 @@ type CsvConventions struct {
 
 //NewCsvConventions creates an importer from a given reader
 //By default, the parsed year is the current year
-func NewCsvConventions(r ConventionReader, j journal.Journal, promotions []string) *CsvConventions {
+func NewCsvConventions(r ConventionReader, promotions []string) *CsvConventions {
 	return &CsvConventions{
-		Reader:     r,
-		j:          j,
+		Reader: r,
+		//j:          j,
 		promotions: promotions,
 		Year:       time.Now().Year()}
 }
 
-func cleanPerson(fn, ln, email, tel string) internship.Person {
-	return internship.Person{
+func cleanPerson(fn, ln, email, tel string) schema.Person {
+	return schema.Person{
 		Firstname: clean(fn),
 		Lastname:  clean(ln),
 		Email:     clean(email),
@@ -72,11 +74,11 @@ func cleanPerson(fn, ln, email, tel string) internship.Person {
 	}
 }
 
-func cleanCompany(name, WWW string) internship.Company {
+func cleanCompany(name, WWW string) schema.Company {
 	if len(WWW) != 0 && !strings.HasPrefix(WWW, "http") {
 		WWW = "http://" + WWW
 	}
-	return internship.Company{
+	return schema.Company{
 		Name: clean(name),
 		WWW:  clean(WWW),
 	}
@@ -87,7 +89,8 @@ func clean(str string) string {
 }
 
 func (f *CsvConventions) log(msg string, err error) {
-	f.j.Log("feeder", msg, err)
+	log.Println(msg + " - " + err.Error())
+	//	f.j.Log("feeder", msg, err)
 }
 
 func cleanInt(str string) int {
@@ -102,14 +105,13 @@ func cleanInt(str string) int {
 	}
 	return i
 }
-func (f *CsvConventions) scan(prom string, s internship.Adder) error {
+func (f *CsvConventions) scan(prom string, s *sqlstore.Store) error {
 	r, err := f.Reader.Reader(f.Year, prom)
 	if err != nil {
 		return err
 	}
 	in := csv.NewReader(r)
 	in.Comma = ';'
-
 	//Get rid of the header
 	in.Read()
 
@@ -119,6 +121,7 @@ func (f *CsvConventions) scan(prom string, s internship.Adder) error {
 		if err == io.EOF {
 			break
 		} else if err != nil {
+			log.Println("buggy")
 			return err
 		}
 		student := cleanPerson(record[stuFn], record[stuLn], record[stuEmail], record[stuTel])
@@ -143,8 +146,10 @@ func (f *CsvConventions) scan(prom string, s internship.Adder) error {
 			return err
 		}
 		//The to-valid users
-		s.NewUser(tutor.Firstname, tutor.Lastname, tutor.Tel, tutor.Email)
-		s.NewUser(student.Firstname, student.Lastname, student.Tel, student.Email)
+		s.NewUser(tutor, schema.NONE)
+		//s.NewUser(student, schema.NONE)
+		s.NewStudent(student, "al", "si", male)
+		s.SetUserRole(student.Email, schema.NONE)
 		s.SetMale(student.Email, male)
 		s.NewConvention(student.Email,
 			startTime,
@@ -163,13 +168,16 @@ func (f *CsvConventions) scan(prom string, s internship.Adder) error {
 }
 
 //Import imports all the conventions by requesting in parallal the conventions for each registered promotions
-func (f *CsvConventions) Import(s internship.Adder) error {
+func (f *CsvConventions) Import(s *sqlstore.Store) error {
 	errors := make([]error, len(f.promotions))
 	var wg sync.WaitGroup
 	for i, prom := range f.promotions {
 		wg.Add(1)
 		go func(i int, p string) {
 			err := f.scan(p, s)
+			if err != nil {
+				log.Println("Import " + p + ": " + err.Error())
+			}
 			errors[i] = err
 		}(i, prom)
 	}

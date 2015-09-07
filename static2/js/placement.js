@@ -8,11 +8,10 @@ $(document).on('change', '.btn-file :file', function() {
 
 //Ignored: XX
 //Errors: {foo: bar}
-var stats
+var stats;
 
 function showPlacementStatus() {
 	$.when(students(), conventions()).done(loadPlacementStatus).fail(logFail)
-		//students().done(loadPlacementStatus).fail(logFail)
 }
 
 

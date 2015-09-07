@@ -19,8 +19,8 @@ function empty() {
 			reportError(arguments[i], "required");
 			count++;
 		} else {
-			$(arguments[i]).closest(".form-group").removeClass("has-error")
-			$(arguments[i]).popover("hide")
+			$(arguments[i]).closest(".form-group").removeClass("has-error");
+			$(arguments[i]).popover("hide");
 		}
 	}
 	return count != 0;
@@ -29,7 +29,7 @@ function empty() {
 function reportError(id, message) {
 	var popover = $(id).data('bs.popover')
 	if (popover) {
-		popover.options.content = message
+		popover.options.content = message;
 	}
 	$(id).popover({
 		template: '<div class="popover popover-error" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>'
@@ -164,11 +164,15 @@ function conventions() {
 }
 
 function postStudent(p) {
-	return post("/students/", p)
+	return post("/students/", p);
 }
 
 function postStudentSkippable(stu, skip) {
-	return post("/students/" + stu + "/skip", skip)
+	return post("/students/" + stu + "/skip", skip);
+}
+
+function replaceUserWith(src, dst) {
+	return post("/users/" + src + "/email", dst);
 }
 /*function user(email, ok, no) {
 	return get("/users/" + email, ok, no);

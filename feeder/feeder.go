@@ -6,20 +6,15 @@ package feeder
 import (
 	"io"
 
-	"github.com/fhermeni/wints/internship"
+	"github.com/fhermeni/wints/sqlstore"
 )
 
 //Importer imports data into the system
 type Importer interface {
-	Import(s internship.Adder) error
+	Import(s *sqlstore.Store) error
 }
 
 //ConventionReader interfaces the source where to read conventions
 type ConventionReader interface {
 	Reader(year int, promotion string) (io.Reader, error)
-}
-
-//StudentReader interfaces the source where to extract students
-type StudentReader interface {
-	Reader() (io.Reader, error)
 }

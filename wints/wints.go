@@ -5,13 +5,14 @@ import (
 	"flag"
 	"log"
 	"os"
+	"time"
 
 	"github.com/BurntSushi/toml"
 	"github.com/fhermeni/wints/config"
+	"github.com/fhermeni/wints/feeder"
 	"github.com/fhermeni/wints/httpd"
 	"github.com/fhermeni/wints/schema"
 	"github.com/fhermeni/wints/sqlstore"
-
 	_ "github.com/lib/pq"
 )
 
@@ -31,8 +32,36 @@ func inviteRoot(store *sqlstore.Store, em string) error {
 	//{{.WWW}}/resetPassword?token={{.Token}}
 	log.Println(cfg.HTTPd.WWW + "/password.html?resetToken=" + string(tok))
 	return nil
-
 }
+
+func newConventionReader(cfg config.Feeder) feeder.ConventionReader {
+	reader := feeder.NewHTTPConventionReader(cfg.URL, cfg.Login, cfg.Password)
+	reader.Encoding = cfg.Encoding
+	return reader
+}
+
+func startFeeder(cfg config.Feeder, store *sqlstore.Store) {
+
+	r := feeder.NewHTTPConventionReader(cfg.URL, cfg.Login, cfg.Password)
+	r.Encoding = cfg.Encoding
+
+	f := feeder.NewCsvConventions(r, cfg.Promotions)
+	go f.Import(store)
+	ticker := time.NewTicker(cfg.Frequency.Duration)
+	quit := make(chan struct{})
+	go func() {
+		for {
+			select {
+			case <-ticker.C:
+				f.Import(store)
+			case <-quit:
+				ticker.Stop()
+				return
+			}
+		}
+	}()
+}
+
 func main() {
 
 	makeRoot := flag.String("invite-root", "", "Invite a root user")
@@ -54,6 +83,9 @@ func main() {
 		os.Exit(0)
 	}
 
+	//the feeder
+	startFeeder(cfg.Feeder, store)
+	log.Println("Convention feeder started")
 	httpd := httpd.NewHTTPd(store, cfg.HTTPd, cfg.Internships)
 	log.Fatalf("%s\n", httpd.Listen())
 }
