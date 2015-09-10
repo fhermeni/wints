@@ -193,7 +193,8 @@ var possiblePositions = [
 	"fixed term contract in another company",
 	"permanent contract in the internship company",
 	"permanent contract in another company",
-	"entrepreneurship"
+	"entrepreneurship",
+	"repeat the year"
 ];
 
 function editablePossiblePositions() {

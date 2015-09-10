@@ -594,10 +594,11 @@ var possiblePositions = [
 	"fixed term contract in another company",
 	"permanent contract in the internship company",
 	"permanent contract in another company",
-	"entrepreneurship"
+	"entrepreneurship",
+	"repeat the year"
 ];
 
-var colors = ["#4D4D4D", "#5DA5DA", '#FAA43A', '#60BD68', '#F17CB0', '#B2912F', '#B276B2', '#DECF3F', '#F15854'];
+var colors = ["#4D4D4D", "#5DA5DA", '#FAA43A', '#60BD68', '#F17CB0', '#B2912F', '#B276B2', '#DECF3F', '#F15854', "#DDDDDD"];
 
 function showAlumni(filter) {
 	if (!filter) filter = "all"

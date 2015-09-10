@@ -32,7 +32,7 @@ func (srv *Service) DefenseSession(student string) (internship.DefenseSession, e
 	var grade sql.NullInt64
 	if rows.Next() {
 		if err = rows.Scan(&stu.Firstname, &stu.Lastname, &stu.Tel, &stu.Email, &def.Major, &def.Promotion, &cpy.Name, &cpy.WWW, &def.Title, &session.Date, &session.Room, &def.Offset, &def.Private, &def.Remote, &grade); err != nil {
-			return session, nil
+			return session, err
 		}
 		def.Student = stu
 		def.Cpy = cpy
@@ -43,7 +43,7 @@ func (srv *Service) DefenseSession(student string) (internship.DefenseSession, e
 		}
 		def.Surveys, err = srv.surveys(student)
 		if err != nil {
-			return session, nil
+			return session, err
 		}
 		session.Defenses = []internship.Defense{def}
 	}
