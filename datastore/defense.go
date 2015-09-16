@@ -16,7 +16,7 @@ var pubDefStmt *sql.Stmt
 func (srv *Service) DefenseSession(student string) (internship.DefenseSession, error) {
 	var err error
 	session := internship.DefenseSession{}
-	def := internship.Defense{}
+	def := internship.Defense{Grade: -1}
 	if DefStmt == nil {
 		if DefStmt, err = srv.DB.Prepare("select firstname, lastname, tel, email,major, promotion,company, companyWWW, title, date,room,rank,private,remote,defenseGrades.grade from defenses inner join users on (defenses.student=users.email) inner join internships on (defenses.student=internships.student) left outer join defenseGrades on (defenses.student=defenseGrades.student) where defenses.student=$1"); err != nil {
 			return session, err
@@ -38,12 +38,24 @@ func (srv *Service) DefenseSession(student string) (internship.DefenseSession, e
 		def.Cpy = cpy
 		if grade.Valid {
 			def.Grade = int(grade.Int64)
-		} else {
-			def.Grade = -1
 		}
 		def.Surveys, err = srv.surveys(student)
 		if err != nil {
 			return session, err
+		}
+		session.Defenses = []internship.Defense{def}
+	}
+	if len(session.Defenses) == 0 {
+		//No defense planned, just grab the grade
+		rows, err = srv.DB.Query("select grade from defenseGrades where student=$1", student)
+		if err != nil {
+			return session, err
+		}
+		defer rows.Close()
+		rows.Next()
+		rows.Scan(&grade)
+		if grade.Valid {
+			def.Grade = int(grade.Int64)
 		}
 		session.Defenses = []internship.Defense{def}
 	}

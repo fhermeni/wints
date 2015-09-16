@@ -138,14 +138,16 @@ function delays(kind, type) {
 						d = Math.round(nbDays(del, rev) / 7) //per week
 						dates[d] = dates[d] ? dates[d] + 1 : 1
 					}
-				} else if (moment(from).isBefore(moment(now))) {
+				}
+				/*else if (moment(from).isBefore(moment(now))) {
 					//not delivered
 					if (r.Grade >= 0 || rev.getTime() > 0) {
 						//but reviewed
 						d = Math.round(nbDays(del, rev) / 7) //per week
+						console.log(d);
 						dates[d] = dates[d] ? dates[d] + 1 : 1
 					}
-				}
+				}*/
 			}
 		})
 	});

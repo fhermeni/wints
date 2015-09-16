@@ -96,7 +96,9 @@ As a major leader or an administrator, you can follow the progress of every stud
             {{#if Defense.Defenses}}            
             <td class="text-center {{defenseStatus Defense}}"><a href="#" data-value="{{defenseGrade Defense}}" data-type="text" data-email="{{Student.Email}}" class="grade">{{defenseGrade Defense}}</a></td>
             {{else}}
-            <td class="text-center"><i>n/a</i></td>
+            <td class="text-center {{defenseStatus Defense}}">
+<a href="#" data-value="{{defenseGrade Defense}}" data-type="text" data-email="{{Student.Email}}" class="grade">{{defenseGrade Defense}}</a>
+            </td>
             {{/if}}
             
             {{#if Future.Position}}

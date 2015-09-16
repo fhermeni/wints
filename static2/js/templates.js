@@ -292,6 +292,9 @@ Handlebars.registerHelper('reportStatus', function(r) {
 });
 
 Handlebars.registerHelper('defenseStatus', function(g) {
+	if (!g.Defenses) {
+		return "bg-link";
+	}
 	var passed = new Date(g.Date).getTime() < new Date().getTime()
 	var style = "bg-link";
 	if (g.Defenses[0].Grade >= 0 && g.Defenses[0].Grade < 10) {
@@ -299,7 +302,7 @@ Handlebars.registerHelper('defenseStatus', function(g) {
 	} else if (g.Defenses[0].Grade >= 10) {
 		return "bg-success";
 	} else if (passed) {
-		return "bg-primary"
+		return "bg-info"
 	}
 	return "bg-link"
 });
@@ -312,6 +315,9 @@ Handlebars.registerHelper('defenseGrade3', function(g) {
 });
 
 Handlebars.registerHelper('defenseGrade', function(g) {
+	if (!g.Defenses) {
+		return "-";
+	}
 	d = moment(g.Date).add(30 * g.Defenses[0].Offset)
 	grade = g.Defenses[0].Grade
 	if (grade >= 0) {
