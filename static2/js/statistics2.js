@@ -437,8 +437,12 @@ function grades(kind, filter) {
 }
 
 function surveys(kind) {
+	$("li.surveys").removeClass("active")
+	$("li.surveys-" + kind).addClass("active")
+
 	var all = 0
 	var nb = 0
+	var grades = 0;
 	stats.forEach(function(stat) {
 		stat.Surveys.forEach(function(s) {
 			if (s.Kind != kind) {
@@ -449,6 +453,8 @@ function surveys(kind) {
 				nb++
 				if (kind == "midterm" && q[19] == "true") {
 					all++
+				} else if (kind == "final") {
+					grades += parseInt(q["q17"])
 				}
 			}
 		})
@@ -456,8 +462,14 @@ function surveys(kind) {
 	//Hide when no data
 	if (nb) {
 		var num = Math.round(all / nb * 100)
-		$("#surveys-" + kind).html(num + "%");
-		$("#surveys-" + kind).closest(".hidden").removeClass('hidden')
+		if (kind == "midterm") {
+			$("#surveys").html(num + "%");
+		} else if (kind == "final") {
+			var avg = grades / nb;
+			$("#surveys").html(avg.toFixed(2) + " / 20");
+		}
+		$("#surveys").closest(".hidden ").removeClass('hidden')
+
 	}
 }
 
