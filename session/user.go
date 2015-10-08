@@ -41,7 +41,7 @@ func (s *Session) SetPassword(email string, oldP, newP []byte) error {
 
 //SetUserPerson set the user profile if the emitter is the targeted user
 func (s *Session) SetUserPerson(p schema.Person) error {
-	if s.Myself(p.Email) {
+	if s.Myself(p.Email) || s.Role() >= schema.ADMIN {
 		return s.store.SetUserPerson(p)
 	}
 	return ErrPermission
@@ -74,6 +74,13 @@ func (s *Session) NewStudent(p schema.Person, major, promotion string, male bool
 func (s *Session) ReplaceUserWith(src, dst string) error {
 	if s.Role() >= schema.ADMIN {
 		return s.store.ReplaceUserWith(src, dst)
+	}
+	return ErrPermission
+}
+
+func (s *Session) SetEmail(old, cur string) error {
+	if s.Role() >= schema.ADMIN {
+		return s.store.SetEmail(old, cur)
 	}
 	return ErrPermission
 }

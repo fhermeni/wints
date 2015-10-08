@@ -1,23 +1,23 @@
-    <h3>Watched Internship(s)</h3>
+<h3>Watchlist</h3>
 
 <div class="btn-group">
-  <button type="button" class="btn dropdown-toggle btn-sm" data-toggle="dropdown" aria-expanded="false"><i class="glyphicon glyphicon-envelope"></i> mail selection <span class="caret"></span>
+  <button type="button" class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown" aria-expanded="false"><i class="glyphicon glyphicon-envelope"></i> mail selection <span class="caret"></span>
   </button>
   <ul class="dropdown-menu" role="menu">
-    <li><a onclick="mailing('students')">students</a></li>
-    <li><a onclick="mailing('students','tutors')">students (cc tutors)</a></li>        
-    <li><a onclick="mailing('supervisors')">supervisors</a></li>
-    <li><a onclick="mailing('tutors')">tutors</a></li>
+    <li><a onclick="conventionMailing('tbody', 'stu')">students</a></li>
+    <li><a onclick="conventionMailing('tbody', 'stu','tut')">students (cc tutors)</a></li>        
+    <li><a onclick="conventionMailing('tbody', 'sup')">supervisors</a></li>
+    <li><a onclick="conventionMailing('tbody', 'tut')">tutors</a></li>
   </ul>
 </div>
 
 <div class="btn-group">
-  <button type="button" class="btn btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="glyphicon glyphicon-list"></i> fullnames from selection <span class="caret"></span>
+  <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="glyphicon glyphicon-list"></i> fullnames from selection <span class="caret"></span>
   </button>
   <ul class="dropdown-menu" role="menu">
-    <li><a onclick="showRawFullname('students')">Students</a></li>    
-    <li><a onclick="showRawFullname('supervisors')">Supervisors</a></li>
-    <li><a onclick="showRawFullname('tutors')">Tutors</a></li>    
+    <li><a onclick="showRawFullname('tbody', 'stu')">Students</a></li>    
+    <li><a onclick="showRawFullname('tbody','sup')">Supervisors</a></li>
+    <li><a onclick="showRawFullname('tbody','tut')">Tutors</a></li>    
   </ul>
 </div>
 
@@ -40,11 +40,11 @@ As a major leader or an administrator, you can follow the progress of every stud
 <li><span class="color bg-danger"></span>grade &lt; 10</li>
 </ul>
 </div>
-<table class="table table-condensed table-hover tablesorter" id="table-conventions">
-            <thead>
+<table class="table table-hover tablesorter" id="table-conventions">
+    <thead>
     <tr>
         <th class="sorter-false" rowspan="2">
-        <input type='checkbox' data-toggle='checkbox' class='icheckbox_flat check_all'/>
+        <input type='checkbox' data-toggle='checkbox' class='globalSelect' data-context="table-conventions"/>
         </th>
         <th rowspan="2">Student</th>
         <th rowspan="2">Promotion</th>
@@ -52,8 +52,8 @@ As a major leader or an administrator, you can follow the progress of every stud
         <th rowspan="2" >Tutor</th>
         <th class="sorter-false text-center" colspan="{{len Org.Reports}}">Reports</th>
         <th class="sorter-false text-center" colspan="{{len Org.Surveys}}">Surveys</th>
-        <th rowspan="2" >def</th>
-        <th rowspan="2">alumni</th>
+        <th rowspan="2" >Def</th>
+        <th rowspan="2">Alumni</th>
     </tr>
     <tr>        
         {{#each Org.Reports}}        
@@ -68,24 +68,26 @@ As a major leader or an administrator, you can follow the progress of every stud
         {{#each Internships}}    
         <tr>
             <td>
-            <input type='checkbox' class='icheckbox_flat' data-email='{{Student.Email}}'/>  
+            <input class="shiftSelectable" type='checkbox'
+ data-stu='{{Convention.Student.User.Person.Email}}' data-stu-fn='{{fullname Convention.Student.User.Person true}}'
+ data-tut='{{Convention.Tutor.Person.Email}}' data-tut-fn='{{fullname Convention.Tutor.Person true}}'
+ data-sup='{{Convention.Supervisor.Email}}' data-sup-fn='{{fullname Convention.Supervisor true}}'/>  
             </td>
             <td>
-            <a class='click fn' onclick="showInternship('{{Student.Email}}')">{{shortFullname Student}}</a>
+            <a class='click fn' onclick="showInternship('{{Convention.Student.User.Person.Email}}')">
+            {{fullname Convention.Student.User.Person}}            
             </td>
-            <td>{{shortProm Promotion}}</td>
-            <td><a href="#" class="major" data-email="{{Student.Email}}" data-type="select" data-value="{{Major}}">{{Major}}</a></td>
+            <td>{{Convention.Student.Promotion}}</td>
+            <td>{{Convention.Student.Major}}</td>
             <td>                
-                <a class="fn tutor" href='#' data-type="select" data-value="{{Tutor.Email}}" data-email="{{Student.Email}}" title='{{fullname Tutor}}'>{{shortFullname Tutor}}</a>
+                <a class="fn tutor" href='#' data-type="select" data-value="{{Convention.Tutor.Person.Email}}" data-email="{{Convention.Tutor.Person.Email}}" title='{{fullname Convention.Tutor.Person}}'>{{fullname Convention.Tutor.Person}}</a>
             </td>            
             {{#each Reports}}
-            <td class="click {{reportStatus this}} text-center" data-text="{{gradeAnnotation this}}" onclick="showReport('{{../Student.Email}}', '{{Kind}}')">            
-            {{reportGrade this}}
-            </td>  
+            {{report this ../Convention.Student.User.Person.Email}}
             {{/each}}            
             
             {{#each Surveys}}
-            <td onclick="window.open('/surveys/{{Kind}}?student={{../Student.Email}}&kind={{Kind}}','_blank')" class="{{surveyStatus this}} text-center click" data-text="{{surveyAnnotation this}}">{{surveyGrade this}}</td>
+            {{survey this ../Convention.Student.User.Person.Email}}
             {{/each}}
 
             {{#if Defense.Defenses}}            
@@ -93,8 +95,8 @@ As a major leader or an administrator, you can follow the progress of every stud
             {{else}}
             <td class="text-center"><i>n/a</i></td>
             {{/if}}
-            
-            {{#if Future.Position}}
+                        
+            {{#if Convention.Student.Alumni}}
             <td class="text-center" data-text="1"><i class="glyphicon glyphicon-star-empty"></i></td>
             {{else}}
             <td class="text-center" data-text="0"></td>           

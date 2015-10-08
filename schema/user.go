@@ -51,8 +51,11 @@ type User struct {
 
 //Alumni denotes the basic information for a student future
 type Alumni struct {
-	Contact  string
-	Position int
+	Contact     string
+	Position    string
+	France      bool
+	Permanent   bool
+	SameCompany bool
 }
 
 //Student denotes a student that as a promotion, a major.
@@ -60,7 +63,7 @@ type Student struct {
 	User      User
 	Promotion string
 	Major     string
-	Alumni    Alumni
+	Alumni    *Alumni `,json:"omitempty"`
 	//Skip indicates we don't care about this student. Might left the school for example
 	Skip bool
 	Male bool

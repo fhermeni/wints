@@ -3,12 +3,14 @@ package httpd
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/dimfeld/httptreemux"
 	"github.com/fhermeni/wints/config"
+	"github.com/fhermeni/wints/feeder"
 	"github.com/fhermeni/wints/schema"
 	"github.com/fhermeni/wints/session"
 	"github.com/fhermeni/wints/sqlstore"
@@ -19,18 +21,20 @@ type EndPoints struct {
 	router       *httptreemux.TreeMux
 	prefix       string
 	store        *sqlstore.Store
+	conventions  feeder.Conventions
 	cfg          config.Rest
 	organization config.Internships
 }
 
 //NewEndPoints creates new prefixed endpoints
-func NewEndPoints(store *sqlstore.Store, cfg config.Rest, org config.Internships) EndPoints {
+func NewEndPoints(store *sqlstore.Store, convs feeder.Conventions, cfg config.Rest, org config.Internships) EndPoints {
 	ed := EndPoints{
 		store:        store,
 		router:       httptreemux.New(),
 		prefix:       strings.TrimSuffix(cfg.Prefix, "/"),
 		cfg:          cfg,
 		organization: org,
+		conventions:  convs,
 	}
 	ed.router.NotFoundHandler = func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "", http.StatusNotFound)
@@ -38,7 +42,7 @@ func NewEndPoints(store *sqlstore.Store, cfg config.Rest, org config.Internships
 	//Set the endpoints
 	ed.get("/users/", users)
 	ed.post("/users/", newUser)
-	ed.post("/users/:u/email", replaceUser)
+	ed.post("/users/:u/email", setEmail)
 	ed.post("/users/:u/password", setPassword)
 	ed.post("/users/:u/person", setUserPerson)
 	ed.post("/users/:u/role", setUserRole)
@@ -48,14 +52,17 @@ func NewEndPoints(store *sqlstore.Store, cfg config.Rest, org config.Internships
 	ed.post("/students/:s/major", setMajor)
 	ed.post("/students/:s/promotion", setPromotion)
 	ed.post("/students/:s/male", setMale)
-	ed.post("/students/:s/alumni/contact", setNextContact)
-	ed.post("/students/:s/alumni/position", setNextPosition)
+	ed.post("/students/:s/alumni", setAlumni)
 	ed.post("/students/:s/skip", setStudentSkippable)
 	ed.get("/students/", students)
 	ed.post("/students/", newStudent)
 
 	ed.get("/internships/", internships)
 	ed.get("/internships/:s/", internship)
+	ed.post("/internships/:s/company", setCompany)
+	ed.post("/internships/:s/supervisor", setSupervisor)
+	ed.post("/internships/:s/tutor", setTutor)
+	ed.post("/internships/", ed.newInternship)
 
 	ed.get("/reports/:s/:k/content", reportContent)
 	ed.post("/reports/:s/:k/content", setReportContent)
@@ -64,12 +71,6 @@ func NewEndPoints(store *sqlstore.Store, cfg config.Rest, org config.Internships
 	ed.post("/reports/:s/:k/private", setReportPrivacy)
 
 	ed.get("/conventions/", conventions)
-	ed.post("/conventions/:s/company", setCompany)
-	ed.post("/conventions/:s/skip", setConventionSkippable)
-	ed.post("/conventions/:s/supervisor", setSupervisor)
-	ed.post("/conventions/:s/title", setTitle)
-	ed.post("/conventions/:s/tutor", setTutor)
-	ed.post("/conventions/:s/valid", validateConvention)
 
 	ed.router.POST(ed.prefix+"/signin", ed.signin)
 	ed.router.POST(ed.prefix+"/resetPassword", ed.resetPassword)
@@ -106,7 +107,7 @@ func (ed *EndPoints) openSession(w http.ResponseWriter, r *http.Request) (sessio
 	if err != nil {
 		return session.Session{}, err
 	}
-	return session.NewSession(user, ed.store), err
+	return session.NewSession(user, ed.store, ed.conventions), err
 }
 
 func (ed *EndPoints) wrap(fn EndPoint) httptreemux.HandlerFunc {
@@ -174,6 +175,14 @@ func replaceUser(ex Exchange) error {
 	return ex.s.ReplaceUserWith(ex.V("u"), em)
 }
 
+func setEmail(ex Exchange) error {
+	var em string
+	if err := ex.inJSON(&em); err != nil {
+		return err
+	}
+	return ex.s.SetEmail(ex.V("u"), em)
+}
+
 func setUserRole(ex Exchange) error {
 	var p schema.Privilege
 	if err := ex.inJSON(&p); err != nil {
@@ -206,20 +215,13 @@ func setMale(ex Exchange) error {
 	return ex.s.SetMale(ex.V("s"), m)
 }
 
-func setNextContact(ex Exchange) error {
-	var c string
-	if err := ex.inJSON(&c); err != nil {
+func setAlumni(ex Exchange) error {
+	var a schema.Alumni
+	if err := ex.inJSON(&a); err != nil {
 		return err
 	}
-	return ex.s.SetNextContact(ex.V("s"), c)
-}
-
-func setNextPosition(ex Exchange) error {
-	var p int
-	if err := ex.inJSON(&p); err != nil {
-		return err
-	}
-	return ex.s.SetNextPosition(ex.V("s"), p)
+	err := ex.s.SetAlumni(ex.V("s"), a)
+	return ex.outJSON(a, err)
 }
 
 func setStudentSkippable(ex Exchange) error {
@@ -240,6 +242,7 @@ func newStudent(ex Exchange) error {
 	if err := ex.inJSON(&s); err != nil {
 		return err
 	}
+	s.User.Role = schema.STUDENT
 	err := ex.s.NewStudent(s.User.Person, s.Major, s.Promotion, s.Male)
 	if err != nil {
 		return err
@@ -299,13 +302,8 @@ func conventions(ex Exchange) error {
 func setCompany(ex Exchange) error {
 	var c schema.Company
 	ex.inJSON(&c)
-	return ex.s.SetCompany(ex.V("s"), c)
-}
-
-func setConventionSkippable(ex Exchange) error {
-	var b bool
-	ex.inJSON(&b)
-	return ex.s.SetConventionSkippable(ex.V("s"), b)
+	err := ex.s.SetCompany(ex.V("s"), c)
+	return ex.outJSON(c, err)
 }
 
 func setSupervisor(ex Exchange) error {
@@ -313,15 +311,8 @@ func setSupervisor(ex Exchange) error {
 	if err := ex.inJSON(&p); err != nil {
 		return err
 	}
-	return ex.s.SetSupervisor(ex.V("s"), p)
-}
-
-func setTitle(ex Exchange) error {
-	var t string
-	if err := ex.inJSON(&t); err != nil {
-		return err
-	}
-	return ex.s.SetTitle(ex.V("s"), t)
+	err := ex.s.SetSupervisor(ex.V("s"), p)
+	return ex.outJSON(p, err)
 }
 
 func setTutor(ex Exchange) error {
@@ -332,12 +323,13 @@ func setTutor(ex Exchange) error {
 	return ex.s.SetTutor(ex.V("s"), t)
 }
 
-func validateConvention(ex Exchange) error {
-	var b bool
-	if err := ex.inJSON(&b); err != nil {
+func (ed *EndPoints) newInternship(ex Exchange) error {
+	var c schema.Convention
+	if err := ex.inJSON(&c); err != nil {
 		return err
 	}
-	return ex.s.ValidateConvention(ex.V("s"), config.Internships{})
+	i, err := ex.s.NewInternship(c, ed.organization)
+	return ex.outJSON(i, err)
 }
 
 func (ed *EndPoints) delSession(ex Exchange) error {
@@ -404,6 +396,7 @@ func (ed *EndPoints) resetPassword(w http.ResponseWriter, r *http.Request, ps ma
 		status(w, err)
 		return
 	}
+	log.Println(string(s))
 	w.Header().Set("Content-type", "application/json; charset=utf-8")
 	status(w, json.NewEncoder(w).Encode(s))
 }

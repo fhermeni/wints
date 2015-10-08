@@ -8,6 +8,8 @@ type Company struct {
 	Name string
 	//The company website
 	WWW string
+	//The job title
+	Title string
 }
 
 //Convention declares a student convention
@@ -19,7 +21,6 @@ type Convention struct {
 	Company    Company
 	Begin      time.Time
 	End        time.Time
-	Title      string
 	//Ignore this convention (don't managed by wints if true)
 	Skip           bool
 	Valid          bool

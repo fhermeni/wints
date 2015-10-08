@@ -1,18 +1,17 @@
 <tr>
-    <td><input type='checkbox' data-email='{{Email}}'/></td>
-    <td class="fn">{{Person.Lastname}}</td>
-    <td class="fn">{{Person.Firstname}}</td>
+    <td><input type='checkbox' data-email='{{Person.Email}}' data-user-fn='{{fullname Person true}}' class="shiftSelectable"/></td>
+    <td class="fn" onclick="showProfileEditor('{{Person.Email}}')">{{fullname Person}}</td>    
     <td><a href="mailto:{{Person.Email}}">{{Person.Email}}</a></td>
     <td data-text="{{Role}}">
         {{#student Role}}
         {{role Role}}
         {{else}}
-        <a  data-user="{{Person.Email}}" class="editable-role" data-type="select" data-value="{{Role}}">{{role Role}}</a>
+        <a data-user="{{Person.Email}}" class="editable-role" data-type="select" data-value="{{Role}}">{{role Role}}</a>
         {{/student}}
     </td>
     <td>{{dateFmt LastVisit "DD/MM/YY HH:mm"}}</td>
     <td>
-        <a data-toggle="teacher-reinvite" data-user="{{Person.Email}}" class="pull-left btn btn-info btn-xs glyphicon glyphicon-refresh" title="re-invite ?"></a> 
+        <a data-user="{{Person.Email}}" class="pull-left btn btn-info btn-xs glyphicon glyphicon-refresh" title="re-invite ?" data-toggle="confirmation" data-on-confirm="resetPassword('{{Person.Email}}')"></a> 
         <a tabindex="0" data-trigger="focus" role="button" data-user="{{Person.Email}}" class="pull-right btn btn-xs btn-danger glyphicon glyphicon-remove" data-toggle="confirmation" data-on-confirm='rmUser("{{Person.Email}}")'> </a>       
     </td>
 </tr>

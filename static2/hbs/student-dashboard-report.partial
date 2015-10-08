@@ -1,0 +1,13 @@
+<tr>
+<td>{{Kind}}</td>
+<td>{{dateFmt Deadline "D MMM YYYY HH:mm"}}</td>
+<td>-1</td>
+<td class="text-right">
+	<input type="file" data-kind="{{Kind}}" accept="application/pdf"  title="upload"/><a href="api/v1/internships/{{../Convention.Student.User.Person.Email}}/reports/{{Kind}}/content"
+	   class="btn btn-primary"
+	   title="download">
+	   	<i class="glyphicon glyphicon-cloud-download"></i>
+	</a><button onclick="showReportComment('{{Kind}}')" type="button" class="btn btn-info" title="tutor review">	<i class="glyphicon glyphicon-comment"></i>
+	</button>
+</td>
+</tr>

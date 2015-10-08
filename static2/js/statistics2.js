@@ -138,14 +138,16 @@ function delays(kind, type) {
 						d = Math.round(nbDays(del, rev) / 7) //per week
 						dates[d] = dates[d] ? dates[d] + 1 : 1
 					}
-				} else if (moment(from).isBefore(moment(now))) {
+				}
+				/*else if (moment(from).isBefore(moment(now))) {
 					//not delivered
 					if (r.Grade >= 0 || rev.getTime() > 0) {
 						//but reviewed
 						d = Math.round(nbDays(del, rev) / 7) //per week
+						console.log(d);
 						dates[d] = dates[d] ? dates[d] + 1 : 1
 					}
-				}
+				}*/
 			}
 		})
 	});
@@ -435,8 +437,12 @@ function grades(kind, filter) {
 }
 
 function surveys(kind) {
+	$("li.surveys").removeClass("active")
+	$("li.surveys-" + kind).addClass("active")
+
 	var all = 0
 	var nb = 0
+	var grades = 0;
 	stats.forEach(function(stat) {
 		stat.Surveys.forEach(function(s) {
 			if (s.Kind != kind) {
@@ -447,6 +453,8 @@ function surveys(kind) {
 				nb++
 				if (kind == "midterm" && q[19] == "true") {
 					all++
+				} else if (kind == "final") {
+					grades += parseInt(q["q17"])
 				}
 			}
 		})
@@ -454,8 +462,14 @@ function surveys(kind) {
 	//Hide when no data
 	if (nb) {
 		var num = Math.round(all / nb * 100)
-		$("#surveys-" + kind).html(num + "%");
-		$("#surveys-" + kind).closest(".hidden").removeClass('hidden')
+		if (kind == "midterm") {
+			$("#surveys").html(num + "%");
+		} else if (kind == "final") {
+			var avg = grades / nb;
+			$("#surveys").html(avg.toFixed(2) + " / 20");
+		}
+		$("#surveys").closest(".hidden ").removeClass('hidden')
+
 	}
 }
 
@@ -594,10 +608,11 @@ var possiblePositions = [
 	"fixed term contract in another company",
 	"permanent contract in the internship company",
 	"permanent contract in another company",
-	"entrepreneurship"
+	"entrepreneurship",
+	"repeat the year"
 ];
 
-var colors = ["#4D4D4D", "#5DA5DA", '#FAA43A', '#60BD68', '#F17CB0', '#B2912F', '#B276B2', '#DECF3F', '#F15854'];
+var colors = ["#4D4D4D", "#5DA5DA", '#FAA43A', '#60BD68', '#F17CB0', '#B2912F', '#B276B2', '#DECF3F', '#F15854', "#DDDDDD"];
 
 function showAlumni(filter) {
 	if (!filter) filter = "all"

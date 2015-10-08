@@ -5,13 +5,15 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Wints dashboard</title>    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">    
-    <link rel="stylesheet" href="static/css/vendor/bootswatch.min.css">
+    <link rel="alternate stylesheet" title="super-hero" href="static/css/vendor/bootstrap-superhero.min.css">
+    <link rel="stylesheet" title="yeti" href="static/css/vendor/bootstrap-yeti.min.css">
+    <link rel="alternate stylesheet" title="cosmo" href="static/css/vendor/bootstrap-cosmo.min.css">
+    <link rel="alternate stylesheet" title="sandstone" href="static/css/vendor/bootstrap-sandstone.min.css">
     <link rel="stylesheet" href="static/css/vendor/bootstrap-editable.css">
     <link rel="stylesheet" href="static/css/error.css">
     <link rel="stylesheet" href="static/css/style.css">
 <body>
-    <div class="container">
-        <nav class="navbar navbar-default navbar-embossed navbar-inverse" role="navigation">
+        <nav class="navbar navbar-default navbar-embossed" role="navigation">
             <div class="container-fluid">
                 <div>
                     <ul id="menu-pages" class="nav navbar-nav navbar-left">
@@ -41,55 +43,42 @@
                                 </li>
                             </ul>
                         </li>
-                        <li class="role-1 hidden">
-                            <a onclick="displayMyStudents()"> <i class="glyphicon glyphicon-briefcase"></i>
+                        <li class="role-2 hidden">
+                            <a onclick="showTutored()"> <i class="glyphicon glyphicon-briefcase"></i>
                                 Tutored students
                             </a>
                         </li>
-                        <li class="role-1 hidden">
+                        <li class="role-2 hidden">
                             <a onclick="showMyDefenses()"> <i class="glyphicon glyphicon-facetime-video"> </i>
                             My defenses
                             </a>
                         </li>                        
-                        <li class="role-2 hidden">
+                        <li class="role-3 hidden">
                             <a onclick="showWatchlist();">
                                 <i class="glyphicon glyphicon-eye-open"></i>
                                 Watchlist
                             </a>
                         </li>
-                        <li>
-                            <a class="role-2 hidden" onclick="showAlumni()">
-                                <i class="glyphicon glyphicon-star"></i>
-                                Alumni
-                            </a>
-                        </li>
-                        <li class="role-3 hidden" >
+                        <li class="role-4 hidden" >
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                 <i class="glyphicon glyphicon-wrench"></i>
                                 Manage <b class="caret"></b>
                             </a>
                             <span class="dropdown-arrow"></span>
                             <ul class="dropdown-menu" role="menu">
-                                <li class="role-3 hidden">
-                                    <a onclick="showConventions()">
+                                <li>
+                                    <a onclick="showConventionValidator()">
                                         <i class="glyphicon glyphicon-filter"></i>
-                                        Conventions
-                                        <span id="pending-counter"></span>
+                                        Conventions                                        
                                     </a>
-                                </li>
-                                <li class="role-3 hidden">
-                                    <a onclick="showPlacementStatus()">
-                                        <i class="glyphicon glyphicon-question-sign"></i>
-                                        Students
-                                    </a>
-                                </li>
-                                <li class="role-3 hidden">
+                                </li>                                
+                                <li>
                                     <a onclick="showDefenses()">
                                         <i class="glyphicon glyphicon-calendar"></i>
-                                        Schedule defenses
+                                        Defenses
                                     </a>
                                 </li>
-                                <li class="role-4 hidden" >
+                                <li class="role-5 hidden" >
                                     <a onclick="showUsers()">
                                         <i class="glyphicon glyphicon-user"></i>
                                         Users
@@ -122,6 +111,7 @@
                 </div>
             </div>
         </nav>
+    <div class="container">
 
         <!-- the students I am supervising -->
         <div class="page" id="cnt">
@@ -153,6 +143,8 @@
     <script src="static/js/vendor/bootstrap-confirmation.js"></script>
 
     <script src="static/js/vendor/jquery.shiftSelectable.js"></script>
+
+    <script src="static/js/vendor/bootstrap-filestyle.min.js"></script>
 <!--    
     <script src="static/js/moment-timezone-with-data-2010-2020.min.js"></script>
     <script src="static/js/bootstrap-datepicker.min.js"></script>
@@ -160,21 +152,24 @@
     
     
     
-    <script src="static/js/jquery.sortable.min.js"></script>    
-    <script src="static/js/bootstrap-filestyle.min.js"></script>
+    <script src="static/js/jquery.sortable.min.js"></script>        
 -->
     <script src="static/js/rest.js"></script>    
     <script src="static/js/templates.js"></script>    
     <script src="static/js/home.js"></script>
-    <script src="static/js/profile.js"></script>
+    <script src="static/js/profile.js"></script>    
+    <script src="static/js/mail.js"></script>
+    <script src="static/js/raw.js"></script>
     <script src="static/js/users.js"></script>
-    <script src="static/js/placement.js"></script>
-    <script src="static/js/conventions.js"></script>
+    <script src="static/js/tutored.js"></script>
+    <script src="static/js/watchlist.js"></script>
+    <script src="static/js/convention-validator.js"></script>
+    <script src="static/js/student.js"></script>
 <!--    <script src="static/js/defenses.js"></script>-->
     
     <!--<script src="static/js/student.js"></script>                        -->
 
-    <script>
+<!--    <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
@@ -183,6 +178,6 @@
   ga('create', 'UA-47650251-4', 'auto');
   ga('send', 'pageview');
 
-</script>
+</script>-->
 </body>
 </html>

@@ -4,6 +4,8 @@ import (
 	"io"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 var buf = `
@@ -554,6 +556,7 @@ func (b BufferReader) Reader(year int, promotion string) (io.Reader, error) {
 func TestCSVParsing(t *testing.T) {
 	r := BufferReader{input: buf}
 	x := NewCsvConventions(r, []string{"si5"})
-	x.Import(nil)
-
+	conventions, errors := x.Import()
+	assert.Nil(t, errors)
+	assert.Equal(t, 1, len(conventions))
 }

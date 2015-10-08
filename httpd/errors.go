@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/fhermeni/wints/feeder"
 	"github.com/fhermeni/wints/schema"
 	"github.com/fhermeni/wints/session"
 )
@@ -28,6 +29,9 @@ func status(w http.ResponseWriter, e error) {
 		return
 	case session.ErrPermission, session.ErrConfidentialReport:
 		http.Error(w, e.Error(), http.StatusForbidden)
+		return
+	case feeder.ErrTimeout:
+		http.Error(w, e.Error(), http.StatusRequestTimeout)
 		return
 	case nil:
 		return

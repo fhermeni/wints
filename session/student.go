@@ -10,14 +10,6 @@ func (s *Session) SetStudentSkippable(em string, st bool) error {
 	return ErrPermission
 }
 
-//SetNextContact change the future contact address if the emitter is the student, or a member of the defense jury
-func (s *Session) SetNextContact(student string, em string) error {
-	if s.Myself(student) || s.JuryOf(student) {
-		return s.store.SetNextContact(student, em)
-	}
-	return ErrPermission
-}
-
 //Students lists all the students if the emitter is an admin at least
 func (s *Session) Students() ([]schema.Student, error) {
 	if s.Role() >= schema.ADMIN {
@@ -28,9 +20,9 @@ func (s *Session) Students() ([]schema.Student, error) {
 
 //SetNextPosition changes the student next position if the emitter is the targetted student,
 //the tutor, a member of his jury or a major leader at minimum
-func (s *Session) SetNextPosition(student string, pos int) error {
+func (s *Session) SetAlumni(student string, a schema.Alumni) error {
 	if s.Myself(student) || s.Role() >= schema.MAJOR || s.Tutoring(student) || s.JuryOf(student) {
-		return s.store.SetNextPosition(student, pos)
+		return s.store.SetAlumni(student, a)
 	}
 	return ErrPermission
 }

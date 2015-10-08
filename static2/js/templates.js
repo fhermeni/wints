@@ -66,11 +66,14 @@ $.handlebars({
 	templatePath: '/static/hbs/',
 	templateExtension: 'hbs',
 	partialPath: '/static/hbs',
-	partials: ['users-user', 'placement-student', 'conventions-convention']
+	partials: ['users-user', 'placement-student', 'conventions-convention', 'convention-student', 'convention-editor', 'student-dashboard-report', 'student-dashboard-company', 'student-dashboard-contacts', 'student-dashboard-alumni']
 });
 
 Handlebars.registerHelper('len', function(a) {
-	return a.length
+	if (a.constructor === Array) {
+		return a.length;
+	}
+	return Object.keys(a).length;
 });
 
 Handlebars.registerHelper('dateFmt', function(d, fmt) {
@@ -134,11 +137,244 @@ Handlebars.registerHelper('student', function(r, opts) {
 		return opts.inverse(this);
 });
 
-/*
-Handlebars.registerHelper('fullname', function(p) {
-	return p.Firstname + " " + p.Lastname;
+Handlebars.registerHelper('ifEq', function(n, val, opts) {
+	console.log(arguments);
+	if (n == val)
+		return opts.fn(this);
+	else
+		return opts.inverse(this);
 });
 
+
+Handlebars.registerHelper('fullname', function(p, pretty) {
+	if (pretty) {
+		return p.Lastname.capitalize() + ", " + p.Firstname.capitalize();
+	}
+	return p.Lastname + ", " + p.Firstname;
+});
+
+Handlebars.registerHelper('survey', function(s, stu) {
+	var value = -10;
+	var grade = "-";
+	var bg = "";
+	if (s.Delivery) {
+		if (s.Kind == "midterm") {
+			if (Object.keys(s.Cnt).length > 0) {
+				if (s.Cnt[19] == "false") {
+					value = -1;
+					grade = "x";
+					bg = "bg-danger";
+				} else {
+					value = 1;
+					grade = "&#10003;";
+					bg = "bg-success";
+				}
+			}
+		} else { //final
+			if (Object.keys(s.Cnt).length > 0) {
+				value = s.Cnt[q17];
+				grade = s.Cnt[q17];
+				bg = grade >= 10 ? "bg-success" : "bg-danger";
+			}
+		}
+	} else if (moment(s.Deadline).isBefore(new Date())) {
+		bg = "bg-warning";
+		value = -20;
+	}
+	var buf = '<td class="click ' + bg + ' text-center" data-text="' + value + '" onclick="showSurvey(\'' + stu + '\', \'' + s.Kind + '\')">' + grade + '</td>';
+	return new Handlebars.SafeString(buf);
+});
+
+Handlebars.registerHelper('report', function(s) {
+	var value = -10;
+	var grade = "-";
+	var bg = "";
+	/*if (s.Delivery) {
+		if (s.Kind == "midterm") {
+			if (Object.keys(s.Cnt).length > 0) {
+				if (s.Cnt[19] == "false") {
+					value = -1;
+					grade = "x";
+					bg = "bg-danger";
+				} else {
+					value = 1;
+					grade = "&#10003;";
+					bg = "bg-success";
+				}
+			}
+		} else { //final
+			if (Object.keys(s.Cnt).length > 0) {
+				value = s.Cnt[q17];
+				grade = s.Cnt[q17];
+				bg = grade >= 10 ? "bg-success" : "bg-danger";
+			}
+		}
+	}*/
+	var buf = '<td class="click ' + bg + 'text-center" data-text="' + value + '" onclick="showReport(\'foo\', \'' + s.Kind + '\')">' + grade + '</td>';
+	return new Handlebars.SafeString(buf);
+});
+
+
+/*Handlebars.registerHelper('reportStatus', function(r) {
+
+	var passed = (new Date(Date.parse(r.Deadline)).getTime() + 86400 * 1000) < new Date().getTime()
+	var style = "bg-link";
+
+	//Deadline passed, nothing
+	if (passed && r.Grade == -2) {
+		style = "bg-warning";
+	} else if (r.Grade == -1) {
+		//waiting for beging reviewed
+		style = "bg-info";
+	} else if (r.ToGrade && r.Grade >= 0 && r.Grade < 10) {
+		style = "bg-danger";
+	} else if ((!r.ToGrade && r.Grade >= 0) || r.Grade >= 10) {
+		style = "bg-success";
+	}
+
+	return style;
+	return "";
+});
+
+Handlebars.registerHelper('gradeAnnotation', function(r) {
+	var passed = (new Date(Date.parse(r.Deadline)).getTime() + 86400 * 1000) < new Date().getTime()
+	var d = 0
+	if (passed && r.Grade == -2) {
+		var d = nbDayLates(r.Deadline, new Date()) //moment(r.Deadline).dayOfYear() - moment(new Date).dayOfYear()
+		return -2000 + d;
+	} else if (passed & r.Grade == -1) {
+		var d = nbDayLates(r.Delivery, new Date()) //moment(r.Delivery).dayOfYear() - moment(new Date).dayOfYear()
+		return -1000 + d
+	} else if (r.Grade >= 0) {
+		return r.Grade
+	}
+	return -9999
+});
+
+Handlebars.registerHelper('reportGrade', function(r) {
+	return "";
+	/*var passed = (new Date(r.Deadline).getTime() + 86400 * 1000) < new Date().getTime()
+	if (!r.ToGrade) {
+		if (passed && r.Grade == -2) {
+			return fmtNbDayLate(nbDayLates(new Date(), r.Deadline))
+		} else if (passed && r.Grade == -1) {
+			return fmtNbDayLate(nbDayLates(new Date(), r.Delivery))
+		} else {
+			return new Handlebars.SafeString("<i title='no grade needed'>n/a</i>");
+		}
+	}
+	if (r.Grade == -2) {
+		if (passed) {
+			return fmtNbDayLate(nbDayLates(new Date(), r.Deadline))
+		} else {
+			return "-";
+		}
+	} else if (r.Grade == -1) {
+		return fmtNbDayLate(nbDayLates(new Date(), r.Delivery))
+	}
+	return r.Grade;
+});
+Handlebars.registerHelper('gradeInput', function(r) {
+	if (!r.Gradeable || r.Grade <= 0) {
+		return "";
+	}
+	return r.Grade;
+});
+
+Handlebars.registerHelper('studentGrade', function(r) {
+	var passed = (new Date(r.Deadline).getTime() + 86400 * 1000) < new Date().getTime()
+	if (!r.Uploaded) {
+		if (r.Grade == 0) {
+			return r.Grade
+		} else if (passed) {
+			return "deadline passed. Hurry!";
+		} else {
+			return "";
+		}
+	} else {
+		if (r.ToGrade) {
+			if (r.Grade == -1) { //waiting for review
+				return "?";
+			} else {
+				return r.Grade;
+			}
+		} else {
+			if (r.Grade == -1) { //waiting for review
+				return "(waiting for the review)";
+			} else {
+				return "n/a";
+			}
+		}
+	}
+});
+
+Handlebars.registerHelper('URIemails', function(students) {
+	var l = [];
+	students.forEach(function(s) {
+		if (s && s.P) {
+			l.push(s.P.Email);
+		}
+	});
+	return encodeURI(l.join(","));
+});
+
+
+Handlebars.registerHelper('student', function(g) {
+	if (!g || g.length == 0) {
+		return "break";
+	}
+
+	var buf = g.P.Firstname + " " + g.P.Lastname;
+	if (defenses.private[g.P.Email]) {
+		buf += " <span class='glyphicon glyphicon-eye-close'></span>";
+	}
+	if (defenses.visio[g.P.Email]) {
+		buf += " <span class='glyphicon glyphicon-facetime-video'></span>";
+	}
+	var c = getConvention(g.P.Email);
+	if (!c.SupReport.IsIn) {
+		buf += " <span class='glyphicon glyphicon-file alert-danger'></span>";
+	}
+	return new Handlebars.SafeString(buf);
+});
+
+Handlebars.registerHelper("offset", function(from, offset, tz) {
+	if (tz === undefined) {
+		tz = true;
+	}
+	var d = moment(from)
+	if (tz) {
+		d = d.tz('Europe/Paris');
+	}
+	d = d.add(offset * 30, "minutes")
+	return d.format("HH:mm") + "-" + d.add(30, "minutes").format("HH:mm");
+})
+
+Handlebars.registerHelper("offset_local", function(from, offset, tz) {
+	var d
+	if (typeof from == "string") {
+		console.log("string");
+		d = moment(new Date(from));
+	} else {
+		d = moment(from);
+	}
+	d = d.add(offset * 30, "minutes")
+	return d.format("dddd D MMMM HH:mm") + "-" + d.add(30, "m").format("HH:mm");
+})
+
+Handlebars.registerHelper('longDate', function(d) {
+	var m = moment(d);
+	m.locale("fr").tz('Europe/Paris')
+	return m.format("dddd D MMMM");
+});
+
+Handlebars.registerHelper('dateFmt', function(d, fmt) {
+	return moment(d).format(fmt)
+});
+*/
+
+
+/*
 Handlebars.registerHelper('prettyFullname', function(p) {
 	var fn = p.Firstname
 	var ln = p.Lastname
@@ -251,7 +487,8 @@ var possiblePositions = [
 	"fixed term contract in another company",
 	"permanent contract in the internship company",
 	"permanent contract in another company",
-	"entrepreneurship"
+	"entrepreneurship",
+	"repeat the year"
 ];
 
 function editablePossiblePositions() {
@@ -329,26 +566,11 @@ Handlebars.registerHelper('shortKind', function(r) {
 	//return r.Kind.substring(0, 3)
 });
 
-Handlebars.registerHelper('reportStatus', function(r) {
-	var passed = (new Date(Date.parse(r.Deadline)).getTime() + 86400 * 1000) < new Date().getTime()
-	var style = "bg-link";
-
-	//Deadline passed, nothing
-	if (passed && r.Grade == -2) {
-		style = "bg-warning";
-	} else if (r.Grade == -1) {
-		//waiting for beging reviewed
-		style = "bg-info";
-	} else if (r.ToGrade && r.Grade >= 0 && r.Grade < 10) {
-		style = "bg-danger";
-	} else if ((!r.ToGrade && r.Grade >= 0) || r.Grade >= 10) {
-		style = "bg-success";
-	}
-
-	return style;
-});
 
 Handlebars.registerHelper('defenseStatus', function(g) {
+	if (!g.Defenses) {
+		return "bg-link";
+	}
 	var passed = new Date(g.Date).getTime() < new Date().getTime()
 	var style = "bg-link";
 	if (g.Defenses[0].Grade >= 0 && g.Defenses[0].Grade < 10) {
@@ -356,7 +578,7 @@ Handlebars.registerHelper('defenseStatus', function(g) {
 	} else if (g.Defenses[0].Grade >= 10) {
 		return "bg-success";
 	} else if (passed) {
-		return "bg-primary"
+		return "bg-info"
 	}
 	return "bg-link"
 });
@@ -369,6 +591,9 @@ Handlebars.registerHelper('defenseGrade3', function(g) {
 });
 
 Handlebars.registerHelper('defenseGrade', function(g) {
+	if (!g.Defenses) {
+		return "-";
+	}
 	d = moment(g.Date).add(30 * g.Defenses[0].Offset)
 	grade = g.Defenses[0].Grade
 	if (grade >= 0) {
@@ -393,70 +618,6 @@ Handlebars.registerHelper('defenseGrade2', function(from, offset, grade) {
 	return "-"
 });
 
-Handlebars.registerHelper('gradeAnnotation', function(r) {
-	var passed = (new Date(Date.parse(r.Deadline)).getTime() + 86400 * 1000) < new Date().getTime()
-	var d = 0
-	if (passed && r.Grade == -2) {
-		var d = nbDayLates(r.Deadline, new Date()) //moment(r.Deadline).dayOfYear() - moment(new Date).dayOfYear()
-		return -2000 + d;
-	} else if (passed & r.Grade == -1) {
-		var d = nbDayLates(r.Delivery, new Date()) //moment(r.Delivery).dayOfYear() - moment(new Date).dayOfYear()
-		return -1000 + d
-	} else if (r.Grade >= 0) {
-		return r.Grade
-	}
-	return -9999
-});
-
-Handlebars.registerHelper('surveyAnnotation', function(s) {
-	if (Object.keys(s.Answers).length == 0) {
-		return -10;
-	}
-	if (s.Kind == "midterm" && s.Answers[19] == "false") {
-		return -1;
-	}
-
-	if (s.Kind == "final" && s.Answers["q17"] < 10) {
-		return -1;
-	}
-
-	return 0;
-});
-
-
-Handlebars.registerHelper('surveyGrade', function(s) {
-	if (Object.keys(s.Answers).length == 0) {
-		return "-"
-	}
-	if (s.Kind == "midterm") {
-		if (s.Answers[19] == "true") {
-			return new Handlebars.SafeString("&#10003;");
-		}
-		return new Handlebars.SafeString("x");
-	} else {
-		return s.Answers["q17"];
-	}
-	return "-";
-});
-
-Handlebars.registerHelper('surveyStatus', function(s) {
-	if (Object.keys(s.Answers).length == 0) {
-		return ""
-	}
-	if (s.Kind == "midterm") {
-		if (s.Answers[19] == "true") {
-			return "bg-success";
-		}
-		return "bg-danger";
-	}
-	if (s.Kind == "final") {
-		if (s.Answers["q17"] >= 10) {
-			return "bg-success";
-		}
-		return "bg-danger";
-	}
-	return "";
-});
 
 
 function nbDayLates(d1, d2) {
@@ -468,126 +629,4 @@ function nbDayLates(d1, d2) {
 function fmtNbDayLate(d) {
 	return new Handlebars.SafeString("<i class='glyphicon glyphicon-time'></i><small> " + d + " d.</small>");
 }
-
-Handlebars.registerHelper('reportGrade', function(r) {
-	var passed = (new Date(r.Deadline).getTime() + 86400 * 1000) < new Date().getTime()
-	if (!r.ToGrade) {
-		if (passed && r.Grade == -2) {
-			return fmtNbDayLate(nbDayLates(new Date(), r.Deadline))
-		} else if (passed && r.Grade == -1) {
-			return fmtNbDayLate(nbDayLates(new Date(), r.Delivery))
-		} else {
-			return new Handlebars.SafeString("<i title='no grade needed'>n/a</i>");
-		}
-	}
-	if (r.Grade == -2) {
-		if (passed) {
-			return fmtNbDayLate(nbDayLates(new Date(), r.Deadline))
-		} else {
-			return "-";
-		}
-	} else if (r.Grade == -1) {
-		return fmtNbDayLate(nbDayLates(new Date(), r.Delivery))
-	}
-	return r.Grade;
-});
-
-Handlebars.registerHelper('gradeInput', function(r) {
-	if (!r.Gradeable || r.Grade <= 0) {
-		return "";
-	}
-	return r.Grade;
-});
-
-Handlebars.registerHelper('studentGrade', function(r) {
-	var passed = (new Date(r.Deadline).getTime() + 86400 * 1000) < new Date().getTime()
-	if (!r.Uploaded) {
-		if (r.Grade == 0) {
-			return r.Grade
-		} else if (passed) {
-			return "deadline passed. Hurry!";
-		} else {
-			return "";
-		}
-	} else {
-		if (r.ToGrade) {
-			if (r.Grade == -1) { //waiting for review
-				return "?";
-			} else {
-				return r.Grade;
-			}
-		} else {
-			if (r.Grade == -1) { //waiting for review
-				return "(waiting for the review)";
-			} else {
-				return "n/a";
-			}
-		}
-	}
-});
-
-Handlebars.registerHelper('URIemails', function(students) {
-	var l = [];
-	students.forEach(function(s) {
-		if (s && s.P) {
-			l.push(s.P.Email);
-		}
-	});
-	return encodeURI(l.join(","));
-});
-
-
-Handlebars.registerHelper('student', function(g) {
-	if (!g || g.length == 0) {
-		return "break";
-	}
-
-	var buf = g.P.Firstname + " " + g.P.Lastname;
-	if (defenses.private[g.P.Email]) {
-		buf += " <span class='glyphicon glyphicon-eye-close'></span>";
-	}
-	if (defenses.visio[g.P.Email]) {
-		buf += " <span class='glyphicon glyphicon-facetime-video'></span>";
-	}
-	var c = getConvention(g.P.Email);
-	if (!c.SupReport.IsIn) {
-		buf += " <span class='glyphicon glyphicon-file alert-danger'></span>";
-	}
-	return new Handlebars.SafeString(buf);
-});
-
-Handlebars.registerHelper("offset", function(from, offset, tz) {
-	if (tz === undefined) {
-		tz = true;
-	}
-	var d = moment(from)
-	if (tz) {
-		d = d.tz('Europe/Paris');
-	}
-	d = d.add(offset * 30, "minutes")
-	return d.format("HH:mm") + "-" + d.add(30, "minutes").format("HH:mm");
-})
-
-Handlebars.registerHelper("offset_local", function(from, offset, tz) {
-	var d
-	if (typeof from == "string") {
-		console.log("string");
-		d = moment(new Date(from));
-	} else {
-		d = moment(from);
-	}
-	d = d.add(offset * 30, "minutes")
-	return d.format("dddd D MMMM HH:mm") + "-" + d.add(30, "m").format("HH:mm");
-})
-
-Handlebars.registerHelper('longDate', function(d) {
-	var m = moment(d);
-	m.locale("fr").tz('Europe/Paris')
-	return m.format("dddd D MMMM");
-});
-
-Handlebars.registerHelper('dateFmt', function(d, fmt) {
-	return moment(d).format(fmt)
-});
-
 */

@@ -22,3 +22,37 @@
 	3. nicer rest middleware. Explicit context
 - tests and comments
 - simplify DB with less fake values and more optional fields hidden in JSONs
+
+
+
+
+- Convocation officielle par mail
+- prévenir tuteurs
+- pecho jury parmis les tuteurs
+- organisation de visio
+- saisie des notes
+
+
+
+placement:
+- bad names & validation ?
+my student page
+
+
+student page
+
+
+reports
+	- grade, penalties
+
+cron
+
+alumni (new)
+
+
+defense
+
+
+
+
+

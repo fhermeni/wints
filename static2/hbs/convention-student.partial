@@ -1,0 +1,10 @@
+<span class="{{#if Skip}}skip{{/if}}">
+        <a onclick="editInternship(this, '{{User.Person.Email}}')" class="fn {{#if Placed}}text-success{{/if}}{{#if Pending}}text-info{{/if}}{{#if Bad}}text-danger{{/if}}">{{User.Person.Lastname}}, {{User.Person.Firstname}}
+        ({{Promotion}}/{{Major}})            
+        </a> 
+    {{#if Skip}}
+    <i class="glyphicon glyphicon-eye-close" title="manage" onclick="updateStudentSkipable('{{User.Person.Email}}', false)"></i>
+    {{else}}
+    <i class="glyphicon glyphicon-eye-open" title="ignore" onclick="updateStudentSkipable('{{User.Person.Email}}', true)"></i>
+    {{/if}}
+</span>

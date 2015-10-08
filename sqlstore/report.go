@@ -24,16 +24,17 @@ func (s *Store) Reports(email string) (map[string]schema.ReportHeader, error) {
 	st := s.stmt(selectReports)
 	rows, err := st.Query(email)
 	if err != nil {
-		return res, nil
+		return res, err
 	}
+	defer rows.Next()
 	for rows.Next() {
 		var hdr schema.ReportHeader
 		if hdr, err = scanReport(rows); err != nil {
-			return res, nil
+			return res, err
 		}
 		res[hdr.Kind] = hdr
 	}
-	return res, nil
+	return res, err
 
 }
 
@@ -43,6 +44,7 @@ func scanReport(rows *sql.Rows) (schema.ReportHeader, error) {
 	var delivery, reviewed pq.NullTime
 	var grade sql.NullInt64
 	err := rows.Scan(
+		&hdr.Kind,
 		&hdr.Deadline,
 		&delivery,
 		&reviewed,

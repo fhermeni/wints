@@ -20,6 +20,7 @@ var (
 	updateUserProfile            = "update users set firstname=$1, lastname=$2, tel=$3 where email=$4"
 	updateUserRole               = "update users set role=$2 where email=$1 and role != 1" //cannot change the role of a student
 	updateUserPassword           = "update users set password=$2 where email=$1"
+	updateEmail                  = "update users set email=$2 where email=$1"
 	deletePasswordRenewalRequest = "delete from password_renewal where email=$1"
 	deleteUser                   = "DELETE FROM users where email=$1"
 	allUsers                     = "select firstname, lastname, email, tel, role, lastVisit from users"
@@ -186,6 +187,10 @@ func (s *Store) NewUser(p schema.Person, role schema.Privilege) error {
 //RmUser removes a user from the database
 func (s *Store) RmUser(email string) error {
 	return s.singleUpdate(deleteUser, schema.ErrUnknownUser, email)
+}
+
+func (s *Store) SetEmail(old, now string) error {
+	return s.singleUpdate(updateEmail, schema.ErrUnknownUser, old, now)
 }
 
 //ReplaceUserWith the account referred by src by the account referred by dst

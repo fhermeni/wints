@@ -1,5 +1,10 @@
 var config;
 
+String.prototype.capitalize = function() {
+	return this.charAt(0).toUpperCase() + this.substring(1)
+}
+
+
 $(document).ready(function() {
 	waitingBlock = $("#cnt").clone().html();
 
@@ -14,17 +19,6 @@ $(document).ready(function() {
 	user(getCookie("login")).done(loadSuccess).fail(function() {
 		window.location.href = "/login";
 	});
-
-	$(document).keydown(function(e) {
-		if (e.keyCode == 16) {
-			shiftPressed = true;
-		}
-	});
-	$(document).keyup(function(e) {
-		if (e.keyCode == 16) {
-			shiftPressed = false;
-		}
-	});
 });
 
 function loadSuccess(data) {
@@ -35,11 +29,28 @@ function loadSuccess(data) {
 	for (i = 0; i <= myself.Role; i++) {
 		$(".role-" + i).removeClass("hidden");
 	}
+
+	//homepage	
+	if (myself.Role == 1) { //student
+		showStudent();
+	} else if (myself.Role >= 4) { //admin +
+		showWatchlist();
+	} else {
+		//tutor || major
+		showTutored();
+	}
 }
 
-function showModal() {
-	$("#modal").modal("show")
+function showModal(next) {
+	$("#modal").modal("show");
 	$('#modal').find('[data-toggle="popover"]').popover()
+	if (next) {
+		$('#modal').on('shown.bs.modal', function(e) {
+			next()
+		});
+	} else {
+		$('#modal').unbind('shown.bs.modal');
+	}
 }
 
 function ui() {
@@ -79,6 +90,20 @@ function ui() {
 			}
 		});
 	});
+
+	$(".globalSelect").change(function() {
+		var ctx = $(this).data("context");
+		$("#" + ctx).find("input:checkbox").prop("checked", this.checked);
+	});
+
+	$('input[type=file]').filestyle({
+		input: false,
+		buttonText: "",
+		buttonName: "btn-success",
+		iconName: "glyphicon-cloud-upload",
+		badge: false
+	});
+
 }
 
 function hideModal() {
@@ -86,17 +111,10 @@ function hideModal() {
 	$("#modal").modal("hide");
 }
 
-function showWatchlist() {
-	internships().done(loadWatchlist);
+function showInternship(em) {
+	internship(em).done(internshipModal).fail(logFail)
 }
 
-function loadWatchlist(interns) {
-	$("#cnt").render("watchlist", {
-		Internships: interns,
-		Org: config
-	});
-}
-
-function logFail(xhr) {
-	console.log(xhr.status + " " + xhr.responseText)
+function internshipModal(i) {
+	$("#modal").render("convention-detail", i, showModal);
 }

@@ -49,11 +49,13 @@ Deadline= "504h"
 Grade = false
 
 [Internships.Reports.midterm]
-Deadline = "1440h"
+Delivery = "1440h"
+Review = "504h"
 Grade = true
 
 [Internships.Reports.final]
-Deadline = "01/09/2015"
+Delivery = "01/09/2015"
+Review = "168h"
 Grade = true
 
 [Internships.Surveys.midterm]
@@ -61,6 +63,14 @@ Deadline = "1440h"
 
 [Internships.Surveys.final]
 Deadline = "01/09/2015"
+
+[[Spies]]
+Kind = "tutor"
+Cron = "0 0 9 * * 1"
+
+[[Spies]]
+Kind = "student"
+Cron = "0 0 9 * * 1"
 `
 
 	expected = Config{
@@ -128,17 +138,17 @@ func TestLoadConfig(t *testing.T) {
 
 	rel, _ = time.ParseDuration("504h")
 	rd := expected.Internships.Reports["dow"]
-	rd.Deadline.relative = &rel
+	rd.Delivery.relative = &rel
 	expected.Internships.Reports["dow"] = rd
 
 	rel, _ = time.ParseDuration("1440h")
 	rm := expected.Internships.Reports["midterm"]
-	rm.Deadline.relative = &rel
+	rm.Delivery.relative = &rel
 	//expected.Reports["midterm"] = rm
 
 	abs, _ = time.Parse(DateLayout, "01/09/2015")
 	rf := expected.Internships.Reports["final"]
-	rf.Deadline.absolute = &abs
+	rf.Delivery.absolute = &abs
 	//expected.Reports["final"] = rf
 
 	assert.Equal(t, expected.Mailer, cfg.Mailer)

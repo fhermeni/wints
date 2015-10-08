@@ -2,6 +2,8 @@ package sqlstore
 
 import (
 	"database/sql"
+	"log"
+	"sync"
 	"time"
 
 	"github.com/fhermeni/wints/config"
@@ -16,6 +18,7 @@ type Store struct {
 	db     *sql.DB
 	stmts  map[string]*stmtErr
 	config config.Internships
+	lock   *sync.Mutex
 }
 
 //NewStore initiate the storage servive
@@ -24,6 +27,7 @@ func NewStore(d *sql.DB, config config.Internships) (*Store, error) {
 		db:     d,
 		stmts:  make(map[string]*stmtErr),
 		config: config,
+		lock:   &sync.Mutex{},
 	}
 	return &s, nil
 }
@@ -39,6 +43,8 @@ func (s *Store) stmt(q string) *stmtErr {
 	if !ok {
 		x, err := s.db.Prepare(q)
 		st = &stmtErr{err: err, st: x}
+		s.lock.Lock()
+		defer s.lock.Unlock()
 		s.stmts[q] = st
 	}
 	return st
@@ -92,6 +98,13 @@ func nullableString(t sql.NullString) string {
 	return ""
 }
 
+func nullableBool(t sql.NullBool, def bool) bool {
+	if t.Valid {
+		return t.Bool
+	}
+	return def
+}
+
 func noRowsTo(got error, with error) error {
 	if got == sql.ErrNoRows {
 		return with
@@ -116,6 +129,7 @@ func mapCstrToError(err error) error {
 		case "fk_conventions_student", "fk_reports_student", "fk_surveys_student", "fk_defenses_student":
 			return schema.ErrUnknownStudent
 		case "fk_conventions_tutor":
+			log.Println(err)
 			return schema.ErrUserTutoring
 		}
 	}

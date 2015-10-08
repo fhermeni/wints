@@ -1,22 +1,28 @@
-<h3>Students(s)</h3>
+<h3>{{len Students}} Student(s) - <small>{{Ints}} placed</small></h3>
 
-<span class="btn btn-success btn-sm btn-file">
-    <i class="glyphicon glyphicon-plus"></i> Import <input id="csv-import" type="file">
-</span>
-	<a id="import-status" class="btn btn-danger btn-sm hidden" onclick="showImportError()">Show import errors</a>
-<!--<button type="button" class="btn btn-default btn-sm" onclick="serviceMailing()">
+<button type="button" class="btn btn-default btn-sm" onclick="userMailing('#table-placement')">
     <i class="glyphicon glyphicon-envelope"></i> mail selection
 </button>
--->
+
+<button type="button" onclick="showRawFullname('tbody','stu')" data-toggle='modal' class="btn btn-default btn-sm">
+    <i class="glyphicon glyphicon-list"></i> fullname from selection
+</button>    
+
 <table class="table table-hover tablesorter" id="table-placement" data-sortlist="[[1,0]]">
 <thead>
     <tr>
-        <th class="sorter-false"></th>
-        <th>Lastname</th><th>Firstname</th><th>Email</th><th>Promotion</th><th>Major</th><th>Placed ?</th><th>Status</th>
+        <th class="sorter-false"><input type='checkbox' class="globalSelect" data-context="table-placement"/></th>
+        <th>Lastname, Firstname</th>        
+        <th>Promotion</th>        
+        <th>Major</th>
+        <th>Company</th>
+        <th class="sorter-false">Period</th>
+        <th>Tutor</th>
+        <th>Gratification</th>       
     </tr>
 </thead>
 <tbody>
-{{#each this}}
+{{#each Students}}
     {{> placement-student this}}
 {{/each}}
 </tbody>

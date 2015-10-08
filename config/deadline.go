@@ -5,10 +5,19 @@ import "time"
 //UnmarshalText parse either duration or date
 func (d *Deadline) UnmarshalText(text []byte) error {
 	var err error
-	rel, err := time.ParseDuration(string(text))
+	str := string(text)
+	/*if strings.HasSuffix(str, "d") {
+		str = strings.TrimSuffix(str, "d")
+		days, r := strconv.Atoi(str)
+		if r == nil {
+			d.relative = &time.Duration(time.Hour * time.Duration(24*days))
+		}
+	}*/
+
+	rel, err := time.ParseDuration(str)
 	if err != nil {
 		var abs time.Time
-		abs, err = time.Parse(DateLayout, string(text))
+		abs, err = time.Parse(DateLayout, str)
 		if err == nil {
 			d.absolute = &abs
 		}

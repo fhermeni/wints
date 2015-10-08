@@ -1,9 +1,15 @@
-function showProfileEditor() {
-	$("#modal").render("profileEditor", myself, showModal)
+function showProfileEditor(em) {
+	if (!em) {
+		$("#modal").render("profile-editor", myself, showModal)
+	} else {
+		user(em).done(function(ctx) {
+			$("#modal").render("profile-editor", ctx, showModal);
+		});
+	}
 }
 
 function showPasswordEditor() {
-	$("#modal").render("passwordEditor", {}, showModal)
+	$("#modal").render("password-editor", {}, showModal)
 }
 
 function updatePassword() {
@@ -17,24 +23,23 @@ function updatePassword() {
 
 function failUpdatePassword(xhr) {
 	if (xhr.status == 401) {
-		reportError("#password-current", xhr.responseText)
+		reportError("#password-current", xhr.responseText);
 	} else if (xhr.status == 400) {
-		reportError("#password-new", xhr.responseText)
+		reportError("#password-new", xhr.responseText);
 	}
 }
 
-function updateProfile() {
+function updateProfile(em) {
 	if (empty("#profile-firstname", "#profile-lastname")) {
 		return
 	}
-	p = {
-		Email: myself.Person.Email,
-		Firstname: $("#profile-firstname").val(),
-		Lastname: $("#profile-lastname").val(),
-		Tel: $("#profile-tel").val()
-	}
-	sendProfile(p)
-		.done(successUpdateProfile)
+	user(em).done(function(u) {
+		p = u.Person;
+		p.Firstname = $("#profile-firstname").val();
+		p.Lastname = $("#profile-lastname").val();
+		p.Tel = $("#profile-tel").val();
+		sendProfile(p).done(successUpdateProfile);
+	});
 }
 
 function logout() {
@@ -46,7 +51,9 @@ function logout() {
 }
 
 function successUpdateProfile(p) {
-	myself.Person = p
-	$("#fullname").html(p.Firstname + " " + p.Lastname);
+	if (p.Email == myself.Person.Email) {
+		myself.Person = p
+		$("#fullname").html(p.Firstname + " " + p.Lastname);
+	}
 	hideModal()
 }

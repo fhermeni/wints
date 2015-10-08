@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/fhermeni/wints/config"
+	"github.com/fhermeni/wints/feeder"
 	"github.com/fhermeni/wints/sqlstore"
 )
 
@@ -17,13 +18,13 @@ type HTTPd struct {
 }
 
 //NewHTTPd makes a new HTTP daemon
-func NewHTTPd(store *sqlstore.Store, cfg config.HTTPd, org config.Internships) HTTPd {
+func NewHTTPd(store *sqlstore.Store, conventions feeder.Conventions, cfg config.HTTPd, org config.Internships) HTTPd {
 
 	//The assets
 	fileHandler := http.FileServer(http.Dir(cfg.Assets))
 	http.Handle("/"+cfg.Assets, http.StripPrefix("/"+cfg.Assets, fileHandler))
 	//The rest endpoints
-	rest := NewEndPoints(store, cfg.Rest, org)
+	rest := NewEndPoints(store, conventions, cfg.Rest, org)
 	http.Handle(cfg.Rest.Prefix, Mon(rest.router.ServeHTTP))
 
 	httpd := HTTPd{

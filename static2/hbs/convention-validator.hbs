@@ -1,0 +1,34 @@
+<div class="modal-dialog">
+<div class="modal-content"> 
+    <div class="modal-body">
+        <button type="button" class="close" aria-hidden="true" onclick="hideModal()">×</button>
+<fieldset>
+	<legend class="fn" data-email="{{S.User.Person.Email}}">		
+			<button type="button" class="btn btn-default">
+			{{#if S.Skip}}			
+			<i class="glyphicon glyphicon-eye-close text-warning" onclick="updateStudentSkipable('{{S.User.Person.Email}}', this)"></i>
+			{{else}}			
+			<i class="glyphicon glyphicon-eye-open text-success" onclick="updateStudentSkipable('{{S.User.Person.Email}}', this)"></i>
+			{{/if}}
+			</button>
+		{{fullname S.User.Person}} - {{S.Promotion}}/{{S.Major}}
+	</legend>	
+	<div class="form-horizontal">	
+	<div class="form-group">
+		<label class="col-lg-3 control-label">Available conventions</label>
+		<div class="col-lg-9">
+		<select class="fn form-control" id="convention-selecter" onchange="showConvention(this)">
+			{{#each Conventions}}
+				<option value="{{Student.User.Person.Email}}">{{fullname Student.User.Person}} ({{Student.Promotion}})</option>
+			{{/each}}
+		</select>
+		</div>
+	</div>		
+	</div>
+	<div id="convention-detail">
+		{{>convention-editor this}}
+	</div>
+</fieldset>
+</div>
+</div>
+</div>

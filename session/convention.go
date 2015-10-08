@@ -8,7 +8,7 @@ import (
 //Conventions lists the conventions if the emitter is an admin at minimum
 func (s *Session) Conventions() ([]schema.Convention, error) {
 	if s.Role() >= schema.ADMIN {
-		return s.store.Conventions()
+		return s.conventions.Import()
 	}
 	return []schema.Convention{}, ErrPermission
 }
@@ -37,29 +37,12 @@ func (s *Session) SetCompany(stu string, c schema.Company) error {
 	return ErrPermission
 }
 
-//SetTitle changes the title if the emitter is the student or an admin at minimum
-func (s *Session) SetTitle(stu string, title string) error {
-	if s.Myself(stu) || s.Role() >= schema.ADMIN {
-		return s.store.SetTitle(stu, title)
-	}
-	return ErrPermission
-}
-
-//SetConventionSkippable changes the skippable status if the emitter is an admin at minimum
-func (s *Session) SetConventionSkippable(student string, skip bool) error {
-	if s.Role() >= schema.ADMIN {
-		return s.store.SetConventionSkippable(student, skip)
-	}
-	return ErrPermission
-
-}
-
 //ValidateConvention validates the convention if the emitter is an admin at minimum
-func (s *Session) ValidateConvention(stu string, cfg config.Internships) error {
+func (s *Session) NewInternship(c schema.Convention, cfg config.Internships) (schema.Internship, error) {
 	if s.Role() >= schema.ADMIN {
-		return s.store.ValidateConvention(stu, cfg)
+		return s.store.NewInternship(c, cfg)
 	}
-	return ErrPermission
+	return schema.Internship{}, ErrPermission
 }
 
 //Internships list the internships if the emitter is at least a major leader.
@@ -74,7 +57,7 @@ func (s *Session) Internships() (schema.Internships, error) {
 
 //Internship returns the internship of the emitter
 func (s *Session) Internship(stu string) (schema.Internship, error) {
-	if s.Myself(stu) {
+	if s.Myself(stu) || s.Role() >= schema.MAJOR {
 		return s.store.Internship(stu)
 	}
 	return schema.Internship{}, ErrPermission

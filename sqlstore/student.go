@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	allStudents     = "select male, firstname, lastname, users.email, tel, role, lastVisit, promotion, major, nextPosition, nextContact, skip from students inner join users on (students.email=users.email)"
-	selectStudent   = "select male, firstname, lastname, users.email, tel, role, lastVisit, promotion, major, nextPosition, nextContact, skip from students inner join users on (students.email=users.email) where students.email=$1"
+	allStudents     = "select male, firstname, lastname, users.email, tel, role, lastVisit, promotion, major, nextPosition, nextFrance,nextPermanent,nextSameCompany, nextContact, skip from students inner join users on (students.email=users.email)"
+	selectStudent   = "select male, firstname, lastname, users.email, tel, role, lastVisit, promotion, major, nextPosition, nextFrance,nextPermanent,nextSameCompany, nextContact, skip from students inner join users on (students.email=users.email) where students.email=$1"
 	insertStudent   = "insert into students(email, male, major, promotion, skip) values ($1,$2,$3,$4,$5)"
 	skipStudent     = "update students set skip=$2 where email=$1"
 	setPromotion    = "update students set promotion=$2 where email=$1"
@@ -17,6 +17,7 @@ var (
 	updateMale      = "update students set male=$2 where email=$1"
 	setNextPosition = "update students set nextPosition=$1 where email=$2"
 	setNextContact  = "update students set nextContact=$1 where email=$2"
+	updateAlumni    = "update students set nextPosition=$1, nextFrance=$2, nextPermanent=$3, nextSameCompany=$4, nextContact=$5 where email=$6"
 )
 
 //Student returns a given student
@@ -35,13 +36,14 @@ func (s *Store) Student(email string) (schema.Student, error) {
 
 func scanStudent(rows *sql.Rows) (schema.Student, error) {
 	var lastVisit pq.NullTime
-	var nextPos sql.NullInt64
+	var nextPos sql.NullString
+	var nextFrance, nextPermanent, nextSameCompany sql.NullBool
 	var nextContact sql.NullString
 	s := schema.Student{
 		User: schema.User{
 			Person: schema.Person{},
 		},
-		Alumni: schema.Alumni{},
+		Alumni: &schema.Alumni{},
 	}
 	err := rows.Scan(
 		&s.Male,
@@ -54,11 +56,21 @@ func scanStudent(rows *sql.Rows) (schema.Student, error) {
 		&s.Promotion,
 		&s.Major,
 		&nextPos,
+		&nextFrance,
+		&nextPermanent,
+		&nextSameCompany,
 		&nextContact,
 		&s.Skip)
 	s.User.LastVisit = nullableTime(lastVisit)
-	s.Alumni.Contact = nullableString(nextContact)
-	s.Alumni.Position = nullableInt(nextPos, 0)
+	if nextPos.Valid {
+		s.Alumni.Contact = nullableString(nextContact)
+		s.Alumni.Position = nullableString(nextPos)
+		s.Alumni.France = nullableBool(nextFrance, false)
+		s.Alumni.Permanent = nullableBool(nextPermanent, false)
+		s.Alumni.SameCompany = nullableBool(nextSameCompany, false)
+	} else {
+		s.Alumni = nil
+	}
 	return s, err
 }
 
@@ -124,12 +136,6 @@ func (s *Store) SetMale(stu string, m bool) error {
 	return s.singleUpdate(updateMale, schema.ErrUnknownStudent, stu, m)
 }
 
-//SetNextPosition updates the student next position
-func (s *Store) SetNextPosition(student string, pos int) error {
-	return s.singleUpdate(setNextPosition, schema.ErrUnknownUser, pos, student)
-}
-
-//SetNextContact updates the student next contact email.
-func (s *Store) SetNextContact(student string, em string) error {
-	return s.singleUpdate(setNextContact, schema.ErrUnknownUser, em, student)
+func (s *Store) SetAlumni(student string, a schema.Alumni) error {
+	return s.singleUpdate(updateAlumni, schema.ErrUnknownUser, a.Position, a.France, a.Permanent, a.SameCompany, a.Contact, student)
 }

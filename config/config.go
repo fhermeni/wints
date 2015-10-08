@@ -8,6 +8,11 @@ var (
 	DateLayout = "02/01/2006"
 )
 
+type Spy struct {
+	Kind string
+	Cron string
+}
+
 //Feeder configures the feeder than scan conventions
 type Feeder struct {
 	Login      string
@@ -80,7 +85,8 @@ func (i Internships) ValidPromotion(p string) bool {
 
 //Report configures a report definition
 type Report struct {
-	Deadline Deadline
+	Delivery Deadline
+	Review   Duration
 	Grade    bool
 }
 
@@ -91,6 +97,7 @@ type Survey struct {
 
 //Config aggregates all the subcomponents configuration parameters
 type Config struct {
+	Spy         Spy
 	Feeder      Feeder
 	Db          Db
 	Mailer      Mailer
@@ -98,4 +105,5 @@ type Config struct {
 	Majors      []string
 	Journal     Journal
 	Internships Internships
+	Spies       []Spy
 }

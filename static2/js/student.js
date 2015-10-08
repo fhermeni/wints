@@ -1,5 +1,111 @@
 var mine;
 
+function showStudent() {
+	internship(myself.Person.Email).done(showStudentDashboard)
+}
+
+function showStudentDashboard(m) {
+	mine = m;
+	$("#cnt").render("student-dashboard", m, function() {
+		syncAlumniEditor($("#position"))
+		ui()
+	});
+}
+
+function showCompanyEditor() {
+	$("#modal").render("company-editor", mine, showModal)
+}
+
+function showSupervisorEditor() {
+	$("#modal").render("student-dashboard-supervisor-editor", mine.Convention.Supervisor, showModal);
+}
+
+function showAlumniEditor() {
+	console.log(mine.Convention.Student.Alumni);
+	$("#modal").render("student-dashboard-alumni-editor", mine.Convention.Student.Alumni, showModal);
+}
+
+function updateCompany() {
+	if (empty("lbl-name") || empty("lbl-title") || empty("lbl-www")) {
+		return
+	}
+	var cpy = {
+		Name: $("#lbl-name").val(),
+		WWW: $("#lbl-www").val(),
+		Title: $("#lbl-title").val()
+	}
+	postCompany(myself.Person.Email, cpy).done(refreshCompany)
+}
+
+function sendSupervisor() {
+	if (empty("lbl-fn") || empty("lbl-ln") || empty("lbl-tel") || empty("lbl-email")) {
+		return
+	}
+	var sup = {
+		Firstname: $("#lbl-fn").val(),
+		Lastname: $("#lbl-ln").val(),
+		Email: $("#lbl-email").val(),
+		Tel: $("#lbl-tel").val()
+	}
+	postSupervisor(myself.Person.Email, sup).done(refreshContacts)
+}
+
+function refreshContacts(p) {
+	mine.Convention.Supervisor = p;
+	var buf = Handlebars.partials["student-dashboard-contacts"](mine);
+	$("#student-dashboard-contacts").html(buf);
+	hideModal();
+}
+
+function refreshCompany(cpy) {
+	mine.Convention.Company = cpy;
+	var buf = Handlebars.partials["student-dashboard-company"](mine);
+	$("#dashboard-company").html(buf);
+	hideModal();
+}
+
+function sendAlumni() {
+	if (empty("#lbl-email")) {
+		return
+	}
+	a = {
+		Contact: $("#lbl-email").val(),
+		Position: $("#position").val(),
+		France: $('input[name=france]:checked').val() == "true",
+		Permanent: $('input[name=permanent]:checked').val() == "true",
+		SameCompany: $('input[name=sameCompany]:checked').val() == "true",
+	}
+	postAlumni(myself.Person.Email, a)
+}
+
+
+function syncAlumniEditor(sel) {
+	var val = $(sel).val();
+	if (val == "sabbatical") {
+		$("#country").addClass("hidden");
+		$("#contract").addClass("hidden");
+		$("#company").addClass("hidden");
+	} else if (val == "entrepreneurship") {
+		$("#country").removeClass("hidden");
+		$("#contract").addClass("hidden");
+		$("#company").addClass("hidden");
+	} else if (val == "study") {
+		$("#country").removeClass("hidden");
+		$("#contract").addClass("hidden");
+		$("#company").addClass("hidden");
+	} else if (val == "company") {
+		$("#country").removeClass("hidden");
+		$("#contract").removeClass("hidden");
+		$("#company").removeClass("hidden");
+	} else if (val == "looking") {
+		$("#country").addClass("hidden");
+		$("#contract").addClass("hidden");
+		$("#company").addClass("hidden");
+	}
+}
+/*
+
+
 function showDashboard() {
 	internship(myself.Email, function(i) {
 		mine = i
@@ -71,30 +177,6 @@ function showProgress(evt) {
 	}
 }
 
-function showCompanyEditor() {
-	var html = Handlebars.getTemplate("company-editor")(mine);
-	var root = $("#modal");
-	root.html(html).modal("show");
-}
-
-function showSupervisorEditor() {
-	var html = Handlebars.getTemplate("supervisor-editor")(mine);
-	var root = $("#modal");
-	root.html(html).modal("show");
-}
-
-function sendCompany() {
-	if (missing("lbl-name") || missing("lbl-title")) {
-		return
-	}
-	setCompany(myself.Email, $("#lbl-name").val(), $("#lbl-www").val(), function() {
-		setTitle(myself.Email, $("#lbl-title").val(), function() {
-			showDashboard();
-			$("#modal").modal('hide');
-			reportSuccess("Operation succeeded");
-		})
-	})
-}
 
 function showReportComment(kind) {
 	mine.Reports.forEach(function(r) {
@@ -131,3 +213,4 @@ function sendAlumni() {
 		reportError(jqr.responseText)
 	})
 }
+*/

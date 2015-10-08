@@ -19,8 +19,8 @@ func newTxErr(db *sql.DB) TxErr {
 //It is committed if err == nil. Rollbacked otherwise.
 func (r *TxErr) Done() error {
 	if r.err != nil {
-		if err := r.tx.Rollback(); err != nil {
-			return mapCstrToError(err)
+		if e := r.tx.Rollback(); e != nil {
+			return mapCstrToError(e)
 		}
 		return mapCstrToError(r.err)
 

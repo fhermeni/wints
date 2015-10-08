@@ -4,15 +4,14 @@ import (
 	"encoding/csv"
 	"io"
 	"log"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
-	//"github.com/fhermeni/wints/journal"
 	"github.com/fhermeni/wints/schema"
-	"github.com/fhermeni/wints/sqlstore"
 )
 
 const (
@@ -74,13 +73,14 @@ func cleanPerson(fn, ln, email, tel string) schema.Person {
 	}
 }
 
-func cleanCompany(name, WWW string) schema.Company {
+func cleanCompany(name, WWW, title string) schema.Company {
 	if len(WWW) != 0 && !strings.HasPrefix(WWW, "http") {
 		WWW = "http://" + WWW
 	}
 	return schema.Company{
-		Name: clean(name),
-		WWW:  clean(WWW),
+		Name:  clean(name),
+		WWW:   clean(WWW),
+		Title: clean(title),
 	}
 }
 
@@ -105,10 +105,11 @@ func cleanInt(str string) int {
 	}
 	return i
 }
-func (f *CsvConventions) scan(prom string, s *sqlstore.Store) error {
+func (f *CsvConventions) scan(prom string) ([]schema.Convention, error) {
+	conventions := make([]schema.Convention, 0, 0)
 	r, err := f.Reader.Reader(f.Year, prom)
 	if err != nil {
-		return err
+		return conventions, err
 	}
 	in := csv.NewReader(r)
 	in.Comma = ';'
@@ -121,66 +122,80 @@ func (f *CsvConventions) scan(prom string, s *sqlstore.Store) error {
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			log.Println("buggy")
-			return err
+			log.Println("buggy: " + reflect.TypeOf(err).String())
+			return conventions, err
 		}
 		student := cleanPerson(record[stuFn], record[stuLn], record[stuEmail], record[stuTel])
 		supervisor := cleanPerson(record[supervisorFn], record[supervisorLn], record[supervisorEmail], record[supervisorTel])
 		tutor := cleanPerson(record[tutorFn], record[tutorLn], record[tutorEmail], record[tutorTel])
-		cpy := cleanCompany(record[company], record[companyWWW])
-		title := clean(record[titleIdx])
+		cpy := cleanCompany(record[company], record[companyWWW], record[titleIdx])
 		foreign := clean(record[foreignCountry]) != "non"
 		inLab := clean(record[lab]) != "non"
 		male := clean(record[gender]) == "m."
 		gratif := cleanInt(record[gratification])
 		ts, err := time.Parse("2006-01-02 15:04", clean(record[timestamp]))
 		if err != nil {
-			return err
+			return conventions, err
 		}
 		startTime, err := time.Parse("02/01/2006", clean(record[begin]))
 		if err != nil {
-			return err
+			return conventions, err
 		}
 		endTime, err := time.Parse("02/01/2006", clean(record[end]))
 		if err != nil {
-			return err
+			return conventions, err
 		}
 		//The to-valid users
-		s.NewUser(tutor, schema.NONE)
-		//s.NewUser(student, schema.NONE)
-		s.NewStudent(student, "al", "si", male)
-		s.SetUserRole(student.Email, schema.NONE)
-		s.SetMale(student.Email, male)
-		s.NewConvention(student.Email,
-			startTime,
-			endTime,
-			tutor.Email,
-			cpy,
-			supervisor,
-			title,
-			ts,
-			foreign,
-			inLab,
-			gratif,
-		)
+
+		c := schema.Convention{
+			Creation: ts,
+			Student: schema.Student{
+				User: schema.User{
+					Person: student,
+					Role:   schema.STUDENT,
+				},
+				Promotion: prom,
+				Skip:      false,
+				Male:      male,
+			},
+			Gratification:  gratif,
+			Lab:            inLab,
+			ForeignCountry: foreign,
+			Begin:          startTime,
+			End:            endTime,
+			Supervisor:     supervisor,
+			Company:        cpy,
+			Tutor: schema.User{
+				Person: tutor,
+				Role:   schema.TUTOR,
+			},
+		}
+		conventions = append(conventions, c)
 	}
-	return err
+	return conventions, err
 }
 
-//Import imports all the conventions by requesting in parallal the conventions for each registered promotions
-func (f *CsvConventions) Import(s *sqlstore.Store) error {
-	errors := make([]error, len(f.promotions))
+//Import imports all the conventions by requesting in parallel the conventions for each registered promotions
+func (f *CsvConventions) Import() ([]schema.Convention, error) {
+	lock := &sync.Mutex{}
+	var error error
+	all := make([]schema.Convention, 0, 0)
 	var wg sync.WaitGroup
+
 	for i, prom := range f.promotions {
 		wg.Add(1)
 		go func(i int, p string) {
-			err := f.scan(p, s)
-			if err != nil {
+			convs, err := f.scan(p)
+			lock.Lock()
+			defer lock.Unlock()
+			if error == nil && err != nil {
 				log.Println("Import " + p + ": " + err.Error())
+				//error = err
 			}
-			errors[i] = err
+			all = append(all, convs...)
+			wg.Done()
 		}(i, prom)
 	}
 	wg.Wait()
-	return nil
+	return all, error
 }

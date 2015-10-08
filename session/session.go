@@ -5,6 +5,7 @@ package session
 import (
 	"errors"
 
+	"github.com/fhermeni/wints/feeder"
 	"github.com/fhermeni/wints/schema"
 	"github.com/fhermeni/wints/sqlstore"
 )
@@ -19,15 +20,16 @@ var (
 //Session restricts the operation that can be executed by the current user with regards
 //to its role and or relationships
 type Session struct {
-	my    schema.User
-	store *sqlstore.Store
+	my          schema.User
+	store       *sqlstore.Store
+	conventions feeder.Conventions
 	//log    journal.Journal
 	//mailer mail.Mailer
 }
 
 //NewSession creates a new session
-func NewSession(u schema.User, store *sqlstore.Store) Session {
-	return Session{my: u, store: store}
+func NewSession(u schema.User, store *sqlstore.Store, conventions feeder.Conventions) Session {
+	return Session{my: u, store: store, conventions: conventions}
 }
 
 //Role returns the current user role

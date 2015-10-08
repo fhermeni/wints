@@ -6,12 +6,12 @@ package feeder
 import (
 	"io"
 
-	"github.com/fhermeni/wints/sqlstore"
+	"github.com/fhermeni/wints/schema"
 )
 
 //Importer imports data into the system
-type Importer interface {
-	Import(s *sqlstore.Store) error
+type Conventions interface {
+	Import() ([]schema.Convention, error)
 }
 
 //ConventionReader interfaces the source where to read conventions

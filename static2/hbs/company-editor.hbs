@@ -1,0 +1,34 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-body">   
+        <button type="button" class="close" aria-hidden="true" onclick="hideModal()">×</button>                 
+            <div class="form-horizontal">
+                <fieldset>
+                    <legend>Company</legend>
+                <div class="form-group">
+                    <label for="lbl-name" class="col-sm-3 control-label">Name</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="lbl-name" value="{{Convention.Company.Name}}"/>
+                        </div>
+                </div>
+                <div class="form-group">
+                    <label for="lbl-www" class="col-sm-3 control-label">Website</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="lbl-www" value="{{Convention.Company.WWW}}"/>
+                        </div>
+                </div>                
+                <div class="form-group">
+                    <label for="lbl-title" class="col-sm-3 control-label">Subject title</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="lbl-title" value="{{Convention.Company.Title}}"/>
+                        </div>
+                </div>                                
+                </fieldset>
+            </div>
+            <div class="text-right form-group">
+            <button type="button" class="btn btn-default" onclick="hideModal()">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="updateCompany()">Update</button>
+            </div>
+        </div>
+    </div>
+</div>    

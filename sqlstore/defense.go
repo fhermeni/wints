@@ -1,6 +1,10 @@
 package sqlstore
 
-import "github.com/fhermeni/wints/schema"
+import (
+	"database/sql"
+
+	"github.com/fhermeni/wints/schema"
+)
 
 var (
 	updateDefensePrivacy  = "update defenses set private=$1 where student=$2"
@@ -38,7 +42,10 @@ func (s *Store) Defense(student string) (schema.Defense, error) {
 		&d.Private,
 		&d.Local,
 	)
-	return d, err
+	if err != sql.ErrNoRows {
+		return d, err
+	}
+	return d, nil
 }
 
 //DefenseSessions get all the defense sessions

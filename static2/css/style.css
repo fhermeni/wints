@@ -5,7 +5,10 @@
 /* file upload */
 .btn-file {
     position: relative;
-    overflow: hidden;
+    overflow: hidden;    
+}
+div.bootstrap-filestyle {
+	display: inline;
 }
 .btn-file input[type=file] {
     position: absolute;
@@ -23,6 +26,17 @@
     display: block;
 }
 
+.skip {	
+	opacity: 0.3;
+}
+
+.fixed {
+	position: fixed;
+}
+
+/*.list-group-item a {
+	color: inherit;
+}*/
 /*
 .raw {
     font-size: 12pt;

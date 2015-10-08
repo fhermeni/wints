@@ -27,15 +27,23 @@ function empty() {
 }
 
 function reportError(id, message) {
-	var popover = $(id).data('bs.popover')
+	var popover = $(id).data('bs.popover');
 	if (popover) {
 		popover.options.content = message;
+	} else {
+		$(id).popover({
+			template: '<div class="popover popover-error" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>',
+			content: message
+		});
 	}
-	$(id).popover({
-		template: '<div class="popover popover-error" role="tooltip"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"></div></div>'
-	});
-	$(id).popover("show")
-		.closest(".form-group").addClass("has-error");
+	$(id).popover("show").closest(".form-group").addClass("has-error");
+}
+
+function cleanError() {
+	for (var i = 0; i < arguments.length; i++) {
+		$(arguments[i]).closest(".form-group").removeClass("has-error");
+		$(arguments[i]).popover("hide");
+	}
 }
 
 function getCookie(name) {
@@ -61,7 +69,7 @@ function post(URL, data) {
 		method: "POST",
 		data: JSON.stringify(data),
 		url: ROOT_API + URL,
-	});
+	}).fail(logFail);
 }
 
 function put(URL, data, ok, no) {
@@ -76,14 +84,14 @@ function get(URL) {
 	return $.ajax({
 		method: "GET",
 		url: ROOT_API + URL,
-	});
+	}).fail(logFail);
 }
 
 function del(URL, ok, no) {
 	return $.ajax({
 		method: "DELETE",
 		url: ROOT_API + URL,
-	});
+	}).fail(logFail);
 }
 
 function signin(login, password) {
@@ -163,6 +171,10 @@ function conventions() {
 	return get("/conventions/");
 }
 
+function pendingConventions() {
+	return get("/conventions/");
+}
+
 function postStudent(p) {
 	return post("/students/", p);
 }
@@ -171,9 +183,46 @@ function postStudentSkippable(stu, skip) {
 	return post("/students/" + stu + "/skip", skip);
 }
 
-function replaceUserWith(src, dst) {
-	return post("/users/" + src + "/email", dst);
+function postUserEmail(old, now) {
+	return post("/users/" + old + "/email", now);
 }
+
+function internship(email) {
+	return get("/internships/" + email);
+}
+
+function convention(email) {
+	return get("/conventions/" + email);
+}
+
+function newInternship(c) {
+	return post("/internships/", c);
+}
+
+function resetPassword(email) {
+	return post("/resetPassword", email)
+}
+
+function logFail(xhr) {
+	console.log(xhr.status + " " + xhr.responseText)
+}
+
+function postCompany(em, cpy) {
+	return post("/internships/" + em + "/company", cpy)
+}
+
+function postTitle(em, title) {
+	return post("/internships/" + em + "/title", title)
+}
+
+function postSupervisor(em, sup) {
+	return post("/internships/" + em + "/supervisor", sup)
+}
+
+function postAlumni(em, a) {
+	return post("/students/" + em + "/alumni", a)
+}
+
 /*function user(email, ok, no) {
 	return get("/users/" + email, ok, no);
 }
