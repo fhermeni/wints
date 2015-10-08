@@ -19,6 +19,10 @@ func newTxErr(db *sql.DB) TxErr {
 //It is committed if err == nil. Rollbacked otherwise.
 func (r *TxErr) Done() error {
 	if r.err != nil {
+		if r.tx == nil {
+			//In case there was an issue while opening the transaction
+			return r.err
+		}
 		if e := r.tx.Rollback(); e != nil {
 			return mapCstrToError(e)
 		}

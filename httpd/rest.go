@@ -270,7 +270,12 @@ func setReportContent(ex Exchange) error {
 	if err != nil {
 		return err
 	}
-	return ex.s.SetReportContent(ex.V("k"), ex.V("s"), cnt)
+	_, err = ex.s.SetReportContent(ex.V("k"), ex.V("s"), cnt)
+	if err != nil {
+		return err
+	}
+	hdr, err := ex.s.Report(ex.V("k"), ex.V("s"))
+	return ex.outJSON(hdr, err)
 }
 
 func setReportDeadline(ex Exchange) error {

@@ -223,6 +223,41 @@ function postAlumni(em, a) {
 	return post("/students/" + em + "/alumni", a)
 }
 
+/*function setReportContent(email, kind, d, progressFunc, ok, no) {
+	return $.ajax({
+		method: "POST",
+		url: ROOT_API + "/internships/" + email + "/reports/" + kind + "/content",
+		data: d,
+		processData: false,
+		contentType: false,
+		xhr: function() { // custom xhr
+			myXhr = $.ajaxSettings.xhr();
+			if (myXhr.upload) { // check if upload property exists
+				myXhr.upload.addEventListener('progress', progressFunc, false); // for handling the progress of the upload
+			}
+			return myXhr;
+		}
+	}).done(noCb(ok)).fail(restError(no));
+}*/
+
+function postReport(email, kind, dta, progress) {
+	return $.ajax({
+		method: "POST",
+		url: ROOT_API + "/reports/" + email + "/" + kind + "/content",
+		data: dta,
+		processData: false,
+		contentType: "application/pdf",
+		xhr: function() { // custom xhr
+			myXhr = $.ajaxSettings.xhr();
+			if (myXhr.upload) { // check if upload property exists
+				myXhr.upload.addEventListener('progress', progress, false); // for handling the progress of the upload
+			}
+			return myXhr;
+		}
+	});
+
+}
+
 /*function user(email, ok, no) {
 	return get("/users/" + email, ok, no);
 }

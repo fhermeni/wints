@@ -138,13 +138,18 @@ Handlebars.registerHelper('student', function(r, opts) {
 });
 
 Handlebars.registerHelper('ifEq', function(n, val, opts) {
-	console.log(arguments);
 	if (n == val)
 		return opts.fn(this);
 	else
 		return opts.inverse(this);
 });
 
+Handlebars.registerHelper('ifLate', function(d, opts) {
+	if (moment(d).isBefore(moment()))
+		return opts.fn(this);
+	else
+		return opts.inverse(this);
+});
 
 Handlebars.registerHelper('fullname', function(p, pretty) {
 	if (pretty) {

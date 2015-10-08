@@ -1,13 +1,16 @@
-<tr>
+<tr {{#ifLate Deadline}}class="text-danger"{{/ifLate}}>
 <td>{{Kind}}</td>
 <td>{{dateFmt Deadline "D MMM YYYY HH:mm"}}</td>
 <td>-1</td>
 <td class="text-right">
-	<input type="file" data-kind="{{Kind}}" accept="application/pdf"  title="upload"/><a href="api/v1/internships/{{../Convention.Student.User.Person.Email}}/reports/{{Kind}}/content"
-	   class="btn btn-primary"
-	   title="download">
-	   	<i class="glyphicon glyphicon-cloud-download"></i>
-	</a><button onclick="showReportComment('{{Kind}}')" type="button" class="btn btn-info" title="tutor review">	<i class="glyphicon glyphicon-comment"></i>
+
+	<button type="button" class="btn btn-success btn-sm btn-file" title="upload" {{#unless Open}}disabled{{/unless}}>
+    	<i class="glyphicon glyphicon-cloud-upload"></i> <input type="file" accept="application/pdf" onchange="loadReport(this, '{{Kind}}')">
+	</button>
+	<button type="button" class="btn btn-info btn-sm btn-file" title="download" {{#unless Delivery}}disabled{{/unless}}>
+    	<i class="glyphicon glyphicon-cloud-download"></i>
+	</button><button onclick="showReportComment('{{Kind}}')" type="button" class="btn btn-info btn-sm" title="tutor review" {{#unless Reviews}}disabled{{/unless}}>
+		<i class="glyphicon glyphicon-comment"></i>
 	</button>
 </td>
 </tr>

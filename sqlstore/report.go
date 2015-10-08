@@ -91,8 +91,9 @@ func (s *Store) ReportContent(kind, email string) ([]byte, error) {
 }
 
 //SetReportContent saves the content of a given report
-func (s *Store) SetReportContent(kind, email string, cnt []byte) error {
-	return s.singleUpdate(setReportCnt, schema.ErrUnknownReport, email, kind, cnt, time.Now())
+func (s *Store) SetReportContent(kind, email string, cnt []byte) (time.Time, error) {
+	now := time.Now()
+	return now, s.singleUpdate(setReportCnt, schema.ErrUnknownReport, email, kind, cnt, now)
 }
 
 //SetReportGrade stores the given report grade

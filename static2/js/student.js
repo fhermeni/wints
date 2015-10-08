@@ -6,6 +6,12 @@ function showStudent() {
 
 function showStudentDashboard(m) {
 	mine = m;
+	Object.keys(mine.Reports).forEach(function(kind) {
+		var passed = moment(mine.Reports[kind].Deadline).isBefore(moment());
+		var r = mine.Reports[kind];
+		//can upload if not reviewed and either the deadline passed or not passed but not uploaded
+		mine.Reports[kind].Open = !r.Reviewed && (!passed || !r.Delivery)
+	});
 	$("#cnt").render("student-dashboard", m, function() {
 		syncAlumniEditor($("#position"))
 		ui()
@@ -21,7 +27,6 @@ function showSupervisorEditor() {
 }
 
 function showAlumniEditor() {
-	console.log(mine.Convention.Student.Alumni);
 	$("#modal").render("student-dashboard-alumni-editor", mine.Convention.Student.Alumni, showModal);
 }
 
@@ -102,6 +107,47 @@ function syncAlumniEditor(sel) {
 		$("#contract").addClass("hidden");
 		$("#company").addClass("hidden");
 	}
+}
+
+function loadReport(input, kind) {
+	var file = input.files[0];
+	var name = file.name;
+	var size = file.size;
+	var type = file.type;
+	if (type != "application/pdf") {
+		reportError("The report must be in PDF format. Currently: " + type)
+		return
+	}
+	if (size > 10000000) {
+		reportError("The report cannot exceed 10MB")
+		return
+	}
+	var reader = new FileReader();
+	reader.onload = function(e) {
+		return reportLoaded(kind, reader.result);
+	};
+	reader.readAsDataURL(file);
+}
+
+function reportLoaded(kind, cnt) {
+	console.log(kind);
+	console.log(cnt);
+
+	$("#modal").render("progress", {}, function() {
+		showModal(function() {
+			postReport(myself.Person.Email, kind, cnt, progress).done(hideModal);
+		});
+	});
+
+}
+
+function progress(ev) {
+	console.log(arguments);
+	var val = (ev.loaded / ev.total) * 100;
+	$("#progress-value")
+		.attr('aria-valuenow', Math.round(val))
+		.width(val + "%")
+		.html(val + "%");
 }
 /*
 

@@ -95,15 +95,6 @@ function ui() {
 		var ctx = $(this).data("context");
 		$("#" + ctx).find("input:checkbox").prop("checked", this.checked);
 	});
-
-	$('input[type=file]').filestyle({
-		input: false,
-		buttonText: "",
-		buttonName: "btn-success",
-		iconName: "glyphicon-cloud-upload",
-		badge: false
-	});
-
 }
 
 function hideModal() {
