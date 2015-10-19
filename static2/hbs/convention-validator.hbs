@@ -3,14 +3,7 @@
     <div class="modal-body">
         <button type="button" class="close" aria-hidden="true" onclick="hideModal()">×</button>
 <fieldset>
-	<legend class="fn" data-email="{{S.User.Person.Email}}">		
-			<button type="button" class="btn btn-default">
-			{{#if S.Skip}}			
-			<i class="glyphicon glyphicon-eye-close text-warning" onclick="updateStudentSkipable('{{S.User.Person.Email}}', this)"></i>
-			{{else}}			
-			<i class="glyphicon glyphicon-eye-open text-success" onclick="updateStudentSkipable('{{S.User.Person.Email}}', this)"></i>
-			{{/if}}
-			</button>
+	<legend class="fn" data-email="{{S.User.Person.Email}}">					
 		{{fullname S.User.Person}} - {{S.Promotion}}/{{S.Major}}
 	</legend>	
 	<div class="alert alert-dismissible alert-danger hidden text-center">
