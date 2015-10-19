@@ -89,6 +89,18 @@ Handlebars.registerHelper('role', function(r) {
 	return roles[r];
 });
 
+Handlebars.registerHelper('optionRoles', function(r) {
+	var res = "";
+	for (i = 2; i < roles.length; i++) {
+		if (r == i) {
+			res += "<option value='" + i + "' selected>" + roles[i] + "</option>";
+		} else {
+			res += "<option value='" + i + "'>" + roles[i] + "</option>";
+		}
+	}
+	return new Handlebars.SafeString(res);
+});
+
 function editableRoles() {
 	var res = [];
 	for (i = 2; i < roles.length; i++) {
@@ -146,6 +158,13 @@ Handlebars.registerHelper('ifEq', function(n, val, opts) {
 
 Handlebars.registerHelper('ifLate', function(d, opts) {
 	if (moment(d).isBefore(moment()))
+		return opts.fn(this);
+	else
+		return opts.inverse(this);
+});
+
+Handlebars.registerHelper('ifRole', function(d, opts) {
+	if (myself.Role >= d)
 		return opts.fn(this);
 	else
 		return opts.inverse(this);

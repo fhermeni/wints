@@ -15,6 +15,52 @@ function showNewUser() {
 	$("#modal").render("new-user", {}, showModal)
 }
 
+function showLongProfileEditor(em) {
+	user(em).done(function(ctx) {
+		$("#modal").render("long-profile-editor", ctx, function() {
+			showModal(function() {
+				makeEditable("#modal");
+			});
+		});
+	});
+}
+
+function showRoleEditor(em) {
+	user(em).done(function(ctx) {
+		$("#modal").render("role-editor", ctx, showModal)
+	});
+}
+
+function updateRole(em) {
+	postUserRole(em, parseInt($("#profile-role").val()))
+		.done(successLongUpdateProfile)
+		.fail(function(xhr) {
+			$("#modal").find(".alert-danger").html(xhr.responseText).removeClass("hidden");
+			return false;
+		});
+}
+
+function longUpdateProfile(em) {
+	if (empty("#profile-firstname", "#profile-lastname")) {
+		return
+	}
+	user(em).done(function(u) {
+		p = u.Person;
+		p.Firstname = $("#profile-firstname").val();
+		p.Lastname = $("#profile-lastname").val();
+		p.Tel = $("#profile-tel").val();
+		sendProfile(p).done(successLongUpdateProfile)
+	});
+}
+
+function successLongUpdateProfile(u) {
+	var row = $("#table-users").find("tr[data-email='" + u.Person.Email + "']");
+	var cnt = Handlebars.partials['users-user'](u);
+	row.replaceWith(cnt);
+	$('#table-users').trigger("update").trigger("updateCache");
+	hideModal();
+}
+
 function newUser() {
 	if (empty("#new-firstname", "#new-lastname", "#new-email")) {
 		return

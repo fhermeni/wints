@@ -175,7 +175,11 @@ func setUserPerson(ex Exchange) error {
 	}
 	err := ex.s.SetUserPerson(p)
 	ex.not.ProfileEdited(ex.s.Me(), p, err)
-	return ex.outJSON(p, err)
+	if err == nil {
+		u, err := ex.s.User(ex.V("u"))
+		return ex.outJSON(u, err)
+	}
+	return err
 }
 
 func replaceUser(ex Exchange) error {
@@ -201,6 +205,10 @@ func setUserRole(ex Exchange) error {
 	}
 	err := ex.s.SetUserRole(ex.V("u"), p)
 	ex.not.PrivilegeUpdated(ex.s.Me(), ex.V("u"), p, err)
+	if err == nil {
+		u, err := ex.s.User(ex.V("u"))
+		return ex.outJSON(u, err)
+	}
 	return err
 }
 

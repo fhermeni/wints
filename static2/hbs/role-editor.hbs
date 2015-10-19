@@ -1,0 +1,27 @@
+<div class="modal-dialog">
+<div class="modal-content"> 
+    <div class="modal-body">
+        <button type="button" class="close" aria-hidden="true" onclick="hideModal()">×</button>
+        <div class="form-horizontal">
+            <fieldset>     
+            <legend class="fn">{{Person.Lastname}}, {{Person.Firstname}}</legend>   
+                <div class="alert text-center alert-danger hidden"></div>
+
+                <div class="form-group">
+                    <label for="profile-role" class="col-lg-2 control-label">Role</label>
+                    <div class="col-lg-10">
+                        <select class="form-control" id="profile-role">
+                            {{optionRoles Role}}
+                        </select>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <div class="text-right form-group">
+            <button type="button" class="btn btn-default" onclick="hideModal()">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="updateRole('{{Person.Email}}')">Update</button>
+        </div>
+    </div>    
+</div>    
+</div>
+        

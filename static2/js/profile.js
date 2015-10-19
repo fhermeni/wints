@@ -1,12 +1,18 @@
-function showProfileEditor(em) {
-	if (!em) {
-		$("#modal").render("profile-editor", myself, showModal)
-	} else {
-		user(em).done(function(ctx) {
-			$("#modal").render("profile-editor", ctx, showModal);
-		});
-	}
+function showProfileEditor() {
+	$("#modal").render("profile-editor", myself, showModal)
 }
+
+function makeEditable(root) {
+	$(root).find(".editable-role").each(function(i, e) {
+		$(e).editable({
+			source: editableRoles(),
+			url: function(p) {
+				return postUserRole($(e).data("user"), parseInt(p.value))
+			}
+		});
+	});
+}
+
 
 function showPasswordEditor() {
 	$("#modal").render("password-editor", {}, showModal)
@@ -69,10 +75,10 @@ function logout() {
 		.fail(logFail);
 }
 
-function successUpdateProfile(p) {
-	if (p.Email == myself.Person.Email) {
-		myself.Person = p
-		$("#fullname").html(p.Firstname + " " + p.Lastname);
+function successUpdateProfile(u) {
+	if (u.Person.Email == myself.Person.Email) {
+		myself = u;
+		$("#fullname").html(p.Lastname + ", " + p.Firstname);
 	}
-	hideModal()
+	hideModal();
 }

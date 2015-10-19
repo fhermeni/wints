@@ -23,7 +23,7 @@ $(document).ready(function() {
 
 function loadSuccess(data) {
 	myself = data;
-	$("#fullname").html(myself.Person.Firstname + " " + myself.Person.Lastname);
+	$("#fullname").html(myself.Person.Lastname + ", " + myself.Person.Firstname);
 
 	//my options
 	for (i = 0; i <= myself.Role; i++) {
@@ -68,12 +68,12 @@ function ui() {
 		$(e).editable({
 			source: editableRoles(),
 			url: function(p) {
-				return postUserRole($(e).data("user"), parseInt(p.value));
+				return postUserRole($(e).data("user"), parseInt(p.value))
 			}
 		});
 	});
 
-	$("#cnt").find(".editable-promotion").each(function(i, e) {
+	/*$("#cnt").find(".editable-promotion").each(function(i, e) {
 		$(e).editable({
 			source: editablePromotions(),
 			url: function(p) {
@@ -89,7 +89,7 @@ function ui() {
 				return postStudentMajor($(e).data("email"), m.value);
 			}
 		});
-	});
+	});*/
 
 	$(".globalSelect").change(function() {
 		var ctx = $(this).data("context");

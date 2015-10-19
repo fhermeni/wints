@@ -82,7 +82,7 @@ function post(URL, data) {
 		method: "POST",
 		data: JSON.stringify(data),
 		url: ROOT_API + URL,
-	}).fail(logFail);
+	});
 }
 
 function get(URL) {
@@ -211,7 +211,6 @@ function resetPassword(email) {
 function logFail(xhr) {
 	if (xhr.status == 403) {
 		var e = $("#modal").render("error", xhr.responseText, showModal)
-
 	}
 	console.log(xhr.status + " " + xhr.responseText)
 }
