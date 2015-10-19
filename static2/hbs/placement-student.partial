@@ -1,11 +1,11 @@
 <tr data-email="{{User.Person.Email}}" {{#if Skip}}class="skip"{{/if}} {{#unless I}}class="text-danger"{{/unless}}>
     <td><input type='checkbox' data-email='{{User.Person.Email}}' class="shiftSelectable" data-stu-fn='{{fullname User.Person true}}'/></td>
-    <td class="fn" {{#if I}}onclick="showInternship('{{User.Person.Email}}')"{{else}}onclick="conventionValidator('{{User.Person.Email}}')"{{/if}}>{{User.Person.Lastname}}, {{User.Person.Firstname}}</td>        
+    <td class="click fn" {{#if I}}onclick="showInternship('{{User.Person.Email}}')"{{else}}onclick="conventionValidator('{{User.Person.Email}}')"{{/if}}>{{User.Person.Lastname}}, {{User.Person.Firstname}}</td>        
     <td>{{Promotion}}</td>
     <td>{{Major}}</td>    
     {{#if I}}
     <td><a href="{{I.Convention.Company.WWW}}">{{I.Convention.Company.Name}}</a></td>
-    <td>{{dateFmt I.Convention.Begin "ddd DD MMM YY"}} - {{dateFmt I.Convention.End "ddd DD MMM YY"}}</td>
+    <td>{{dateFmt I.Convention.Begin "DD/MM/YY"}} - {{dateFmt I.Convention.End "DD/MM/YY"}}</td>
     <td class="fn">{{I.Convention.Tutor.Person.Lastname}}, {{I.Convention.Tutor.Person.Firstname}}</td>
     <td class="text-right">{{I.Convention.Gratification}}</td>
     {{else}}

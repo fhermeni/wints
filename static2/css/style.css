@@ -2,6 +2,11 @@
 	text-transform: capitalize;
 }
 
+.click {
+	cursor: pointer;
+}
+
+
 /* file upload */
 .btn-file {
     position: relative;

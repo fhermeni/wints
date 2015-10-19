@@ -7,7 +7,8 @@ $(document).on('change', '.btn-file :file', function() {
 
 
 function showUsers() {
-	users().done(loadUsers)
+	$.when(users(), internships()).done(loadUsers);
+	//users().done(loadUsers)
 }
 
 function showNewUser() {
@@ -47,8 +48,16 @@ function usersUI() {
 	ui();
 }
 
-function loadUsers(users) {
-	$("#cnt").render("users-header", users, usersUI);
+function loadUsers(uss, ints) {
+	var got = {};
+	ints[0].forEach(function(i) {
+		got[i.Convention.Student.User.Person.Email] = true;
+	});
+	var allUsers = uss[0];
+	allUsers.forEach(function(u, idx) {
+		allUsers[idx].Resetable = (u.Role != 1 || got[u.Person.Email]);
+	});
+	$("#cnt").render("users-header", allUsers, usersUI);
 }
 
 

@@ -18,7 +18,7 @@ func New(m mail.Mailer, l journal.Journal) *Notifier {
 }
 
 func (n *Notifier) Println(s string, err error) {
-	n.Log.Log("anon", s, err)
+	n.Log.Log("wintsd", s, err)
 	if err == nil {
 		log.Println(s + ": OK")
 	} else {
@@ -27,7 +27,7 @@ func (n *Notifier) Println(s string, err error) {
 }
 
 func (n *Notifier) Fatalln(s string, err error) {
-	n.Log.Log("anon", s, err)
+	n.Log.Log("wintsd", s, err)
 	if err == nil {
 		log.Println(s + ": OK")
 	} else {
@@ -35,17 +35,20 @@ func (n *Notifier) Fatalln(s string, err error) {
 	}
 }
 
-func (n *Notifier) NewInternship(i schema.Internship, token []byte) {
+/*func (n *Notifier) NewInternship(i schema.Internship, token []byte, err error) {
+	//
+	ed.notifier.InviteStudent(ex.s.Me(), i, string(token), err)
+
 	//invite the student
 	//Invitation mail
 	//notify the tutor
 
 	//log
-}
+}*/
 func (n *Notifier) AccountReseted(em string, token []byte, err error) error {
 	//mail with token
 	//log
-	n.Log.Log("anon", "start password reset for "+em, err)
+	n.Log.Log("wintsd", "start password reset for "+em, err)
 	if err != nil {
 		return err
 	}
@@ -98,8 +101,10 @@ func (n *Notifier) RmAccount(from schema.User, em string, err error) error {
 
 func (n *Notifier) InviteStudent(from schema.User, i schema.Internship, token string, err error) error {
 	err = n.invite(from, i.Convention.Student.User.Person, token, "student_welcome.txt", err)
-	err = n.mailer.Send(i.Convention.Tutor.Person, "tutor.txt", i.Convention.Student)
-	n.Log.UserLog(from, "Notify tutor ", err)
+	if err == nil {
+		err = n.mailer.Send(i.Convention.Tutor.Person, "tutor.txt", i.Convention.Student)
+		n.Log.UserLog(from, "Notify tutor ", err)
+	}
 	return err
 }
 

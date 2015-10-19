@@ -345,8 +345,8 @@ func (ed *EndPoints) newInternship(ex Exchange) error {
 	if err := ex.inJSON(&c); err != nil {
 		return err
 	}
-	i, token, err := ex.s.NewInternship(c, ed.cfg.RenewalRequestLifetime.Duration, ed.organization)
-	ed.notifier.InviteStudent(ex.s.Me(), i, string(token), err)
+	i, token, err := ex.s.NewInternship(c, ed.organization)
+	err = ed.notifier.InviteStudent(ex.s.Me(), i, string(token), err)
 	return ex.outJSON(i, err)
 }
 

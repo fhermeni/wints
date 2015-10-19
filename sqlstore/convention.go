@@ -2,7 +2,6 @@ package sqlstore
 
 import (
 	"database/sql"
-	"time"
 
 	"github.com/fhermeni/wints/config"
 	"github.com/fhermeni/wints/schema"
@@ -60,7 +59,7 @@ func (s *Store) SetCompany(stu string, c schema.Company) error {
 	return s.singleUpdate(updateCompany, schema.ErrUnknownInternship, c.WWW, c.Name, stu)
 }
 
-func (s *Store) NewInternship(c schema.Convention, d time.Duration, cfg config.Internships) (schema.Internship, []byte, error) {
+func (s *Store) NewInternship(c schema.Convention, cfg config.Internships) (schema.Internship, []byte, error) {
 	i := schema.Internship{
 		Convention: c,
 	}
@@ -74,7 +73,9 @@ func (s *Store) NewInternship(c schema.Convention, d time.Duration, cfg config.I
 		tx.Exec(insertReport, c.Student.User.Person.Email, kind, report.Delivery.Value(c.Begin), false, report.Grade)
 	}
 	token := randomBytes(32)
-	tx.Exec(startPasswordRenewal, c.Student.User.Person.Email, token, time.Now().Add(d))
+	//We delete in cast we start a reset a unvalidated account
+	tx.Exec(deletePasswordRenewalRequest, c.Student.User.Person.Email)
+	tx.Exec(startPasswordRenewal, c.Student.User.Person.Email, token)
 	for kind, survey := range cfg.Surveys {
 		token := randomBytes(16)
 		tx.Exec(insertSurvey, c.Student.User.Person.Email, kind, token, survey.Deadline.Value(c.Begin))

@@ -20,7 +20,6 @@ func (fake *Fake) Send(to schema.Person, tpl string, data interface{}, cc ...sch
 		Fullname: fake.Config.Fullname,
 		Data:     data,
 	}
-	log.Println(dta)
 	body, err := fill(path, dta)
 	if err != nil {
 		return err

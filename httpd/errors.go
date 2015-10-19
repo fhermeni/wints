@@ -35,6 +35,6 @@ func status(not *notifier.Notifier, w http.ResponseWriter, e error) {
 	default:
 		http.Error(w, "Internal server error. A possible bug to report", http.StatusInternalServerError)
 
-		not.Log.Log("-", "unsupported error ", e)
+		not.Log.Log("wintsd", "unsupported error ", e)
 	}
 }

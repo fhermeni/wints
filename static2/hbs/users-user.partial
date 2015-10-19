@@ -11,7 +11,7 @@
     </td>
     <td>{{dateFmt LastVisit "DD/MM/YY HH:mm"}}</td>
     <td>
-        <a data-user="{{Person.Email}}" class="pull-left btn btn-info btn-xs glyphicon glyphicon-refresh" title="re-invite ?" data-toggle="confirmation" data-on-confirm="startPasswordReset('{{Person.Email}}')"></a> 
-        <a tabindex="0" data-trigger="focus" role="button" data-user="{{Person.Email}}" class="pull-right btn btn-xs btn-danger glyphicon glyphicon-remove" data-toggle="confirmation" data-on-confirm='rmUser("{{Person.Email}}")'> </a>       
+        <button type="button" data-user="{{Person.Email}}" class="pull-left btn btn-info btn-xs glyphicon glyphicon-refresh" title="re-invite ?" data-toggle="confirmation" data-on-confirm="startPasswordReset('{{Person.Email}}')" {{#unless Resetable}}disabled{{/unless}}></button> 
+        <button type="button" tabindex="0" data-trigger="focus" role="button" data-user="{{Person.Email}}" class="pull-right btn btn-xs btn-danger glyphicon glyphicon-remove" data-toggle="confirmation" data-on-confirm='rmUser("{{Person.Email}}")'> </button>       
     </td>
 </tr>
