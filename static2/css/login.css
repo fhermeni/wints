@@ -9,12 +9,6 @@
 .well {
 	margin-bottom: 0px;
 }
-.alert {
-    display: none;    
-}
-.alert:target {
-    display: block;
-}	
 
 .has-error input {
 	color: #d9534f;

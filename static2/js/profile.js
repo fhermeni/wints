@@ -8,6 +8,24 @@ function showProfileEditor(em) {
 	}
 }
 
+function showPasswordEditor() {
+	$("#modal").render("password-editor", {}, showModal)
+}
+
+function startResetPassword() {
+	resetPassword(myself.Person.Email)
+		.fail(resetFail).done(passwordLostOk);
+}
+
+function passwordLostOk(xhr) {
+	$(".alert-success").removeClass("hidden");
+	$("#modal").find(".btn").attr("disabled", "disabled");
+}
+
+function resetFail(xhr) {
+	$("#modal").find(".alert-danger").removeClass("hidden");
+}
+
 /*
 function showPasswordEditor() {
 	$("#modal").render("password-editor", {}, showModal)

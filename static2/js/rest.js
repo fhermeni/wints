@@ -39,10 +39,23 @@ function reportError(id, message) {
 	$(id).popover("show").closest(".form-group").addClass("has-error");
 }
 
+function defaultSuccess(data, status, xhr) {
+	$.notify({
+		message: xhr.responseText ? xhr.responseText : status
+	}, {
+		type: "success",
+		delay: 1000,
+		placement: {
+			from: "bottom",
+			align: "right"
+		}
+	});
+}
+
 function cleanError() {
 	for (var i = 0; i < arguments.length; i++) {
 		$(arguments[i]).closest(".form-group").removeClass("has-error");
-		$(arguments[i]).popover("hide");
+		$(arguments[i]).popover("destroy");
 	}
 }
 
@@ -72,19 +85,11 @@ function post(URL, data) {
 	}).fail(logFail);
 }
 
-function put(URL, data, ok, no) {
-	return $.ajax({
-		method: "PUT",
-		data: JSON.stringify(data),
-		url: ROOT_API + URL,
-	}).done(noCb(ok)).fail(restError(no));
-}
-
 function get(URL) {
 	return $.ajax({
 		method: "GET",
 		url: ROOT_API + URL,
-	}).fail(logFail);
+	}).fail(logFail)
 }
 
 function del(URL, ok, no) {

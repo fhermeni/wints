@@ -4,6 +4,13 @@
 
 function flipForm(from, to) {
 	$('[data-toggle="popover"]').popover('hide').closest(".form-group").removeClass("has-error");
+	var em = from == 'login-diag' ? $("#loginEmail").val() : $("#lostEmail").val();
+	if (to == 'login-diag') {
+		$("#loginEmail").val(em);
+	} else {
+		$("#lostEmail").val(em);
+	}
+
 	$("#" + from).slideToggle(400, function() {
 		$("#" + to).slideToggle();
 	});
@@ -11,8 +18,9 @@ function flipForm(from, to) {
 
 function login() {
 	if (empty("#loginEmail", "#loginPassword")) {
-		return
+		return;
 	}
+	cleanError("#loginEmail", "#loginPassword");
 	signin($("#loginEmail").val(), $("#loginPassword").val())
 		.done(loginSuccess).fail(loginFail)
 
@@ -21,7 +29,6 @@ function login() {
 function loginSuccess(session) {
 	localStorage.setItem("token", session.Token);
 	window.location.href = "/"
-	console.log("success, relocation")
 }
 
 function loginFail(xhr) {
@@ -42,7 +49,8 @@ function passwordLost() {
 }
 
 function passwordLostOk(xhr) {
-	console.log("clean");
+	$(".alert-success").removeClass("hidden");
+	$(".btn").attr("disabled", "disabled");
 	cleanError("#lostEmail")
 }
 
@@ -51,9 +59,21 @@ function passwordLostFail(xhr) {
 }
 
 $(document).ready(function() {
-	var em = $.urlParam("login")
+	var em = $.urlParam("email")
 	if (em) {
 		$("#loginEmail").val(em);
 	}
 	$('[data-toggle="popover"]').popover()
+
+	$(function() {
+		$("input").keypress(function(e) {
+			if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
+				$('.btn-primary').click();
+				return false;
+			} else {
+				return true;
+			}
+		});
+	});
+
 });

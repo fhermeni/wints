@@ -17,7 +17,7 @@ var (
 	ErrUserTutoring       = errors.New("The user is tutoring students")
 	ErrCredentials        = errors.New("Incorrect credentials")
 	ErrPasswordTooShort   = errors.New("Password too short (8 chars. min)")
-	ErrNoPendingRequests  = errors.New("No password renewable request pending")
+	ErrNoPendingRequests  = errors.New("No pending reset request.You might use a bad or an expired reset token.")
 	ErrInvalidPeriod      = errors.New("invalid internship period")
 	ErrConventionExists   = errors.New("convention already scanned")
 	ErrInvalidMajor       = errors.New("Unknown major")

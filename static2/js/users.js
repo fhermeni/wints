@@ -99,6 +99,10 @@ function csvLoaded(event, numFiles, label) {
 	}
 }
 
+function startPasswordReset(em) {
+	resetPassword(em).done(defaultSuccess);
+}
+
 function parseCSV(e) {
 	stats = {
 		Nb: 0,

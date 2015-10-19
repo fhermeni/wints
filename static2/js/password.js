@@ -9,7 +9,11 @@ function equals(f1, f2) {
 }
 
 function setPassword() {
-	if (empty("#passwd1", "#passwd2") || !equals("#passwd1", "#passwd2")) {
+	$(".alert-danger").addClass("hidden");
+	if (empty("#passwd1", "#passwd2")) {
+		return
+	}
+	if (!equals("#passwd1", "#passwd2")) {
 		return
 	}
 	newPassword($.urlParam("token"), $("#passwd1").val())
@@ -17,13 +21,20 @@ function setPassword() {
 		.done(doneSetPassword)
 }
 
-function doneSetPassword(xhr) {
-	window.location.href = "login.html?login=" + xhr.responseText;
+function doneSetPassword(em) {
+	$(".btn").attr("disabled", "disabled");
+	window.location = "/login?email=" + em;
 }
 
 function failSetPassword(xhr) {
-	reportError("#passwd1", xhr.responseText)
+	cleanError("#passwd1", "#passwd2");
+	$(".alert-danger").html(xhr.responseText).removeClass("hidden");
 }
 $(document).ready(function() {
+	var t = $.urlParam("token");
+	if (!t) {
+		$(".alert-danger").html("<strong>There is no token in the request</strong>. Initiate a reset request <a href='login'>here</a>.").removeClass("hidden");
+		$(".btn").attr("disabled", "disabled");
+	}
 	$('[data-toggle="popover"]').popover()
 });

@@ -45,7 +45,7 @@ func (n *Notifier) NewInternship(i schema.Internship, token []byte) {
 func (n *Notifier) AccountReseted(em string, token []byte, err error) error {
 	//mail with token
 	//log
-	n.Log.Log("anon", "password reset for "+em, err)
+	n.Log.Log("anon", "start password reset for "+em, err)
 	if err != nil {
 		return err
 	}
