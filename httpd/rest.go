@@ -155,7 +155,7 @@ func newUser(ex Exchange) error {
 		return err
 	}
 	token, err := ex.s.NewUser(u.Person, u.Role)
-	ex.not.InviteTeacher(ex.s.Me(), u.Person, string(token), err)
+	err = ex.not.InviteTeacher(ex.s.Me(), u.Person, string(token), err)
 	return ex.outJSON(u, err)
 }
 func delUser(ex Exchange) error {

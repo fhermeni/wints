@@ -130,7 +130,7 @@ func (n *Notifier) ProfileEdited(from schema.User, p schema.Person, err error) {
 }
 
 func (n *Notifier) InviteTeacher(from schema.User, p schema.Person, token string, err error) error {
-	return n.invite(from, p, token, "teacher_welcome.txt", err)
+	return n.invite(from, p, token, "tutor_welcome.txt", err)
 }
 
 func (n *Notifier) InviteRoot(from schema.User, p schema.Person, token string, err error) error {

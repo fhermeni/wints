@@ -27,6 +27,7 @@ function newUser() {
 		},
 		Role: parseInt($("#new-role").val())
 	}
+	$("#modal").find(".alert-danger").addClass("hidden");
 	postNewUser(u)
 		.done(successNewUser)
 		.fail(failNewUser)
@@ -70,8 +71,9 @@ function successNewUser(p) {
 function failNewUser(xhr) {
 	if (xhr.status == 409 || xhr.status == 400) { //user exists or invalid email
 		reportError("#new-email", xhr.responseText)
+	} else {
+		$("#modal").find(".alert-danger").html(xhr.responseText).removeClass("hidden");
 	}
-	console.log(xhr.status + " " + xhr.responseText);
 }
 
 function rmUser(em) {
