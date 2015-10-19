@@ -77,7 +77,7 @@ function failNewUser(xhr) {
 function rmUser(em) {
 	delUser(em).done(function() {
 		successDelUser(em)
-	}).fail(logFail)
+	})
 }
 
 function successDelUser(em) {

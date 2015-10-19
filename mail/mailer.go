@@ -1,21 +1,39 @@
 package mail
 
-/*
+import (
+	"bytes"
+	"text/template"
+
+	"github.com/fhermeni/wints/schema"
+)
+
+var (
+	NONE = []schema.Person{}
+)
+
+//Mailer is an interface to specify a mail must be send
 type Mailer interface {
-	SendAdminInvitation(u internship.User, token []byte)
-	SendStudentInvitation(u internship.User, token []byte)
-	SendTutorNotification(s internship.Person, t internship.Person)
-	SendPasswordResetLink(u internship.User, token []byte)
-	SendAccountRemoval(u internship.User)
-	SendRoleUpdate(u internship.User)
-	SendTutorUpdate(s internship.User, old internship.User, now internship.User)
-	SendReportUploaded(s internship.User, t internship.User, kind string)
-	SendGradeUploaded(s internship.User, t internship.User, kind string)
-	SendReportDeadline(s internship.User, t internship.User, kind string, d time.Time)
-	SendReportPrivate(s internship.User, t internship.User, kind string, b bool)
-	SendTest(dst string) error
-	SendSurveyUploaded(tutor internship.User, student internship.User, kind string)
-	SendSurveyRequest(i internship.Internship, kind string)
-	Fake(bool)
+	//Send a mail to all the given person in to with cc'ing persons in cc.
+	//The mail body is created using the given template and data
+	Send(to schema.Person, tpl string, data interface{}, cc ...schema.Person) error
 }
-*/
+
+func fill(path string, data interface{}) ([]byte, error) {
+	tpl, err := template.ParseFiles(path)
+	if err != nil {
+		return []byte{}, err
+	}
+	var b bytes.Buffer
+	if err = tpl.Execute(&b, data); err != nil {
+		return []byte{}, err
+	}
+	return b.Bytes(), err
+}
+
+func emails(persons ...schema.Person) []string {
+	emails := make([]string, 0, 0)
+	for _, p := range persons {
+		emails = append(emails, p.Email)
+	}
+	return emails
+}

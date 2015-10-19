@@ -2,8 +2,6 @@
 package httpd
 
 import (
-	"encoding/json"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -11,6 +9,8 @@ import (
 	"github.com/dimfeld/httptreemux"
 	"github.com/fhermeni/wints/config"
 	"github.com/fhermeni/wints/feeder"
+	"github.com/fhermeni/wints/mail"
+	"github.com/fhermeni/wints/notifier"
 	"github.com/fhermeni/wints/schema"
 	"github.com/fhermeni/wints/session"
 	"github.com/fhermeni/wints/sqlstore"
@@ -24,10 +24,12 @@ type EndPoints struct {
 	conventions  feeder.Conventions
 	cfg          config.Rest
 	organization config.Internships
+	mailer       mail.Mailer
+	notifier     *notifier.Notifier
 }
 
 //NewEndPoints creates new prefixed endpoints
-func NewEndPoints(store *sqlstore.Store, convs feeder.Conventions, cfg config.Rest, org config.Internships) EndPoints {
+func NewEndPoints(not *notifier.Notifier, store *sqlstore.Store, convs feeder.Conventions, cfg config.Rest, org config.Internships) EndPoints {
 	ed := EndPoints{
 		store:        store,
 		router:       httptreemux.New(),
@@ -35,6 +37,7 @@ func NewEndPoints(store *sqlstore.Store, convs feeder.Conventions, cfg config.Re
 		cfg:          cfg,
 		organization: org,
 		conventions:  convs,
+		notifier:     not,
 	}
 	ed.router.NotFoundHandler = func(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "", http.StatusNotFound)
@@ -43,7 +46,6 @@ func NewEndPoints(store *sqlstore.Store, convs feeder.Conventions, cfg config.Re
 	ed.get("/users/", users)
 	ed.post("/users/", newUser)
 	ed.post("/users/:u/email", setEmail)
-	ed.post("/users/:u/password", setPassword)
 	ed.post("/users/:u/person", setUserPerson)
 	ed.post("/users/:u/role", setUserRole)
 	ed.del("/users/:u", delUser)
@@ -72,10 +74,10 @@ func NewEndPoints(store *sqlstore.Store, convs feeder.Conventions, cfg config.Re
 
 	ed.get("/conventions/", conventions)
 
-	ed.router.POST(ed.prefix+"/signin", ed.signin)
-	ed.router.POST(ed.prefix+"/resetPassword", ed.resetPassword)
-	ed.router.POST(ed.prefix+"/newPassword", ed.newPassword)
-	ed.router.GET(ed.prefix+"/config", ed.config)
+	ed.router.POST(ed.prefix+"/signin", ed.anon(ed.signin))
+	ed.router.POST(ed.prefix+"/resetPassword", ed.anon(ed.resetPassword))
+	ed.router.POST(ed.prefix+"/newPassword", ed.anon(ed.newPassword))
+	ed.router.GET(ed.prefix+"/config", ed.anon(ed.config))
 	return ed
 }
 
@@ -110,20 +112,35 @@ func (ed *EndPoints) openSession(w http.ResponseWriter, r *http.Request) (sessio
 	return session.NewSession(user, ed.store, ed.conventions), err
 }
 
+func (ed *EndPoints) anon(fn EndPoint) httptreemux.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request, ps map[string]string) {
+		ex := Exchange{
+			w:   w,
+			r:   r,
+			ps:  ps,
+			cfg: ed.cfg,
+			not: ed.notifier,
+		}
+		status(ed.notifier, w, fn(ex))
+	}
+}
+
 func (ed *EndPoints) wrap(fn EndPoint) httptreemux.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request, ps map[string]string) {
 		//Create a session
 		s, err := ed.openSession(w, r)
 		if err != nil {
-			status(w, err)
+			status(ed.notifier, w, err)
 		}
 		ex := Exchange{
-			w:  w,
-			r:  r,
-			ps: ps,
-			s:  s,
+			w:   w,
+			r:   r,
+			ps:  ps,
+			s:   s,
+			cfg: ed.cfg,
+			not: ed.notifier,
 		}
-		status(w, fn(ex))
+		status(ed.notifier, w, fn(ex))
 	}
 }
 
@@ -137,10 +154,13 @@ func newUser(ex Exchange) error {
 	if err := ex.inJSON(&u); err != nil {
 		return err
 	}
-	return ex.outJSON(u, ex.s.NewUser(u.Person, u.Role))
+	token, err := ex.s.NewUser(u.Person, u.Role)
+	ex.not.InviteTeacher(ex.s.Me(), u.Person, string(token), err)
+	return ex.outJSON(u, err)
 }
 func delUser(ex Exchange) error {
-	return ex.s.RmUser(ex.V("u"))
+	err := ex.s.RmUser(ex.V("u"))
+	return ex.not.RmAccount(ex.s.Me(), ex.V("u"), err)
 }
 
 func user(ex Exchange) error {
@@ -148,23 +168,14 @@ func user(ex Exchange) error {
 	return ex.outJSON(u, err)
 }
 
-func setPassword(ex Exchange) error {
-	var req struct {
-		Current string
-		Now     string
-	}
-	if err := ex.inJSON(&req); err != nil {
-		return err
-	}
-	return ex.s.SetPassword(ex.V("u"), []byte(req.Current), []byte(req.Now))
-}
-
 func setUserPerson(ex Exchange) error {
 	var p schema.Person
 	if err := ex.inJSON(&p); err != nil {
 		return err
 	}
-	return ex.outJSON(p, ex.s.SetUserPerson(p))
+	err := ex.s.SetUserPerson(p)
+	ex.not.ProfileEdited(ex.s.Me(), p, err)
+	return ex.outJSON(p, err)
 }
 
 func replaceUser(ex Exchange) error {
@@ -188,7 +199,9 @@ func setUserRole(ex Exchange) error {
 	if err := ex.inJSON(&p); err != nil {
 		return err
 	}
-	return ex.s.SetUserRole(ex.V("u"), p)
+	err := ex.s.SetUserRole(ex.V("u"), p)
+	ex.not.PrivilegeUpdated(ex.s.Me(), ex.V("u"), p, err)
+	return err
 }
 
 func setMajor(ex Exchange) error {
@@ -244,9 +257,7 @@ func newStudent(ex Exchange) error {
 	}
 	s.User.Role = schema.STUDENT
 	err := ex.s.NewStudent(s.User.Person, s.Major, s.Promotion, s.Male)
-	if err != nil {
-		return err
-	}
+	ex.not.NewStudent(ex.s.Me(), s, err)
 	return ex.outJSON(s, err)
 }
 
@@ -308,6 +319,7 @@ func setCompany(ex Exchange) error {
 	var c schema.Company
 	ex.inJSON(&c)
 	err := ex.s.SetCompany(ex.V("s"), c)
+
 	return ex.outJSON(c, err)
 }
 
@@ -333,11 +345,17 @@ func (ed *EndPoints) newInternship(ex Exchange) error {
 	if err := ex.inJSON(&c); err != nil {
 		return err
 	}
-	i, err := ex.s.NewInternship(c, ed.organization)
+	i, token, err := ex.s.NewInternship(c, ed.cfg.RenewalRequestLifetime.Duration, ed.organization)
+	ed.notifier.InviteStudent(ex.s.Me(), i, string(token), err)
 	return ex.outJSON(i, err)
 }
 
 func (ed *EndPoints) delSession(ex Exchange) error {
+	err := ex.s.RmSession(ex.s.Me().Person.Email)
+	ex.not.Logout(ex.s.Me(), err)
+	if err != nil {
+		return err
+	}
 	token := &http.Cookie{
 		Name:   "token",
 		Value:  "",
@@ -357,21 +375,18 @@ func (ed *EndPoints) delSession(ex Exchange) error {
 	return nil
 }
 
-func (ed *EndPoints) signin(w http.ResponseWriter, r *http.Request, ps map[string]string) {
+func (ed *EndPoints) signin(ex Exchange) error {
 	var cred struct {
 		Login    string
 		Password string
 	}
-	if err := json.NewDecoder(r.Body).Decode(&cred); err != nil {
-		status(w, ErrMalformedJSON)
-		return
+	if err := ex.inJSON(&cred); err != nil {
+		return err
 	}
-	s, err := ed.store.NewSession(cred.Login,
-		[]byte(cred.Password),
-		ed.cfg.SessionLifeTime.Duration)
+	s, err := ed.store.NewSession(cred.Login, []byte(cred.Password), ed.cfg.SessionLifeTime.Duration)
+	ed.notifier.Login(s, err)
 	if err != nil {
-		status(w, err)
-		return
+		return err
 	}
 
 	token := &http.Cookie{
@@ -384,47 +399,36 @@ func (ed *EndPoints) signin(w http.ResponseWriter, r *http.Request, ps map[strin
 		Value: string(s.Email),
 		Path:  "/",
 	}
-	http.SetCookie(w, token)
-	http.SetCookie(w, login)
-	http.Redirect(w, r, "/", 302)
+	http.SetCookie(ex.w, token)
+	http.SetCookie(ex.w, login)
+	http.Redirect(ex.w, ex.r, "/", 302)
 	ed.store.Visit(cred.Login)
+	return err
 }
 
-func (ed *EndPoints) resetPassword(w http.ResponseWriter, r *http.Request, ps map[string]string) {
+func (ed *EndPoints) resetPassword(ex Exchange) error {
 	var email string
-	if err := json.NewDecoder(r.Body).Decode(&email); err != nil {
-		status(w, ErrMalformedJSON)
-		return
+	if err := ex.inJSON(&email); err != nil {
+		return err
 	}
-	s, err := ed.store.ResetPassword(email, ed.cfg.RenewalRequestLifetime.Duration)
-	if err != nil {
-		status(w, err)
-		return
-	}
-	log.Println(string(s))
-	w.Header().Set("Content-type", "application/json; charset=utf-8")
-	status(w, json.NewEncoder(w).Encode(s))
+	token, err := ed.store.ResetPassword(email)
+	ed.notifier.AccountReseted(email, token, err)
+	return err
 }
 
-func (ed *EndPoints) config(w http.ResponseWriter, r *http.Request, ps map[string]string) {
-	w.Header().Set("Content-type", "application/json; charset=utf-8")
-	status(w, json.NewEncoder(w).Encode(ed.organization))
+func (ed *EndPoints) config(ex Exchange) error {
+	return ex.outJSON(ed.organization, nil)
 }
 
-func (ed *EndPoints) newPassword(w http.ResponseWriter, r *http.Request, ps map[string]string) {
+func (ed *EndPoints) newPassword(ex Exchange) error {
 	var req struct {
 		Token    string
 		Password string
 	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		status(w, ErrMalformedJSON)
-		return
+	if err := ex.inJSON(&req); err != nil {
+		return err
 	}
-	s, err := ed.store.NewPassword([]byte(req.Token), []byte(req.Password))
-	if err != nil {
-		status(w, err)
-		return
-	}
-	w.Header().Set("Content-type", "application/json; charset=utf-8")
-	status(w, json.NewEncoder(w).Encode(s))
+	email, err := ed.store.NewPassword([]byte(req.Token), []byte(req.Password))
+	ex.not.PasswordChanged(email, err)
+	return ex.outJSON(email, err)
 }

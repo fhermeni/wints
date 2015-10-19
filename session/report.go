@@ -63,9 +63,8 @@ func (s *Session) ReportContent(kind, email string) ([]byte, error) {
 		s.Role() >= schema.ROOT {
 		return s.store.ReportContent(kind, email)
 	}
-	err = ErrPermission
-	if h.Private && s.Role() < schema.ROOT {
-		err = ErrConfidentialReport
+	if s.Role() >= schema.MAJOR && !h.Private {
+		return s.store.ReportContent(kind, email)
 	}
-	return []byte{}, err
+	return []byte{}, ErrPermission
 }

@@ -48,6 +48,6 @@ func (s *Store) NewSession(email string, password []byte, expire time.Duration) 
 }
 
 //RmSession destroy the current user session if exists
-func (s *Store) RmSession(token []byte) error {
-	return s.singleUpdate(deleteSessionFromToken, schema.ErrUnknownUser, token)
+func (s *Store) RmSession(email string) error {
+	return s.singleUpdate(deleteSession, schema.ErrUnknownUser, email)
 }

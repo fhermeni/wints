@@ -13,8 +13,6 @@ import (
 var (
 	//ErrPermission indicates an operation that is not permitted
 	ErrPermission = errors.New("Permission denied")
-	//ErrConfidentialReport indicates the report cannot be access due to its confidential status
-	ErrConfidentialReport = errors.New("Confidential report")
 )
 
 //Session restricts the operation that can be executed by the current user with regards
@@ -30,6 +28,16 @@ type Session struct {
 //NewSession creates a new session
 func NewSession(u schema.User, store *sqlstore.Store, conventions feeder.Conventions) Session {
 	return Session{my: u, store: store, conventions: conventions}
+}
+
+func (s *Session) RmSession(em string) error {
+	if s.Myself(em) || s.Role() >= schema.ADMIN {
+		return s.store.RmSession(em)
+	}
+	return ErrPermission
+}
+func (s *Session) Me() schema.User {
+	return s.my
 }
 
 //Role returns the current user role

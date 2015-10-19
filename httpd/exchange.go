@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/fhermeni/wints/config"
+	"github.com/fhermeni/wints/notifier"
 	"github.com/fhermeni/wints/session"
 )
 
@@ -18,7 +20,9 @@ type Exchange struct {
 	r   *http.Request
 	ps  map[string]string
 	s   session.Session
+	cfg config.Rest
 	err error
+	not *notifier.Notifier
 }
 
 // Create a Pool that contains previously used Writers and

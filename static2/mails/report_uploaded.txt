@@ -3,4 +3,4 @@ Subject:[Wints] {{.Student.Fullname}} uploaded his/her {{.Kind}} report
 Log on your dashboard to grade the report: {{.WWW}}
 
 Regards,
-Fabien Hermenier
+{{.Fullname}}

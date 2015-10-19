@@ -31,14 +31,6 @@ func (s *Session) User(em string) (schema.User, error) {
 	return schema.User{}, ErrPermission
 }
 
-//SetPassword changes the user password if the emitter is the targeted user
-func (s *Session) SetPassword(email string, oldP, newP []byte) error {
-	if s.Myself(email) {
-		return s.store.SetPassword(email, oldP, newP)
-	}
-	return ErrPermission
-}
-
 //SetUserPerson set the user profile if the emitter is the targeted user
 func (s *Session) SetUserPerson(p schema.Person) error {
 	if s.Myself(p.Email) || s.Role() >= schema.ADMIN {
@@ -56,11 +48,11 @@ func (s *Session) SetUserRole(email string, priv schema.Privilege) error {
 }
 
 //NewUser creates a new user account if the emitter is an admin at least
-func (s *Session) NewUser(p schema.Person, role schema.Privilege) error {
+func (s *Session) NewUser(p schema.Person, role schema.Privilege) ([]byte, error) {
 	if s.Role() >= schema.ADMIN {
 		return s.store.NewUser(p, role)
 	}
-	return ErrPermission
+	return []byte{}, ErrPermission
 }
 
 //NewStudent creates a new student account if the emitter is an admin at least

@@ -2,7 +2,6 @@ package sqlstore
 
 import (
 	"database/sql"
-	"log"
 	"sync"
 	"time"
 
@@ -129,7 +128,6 @@ func mapCstrToError(err error) error {
 		case "fk_conventions_student", "fk_reports_student", "fk_surveys_student", "fk_defenses_student":
 			return schema.ErrUnknownStudent
 		case "fk_conventions_tutor":
-			log.Println(err)
 			return schema.ErrUserTutoring
 		}
 	}

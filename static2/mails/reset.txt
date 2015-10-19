@@ -3,9 +3,9 @@ Subject:[Wints] Password reset
 A request has been emitted to reset your account.
 Click the following link to generate a new password if needed:
 
-{{.WWW}}/resetPassword?token={{.Token}}
+{{.WWW}}/resetPassword?token={{.Data}}
 
 If you do not want a new password, simply ignore this mail
 
 Regards
-Fabien Hermenier
+{{.Fullname}}

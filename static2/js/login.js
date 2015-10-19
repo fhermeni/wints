@@ -38,7 +38,12 @@ function passwordLost() {
 		return
 	}
 	resetPassword($("#lostEmail").val())
-		.fail(passwordLostFail)
+		.fail(passwordLostFail).done(passwordLostOk);
+}
+
+function passwordLostOk(xhr) {
+	console.log("clean");
+	cleanError("#lostEmail")
 }
 
 function passwordLostFail(xhr) {

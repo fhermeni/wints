@@ -33,8 +33,7 @@ create table sessions(
 
 
 create table password_renewal(
-    email text,
-    deadline timestamp with time zone,
+    email text,    
     token text unique,
     constraint pk_password_renewal_email PRIMARY KEY(email),
     constraint fk_password_renewal_email FOREIGN KEY(email) REFERENCES users(email) on delete cascade on update cascade
@@ -44,7 +43,7 @@ create table students(
     email text,
     major text,
     promotion text,
-    nextPosition string,
+    nextPosition text,
     nextFrance boolean,
     nextSameCompany boolean,
     nextPermanent boolean,

@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"errors"
 	"flag"
 	"log"
 	"os"
@@ -13,6 +12,9 @@ import (
 	"github.com/fhermeni/wints/config"
 	"github.com/fhermeni/wints/feeder"
 	"github.com/fhermeni/wints/httpd"
+	"github.com/fhermeni/wints/journal"
+	"github.com/fhermeni/wints/mail"
+	"github.com/fhermeni/wints/notifier"
 	"github.com/fhermeni/wints/schema"
 	"github.com/fhermeni/wints/spy"
 	"github.com/fhermeni/wints/sqlstore"
@@ -21,21 +23,27 @@ import (
 )
 
 var cfg config.Config
+var not *notifier.Notifier
+var store *sqlstore.Store
+var mailer mail.Mailer
 
-func inviteRoot(store *sqlstore.Store, em string) error {
+func confirm(msg string) bool {
+	os.Stdout.WriteString(msg + " (y/n) ?")
+	var b []byte = make([]byte, 1)
+	os.Stdin.Read(b)
+	ret := string(b) == "y"
+	return ret
+}
+
+func inviteRoot(em string) {
 	p := schema.Person{Firstname: "root", Lastname: "root", Email: em, Tel: "n/a"}
-	if err := store.NewUser(p, schema.ROOT); err != nil {
-		log.Println(err.Error())
-		return err
+	token, err := store.NewUser(p, schema.ROOT)
+	not.Fatalln("Create root account", err)
+	if err := not.InviteRoot(schema.User{Person: p}, p, string(token), err); err != nil {
+		//Here, we delete the account as the root account was not aware of the creation
+		store.RmUser(p.Email)
+		not.Fatalln("Invite root", err)
 	}
-	tok, err := store.ResetPassword(p.Email, cfg.HTTPd.Rest.RenewalRequestLifetime.Duration)
-	if err != nil {
-		log.Println("Unable to prepare the password reset:%s\n", err.Error())
-		return err
-	}
-	//{{.WWW}}/resetPassword?token={{.Token}}
-	log.Println(cfg.HTTPd.WWW + "/password.html?resetToken=" + string(tok))
-	return nil
 }
 
 func newConventionReader(cfg config.Feeder) feeder.ConventionReader {
@@ -44,19 +52,45 @@ func newConventionReader(cfg config.Feeder) feeder.ConventionReader {
 	return reader
 }
 
-func newFeeder(cfg config.Feeder) feeder.Conventions {
-	r := feeder.NewHTTPConventionReader(cfg.URL, cfg.Login, cfg.Password)
-	r.Encoding = cfg.Encoding
+func newMailer(fake bool) mail.Mailer {
+	if fake {
+		return &mail.Fake{WWW: cfg.HTTPd.WWW, Config: cfg.Mailer}
+	}
+	m, err := mail.NewSMTP(cfg.Mailer, cfg.HTTPd.WWW)
+	if err != nil {
+		log.Fatalln("SMTP Mailer: " + err.Error())
+	}
+	return m
+}
 
-	f := feeder.NewCsvConventions(r, cfg.Promotions)
+func newJournal() journal.Journal {
+	j, err := journal.FileBacked(cfg.Journal.Path)
+	if err != nil {
+		log.Fatalln("Unable to create logs: " + err.Error())
+	}
+	return j
+}
+
+func newStore() *sqlstore.Store {
+	DB, err := sql.Open("postgres", cfg.Db.ConnectionString)
+	not.Fatalln("Database connexion", err)
+	store, _ := sqlstore.NewStore(DB, cfg.Internships)
+	_, err = store.Internships()
+	not.Fatalln("Database communication", err)
+	return store
+}
+
+func newFeeder() feeder.Conventions {
+	r := feeder.NewHTTPConventionReader(cfg.Feeder.URL, cfg.Feeder.Login, cfg.Feeder.Password)
+	r.Encoding = cfg.Feeder.Encoding
+	f := feeder.NewCsvConventions(r, cfg.Feeder.Promotions)
 	return f
 }
 
-func runSpies(st *sqlstore.Store, cfg config.Config) error {
+func runSpies() {
 
 	if len(cfg.Spies) == 0 {
 		log.Println("No spies to schedule")
-		return nil
 	}
 	cr := cron.New()
 	for _, s := range cfg.Spies {
@@ -66,49 +100,51 @@ func runSpies(st *sqlstore.Store, cfg config.Config) error {
 			for k, r := range cfg.Internships.Reports {
 				reviews[k] = r.Review.Duration
 			}
-			cr.AddJob(s.Cron, spy.NewTutor(st, reviews))
+			cr.AddJob(s.Cron, spy.NewTutor(store, reviews))
 		default:
-			return errors.New("Unsupported spy '" + s.Kind + "'")
+			log.Fatalln("Unsupported spy '" + s.Kind + "'")
 		}
 		log.Println("Spy '" + s.Kind + "' scheduled")
 	}
 	cr.Start()
-	return nil
 }
 
+func install() {
+	if !confirm("This will erase any data. Confirm ") {
+		os.Exit(1)
+	}
+	err := store.Install()
+	not.Fatalln("Creating tables", err)
+}
 func main() {
 
-	makeRoot := flag.String("invite-root", "", "Invite a root user")
+	makeRoot := flag.String("new-root", "", "Invite a root user")
+	fakeMailer := flag.Bool("fake-mailer", false, "Don't send emails. Print them out stdout")
+	installStore := flag.Bool("install-db", false, "install the database")
+
 	flag.Parse()
 
 	if _, err := toml.DecodeFile("wints_test.conf", &cfg); err != nil {
 		log.Fatalln(err.Error())
 	}
 
-	//the store
-	DB, err := sql.Open("postgres", cfg.Db.ConnectionString)
-	if err != nil {
-		log.Fatalln("Unable to connect to the Database: " + err.Error())
-	}
-	store, _ := sqlstore.NewStore(DB, cfg.Internships)
-	//test the connecion
-	_, err = store.Internships()
-	if err != nil {
-		log.Fatalln("Error while communicating with the database: " + err.Error())
-	}
-
-	if len(*makeRoot) > 0 {
-		inviteRoot(store, *makeRoot)
+	mailer = newMailer(*fakeMailer)
+	not = notifier.New(mailer, newJournal())
+	not.Log.Wipe()
+	store = newStore()
+	if *installStore {
+		install()
 		os.Exit(0)
 	}
 
-	//the spies
-	err = runSpies(store, cfg)
-	if err != nil {
-		log.Fatalln("Unable to launch the spies: " + err.Error())
+	if len(*makeRoot) > 0 {
+		inviteRoot(*makeRoot)
+		os.Exit(0)
 	}
-	//the feeder
-	conventions := newFeeder(cfg.Feeder)
-	httpd := httpd.NewHTTPd(store, conventions, cfg.HTTPd, cfg.Internships)
-	log.Fatalf("%s\n", httpd.Listen())
+
+	runSpies()
+	conventions := newFeeder()
+	not.Println("Listening on "+cfg.HTTPd.WWW, nil)
+	httpd := httpd.NewHTTPd(not, store, conventions, cfg.HTTPd, cfg.Internships)
+	not.Fatalln("%s\n", httpd.Listen())
 }

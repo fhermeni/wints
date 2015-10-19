@@ -2,6 +2,7 @@ package sqlstore
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/fhermeni/wints/config"
 	"github.com/fhermeni/wints/schema"
@@ -59,12 +60,12 @@ func (s *Store) SetCompany(stu string, c schema.Company) error {
 	return s.singleUpdate(updateCompany, schema.ErrUnknownInternship, c.WWW, c.Name, stu)
 }
 
-func (s *Store) NewInternship(c schema.Convention, cfg config.Internships) (schema.Internship, error) {
+func (s *Store) NewInternship(c schema.Convention, d time.Duration, cfg config.Internships) (schema.Internship, []byte, error) {
 	i := schema.Internship{
 		Convention: c,
 	}
 	if c.Begin.After(c.End) {
-		return i, schema.ErrInvalidPeriod
+		return i, []byte{}, schema.ErrInvalidPeriod
 	}
 
 	tx := newTxErr(s.db)
@@ -72,6 +73,8 @@ func (s *Store) NewInternship(c schema.Convention, cfg config.Internships) (sche
 	for kind, report := range cfg.Reports {
 		tx.Exec(insertReport, c.Student.User.Person.Email, kind, report.Delivery.Value(c.Begin), false, report.Grade)
 	}
+	token := randomBytes(32)
+	tx.Exec(startPasswordRenewal, c.Student.User.Person.Email, token, time.Now().Add(d))
 	for kind, survey := range cfg.Surveys {
 		token := randomBytes(16)
 		tx.Exec(insertSurvey, c.Student.User.Person.Email, kind, token, survey.Deadline.Value(c.Begin))
@@ -81,16 +84,16 @@ func (s *Store) NewInternship(c schema.Convention, cfg config.Internships) (sche
 	stu, err := s.Student(c.Student.User.Person.Email)
 	if err != nil {
 		tx.err = err
-		return i, tx.Done()
+		return i, []byte{}, tx.Done()
 	}
 	tut, err := s.User(c.Tutor.Person.Email)
 	if err != nil {
 		tx.err = err
-		return i, tx.Done()
+		return i, []byte{}, tx.Done()
 	}
 	i.Convention.Tutor = tut
 	i.Convention.Student = stu
-	return i, tx.Done()
+	return i, token, tx.Done()
 }
 
 //Convention returns the convention of a given student

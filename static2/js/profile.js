@@ -8,6 +8,7 @@ function showProfileEditor(em) {
 	}
 }
 
+/*
 function showPasswordEditor() {
 	$("#modal").render("password-editor", {}, showModal)
 }
@@ -28,7 +29,7 @@ function failUpdatePassword(xhr) {
 		reportError("#password-new", xhr.responseText);
 	}
 }
-
+*/
 function updateProfile(em) {
 	if (empty("#profile-firstname", "#profile-lastname")) {
 		return

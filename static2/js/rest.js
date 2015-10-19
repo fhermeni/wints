@@ -204,6 +204,10 @@ function resetPassword(email) {
 }
 
 function logFail(xhr) {
+	if (xhr.status == 403) {
+		var e = $("#modal").render("error", xhr.responseText, showModal)
+
+	}
 	console.log(xhr.status + " " + xhr.responseText)
 }
 

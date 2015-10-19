@@ -1,6 +1,8 @@
 package session
 
 import (
+	"time"
+
 	"github.com/fhermeni/wints/config"
 	"github.com/fhermeni/wints/schema"
 )
@@ -38,11 +40,11 @@ func (s *Session) SetCompany(stu string, c schema.Company) error {
 }
 
 //ValidateConvention validates the convention if the emitter is an admin at minimum
-func (s *Session) NewInternship(c schema.Convention, cfg config.Internships) (schema.Internship, error) {
+func (s *Session) NewInternship(c schema.Convention, d time.Duration, cfg config.Internships) (schema.Internship, []byte, error) {
 	if s.Role() >= schema.ADMIN {
-		return s.store.NewInternship(c, cfg)
+		return s.store.NewInternship(c, d, cfg)
 	}
-	return schema.Internship{}, ErrPermission
+	return schema.Internship{}, []byte{}, ErrPermission
 }
 
 //Internships list the internships if the emitter is at least a major leader.

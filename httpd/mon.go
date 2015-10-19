@@ -1,9 +1,10 @@
 package httpd
 
 import (
-	"log"
 	"net/http"
 	"time"
+
+	"github.com/fhermeni/wints/notifier"
 )
 
 //MonResponseWriter embeds a responsewriter to save the status code
@@ -43,12 +44,12 @@ func (w *MonResponseWriter) WriteHeader(statusCode int) {
 }
 
 //Mon monitores the requests
-func Mon(h http.HandlerFunc) http.HandlerFunc {
+func Mon(not *notifier.Notifier, h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		myRw := NewMonResponseWriter(w)
 		start := time.Now()
 		defer func() {
-			log.Printf("%s %s %d %d", r.Method, r.URL.String(), myRw.Status(), int(time.Since(start).Nanoseconds()/1000000))
+			not.Log.Access(r.Method, r.URL.String(), myRw.Status(), int(time.Since(start).Nanoseconds()/1000000))
 		}()
 		h(myRw, r)
 	}

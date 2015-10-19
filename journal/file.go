@@ -1,6 +1,5 @@
 package journal
 
-/*
 import (
 	"fmt"
 	"log"
@@ -9,7 +8,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/fhermeni/wints/internship"
+	"github.com/fhermeni/wints/schema"
 )
 
 var (
@@ -32,13 +31,14 @@ type File struct {
 func FileBacked(p string) (*File, error) {
 	err := os.MkdirAll(p, 0770)
 	if err != nil && !os.IsExist(err) {
+
 		return &File{}, err
 	}
 	return &File{path: p, mutex: sync.Mutex{}}, nil
 }
 
 //UserLog stores the event emitted by a logged user into the file.
-func (f *File) UserLog(u internship.User, msg string, err error) {
+func (f *File) UserLog(u schema.User, msg string, err error) {
 	go func() {
 		f.log(EventLog, "[%s] %s (%s) - %s: %s\n", time.Now().Format(TimeFmt), u.Person.Email, u.Role.String(), msg, status(err))
 	}()
@@ -81,4 +81,3 @@ func (f *File) Access(method, url string, statusCode, latency int) {
 		f.log(AccessLog, "[%s] \"%s %s\" %d %d\n", time.Now().Format(TimeFmt), method, url, statusCode, latency)
 	}()
 }
-*/

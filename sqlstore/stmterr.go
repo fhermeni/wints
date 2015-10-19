@@ -1,9 +1,6 @@
 package sqlstore
 
-import (
-	"database/sql"
-	"log"
-)
+import "database/sql"
 
 type stmtErr struct {
 	st  *sql.Stmt
@@ -44,6 +41,5 @@ func (st *stmtErr) QueryRow(args ...interface{}) *rowErr {
 }
 
 func (st *stmtErr) Close() {
-	log.Println("closing")
 	st.st.Close()
 }

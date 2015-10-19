@@ -1,66 +1,76 @@
 package mail
 
-/*
+import (
+	"crypto/tls"
+	"fmt"
+	"net"
+	"net/smtp"
+	"os"
+
+	"github.com/fhermeni/wints/schema"
+)
+
+//SMTP depicts a SMTP-based mailer
 type SMTP struct {
-	server string
-	sender string
-	path   string
-	www    string
-	auth   smtp.Auth
-	tls    tls.Config
-	fake   bool
-	j      journal.Journal
+	server   string
+	sender   string
+	path     string
+	auth     smtp.Auth
+	tls      tls.Config
+	www      string
+	fullname string
 }
 
-func NewSMTP(srv, login, passwd, emitter, www, path string, j journal.Journal) (*SMTP, error) {
-	hostname, _, err := net.SplitHostPort(srv)
+//Config configures the SMTP-based mailer
+type Config struct {
+	Server   string
+	Login    string
+	Password string
+	Sender   string
+	Path     string
+	Fullname string
+}
+
+type metaData struct {
+	WWW      string
+	Fullname string
+	Data     interface{}
+}
+
+//NewSMTP creates a new SMTP mailer
+func NewSMTP(cfg Config, www string) (*SMTP, error) {
+	hostname, _, err := net.SplitHostPort(cfg.Server)
 	if err != nil {
 		return &SMTP{}, err
 	}
 	m := SMTP{
-		server: srv,
-		sender: emitter,
-		path:   path,
-		www:    www,
-		auth:   smtp.PlainAuth("", login, passwd, hostname),
-		tls:    tls.Config{ServerName: hostname, InsecureSkipVerify: true},
-		j:      j,
+		server:   cfg.Server,
+		sender:   cfg.Sender,
+		path:     cfg.Path,
+		auth:     smtp.PlainAuth("", cfg.Login, cfg.Password, hostname),
+		tls:      tls.Config{ServerName: hostname, InsecureSkipVerify: true},
+		www:      www,
+		fullname: cfg.Fullname,
 	}
 	return &m, err
 }
 
-func fill(path string, data interface{}) ([]byte, error) {
-	tpl, err := template.ParseFiles(path)
-	if err != nil {
-		return []byte{}, err
+func (smtp *SMTP) Send(to schema.Person, tpl string, data interface{}, cc ...schema.Person) error {
+	path := fmt.Sprintf("%s%c%s", smtp.path, os.PathSeparator, tpl)
+	dta := metaData{
+		WWW:      smtp.www,
+		Fullname: smtp.fullname,
+		Data:     data,
 	}
-	var b bytes.Buffer
-	if tpl.Execute(&b, data); err != nil {
-		return []byte{}, err
-	}
-	return b.Bytes(), err
-}
-
-func (m *SMTP) mail(to []string, cc []string, input string, data interface{}) error {
-	body, err := fill(input, data)
+	body, err := fill(path, dta)
 	if err != nil {
 		return err
 	}
-	if m.fake {
-		log.Printf("To: %s\n", to)
-		for _, m := range cc {
-			log.Printf("Cc: %s\n", m)
-		}
-		log.Println(string(body))
-		return nil
-	} else {
-		return m.sendMail(m.server, m.sender, to, cc, body)
-	}
-
+	return smtp.sendMail(to.Email, emails(cc...), body)
 }
 
-func (m *SMTP) sendMail(addr string, from string, to []string, cc []string, msg []byte) error {
-	c, err := smtp.Dial(addr)
+func (m *SMTP) sendMail(to string, cc []string, msg []byte) error {
+	c, err := smtp.Dial(m.server)
 	if err != nil {
 		return err
 	}
@@ -74,14 +84,13 @@ func (m *SMTP) sendMail(addr string, from string, to []string, cc []string, msg 
 		return err
 	}
 
-	if err = c.Mail(from); err != nil {
+	if err = c.Mail(m.sender); err != nil {
 		return err
 	}
-	for _, addr := range to {
-		if err = c.Rcpt(addr); err != nil {
-			return err
-		}
+	if err = c.Rcpt(to); err != nil {
+		return err
 	}
+
 	w, err := c.Data()
 	if err != nil {
 		return err
@@ -99,221 +108,3 @@ func (m *SMTP) sendMail(addr string, from string, to []string, cc []string, msg 
 	}
 	return c.Quit()
 }
-
-type InvitationData struct {
-	WWW   string
-	Token string
-	Login string
-}
-
-func join(mails ...string) []string {
-	res := make([]string, 0, 0)
-	for _, m := range mails {
-		res = append(res, m)
-	}
-	return res
-}
-
-func (m *SMTP) log(msg string, err error) {
-	m.j.Log("mailer", msg, err)
-}
-func (m *SMTP) SendAdminInvitation(u internship.User, token []byte) {
-	go func() {
-		d := InvitationData{WWW: m.www, Token: string(token), Login: u.Email}
-		err := m.mail(join(u.Email), join(), m.path+"/tutor_welcome.txt", d)
-		m.log("Sending invitation to '"+u.Fullname()+"'", err)
-	}()
-}
-
-func (m *SMTP) SendStudentInvitation(u internship.User, token []byte) {
-	go func() {
-		d := InvitationData{WWW: m.www, Token: string(token), Login: u.Email}
-		err := m.mail(join(u.Email), join(), m.path+"/student_welcome.txt", d)
-		m.log("Sending invitation to '"+u.Fullname()+"'", err)
-	}()
-}
-
-func (m *SMTP) SendPasswordResetLink(u internship.User, token []byte) {
-	go func() {
-		d := InvitationData{WWW: m.www, Token: string(token)}
-		err := m.mail(join(u.Email), join(), m.path+"/reset.txt", d)
-		m.log("Sending the account reset link to '"+u.Fullname()+"'", err)
-	}()
-}
-
-func (m *SMTP) SendAccountRemoval(u internship.User) {
-	go func() {
-		empty := struct{}{}
-		err := m.mail(join(u.Email), join(), m.path+"/delete.txt", empty)
-		m.log("Sending the account removal mail to '"+u.Fullname()+"'", err)
-	}()
-}
-
-func (m *SMTP) SendRoleUpdate(u internship.User) {
-	go func() {
-		d := struct {
-			WWW  string
-			Role string
-		}{
-			m.www,
-			u.Role.String(),
-		}
-		err := m.mail(join(u.Email), join(), m.path+"/privileges.txt", d)
-		m.log("Sending the role update mail to '"+u.Fullname()+"'", err)
-	}()
-}
-
-func (m *SMTP) SendTutorNotification(s internship.Person, t internship.Person) {
-	go func() {
-		d := struct {
-			Student internship.Person
-			Tutor   internship.Person
-			WWW     string
-		}{
-			s,
-			t,
-			m.www,
-		}
-		err := m.mail(join(t.Email), join(), m.path+"/tutor.txt", d)
-		m.log("Notifying the new student '"+s.Fullname()+"' to '"+t.Fullname()+"'", err)
-	}()
-}
-
-func (m *SMTP) SendTutorUpdate(s internship.User, old internship.User, now internship.User) {
-	go func() {
-		d := struct {
-			WWW string
-			Old internship.User
-			New internship.User
-		}{
-			m.www,
-			old,
-			now,
-		}
-		err := m.mail(join(s.Email, now.Email), join(old.Email), m.path+"/tutor_switch.txt", d)
-		m.log("Sending the tutor switch of '"+s.Fullname()+"' to '"+now.Fullname()+"'(new) and '"+old.Fullname()+"' (old)", err)
-	}()
-}
-
-func (m *SMTP) SendReportUploaded(s internship.User, t internship.User, kind string) {
-	go func() {
-		d := struct {
-			WWW     string
-			Student internship.User
-			Tutor   internship.User
-			Kind    string
-		}{
-			m.www,
-			s,
-			t,
-			kind,
-		}
-		err := m.mail(join(t.Email), join(s.Email), m.path+"/report_uploaded.txt", d)
-		m.log("Sending the '"+kind+"' report uploaded notification to '"+t.Fullname()+"'", err)
-	}()
-}
-
-func (m *SMTP) SendReportDeadline(s internship.User, t internship.User, kind string, deadline time.Time) {
-	go func() {
-		d := struct {
-			WWW     string
-			Student internship.User
-			Tutor   internship.User
-			Kind    string
-			Date    time.Time
-		}{
-			m.www,
-			s,
-			t,
-			kind,
-			deadline,
-		}
-		err := m.mail(join(s.Email), join(t.Email), m.path+"/report_deadline.txt", d)
-		m.log("Send the '"+kind+"' report deadline notification to '"+s.Fullname()+"'", err)
-	}()
-}
-
-func (m *SMTP) SendGradeUploaded(s internship.User, t internship.User, kind string) {
-	go func() {
-		d := struct {
-			WWW     string
-			Student internship.User
-			Tutor   internship.User
-			Kind    string
-		}{
-			m.www,
-			s,
-			t,
-			kind,
-		}
-		err := m.mail(join(s.Email), join(t.Email), m.path+"/report_graded.txt", d)
-		m.log("Send the '"+kind+"' report graded notification to '"+s.Fullname()+"'", err)
-	}()
-}
-
-func (m *SMTP) SendReportPrivate(s internship.User, t internship.User, kind string, b bool) {
-	go func() {
-		d := struct {
-			WWW     string
-			Student internship.User
-			Tutor   internship.User
-			Kind    string
-			Status  string
-		}{Student: s, Tutor: t, Kind: kind, Status: "public"}
-		if b {
-			d.Status = "private"
-		}
-		err := m.mail(join(t.Email), join(), m.path+"/report_status.txt", d)
-		m.log("Sending the '"+kind+"' report status update to '"+t.Fullname()+"'", err)
-	}()
-}
-
-func (m *SMTP) SendSurveyUploaded(tutor internship.User, student internship.User, kind string) {
-	go func() {
-		d := struct {
-			WWW     string
-			Student internship.User
-			Tutor   internship.User
-			Kind    string
-		}{
-			m.www,
-			student,
-			tutor,
-			kind,
-		}
-		err := m.mail(join(tutor.Email), join(), m.path+"/survey_uploaded.txt", d)
-		m.log("Sending the '"+kind+"' survey uploaded status update to '"+tutor.Fullname()+"'", err)
-	}()
-}
-
-func (m *SMTP) SendSurveyRequest(i internship.Internship, kind string) {
-	go func() {
-		var su internship.Survey
-		for _, s := range i.Surveys {
-			if s.Kind == kind {
-				su = s
-				break
-			}
-		}
-		d := struct {
-			WWW        string
-			Survey     internship.Survey
-			Internship internship.Internship
-		}{
-			m.www,
-			su,
-			i,
-		}
-		err := m.mail(join(i.Sup.Email), join(i.Tutor.Email), m.path+"/survey_request.txt", d)
-		m.log("Sending the '"+kind+"' request survey for student '"+i.Student.Fullname()+"' ("+i.Student.Email+") to '"+i.Sup.Email+"'", err)
-	}()
-}
-func (m *SMTP) SendTest(s string) error {
-	return m.mail(join(s), join(s), m.path+"/test.txt", struct{}{})
-}
-
-func (m *SMTP) Fake(b bool) {
-	m.fake = b
-}
-
-*/

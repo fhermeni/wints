@@ -15,7 +15,7 @@ import (
 var (
 	selectUser                   = "select firstname, lastname, email, tel, role, lastVisit from users where email=$1"
 	insertUser                   = "insert into users(firstname, lastname, tel, email, role, password) values ($1,$2,$3,$4,$5,$6)"
-	startPasswordRenewal         = "insert into password_renewal(email,token,deadline) values($1,$2,$3)"
+	startPasswordRenewal         = "insert into password_renewal(email,token) values($1,$2)"
 	updateLastVisit              = "update users set lastVisit=$1 where email=$2"
 	updateUserProfile            = "update users set firstname=$1, lastname=$2, tel=$3 where email=$4"
 	updateUserRole               = "update users set role=$2 where email=$1 and role != 1" //cannot change the role of a student
@@ -114,40 +114,14 @@ func (s *Store) SetUserRole(email string, priv schema.Privilege) error {
 	return s.singleUpdate(updateUserRole, schema.ErrUnknownUser, email, priv)
 }
 
-//SetPassword changes the user password
-//Any pending renewable requests are deleted on success
-func (s *Store) SetPassword(email string, oldP, newP []byte) error {
-	if len(newP) < 8 {
-		return schema.ErrPasswordTooShort
-	}
-	hash, err := bcrypt.GenerateFromPassword(newP, bcrypt.MinCost)
-	if err != nil {
-		return err
-	}
-	tx := newTxErr(s.db)
-	var p []byte
-	tx.QueryRow(selectPassword, email).Scan(&p)
-	tx.err = noRowsTo(tx.err, schema.ErrCredentials)
-	if tx.err != nil {
-		return tx.Done()
-	}
-	if err := bcrypt.CompareHashAndPassword(p, oldP); err != nil {
-		tx.err = schema.ErrCredentials
-	}
-	tx.Exec(deletePasswordRenewalRequest, email)
-	tx.Update(updateUserPassword, email, hash)
-	//no need to check update, we know the user exists in the transaction context
-	return tx.Done()
-}
-
-//ResetPassword starts a reset procedure, valid for a given period
-func (s *Store) ResetPassword(email string, d time.Duration) ([]byte, error) {
-	//In case a request already exists
+//ResetPassword starts a reset procedure
+func (s *Store) ResetPassword(email string) ([]byte, error) {
 	token := randomBytes(32)
 
 	tx := newTxErr(s.db)
 	tx.Exec(deletePasswordRenewalRequest, email)
-	tx.Exec(startPasswordRenewal, email, token, time.Now().Add(d))
+	//In case a request already exists
+	tx.Exec(startPasswordRenewal, email, token)
 	return token, tx.Done()
 }
 
@@ -177,11 +151,19 @@ func (s *Store) NewPassword(token, newP []byte) (string, error) {
 
 //NewUser add a user
 //Basically, calls addUser
-func (s *Store) NewUser(p schema.Person, role schema.Privilege) error {
+func (s *Store) NewUser(p schema.Person, role schema.Privilege) ([]byte, error) {
 	if !strings.Contains(p.Email, "@") {
-		return schema.ErrInvalidEmail
+		return []byte{}, schema.ErrInvalidEmail
 	}
-	return s.singleUpdate(insertUser, schema.ErrUserExists, p.Firstname, p.Lastname, p.Tel, p.Email, role, randomBytes(32))
+	token := randomBytes(32)
+	tx := newTxErr(s.db)
+	//s.singleUpdate(insertUser, schema.ErrUserExists, p.Firstname, p.Lastname, p.Tel, p.Email, role, randomBytes(32))
+	nb := tx.Update(insertUser, p.Firstname, p.Lastname, p.Tel, p.Email, role, randomBytes(32))
+	if nb == 0 {
+		tx.err = schema.ErrUserExists
+	}
+	tx.Exec(startPasswordRenewal, p.Email, token)
+	return token, tx.Done()
 }
 
 //RmUser removes a user from the database

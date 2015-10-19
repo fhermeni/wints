@@ -1,6 +1,8 @@
 //Package config aggregates the necessary material to configure the wints daemon
 package config
 
+import "github.com/fhermeni/wints/mail"
+
 var (
 	//DateTimeLayout expresses the expected format for a date + time
 	DateTimeLayout = "02/01/2006 15:04"
@@ -21,15 +23,6 @@ type Feeder struct {
 	Frequency  Duration
 	Promotions []string
 	Encoding   string
-}
-
-//Mailer configures the mailing service
-type Mailer struct {
-	Server   string
-	Login    string
-	Password string
-	Sender   string
-	Path     string
 }
 
 //Db configures the database connection string
@@ -87,6 +80,7 @@ func (i Internships) ValidPromotion(p string) bool {
 type Report struct {
 	Delivery Deadline
 	Review   Duration
+	Reminder Duration
 	Grade    bool
 }
 
@@ -100,7 +94,7 @@ type Config struct {
 	Spy         Spy
 	Feeder      Feeder
 	Db          Db
-	Mailer      Mailer
+	Mailer      mail.Config
 	HTTPd       HTTPd
 	Majors      []string
 	Journal     Journal

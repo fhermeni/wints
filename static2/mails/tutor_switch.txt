@@ -4,4 +4,4 @@ Your academic tutor has changed.
 Now {{.New.Fullname}} ({{.New.Email}}) supervises your internship
 
 Regards,
-Fabien Hermenier
+{{.Fullname}}

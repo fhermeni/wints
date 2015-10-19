@@ -3,4 +3,4 @@ Subject:[Wints] '{{.Kind}}' survey uploaded for student {{.Student.Fullname}}
 Log on your dashboard to read the tutor observations: {{.WWW}}
 
 Regards,
-Fabien Hermenier
+{{.Fullname}}

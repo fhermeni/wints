@@ -1,6 +1,6 @@
 Subject:[Wints] Account deleted
 
-Your account has been deleted. If this is a mistake, contact fabien.hermenier@unice.fr
+Your account has been deleted. If this is a mistake, contact {{.Sender}}
 
 Regards
-Fabien Hermenier
+{{.Fullname}}
