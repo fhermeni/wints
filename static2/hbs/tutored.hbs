@@ -4,9 +4,9 @@
   <button type="button" class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown" aria-expanded="false"><i class="glyphicon glyphicon-envelope"></i> mail selection <span class="caret"></span>
   </button>
   <ul class="dropdown-menu" role="menu">
-    <li><a onclick="mailing('stu')">students</a></li>
-    <li><a onclick="mailing('stu','sup')">students (cc supervisors)</a></li>        
-    <li><a onclick="mailing('sup','stu')">supervisors (cc students)</a></li>        
+    <li><a onclick="conventionMailing('tbody','stu')">students</a></li>
+    <li><a onclick="conventionMailing('tbody','stu','sup')">students (cc supervisors)</a></li>        
+    <li><a onclick="conventionMailing('tbody','sup','stu')">supervisors (cc students)</a></li>        
   </ul>
 </div>
 
@@ -14,8 +14,8 @@
   <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="glyphicon glyphicon-list"></i> fullnames from selection <span class="caret"></span>
   </button>
   <ul class="dropdown-menu" role="menu">
-    <li><a onclick="showRawFullname('stu')">Students</a></li>    
-    <li><a onclick="showRawFullname('sup')">Supervisors</a></li>    
+    <li><a onclick="showRawFullname('tbody','stu')">Students</a></li>    
+    <li><a onclick="showRawFullname('tbody','sup')">Supervisors</a></li>    
   </ul>
 </div>
 </h3>
