@@ -66,7 +66,7 @@ $.handlebars({
 	templatePath: '/static/hbs/',
 	templateExtension: 'hbs',
 	partialPath: '/static/hbs',
-	partials: ['users-user', 'placement-student', 'conventions-convention', 'convention-student', 'convention-editor', 'student-dashboard-report', 'student-dashboard-company', 'student-dashboard-contacts', 'student-dashboard-alumni']
+	partials: ['users-user', 'placement-student', 'conventions-convention', 'convention-student', 'convention-editor', 'student-dashboard-report', 'student-dashboard-company', 'student-dashboard-contacts', 'student-dashboard-alumni', 'tutored-student', 'watchlist-student']
 });
 
 Handlebars.registerHelper('len', function(a) {
@@ -209,7 +209,7 @@ Handlebars.registerHelper('survey', function(s, stu) {
 	return new Handlebars.SafeString(buf);
 });
 
-Handlebars.registerHelper('report', function(s) {
+Handlebars.registerHelper('report', function(r, em, cb) {
 	var value = -10;
 	var grade = "-";
 	var bg = "";
@@ -234,7 +234,7 @@ Handlebars.registerHelper('report', function(s) {
 			}
 		}
 	}*/
-	var buf = '<td class="click ' + bg + 'text-center" data-text="' + value + '" onclick="showReport(\'foo\', \'' + s.Kind + '\')">' + grade + '</td>';
+	var buf = '<td data-report-kind="' + r.Kind + '" class="report click ' + bg + 'text-center" data-text="' + value + '">' + grade + '</td>';
 	return new Handlebars.SafeString(buf);
 });
 

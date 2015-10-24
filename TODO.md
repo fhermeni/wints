@@ -23,7 +23,9 @@
 - tests and comments
 - simplify DB with less fake values and more optional fields hidden in JSONs
 
-
+## Mailing
+- when I act on behalf of tutor, cc tutor
+- cc. emitter as well
 
 
 - Convocation officielle par mail
@@ -53,6 +55,11 @@ alumni (new)
 defense
 
 
+# login page
+- remove error when logged in
+
+# mailing
+always have tutor in cc. when doing sth. about the student
 
 
 

@@ -1,7 +1,9 @@
 package notifier
 
 import (
+	"fmt"
 	"log"
+	"time"
 
 	"github.com/fhermeni/wints/journal"
 	"github.com/fhermeni/wints/mail"
@@ -24,6 +26,38 @@ func (n *Notifier) Println(s string, err error) {
 	} else {
 		log.Println(s + ": " + err.Error())
 	}
+}
+
+func (n *Notifier) ReportPrivacyUpdated(from schema.User, stu, kind string, priv bool, err error) error {
+	status := "public"
+	if priv {
+		status = "private"
+	}
+	buf := fmt.Sprintf("set privacy status for '%s' report of '%s' to '%t'", kind, stu, priv)
+	n.Log.UserLog(from, buf, err)
+	if err != nil {
+		return err
+	}
+	data := struct {
+		Status string
+		Kind   string
+	}{Status: status, Kind: kind}
+	return n.mailer.Send(schema.Person{Email: stu}, "report_status.txt", data, from.Person)
+}
+
+
+func (n *Notifier) ReportDeadlineUpdated(from schema.User, stu, kind string, d time.Time, err error) error {
+	s := d.Format("02/01/2006")
+	buf := fmt.Sprintf("set deafline for '%s' report of '%s' to '%s'", kind, stu, s)
+	n.Log.UserLog(from, buf, err)
+	if err != nil {
+		return err
+	}
+	data := struct {
+		Date string
+		Kind   string
+	}{Date: s, Kind: kind}
+	return n.mailer.Send(schema.Person{Email: stu}, "report_deadline.txt", data, from.Person)
 }
 
 func (n *Notifier) Fatalln(s string, err error) {
@@ -60,10 +94,6 @@ func (n *Notifier) ReportUploaded() {
 }
 
 func (n *Notifier) ReportReviewed() {
-	//mail student, cc tutor
-}
-
-func (n *Notifier) ReportDeadlineChanged() {
 	//mail student, cc tutor
 }
 

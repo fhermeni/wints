@@ -8,7 +8,6 @@ $(document).on('change', '.btn-file :file', function() {
 
 function showUsers() {
 	$.when(users(), internships()).done(loadUsers);
-	//users().done(loadUsers)
 }
 
 function showNewUser() {

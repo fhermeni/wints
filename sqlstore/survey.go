@@ -11,7 +11,7 @@ import (
 var (
 	selectSurveyFromToken = "select kind, deadline, delivery, cnt, token from surveys where token=$1"
 	selectSurvey          = "select kind, deadline, delivery, cnt, token from surveys where student=$1 and kind=$2"
-	selectSurveys         = "select kind, deadline, delivery, cnt, token from surveys where student=$1"
+	selectSurveys         = "select kind, deadline, delivery, cnt, token from surveys where student=$1 order by deadline asc"
 	updateSurveyContent   = "update surveys set cnt=$1, delivery=$2 where token=$3"
 	resetSurveyContent    = "update surveys set cnt=null and delivery=null where student=$1 and kind=$2"
 )
@@ -49,8 +49,8 @@ func scanSurvey(rows *sql.Rows) (schema.SurveyHeader, error) {
 }
 
 //Surveys returns all the survey related to a student
-func (s *Store) Surveys(student string) (map[string]schema.SurveyHeader, error) {
-	res := make(map[string]schema.SurveyHeader)
+func (s *Store) Surveys(student string) ([]schema.SurveyHeader, error) {
+	res := make([]schema.SurveyHeader, 0, 0)
 	st := s.stmt(selectSurveys)
 	rows, err := st.Query(student)
 	if err != nil {
@@ -62,7 +62,7 @@ func (s *Store) Surveys(student string) (map[string]schema.SurveyHeader, error) 
 		if err != nil {
 			return res, err
 		}
-		res[s.Kind] = s
+		res = append(res, s)
 	}
 	return res, err
 }

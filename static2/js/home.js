@@ -51,6 +51,9 @@ function showModal(next) {
 	} else {
 		$('#modal').unbind('shown.bs.modal');
 	}
+
+	$("#modal").find(".date").datetimepicker();
+
 }
 
 function ui() {
@@ -73,6 +76,9 @@ function ui() {
 		});
 	});
 
+	$(".date").datetimepicker({
+		format: "DD MMM YYYY"
+	});
 	/*$("#cnt").find(".editable-promotion").each(function(i, e) {
 		$(e).editable({
 			source: editablePromotions(),

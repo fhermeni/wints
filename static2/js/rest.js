@@ -140,6 +140,10 @@ function internships() {
 	return get("/internships/");
 }
 
+function internship(em) {
+	return get("/internships/" + em);
+}
+
 function getConfig() {
 	return get("/config/");
 }
@@ -215,6 +219,19 @@ function logFail(xhr) {
 	console.log(xhr.status + " " + xhr.responseText)
 }
 
+function notifyError(xhr) {
+	$.notify({
+		message: xhr.responseText ? xhr.responseText : status
+	}, {
+		type: "danger",
+		delay: 1000,
+		placement: {
+			from: "bottom",
+			align: "right"
+		}
+	});
+}
+
 function postCompany(em, cpy) {
 	return post("/internships/" + em + "/company", cpy)
 }
@@ -229,6 +246,18 @@ function postSupervisor(em, sup) {
 
 function postAlumni(em, a) {
 	return post("/students/" + em + "/alumni", a)
+}
+
+function getReport(stu, kind) {
+	return get("/reports/" + stu + "/" + kind)
+}
+
+function postReportConfidential(stu, kind, b) {
+	return post("/reports/" + stu + "/" + kind + "/private", b)
+}
+
+function postReportDeadline(stu, kind, date) {
+	return post("/reports/" + stu + "/" + kind + "/deadline", date);
 }
 
 /*function setReportContent(email, kind, d, progressFunc, ok, no) {

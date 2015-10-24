@@ -66,6 +66,7 @@ func NewEndPoints(not *notifier.Notifier, store *sqlstore.Store, convs feeder.Co
 	ed.post("/internships/:s/tutor", setTutor)
 	ed.post("/internships/", ed.newInternship)
 
+	ed.get("/reports/:s/:k/", report)
 	ed.get("/reports/:s/:k/content", reportContent)
 	ed.post("/reports/:s/:k/content", setReportContent)
 	ed.post("/reports/:s/:k/deadline", setReportDeadline)
@@ -284,6 +285,11 @@ func reportContent(ex Exchange) error {
 	return ex.outJSON(r, err)
 }
 
+func report(ex Exchange) error {
+	r, err := ex.s.Report(ex.V("k"), ex.V("s"))
+	return ex.outJSON(r, err)
+}
+
 func setReportContent(ex Exchange) error {
 	cnt, err := ex.inBytes("application/pdf")
 	if err != nil {
@@ -299,8 +305,12 @@ func setReportContent(ex Exchange) error {
 
 func setReportDeadline(ex Exchange) error {
 	var t time.Time
-	ex.inJSON(&t)
-	return ex.s.SetReportDeadline(ex.V("k"), ex.V("s"), t)
+	if err := ex.inJSON(&t); err != nil {
+		return err
+	}
+	err := ex.s.SetReportDeadline(ex.V("k"), ex.V("s"), t)
+	err = ex.not.ReportDeadlineUpdated(ex.s.Me(), ex.V("s"), ex.V("k"), t, err)
+	return err
 }
 
 func setReportGrade(ex Exchange) error {
@@ -315,7 +325,9 @@ func setReportGrade(ex Exchange) error {
 func setReportPrivacy(ex Exchange) error {
 	var p bool
 	ex.inJSON(&p)
-	return ex.s.SetReportPrivacy(ex.V("k"), ex.V("s"), p)
+	err := ex.s.SetReportPrivacy(ex.V("k"), ex.V("s"), p)
+	ex.not.ReportPrivacyUpdated(ex.s.Me(), ex.V("s"), ex.V("k"), p, err)
+	return err
 }
 
 func conventions(ex Exchange) error {

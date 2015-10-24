@@ -97,8 +97,8 @@ func runSpies() {
 		switch strings.ToLower(s.Kind) {
 		case "tutor":
 			reviews := make(map[string]time.Duration)
-			for k, r := range cfg.Internships.Reports {
-				reviews[k] = r.Review.Duration
+			for _, r := range cfg.Internships.Reports {
+				reviews[r.Kind] = r.Review.Duration
 			}
 			cr.AddJob(s.Cron, spy.NewTutor(store, reviews))
 		default:

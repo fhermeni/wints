@@ -33,9 +33,9 @@ type Convention struct {
 type Internship struct {
 	Convention Convention
 	//The headers for each
-	Reports map[string]ReportHeader
+	Reports []ReportHeader
 	//The surveys
-	Surveys map[string]SurveyHeader
+	Surveys []SurveyHeader
 	//Defense
 	Defense Defense
 }

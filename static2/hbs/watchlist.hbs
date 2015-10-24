@@ -57,51 +57,16 @@ As a major leader or an administrator, you can follow the progress of every stud
     </tr>
     <tr>        
         {{#each Org.Reports}}        
-        <th><small>{{@key}}</small></th>
+        <th><small>{{this.Kind}}</small></th>
         {{/each}}        
         {{#each Org.Surveys}}        
-        <th><small>{{@key}}</small></th>
+        <th><small>{{this.Kind}}</small></th>
         {{/each}}        
     </tr>    
     </thead>
     <tbody>
         {{#each Internships}}    
-        <tr>
-            <td>
-            <input class="shiftSelectable" type='checkbox'
- data-stu='{{Convention.Student.User.Person.Email}}' data-stu-fn='{{fullname Convention.Student.User.Person true}}'
- data-tut='{{Convention.Tutor.Person.Email}}' data-tut-fn='{{fullname Convention.Tutor.Person true}}'
- data-sup='{{Convention.Supervisor.Email}}' data-sup-fn='{{fullname Convention.Supervisor true}}'/>  
-            </td>
-            <td>
-            <a class='click fn' onclick="showInternship('{{Convention.Student.User.Person.Email}}')">
-            {{fullname Convention.Student.User.Person}}            
-            </td>
-            <td>{{Convention.Student.Promotion}}</td>
-            <td>{{Convention.Student.Major}}</td>
-            <td>                
-                <a class="fn tutor" href='#' data-type="select" data-value="{{Convention.Tutor.Person.Email}}" data-email="{{Convention.Tutor.Person.Email}}" title='{{fullname Convention.Tutor.Person}}'>{{fullname Convention.Tutor.Person}}</a>
-            </td>            
-            {{#each Reports}}
-            {{report this ../Convention.Student.User.Person.Email}}
-            {{/each}}            
-            
-            {{#each Surveys}}
-            {{survey this ../Convention.Student.User.Person.Email}}
-            {{/each}}
-
-            {{#if Defense.Defenses}}            
-            <td class="text-center {{defenseStatus Defense}}"><a href="#" data-value="{{defenseGrade Defense}}" data-type="text" data-email="{{Student.Email}}" class="grade">{{defenseGrade Defense}}</a></td>
-            {{else}}
-            <td class="text-center"><i>n/a</i></td>
-            {{/if}}
-                        
-            {{#if Convention.Student.Alumni}}
-            <td class="text-center" data-text="1"><i class="glyphicon glyphicon-star-empty"></i></td>
-            {{else}}
-            <td class="text-center" data-text="0"></td>           
-            {{/if}}            
-        </tr>
+        {{> watchlist-student this}}
     {{/each}}
     </tbody>
 </table>

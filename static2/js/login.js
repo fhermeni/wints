@@ -17,10 +17,10 @@ function flipForm(from, to) {
 }
 
 function login() {
+	cleanError("#loginEmail", "#loginPassword");
 	if (empty("#loginEmail", "#loginPassword")) {
 		return;
 	}
-	cleanError("#loginEmail", "#loginPassword");
 	signin($("#loginEmail").val(), $("#loginPassword").val())
 		.done(loginSuccess).fail(loginFail)
 
@@ -68,7 +68,7 @@ $(document).ready(function() {
 	$(function() {
 		$("input").keypress(function(e) {
 			if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
-				$('.btn-primary').click();
+				$('#login').click();
 				return false;
 			} else {
 				return true;

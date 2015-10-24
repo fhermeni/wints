@@ -69,16 +69,16 @@ func (s *Store) NewInternship(c schema.Convention, cfg config.Internships) (sche
 
 	tx := newTxErr(s.db)
 	tx.Exec(insertConvention, c.Student.User.Person.Email, c.Begin, c.End, c.Tutor.Person.Email, c.Company.Name, c.Company.WWW, c.Supervisor.Firstname, c.Supervisor.Lastname, c.Supervisor.Email, c.Supervisor.Tel, c.Company.Title, c.Creation, c.ForeignCountry, c.Lab, c.Gratification)
-	for kind, report := range cfg.Reports {
-		tx.Exec(insertReport, c.Student.User.Person.Email, kind, report.Delivery.Value(c.Begin), false, report.Grade)
+	for _, report := range cfg.Reports {
+		tx.Exec(insertReport, c.Student.User.Person.Email, report.Kind, report.Delivery.Value(c.Begin), false, report.Grade)
 	}
 	token := randomBytes(32)
 	//We delete in cast we start a reset a unvalidated account
 	tx.Exec(deletePasswordRenewalRequest, c.Student.User.Person.Email)
 	tx.Exec(startPasswordRenewal, c.Student.User.Person.Email, token)
-	for kind, survey := range cfg.Surveys {
+	for _, survey := range cfg.Surveys {
 		token := randomBytes(16)
-		tx.Exec(insertSurvey, c.Student.User.Person.Email, kind, token, survey.Deadline.Value(c.Begin))
+		tx.Exec(insertSurvey, c.Student.User.Person.Email, survey.Kind, token, survey.Deadline.Value(c.Begin))
 	}
 
 	//refresh student & tutor informations for a clean version

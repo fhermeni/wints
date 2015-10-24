@@ -56,8 +56,8 @@ type Journal struct {
 type Internships struct {
 	Majors     []string
 	Promotions []string
-	Reports    map[string]Report
-	Surveys    map[string]Survey
+	Reports    []Report
+	Surveys    []Survey
 }
 
 func contains(s []string, v string) bool {
@@ -78,6 +78,7 @@ func (i Internships) ValidPromotion(p string) bool {
 
 //Report configures a report definition
 type Report struct {
+	Kind     string
 	Delivery Deadline
 	Review   Duration
 	Reminder Duration
@@ -87,6 +88,7 @@ type Report struct {
 //Survey configures a survey definition
 type Survey struct {
 	Deadline Deadline
+	Kind     string
 }
 
 //Config aggregates all the subcomponents configuration parameters

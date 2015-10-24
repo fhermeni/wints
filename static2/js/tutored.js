@@ -10,5 +10,24 @@ function loadTutored(interns) {
 	$("#cnt").render("tutored", {
 		Internships: ii,
 		Org: config
-	}, ui);
+	}, function() {
+		ui();
+		$(".report").each(function(i, r) {
+			var em = $(r).closest("tr").data("email");
+			var k = $(r).data("report-kind");
+			$(r).on("click", function() {
+				showReport(em, k, updateStudentTutored);
+			});
+		});
+	});
+}
+
+function updateStudentTutored(em) {
+	var row = $("#table-tutoring").find("tr[data-email='" + em + "']");
+	internship(em).done(function(u) {
+		var cnt = Handlebars.partials['tutored-student'](u);
+		row.replaceWith(cnt);
+		$('#table-users').trigger("update").trigger("updateCache");
+		hideModal();
+	});
 }

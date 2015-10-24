@@ -1,0 +1,98 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+            <div class="modal-body">
+            <button type="button" class="close" aria-hidden="true" onclick="hideModal()">×</button>
+            <fieldset>
+                <legend>{{Kind}} Report</legend>
+                <div class="form-horizontal">
+
+                    <div class="form-group">
+                        <div class="col-sm-3 control-label">Confidential</div>
+                        <div class="col-sm-9">
+                          <div class="checkbox">
+                                <label for="private">
+                                    <input onchange="toggleReportConfidential('{{Kind}}','{{Email}}',this)" type="checkbox" id="private" {{#if Private}}checked{{/if}}>
+                                    <i>(access limited to the tutor and root)</i>
+                                </label>
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <label for="deadline" class="col-sm-3 control-label">Deadline</label>                        
+                        <div class="col-sm-9">
+                            <div class="input-group date" id="deadline">
+                            <input type="text" class="form-control" data-date-format="D MMM YYYY" value="{{dateFmt Deadline 'D MMM YYYY'}}" {{#if Delivery}}disabled{{/if}} />
+                            <span class="input-group-addon">
+                                <span class="glyphicon glyphicon-calendar"></span>
+                            </span>
+                            </div>
+                        </div>
+                    </div>
+                    {{#if Delivery}}
+                    <div class="form-group">
+                        <label for="down" class="col-sm-3 control-label">Document</label>                        
+                        <div class="col-sm-9">
+                            <a class="btn btn-primary" href="api/v2/reports/{{Email}}/{{Kind}}/content">
+                                <i class="glyphicon glyphicon-cloud-download"></i> download                    
+                            </a>
+                        </div>
+                    </div>
+                    {{/if}}
+                    <div class="form-group">
+                        <label for="delivery" class="col-sm-3 control-label">Delivery date</label>
+                        <div class="col-sm-9">
+                            {{#if Delivery}}                            
+                                <p class="form-control-static">{{dateFmt Delivery "D MMM YYYY HH:mm"}} {{#ifLate Delivery}}<span class="alert-text">Deadline missed !</span>{{/ifLate}}</p>
+                            {{else}}
+                                <p class="form-control-static"><i>n/a</i></p>
+                            {{/if}}                            
+                        </div>
+                    </div>
+                    {{#if ToGrade}}                  
+                        <div class="form-group">
+                            <label for="grade" class="col-sm-2 control-label">Grade</label>
+                            <div class="col-sm-9">
+                                <input type="number" class="form-control" id="grade" value="{{this}}" {{#unless Delivery}}disabled="disabled"{{/unless}} />                                
+                            </div>
+                        </div>
+                    {{/if}}
+                    <div class="form-group">
+                        <label for="comments" class="control-label col-sm-offset-1">Comment  <small><a href="/static/consignes-rapports.pdf">(expectations)</a></small></label>                        
+                        <textarea id="comment" rows="9" class="col-sm-10 col-sm-offset-1" {{#unless Mine}}readonly{{/unless}}>{{Comment}}</textarea>
+                    </div>                        
+                    {{#if Delivery}}
+                        <div class="text-center form-group">
+                            <button type="button" class="btn btn-success" onclick="gradeReport({{ToGrade}},'{{Email}}','{{Kind}}')">Grade</button>
+                        </div>                                
+                    {{/if}} 
+                    {{#if ToGrade}}
+                        <div class="form-group">
+                        <label for="notes" class="control-label col-sm-offset-1">Notation</label>                            
+                        <small class="col-sm-offset-1">                            
+                        <ul>
+    <li><b>16 to 18: </b> Well written, crystal clear. It indicates the context, the problematic, the associated bibliography, the solution, the difficulties, the benefits and the planification. Everything is carefully justified.
+    The note might vary according to the subject difficulties.
+    </li>
+    <li><b>13 to 15: </b>
+    Well written, good explanations about the work done and the work to come but
+    editorial issues, un-rigourous justications.
+    </li>
+    <li><b>10 to 12: </b>
+    Readable but no enough details to really understand the work done. Lack of analysis. Some part are missings (bibliography, difficulties, planning, ...)    
+    </li>
+    <li><b>&lt; 10: </b>
+    Hard to read/understand, severe lacks in terms of contents or analysis capacities</li>
+                        </ul>
+                        </small>    
+                        </div>    
+                    {{/if}}                
+            </div>
+        </fieldset>            
+        <div class="text-center form-group">
+            <button type="button" class="btn btn-default" onclick="hideModal()">Done</button>            
+        </div>
+    </div>    
+</div>

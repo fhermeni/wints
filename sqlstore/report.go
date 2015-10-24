@@ -10,7 +10,7 @@ import (
 
 var (
 	selectReport      = "select kind, deadline, delivery, reviewed, grade, comment, private, toGrade from reports where student=$1 and kind=$2"
-	selectReports     = "select kind, deadline, delivery, reviewed, grade, comment, private, toGrade from reports where student=$1"
+	selectReports     = "select kind, deadline, delivery, reviewed, grade, comment, private, toGrade from reports where student=$1 order by deadline asc"
 	selectReportCnt   = "select delivery, cnt from reports where student=$1 and kind=$2"
 	setReportCnt      = "update reports set cnt=$3, delivery=$4 where student=$1 and kind=$2"
 	setGrade          = "update reports set grade=$3, comment=$4,reviewed=$5 where student=$1 and kind=$2"
@@ -19,8 +19,8 @@ var (
 )
 
 //Reports returns all the reports for a given student
-func (s *Store) Reports(email string) (map[string]schema.ReportHeader, error) {
-	res := make(map[string]schema.ReportHeader)
+func (s *Store) Reports(email string) ([]schema.ReportHeader, error) {
+	res := make([]schema.ReportHeader, 0, 0)
 	st := s.stmt(selectReports)
 	rows, err := st.Query(email)
 	if err != nil {
@@ -32,7 +32,7 @@ func (s *Store) Reports(email string) (map[string]schema.ReportHeader, error) {
 		if hdr, err = scanReport(rows); err != nil {
 			return res, err
 		}
-		res[hdr.Kind] = hdr
+		res = append(res, hdr)
 	}
 	return res, err
 

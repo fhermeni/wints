@@ -30,7 +30,7 @@ func (stu *Students) Run() {
 	}
 }
 
-func (stu *Students) spy(s schema.Student, reports map[string]schema.ReportHeader) {
+func (stu *Students) spy(s schema.Student, reports []schema.ReportHeader) {
 	notify := false
 	now := time.Now()
 	for _, r := range reports {
