@@ -133,6 +133,7 @@ function failNewUser(xhr) {
 function rmUser(em) {
 	delUser(em).done(function() {
 		successDelUser(em)
+		tableCount();
 	})
 }
 

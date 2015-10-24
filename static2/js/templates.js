@@ -234,7 +234,7 @@ Handlebars.registerHelper('report', function(r, em, cb) {
 			}
 		}
 	}*/
-	var buf = '<td data-report-kind="' + r.Kind + '" class="report click ' + bg + 'text-center" data-text="' + value + '">' + grade + '</td>';
+	var buf = '<td onclick="showReport(\'' + em + '\', \'' + r.Kind + '\')" class="click ' + bg + 'text-center" data-text="' + value + '">' + grade + '</td>';
 	return new Handlebars.SafeString(buf);
 });
 

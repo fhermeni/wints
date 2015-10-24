@@ -44,16 +44,19 @@ function loadSuccess(data) {
 function showModal(next) {
 	$("#modal").modal("show");
 	$('#modal').find('[data-toggle="popover"]').popover()
+	$('#modal').unbind('shown.bs.modal');
 	if (next) {
 		$('#modal').on('shown.bs.modal', function(e) {
 			next()
 		});
-	} else {
-		$('#modal').unbind('shown.bs.modal');
 	}
-
 	$("#modal").find(".date").datetimepicker();
 
+}
+
+function tableCount() {
+	count = $("tbody").find("tr").length;
+	$(".count").html(count);
 }
 
 function ui() {
@@ -79,6 +82,8 @@ function ui() {
 	$(".date").datetimepicker({
 		format: "DD MMM YYYY"
 	});
+
+	tableCount();
 	/*$("#cnt").find(".editable-promotion").each(function(i, e) {
 		$(e).editable({
 			source: editablePromotions(),
@@ -106,6 +111,19 @@ function ui() {
 function hideModal() {
 	$('#modal').find('[data-toggle="popover"]').popover('destroy');
 	$("#modal").modal("hide");
+	$("#modal").html("");
+}
+
+function updateInternshipRow(em) {
+	var partial = $("table").data("partial");
+	var row = $("table").find("tr[data-email='" + em + "']");
+	console.log(row);
+	internship(em).done(function(u) {
+		var cnt = Handlebars.partials[partial](u);
+		row.replaceWith(cnt);
+		$('table').trigger("update").trigger("updateCache");
+		hideModal();
+	});
 }
 
 function showInternship(em) {

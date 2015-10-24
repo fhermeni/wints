@@ -16,18 +16,8 @@ function loadTutored(interns) {
 			var em = $(r).closest("tr").data("email");
 			var k = $(r).data("report-kind");
 			$(r).on("click", function() {
-				showReport(em, k, updateStudentTutored);
+				showReport(em, k);
 			});
 		});
-	});
-}
-
-function updateStudentTutored(em) {
-	var row = $("#table-tutoring").find("tr[data-email='" + em + "']");
-	internship(em).done(function(u) {
-		var cnt = Handlebars.partials['tutored-student'](u);
-		row.replaceWith(cnt);
-		$('#table-users').trigger("update").trigger("updateCache");
-		hideModal();
 	});
 }
