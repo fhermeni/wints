@@ -9,6 +9,8 @@ function toggleReportConfidential(k, em, chk) {
 	postReportConfidential(em, k, b).fail(function(xhr) {
 		$(chk).prop("checked", !b);
 		notifyError(xhr);
+	}).done(function(data, status, xhr) {
+		defaultSuccess({}, status, xhr);
 	});
 }
 

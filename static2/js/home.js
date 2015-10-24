@@ -122,7 +122,6 @@ function updateInternshipRow(em) {
 		var cnt = Handlebars.partials[partial](u);
 		row.replaceWith(cnt);
 		$('table').trigger("update").trigger("updateCache");
-		hideModal();
 	});
 }
 
