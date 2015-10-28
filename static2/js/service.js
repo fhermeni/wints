@@ -8,13 +8,15 @@ function showService() {
 				service[em] = {
 					U: i.Convention.Tutor,
 					Ints: {},
-					Defs: []
+					Defs: [],
+					TotalInts: 0
 				};
 			}
 			if (!service[em].Ints[p]) {
 				service[em].Ints[p] = []
 			}
 			service[em].Ints[p].push(i)
+			service[em].TotalInts++
 		});
 		$("#cnt").render("service", service, ui);
 	});

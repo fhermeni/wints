@@ -28,7 +28,7 @@
             <td class="text-left fn">
                 {{> person U.Person}}
             </td>
-            <td>
+            <td data-text="{{TotalInts}}">
             {{#each Ints}}
                 {{len this}} {{@key}}{{#unless @last}} ; {{/unless}}
             {{/each}}
