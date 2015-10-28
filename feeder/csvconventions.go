@@ -170,6 +170,7 @@ func (f *CsvConventions) scan(prom string) ([]schema.Convention, error) {
 				Role:   schema.TUTOR,
 			},
 		}
+		log.Println(c.Student.User.Person.Fullname())
 		conventions = append(conventions, c)
 	}
 	return conventions, err

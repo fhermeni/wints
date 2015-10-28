@@ -18,6 +18,13 @@ func (s *Session) Students() ([]schema.Student, error) {
 	return []schema.Student{}, ErrPermission
 }
 
+func (s *Session) Student(stu string) (schema.Student, error) {
+	if s.Myself(stu) || s.Tutoring(stu) || s.Role() >= schema.MAJOR {
+		return s.store.Student(stu)
+	}
+	return schema.Student{}, ErrPermission
+}
+
 //SetNextPosition changes the student next position if the emitter is the targetted student,
 //the tutor, a member of his jury or a major leader at minimum
 func (s *Session) SetAlumni(student string, a schema.Alumni) error {

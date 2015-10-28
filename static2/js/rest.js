@@ -40,11 +40,15 @@ function reportError(id, message) {
 }
 
 function defaultSuccess(data, status, xhr) {
+	var msg = status;
+	if (xhr && xhr.responseText) {
+		msg = xhr.responseText
+	}
 	$.notify({
-		message: xhr.responseText ? xhr.responseText : status
+		message: msg
 	}, {
 		type: "success",
-		delay: 1000,
+		delay: 1,
 		placement: {
 			from: "bottom",
 			align: "right"
@@ -292,9 +296,11 @@ function postReport(email, kind, dta, progress) {
 			return myXhr;
 		}
 	});
-
 }
 
+function postNewTutor(stu, now) {
+	return post("/internships/" + stu + "/tutor", now);
+}
 /*function user(email, ok, no) {
 	return get("/users/" + email, ok, no);
 }

@@ -63,3 +63,33 @@ always have tutor in cc. when doing sth. about the student
 
 
 
+
+## By page
+
+### Login
+	RAS
+
+### Reset password
+	RAS
+
+### Users
+	RAS
+
+### Conventions
+
+	support refresh, cache
+
+	skip student (might have or not an internship)
+		-> will be ignored by the mailing lists if he has an internship OK
+		-> ignored in the placed % if it does not have an internship OK
+
+	change tutor OK
+		-> mail student/old tutor/new tutor OK
+	change promo OK
+	change major OK
+
+## Tutored/Watchlist
+	
+	report workflow
+	grade report
+	late penalties

@@ -13,7 +13,7 @@ func status(not *notifier.Notifier, w http.ResponseWriter, e error) {
 	switch e {
 	case schema.ErrInvalidToken, schema.ErrSessionExpired:
 		return
-	case schema.ErrUnknownStudent, schema.ErrUnknownSurvey, schema.ErrUnknownUser, schema.ErrUnknownReport, schema.ErrUnknownInternship, schema.ErrNoPendingRequests:
+	case schema.ErrUnknownConvention, schema.ErrUnknownStudent, schema.ErrUnknownSurvey, schema.ErrUnknownUser, schema.ErrUnknownReport, schema.ErrUnknownInternship, schema.ErrNoPendingRequests:
 		http.Error(w, e.Error(), http.StatusNotFound)
 		return
 	case schema.ErrReportExists, schema.ErrUserExists, schema.ErrInternshipExists, schema.ErrUserTutoring:

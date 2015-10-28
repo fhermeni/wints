@@ -61,7 +61,6 @@ func (h *HTTPConventionReader) Reader(year int, promotion string) (io.Reader, er
 		log.Println(res.StatusCode)
 		return nil, ErrAuthorization
 	}
-	log.Println("Got it")
 	return charset.NewReader(h.Encoding, res.Body)
 }
 

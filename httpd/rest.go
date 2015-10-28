@@ -74,6 +74,7 @@ func NewEndPoints(not *notifier.Notifier, store *sqlstore.Store, convs feeder.Co
 	ed.post("/reports/:s/:k/private", setReportPrivacy)
 
 	ed.get("/conventions/", conventions)
+	ed.get("/conventions/:s", convention)
 
 	ed.router.POST(ed.prefix+"/signin", ed.anon(ed.signin))
 	ed.router.POST(ed.prefix+"/resetPassword", ed.anon(ed.resetPassword))
@@ -251,7 +252,13 @@ func setStudentSkippable(ex Exchange) error {
 	if err := ex.inJSON(&b); err != nil {
 		return err
 	}
-	return ex.s.SetStudentSkippable(ex.V("s"), b)
+	err := ex.s.SetStudentSkippable(ex.V("s"), b)
+	err = ex.not.SkipStudent(ex.V("s"), b, err)
+	if err != nil {
+		return err
+	}
+	stu, err := ex.s.Student(ex.V("s"))
+	return ex.outJSON(stu, err)
 }
 
 func students(ex Exchange) error {
@@ -335,6 +342,11 @@ func conventions(ex Exchange) error {
 	return ex.outJSON(cc, err)
 }
 
+func convention(ex Exchange) error {
+	c, err := ex.s.Convention(ex.V("s"))
+	return ex.outJSON(c, err)
+}
+
 func setCompany(ex Exchange) error {
 	var c schema.Company
 	ex.inJSON(&c)
@@ -357,7 +369,18 @@ func setTutor(ex Exchange) error {
 	if err := ex.inJSON(&t); err != nil {
 		return err
 	}
-	return ex.s.SetTutor(ex.V("s"), t)
+	stu := ex.V("s")
+	i, err := ex.s.Internship(stu)
+	if err != nil {
+		return err
+	}
+	now, err := ex.s.User(t)
+	if err != nil {
+		return err
+	}
+	err = ex.s.SetTutor(stu, t)
+	err = ex.not.NewTutor(ex.s.Me(), stu, i.Convention.Tutor, now, err)
+	return ex.outJSON(now, err)
 }
 
 func (ed *EndPoints) newInternship(ex Exchange) error {

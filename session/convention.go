@@ -13,6 +13,13 @@ func (s *Session) Conventions() ([]schema.Convention, error) {
 	return []schema.Convention{}, ErrPermission
 }
 
+func (s *Session) Convention(stu string) (schema.Convention, error) {
+	if s.Myself(stu) || s.Role() >= schema.ADMIN {
+		return s.store.Convention(stu)
+	}
+	return schema.Convention{}, ErrPermission
+}
+
 //SetSupervisor changes the supervisor if the emitter is the student or an admin at minimum
 func (s *Session) SetSupervisor(stu string, sup schema.Person) error {
 	if s.Myself(stu) || s.Role() >= schema.ADMIN {

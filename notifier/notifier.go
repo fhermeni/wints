@@ -45,7 +45,6 @@ func (n *Notifier) ReportPrivacyUpdated(from schema.User, stu, kind string, priv
 	return n.mailer.Send(schema.Person{Email: stu}, "report_status.txt", data, from.Person)
 }
 
-
 func (n *Notifier) ReportDeadlineUpdated(from schema.User, stu, kind string, d time.Time, err error) error {
 	s := d.Format("02/01/2006")
 	buf := fmt.Sprintf("set deafline for '%s' report of '%s' to '%s'", kind, stu, s)
@@ -55,7 +54,7 @@ func (n *Notifier) ReportDeadlineUpdated(from schema.User, stu, kind string, d t
 	}
 	data := struct {
 		Date string
-		Kind   string
+		Kind string
 	}{Date: s, Kind: kind}
 	return n.mailer.Send(schema.Person{Email: stu}, "report_deadline.txt", data, from.Person)
 }
@@ -174,4 +173,17 @@ func (n *Notifier) InviteRoot(from schema.User, p schema.Person, token string, e
 
 func (n *Notifier) NewStudent(from schema.User, st schema.Student, err error) {
 	n.Log.UserLog(from, "new student "+st.User.Fullname()+"("+st.User.Person.Email+") "+st.Major+"/"+st.Promotion, err)
+}
+
+func (n *Notifier) NewTutor(from schema.User, stu string, old, now schema.User, err error) error {
+	n.Log.UserLog(from, stu+" was tutored by "+old.Person.Email+", now "+now.Person.Email, err)
+	if err != nil {
+		return err
+	}
+	dta := struct {
+		Old schema.User
+		Now schema.User
+	}{Old: old, Now: now}
+	//Mail the student, cc the tutors
+	return n.mailer.Send(schema.Person{Email: stu}, "tutor_switch.txt", dta, old.Person, now.Person, from.Person)
 }

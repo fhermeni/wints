@@ -1,27 +1,25 @@
-<tr data-email="{{User.Person.Email}}" {{#if Skip}}class="skip"{{/if}} {{#unless I}}class="text-danger"{{/unless}}>
+<tr data-email="{{User.Person.Email}}">
     <td><input type='checkbox' data-email='{{User.Person.Email}}' class="shiftSelectable" data-stu-fn='{{fullname User.Person true}}'/></td>
-    <td class="click fn">
+    <td class="fn">
 
-    <a {{#if I}}onclick="showInternship('{{User.Person.Email}}')"{{else}}onclick="conventionValidator('{{User.Person.Email}}')"{{/if}}>{{User.Person.Lastname}}, {{User.Person.Firstname}} 
+    <a {{#if I}}onclick="showInternship('{{User.Person.Email}}', true)"{{else}}onclick="conventionValidator('{{User.Person.Email}}')"{{/if}}>{{User.Person.Lastname}}, {{User.Person.Firstname}} 
     </a>
-    {{#unless I}}
-    <a class="pull-right">
-        {{#if S.Skip}}          
-            <i class="glyphicon glyphicon-eye-close text-warning" onclick="updateStudentSkipable('{{User.Person.Email}}', this)"></i>
-        {{else}}            
-            <i class="glyphicon glyphicon-eye-open text-success" onclick="updateStudentSkipable('{{User.Person.Email}}', this)"></i>
+    </td>      
+    <td class="text-center" {{#if Warn}}data-text="-1"{{else}}data-text="0"{{/if}}>
+        {{#if Skip}}
+            <i class="glyphicon glyphicon-remove" onclick="updateStudentSkipable('{{User.Person.Email}}', this)"></i>          
+        {{else}}
+            <i class="glyphicon glyphicon-ok" onclick="updateStudentSkipable('{{User.Person.Email}}', this)"></i>          
         {{/if}}
-    </a>
-    {{/unless}}
-    </td>        
+    </td>  
     <td>{{Promotion}}</td>
     <td>{{Major}}</td>    
     {{#if I}}
-    <td><a href="{{I.Convention.Company.WWW}}">{{I.Convention.Company.Name}}</a></td>
+    <td><small><a href="{{I.Convention.Company.WWW}}">{{I.Convention.Company.Name}}</a></small></td>
     <td>{{dateFmt I.Convention.Begin "DD/MM/YY"}} - {{dateFmt I.Convention.End "DD/MM/YY"}}</td>
     <td class="fn">{{I.Convention.Tutor.Person.Lastname}}, {{I.Convention.Tutor.Person.Firstname}}</td>
     <td class="text-right">{{I.Convention.Gratification}}</td>
     {{else}}
-    <td>-</td><td>-</td><td>-</td><td>-</td>
+    <td colspan="4" class="text-center"><i {{#if Warn}}class="text-danger"{{/if}}>no validated internship</i></td>
     {{/if}}    
 </tr>

@@ -12,13 +12,15 @@ function userSort(a, b) {
 	return a.Person.Lastname.toLowerCase().localeCompare(b.Person.Lastname.toLowerCase());
 }
 
-
 function convSort(a, b) {
 	return a.Student.User.Person.Lastname.toLowerCase().localeCompare(b.Student.User.Person.Lastname.toLowerCase());
 }
 
 function loadConventionValidator(students, internships, convs, us) {
 	allStudents = students[0];
+	allStudents.forEach(function(s, idx, arr) {
+		allStudents[idx].Warn = !s.Skip;
+	});
 	us = us[0];
 	allStudents.sort(studentSort);
 	internships = internships[0];
@@ -34,7 +36,9 @@ function loadConventionValidator(students, internships, convs, us) {
 			if (s.User.Person.Email == i.Convention.Student.User.Person.Email) {
 				allStudents[idx].Placed = true;
 				allStudents[idx].I = i;
+				allStudents[idx].Warn = !i && !allStudents[idx].Skip;
 			}
+
 		});
 	});
 	$("#cnt").render("placement-header", {
@@ -103,8 +107,8 @@ function showConvention(cnt) {
 		if (c.Student.User.Person.Email == em) {
 			dta.C = c;
 			$("#convention-detail").html(Handlebars.partials['convention-editor'](dta));
-			cleanError("#convention-selecter", "#tutor-selecter");
-			$('#convention-detail').find('[data-toggle="confirmation"]').confirmation('destroy');
+			cleanError("#tutor-selecter");
+			$('#modal').find('[data-toggle="confirmation"]').confirmation();
 			propose(c.Tutor, allTeachers, $("#tutor-group"));
 			return false;
 		}
@@ -115,18 +119,27 @@ function showConvention(cnt) {
 function updateStudentSkipable(stu, btn) {
 	allStudents.forEach(function(s, idx) {
 		if (s.User.Person.Email == stu) {
-			s.Skip = !s.Skip;
-			allStudents[idx] = s;
-			postStudentSkippable(stu, s.Skip).done(function() {
+			postStudentSkippable(stu, !s.Skip).done(function(dta, status, xhr) {
+				s.Skip = !s.Skip;
 				var row = $("#table-placement").find("tr[data-email='" + stu + "']");
-				if (s.Skip) {
-					$(btn).removeClass("glyphicon-eye-open text-success").addClass("glyphicon-eye-close text-warning");
-					row.addClass("skip");
-				} else {
-					$(btn).removeClass("glyphicon-eye-close text-warning").addClass("glyphicon-eye-open text-success");
-					row.removeClass("skip");
-				}
-
+				s.I = undefined;
+				//catch the convention if it has
+				internship(stu).done(function(i) {
+					s = i.Convention.Student;
+					s.I = i;
+					s.Warn = false;
+					allStudents[idx] = s;
+					var cnt = Handlebars.partials['placement-student'](s);
+					row.replaceWith(cnt);
+					$('.tablesorter').trigger("update").trigger("updateCache");
+				}).fail(function(xhr) {
+					s.Warn = !s.Skip
+					allStudents[idx] = s;
+					var cnt = Handlebars.partials['placement-student'](s);
+					row.replaceWith(cnt);
+					$('.tablesorter').trigger("update").trigger("updateCache");
+				});
+				defaultSuccess({}, "OK");
 			}).fail(logFail);
 			return false;
 		}
@@ -136,9 +149,10 @@ function updateStudentSkipable(stu, btn) {
 function validateConvention(stu) {
 	if (checkConventionAlignment() && checkTutorAlignment()) {
 		prepareValidation();
-	} else {
-		$('#modal').find('[data-toggle="confirmation"]').confirmation('show');
 	}
+	/*else {
+		$('#modal').find('[data-toggle="confirmation"]').confirmation('show');
+	}*/
 }
 
 function checkConventionAlignment() {
@@ -161,7 +175,7 @@ function checkConventionAlignment() {
 	});
 	//Check if the students match
 	if (!matching(student.User, th_student.User)) {
-		reportError("#convention-selecter", "The student does not match")
+		reportError("#convention-selecter", "does not match")
 		return false;
 	}
 	cleanError("#convention-selecter");
@@ -179,10 +193,10 @@ function checkTutorAlignment() {
 		}
 	});
 
-	e = exists(tutor, allTeachers);
+	var e = exists(tutor, allTeachers);
 	if (em == "_new_") {
 		if (e) {
-			reportError("#tutor-selecter", "A registered teacher exists");
+			reportError("#tutor-selecter", e.Lastname + ", " + e.Firstname + " ?");
 			return false;
 		} else {
 			cleanError("#tutor-selecter");
@@ -245,14 +259,16 @@ function commitValidation(c, tut) {
 }
 
 function updateConventionTable(i) {
-	hideModal();
 	//Catch the line, remove it by the new one
 	var em = $("legend").data("email");
 	var row = $("#table-placement").find("tr[data-email='" + em + "']");
 	var dta = i.Convention.Student;
 	dta.I = i;
+	dta.Warn = !i && !dta.Skip;
 	var cnt = Handlebars.partials['placement-student'](dta);
 	row.replaceWith(cnt);
+	$('.tablesorter').trigger("update").trigger("updateCache");
+	hideModal();
 }
 
 function matching(u1, u2) {
@@ -294,4 +310,54 @@ function propose(u, us) {
 		}
 	});
 	return res;
+}
+
+function updateInternship(xhr, em) {
+	internship(em).done(function(i) {
+		var row = $("#table-placement").find("tr[data-email='" + em + "']");
+		var dta = i.Convention.Student;
+		dta.I = i;
+		dta.Warn = !i && !dta.Skip
+		var cnt = Handlebars.partials['placement-student'](dta);
+		row.replaceWith(cnt);
+		$('.tablesorter').trigger("update").trigger("updateCache");
+	});
+}
+
+function updateMajor(em, old, sel) {
+	var v = $(sel).val();
+	postStudentMajor(em, v).done(
+		function(dta, status, xhr) {
+			updateInternship(xhr, em)
+			defaultSuccess({}, "OK");
+		}
+	).fail(function(xhr) {
+		notifyError(xhr)
+		$(sel).val(old);
+	});
+}
+
+function updatePromotion(em, old, sel) {
+	var v = $(sel).val();
+	postStudentPromotion(em, v).done(
+		function(dta, status, xhr) {
+			updateInternship(xhr, em);
+			defaultSuccess({}, "OK");
+		}
+	).fail(function(xhr) {
+		notifyError(xhr)
+		$(sel).val(old);
+	});
+}
+
+function switchTutor(stu, old) {
+	var now = $("#tutor-selecter").val();
+	if (now == old) {
+		return;
+	}
+	postNewTutor(stu, now).done(function(u, status, xhr) {
+		defaultSuccess({}, "OK");
+		$("#tutor-group").find("p").html(Handlebars.partials['person'](u.Person));
+		updateInternship(xhr, stu);
+	})
 }

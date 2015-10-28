@@ -66,7 +66,7 @@ $.handlebars({
 	templatePath: '/static/hbs/',
 	templateExtension: 'hbs',
 	partialPath: '/static/hbs',
-	partials: ['users-user', 'placement-student', 'conventions-convention', 'convention-student', 'convention-editor', 'student-dashboard-report', 'student-dashboard-company', 'student-dashboard-contacts', 'student-dashboard-alumni', 'tutored-student', 'watchlist-student']
+	partials: ['person', 'users-user', 'placement-student', 'convention-student', 'convention-editor', 'student-dashboard-report', 'student-dashboard-company', 'student-dashboard-contacts', 'student-dashboard-alumni', 'tutored-student', 'watchlist-student']
 });
 
 Handlebars.registerHelper('len', function(a) {
@@ -99,6 +99,38 @@ Handlebars.registerHelper('optionRoles', function(r) {
 		}
 	}
 	return new Handlebars.SafeString(res);
+});
+
+Handlebars.registerHelper('optionMajors', function(m) {
+	var b = "";
+	if (!m) {
+		b += "<option selected>?</option>";
+	}
+	config.Majors.forEach(function(o) {
+		var selected = m == o ? " selected " : "";
+		b += "<option value='" + o + "' " + selected + " >" + o + "</option>";
+	});
+	return new Handlebars.SafeString(b);
+});
+
+Handlebars.registerHelper('optionPromotions', function(p) {
+	var b = "";
+	if (!p) {
+		b += "<option selected>?</option>";
+	}
+	config.Promotions.forEach(function(o) {
+		var selected = p == o ? " selected " : "";
+		b += "<option value='" + o + "' " + selected + " >" + o + "</option>";
+	});
+	return new Handlebars.SafeString(b);
+});
+
+Handlebars.registerHelper('optionUsers', function(users, u) {
+	var b = "";
+	users.forEach(function(o) {
+		b += "<option value='" + o.Person.Email + "'" + (o.Person.Email == u.Person.Email ? "selected" : "") + ">" + o.Person.Lastname + ", " + o.Person.Firstname + "</option>";
+	});
+	return new Handlebars.SafeString(b);
 });
 
 function editableRoles() {
@@ -460,18 +492,6 @@ Handlebars.registerHelper('raw', function(p) {
 		fn = fn + " ";
 	}
 	return fn;
-});
-
-Handlebars.registerHelper('majorOptions', function(m) {
-	var b = "";
-	if (!m) {
-		b += "<option selected>?</option>";
-	}
-	allMajors.forEach(function(o) {
-		var selected = m == o ? " selected " : "";
-		b += "<option value='" + o + "' " + selected + " >" + o + "</option>";
-	});
-	return new Handlebars.SafeString(b);
 });
 
 

@@ -51,7 +51,7 @@ function showModal(next) {
 		});
 	}
 	$("#modal").find(".date").datetimepicker();
-
+	$('#modal').find('[data-toggle="confirmation"]').confirmation();
 }
 
 function tableCount() {
@@ -125,10 +125,27 @@ function updateInternshipRow(em) {
 	});
 }
 
-function showInternship(em) {
-	internship(em).done(internshipModal).fail(logFail)
+function showInternship(em, edit) {
+	if (!edit) {
+		internship(em).done(function(i) {
+			internshipModal(i, [], edit);
+		}).fail(logFail);
+	} else {
+		$.when(internship(em), users()).done(function(i, uss) {
+			i = i[0];
+			uss = uss[0].filter(function(u) {
+				return u.Role > 1
+			});
+			internshipModal(i, uss, edit);
+		}).fail(logFail);
+	}
 }
 
-function internshipModal(i) {
-	$("#modal").render("convention-detail", i, showModal);
+function internshipModal(i, uss, edit) {
+	var dta = {
+		I: i,
+		Editable: edit,
+		Teachers: uss
+	}
+	$("#modal").render("convention-detail", dta, showModal);
 }
