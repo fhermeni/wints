@@ -1,22 +1,21 @@
 function showService() {
-	internships(function(interns) {
+	internships().done(function(ints) {
 		var service = {};
-		interns.forEach(function(i) {
-			if (!service[i.Tutor.Email]) {
-				service[i.Tutor.Email] = {
-					P: i.Tutor,
-					Internships: {}
+		ints.forEach(function(i) {
+			var em = i.Convention.Tutor.Person.Email;
+			var p = i.Convention.Student.Promotion;
+			if (!service[em]) {
+				service[em] = {
+					U: i.Convention.Tutor,
+					Ints: {},
+					Defs: []
 				};
 			}
-			if (!service[i.Tutor.Email].Internships[i.Promotion]) {
-				service[i.Tutor.Email].Internships[i.Promotion] = []
+			if (!service[em].Ints[p]) {
+				service[em].Ints[p] = []
 			}
-			service[i.Tutor.Email].Internships[i.Promotion].push(i)
+			service[em].Ints[p].push(i)
 		});
-		var html = Handlebars.getTemplate("service")(service);
-		$("#cnt").html(html);
-
-		$("#cnt").find("td .icheckbox_flat").icheck(shiftSelect());
-		$('#cnt').find(".check_all").icheck(selectAllNone($("#cnt")));
+		$("#cnt").render("service", service, ui);
 	});
 }
