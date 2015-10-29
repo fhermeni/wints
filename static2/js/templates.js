@@ -171,14 +171,6 @@ function editableMajors() {
 	return res;
 }
 
-Handlebars.registerHelper('roleSelect', function(m) {
-	var b = "";
-	for (i = 2; i < roles.length; i++) {
-		b += "<option value='" + i + "'>" + roles[i] + "</option>";
-	}
-	return new Handlebars.SafeString(b);
-});
-
 Handlebars.registerHelper('student', function(r, opts) {
 	if (r <= 1)
 		return opts.fn(this);

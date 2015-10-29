@@ -115,3 +115,24 @@ func (u User) String() string {
 func (u User) Fullname() string {
 	return u.Person.Fullname()
 }
+
+//Internships aliases slices of internship to exhibit filtering methods
+type Students []Student
+
+//Filter returns the internships that pass the given filter
+func (ss Students) Filter(filter func(Student) bool) Students {
+	res := make(Students, 0)
+	for _, s := range ss {
+		if filter(s) {
+			res = append(res, s)
+		}
+	}
+	return res
+}
+
+//StudentInMajor is a filter that keep only the internships in the given major
+func StudentInMajor(major string) func(Student) bool {
+	return func(s Student) bool {
+		return s.Major == major
+	}
+}

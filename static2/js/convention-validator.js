@@ -1,7 +1,11 @@
 var allStudents, allConventions, allTeachers;
 
 function showConventionValidator() {
-	$.when(students(), internships(), conventions(), users()).done(loadConventionValidator).fail(logFail)
+	if (level(myself.Role) >= ADMIN_LEVEL) {
+		$.when(students(), internships(), conventions(), users()).done(loadConventionValidator).fail(logFail)
+	} else {
+		$.when(students(), internships()).done(loadConventionValidator).fail(logFail)
+	}
 }
 
 function studentSort(a, b) {
@@ -18,18 +22,25 @@ function convSort(a, b) {
 
 function loadConventionValidator(students, internships, convs, us) {
 	allStudents = students[0];
+	allTeachers = [];
+	allConventions = [];
 	allStudents.forEach(function(s, idx, arr) {
 		allStudents[idx].Warn = !s.Skip;
 	});
-	us = us[0];
+
 	allStudents.sort(studentSort);
 	internships = internships[0];
-	allConventions = convs[0];
-	allConventions.sort(convSort);
+	if (convs) {
+		allConventions = convs[0];
+		allConventions.sort(convSort);
+	}
 
-	allTeachers = us.filter(function(u) { 
-		return u.Role > 1
-	});
+	if (us) {
+		us = us[0];
+		allTeachers = us.filter(function(u) { 
+			return u.Role > 1
+		});
+	}
 	allTeachers.sort(userSort);
 	internships.forEach(function(i) {
 		allStudents.forEach(function(s, idx, arr) {
@@ -140,7 +151,7 @@ function updateStudentSkipable(stu, btn) {
 					$('.tablesorter').trigger("update").trigger("updateCache");
 				});
 				defaultSuccess({}, "OK");
-			}).fail(logFail);
+			}).fail(notifyError);
 			return false;
 		}
 	});

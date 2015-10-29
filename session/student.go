@@ -4,22 +4,26 @@ import "github.com/fhermeni/wints/schema"
 
 //SetStudentSkippable change the skippable status if the emitter is a major leader at minimum
 func (s *Session) SetStudentSkippable(em string, st bool) error {
-	if s.Role().Level() >= schema.MAJOR_LEVEL {
+	if s.Role().Level() >= schema.ADMIN_LEVEL {
 		return s.store.SetStudentSkippable(em, st)
 	}
 	return ErrPermission
 }
 
 //Students lists all the students if the emitter is an admin at least
-func (s *Session) Students() ([]schema.Student, error) {
-	if s.Role().Level() >= schema.ADMIN_LEVEL {
-		return s.store.Students()
+func (s *Session) Students() (schema.Students, error) {
+	students, err := s.store.Students()
+	if s.Role().Level() >= schema.HEAD_LEVEL {
+		return students, err
+	}
+	if s.Role().Level() == schema.MAJOR_LEVEL {
+		return students.Filter(schema.StudentInMajor(s.Role().SubRole())), err
 	}
 	return []schema.Student{}, ErrPermission
 }
 
 func (s *Session) Student(stu string) (schema.Student, error) {
-	if s.Myself(stu) || s.Tutoring(stu) || s.Role().Level() >= schema.MAJOR_LEVEL {
+	if s.Myself(stu) || s.Watching(stu) {
 		return s.store.Student(stu)
 	}
 	return schema.Student{}, ErrPermission

@@ -77,7 +77,7 @@ func scanStudent(rows *sql.Rows) (schema.Student, error) {
 }
 
 //Students list all the registered students
-func (s *Store) Students() ([]schema.Student, error) {
+func (s *Store) Students() (schema.Students, error) {
 	rows, err := s.db.Query(allStudents)
 
 	students := make([]schema.Student, 0, 0)

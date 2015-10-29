@@ -41,19 +41,26 @@ function loadSuccess(data) {
 	}
 }
 
+var STUDENT_LEVEL = 0;
+var TUTOR_LEVEL = 1;
+var MAJOR_LEVEL = 2;
+var HEAD_LEVEL = 3;
+var ADMIN_LEVEL = 4;
+var ROOT_LEVEL = 5;
+
 function level(role) {
 	if (role == "student") {
-		return 0;
+		return STUDENT_LEVEL;
 	} else if (role == "tutor") {
-		return 1;
+		return TUTOR_LEVEL;
 	} else if (role.indexOf("major") == 0) {
-		return 2;
+		return MAJOR_LEVEL;
 	} else if (role == "head") {
-		return 3;
+		return HEAD_LEVEL;
 	} else if (role == "admin") {
-		return 4;
+		return ADMIN_LEVEL;
 	} else if (role == "root") {
-		return 5;
+		return ROOT_LEVEL;
 	}
 	return -1;
 }
@@ -143,9 +150,9 @@ function updateInternshipRow(em) {
 }
 
 function showInternship(em, edit) {
-	if (!edit) {
+	if (!edit || level(myself.Role) < ADMIN_LEVEL) {
 		internship(em).done(function(i) {
-			internshipModal(i, [], edit);
+			internshipModal(i, [], edit && level(myself.Role) >= ADMIN_LEVEL);
 		}).fail(logFail);
 	} else {
 		$.when(internship(em), users()).done(function(i, uss) {
