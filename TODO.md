@@ -75,6 +75,9 @@ always have tutor in cc. when doing sth. about the student
 ### Users
 	RAS
 
+### Service
+	RAS
+
 ### Conventions
 
 	support refresh, cache
@@ -93,3 +96,11 @@ always have tutor in cc. when doing sth. about the student
 	report workflow
 	grade report
 	late penalties
+
+
+Roles:
+Student
+Tutor (teacher in fact)
+MAJOR_x (see his major)
+HEAD (see everything)
+ADMIN (+ add student, teachers, validate convention, plan defenses)
