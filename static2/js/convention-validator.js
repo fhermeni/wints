@@ -38,7 +38,7 @@ function loadConventionValidator(students, internships, convs, us) {
 	if (us) {
 		us = us[0];
 		allTeachers = us.filter(function(u) { 
-			return u.Role > 1
+			return level(u.Role) >= TUTOR_LEVEL;
 		});
 	}
 	allTeachers.sort(userSort);
@@ -59,6 +59,10 @@ function loadConventionValidator(students, internships, convs, us) {
 }
 
 function conventionValidator(em) {
+	if (level(myself.Role) < ADMIN_LEVEL) {
+		notifyError("Only an admin can validate a convention");
+		return
+	}
 	data = {
 		Conventions: allConventions,
 		C: allConventions[0],
@@ -280,6 +284,8 @@ function updateConventionTable(i) {
 	row.replaceWith(cnt);
 	$('.tablesorter').trigger("update").trigger("updateCache");
 	hideModal();
+	var v = $('#placed_cnt').html();
+	$('#placed_cnt').html(parseInt(v) + 1);
 }
 
 function matching(u1, u2) {

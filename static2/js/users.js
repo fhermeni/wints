@@ -53,6 +53,7 @@ function longUpdateProfile(em) {
 }
 
 function successLongUpdateProfile(u) {
+	defaultSuccess({}, "OK");
 	u.Resetable = true;
 	var row = $("#table-users").find("tr[data-email='" + u.Person.Email + "']");
 	var cnt = Handlebars.partials['users-user'](u);

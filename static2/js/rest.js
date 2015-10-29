@@ -224,8 +224,12 @@ function logFail(xhr) {
 }
 
 function notifyError(xhr) {
+	var msg = xhr
+	if (typeof xhr !== "string") {
+		msg = xhr.responseText ? xhr.responseText : xhr.status;
+	}
 	$.notify({
-		message: xhr.responseText ? xhr.responseText : status
+		message: msg
 	}, {
 		type: "danger",
 		delay: 1000,
