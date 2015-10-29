@@ -1,5 +1,13 @@
 var config;
 
+var STUDENT_LEVEL = 0;
+var TUTOR_LEVEL = 1;
+var MAJOR_LEVEL = 2;
+var HEAD_LEVEL = 3;
+var ADMIN_LEVEL = 4;
+var ROOT_LEVEL = 5;
+
+
 String.prototype.capitalize = function() {
 	return this.charAt(0).toUpperCase() + this.substring(1)
 }
@@ -31,22 +39,14 @@ function loadSuccess(data) {
 	}
 
 	//homepage	
-	if (myself.Role == 1) { //student
+	if (level(myself.Role) == STUDENT_LEVEL) {
 		showStudent();
-	} else if (myself.Role >= 4) { //admin +
+	} else if (level(myself.Role) >= MAJOR_LEVEL) {
 		showWatchlist();
 	} else {
-		//tutor || major
 		showTutored();
 	}
 }
-
-var STUDENT_LEVEL = 0;
-var TUTOR_LEVEL = 1;
-var MAJOR_LEVEL = 2;
-var HEAD_LEVEL = 3;
-var ADMIN_LEVEL = 4;
-var ROOT_LEVEL = 5;
 
 function level(role) {
 	if (role == "student") {

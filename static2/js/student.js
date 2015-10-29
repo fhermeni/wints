@@ -43,14 +43,14 @@ function updateCompany() {
 }
 
 function sendSupervisor() {
-	if (empty("lbl-fn") || empty("lbl-ln") || empty("lbl-tel") || empty("lbl-email")) {
+	if (empty("sup-fn") || empty("sup-ln") || empty("sup-tel") || empty("sup-email")) {
 		return
 	}
 	var sup = {
-		Firstname: $("#lbl-fn").val(),
-		Lastname: $("#lbl-ln").val(),
-		Email: $("#lbl-email").val(),
-		Tel: $("#lbl-tel").val()
+		Firstname: $("#sup-fn").val(),
+		Lastname: $("#sup-ln").val(),
+		Email: $("#sup-email").val(),
+		Tel: $("#sup-tel").val()
 	}
 	postSupervisor(myself.Person.Email, sup).done(refreshContacts)
 }

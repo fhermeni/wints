@@ -1,1 +1,1 @@
-<a href="mailto:{{Email}}">{{fullname this}}</a>  ({{Tel}})
+	<a href="mailto:{{Email}}">{{fullname this}}</a>  (<i class="glyphicon glyphicon-earphone"></i> {{Tel}})

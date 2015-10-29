@@ -66,6 +66,22 @@ always have tutor in cc. when doing sth. about the student
 
 ## By page
 
+### Student
+   - notify company update OK
+   - notify tutor when supervisor status changed OK
+   	-> mail ?
+   - notify future update OK
+
+   - robust upload report
+   - grade + penalty computation
+
+   - Grading
+   	<D -
+   	>D 
+   		R grade - lates
+   	    !R
+   	    	uploaded -> ?
+   	    	!uploaded 
 ### Login
 	RAS
 
@@ -104,3 +120,9 @@ Tutor (teacher in fact)
 MAJOR_x (see his major)
 HEAD (see everything)
 ADMIN (+ add student, teachers, validate convention, plan defenses)
+
+### Caching
+
+1 cache per user/request
+POST invalidate all the caches
+GET populate local cache

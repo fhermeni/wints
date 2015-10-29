@@ -246,6 +246,7 @@ func setAlumni(ex Exchange) error {
 		return err
 	}
 	err := ex.s.SetAlumni(ex.V("s"), a)
+	ex.not.AlumniUpdated(ex.s.Me(), a, err)
 	return ex.outJSON(a, err)
 }
 
@@ -353,7 +354,7 @@ func setCompany(ex Exchange) error {
 	var c schema.Company
 	ex.inJSON(&c)
 	err := ex.s.SetCompany(ex.V("s"), c)
-
+	ex.not.CompanyUpdated(ex.s.Me(), c, err)
 	return ex.outJSON(c, err)
 }
 
@@ -363,6 +364,7 @@ func setSupervisor(ex Exchange) error {
 		return err
 	}
 	err := ex.s.SetSupervisor(ex.V("s"), p)
+	ex.not.SupervisorUpdated(ex.s.Me(), p, err)
 	return ex.outJSON(p, err)
 }
 

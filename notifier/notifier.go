@@ -121,6 +121,20 @@ func (n *Notifier) SurveyReseted() {
 	//mail supervisor, cc tutor
 }
 
+func (n *Notifier) CompanyUpdated(from schema.User, c schema.Company, err error) {
+	buf := fmt.Sprintf("company data updated '%+v'", c)
+	n.Log.UserLog(from, buf, err)
+}
+
+func (n *Notifier) AlumniUpdated(from schema.User, a schema.Alumni, err error) {
+	buf := fmt.Sprintf("alumni data updated '%+v'", a)
+	n.Log.UserLog(from, buf, err)
+}
+func (n *Notifier) SupervisorUpdated(from schema.User, sup schema.Person, err error) {
+	buf := fmt.Sprintf("supervisor data updated '%+v'", sup)
+	n.Log.UserLog(from, buf, err)
+}
+
 func (n *Notifier) RmAccount(from schema.User, em string, err error) error {
 	n.Log.UserLog(from, "delete account '"+em+"'", err)
 	if err == nil {

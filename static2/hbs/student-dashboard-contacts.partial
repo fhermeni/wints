@@ -7,11 +7,7 @@
 	<dl class="dl-horizontal">
 		<dt>Supervisor</dt>
 		<dd id="supervisor-contact">
-		<a href="mailto:{{Convention.Supervisor.Email}}" class="fn">{{fullname Convention.Supervisor}}</a>
-			 (	<i class="glyphicon glyphicon-earphone"></i> {{Convention.Supervisor.Tel}})
-		</dd>
+		{{> person Convention.Supervisor}}</dd>
 		<dt>Academic tutor</dt>
-		<dd><a class="fn" href="mailto:{{Convention.Tutor.Person.Email}}">{{fullname Convention.Tutor.Person}}</a>
-			 (	<i class="glyphicon glyphicon-earphone"></i> {{Convention.Tutor.Person.Tel}})
-		</dd>	
+		<dd>{{> person Convention.Tutor.Person}}</dd>	
 	</dl>
