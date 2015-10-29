@@ -6,18 +6,11 @@ import "time"
 func (d *Deadline) UnmarshalText(text []byte) error {
 	var err error
 	str := string(text)
-	/*if strings.HasSuffix(str, "d") {
-		str = strings.TrimSuffix(str, "d")
-		days, r := strconv.Atoi(str)
-		if r == nil {
-			d.relative = &time.Duration(time.Hour * time.Duration(24*days))
-		}
-	}*/
 
 	rel, err := time.ParseDuration(str)
 	if err != nil {
 		var abs time.Time
-		abs, err = time.Parse(DateLayout, str)
+		abs, err = time.Parse(DateTimeLayout, str)
 		if err == nil {
 			d.absolute = &abs
 		}

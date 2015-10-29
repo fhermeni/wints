@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/fhermeni/wints/config"
 	"github.com/fhermeni/wints/journal"
 	"github.com/fhermeni/wints/mail"
 	"github.com/fhermeni/wints/schema"
@@ -47,8 +48,8 @@ func (n *Notifier) ReportPrivacyUpdated(from schema.User, stu, kind string, priv
 }
 
 func (n *Notifier) ReportDeadlineUpdated(from schema.User, stu, kind string, d time.Time, err error) error {
-	s := d.Format("02/01/2006")
-	buf := fmt.Sprintf("set deafline for '%s' report of '%s' to '%s'", kind, stu, s)
+	s := d.Format(config.DateTimeLayout)
+	buf := fmt.Sprintf("set deadline for '%s' report of '%s' to '%s'", kind, stu, s)
 	n.Log.UserLog(from, buf, err)
 	if err != nil {
 		return err
