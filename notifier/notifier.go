@@ -106,7 +106,7 @@ func (n *Notifier) Logout(s schema.User, err error) {
 }
 
 func (n *Notifier) PrivilegeUpdated(from schema.User, em string, p schema.Role, err error) error {
-	n.Log.UserLog(from, +"'" string(p)+"' privileges for "+em, err)
+	n.Log.UserLog(from, "'"+string(p)+"' privileges for "+em, err)
 	if err != nil {
 		return err
 	}

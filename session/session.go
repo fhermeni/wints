@@ -59,6 +59,33 @@ func (s *Session) Tutoring(student string) bool {
 	return c.Tutor.Person.Email == s.my.Person.Email
 }
 
+//InMyMajor checks if the student is in the major I am the leader of
+func (s *Session) Watching(student string) bool {
+	//wathing
+	if s.my.Role.Level() >= schema.HEAD_LEVEL {
+		return true
+	}
+	c, err := s.store.Convention(student)
+	if err != nil {
+		return false
+	}
+	//wathing
+	if s.my.Role.Level() == schema.MAJOR_LEVEL && s.my.Role.SubRole() == c.Student.Major {
+		return true
+	}
+	//tutoring
+	return s.my.Person.Email == c.Tutor.Person.Email
+}
+
+//InMyMajor checks if the student is in the major I am the leader of
+func (s *Session) InMyMajor(student string) bool {
+	stu, err := s.store.Student(student)
+	if err != nil {
+		return false
+	}
+	return s.my.Role.SubRole() == stu.Major
+}
+
 //JuryOf checks if I attend to the student defense
 func (s *Session) JuryOf(student string) bool {
 	_, err := s.store.Defense(student)

@@ -42,6 +42,10 @@ func (p Role) Level() int {
 	return -1
 }
 
+func (p Role) SubRole() string {
+	from := strings.LastIndex(string(p), "-") + 1
+	return string(p)[from:len(p)]
+}
 func (p Role) Value() (driver.Value, error) {
 	return p.String(), nil
 }

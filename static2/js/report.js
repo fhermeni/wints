@@ -19,7 +19,11 @@ function updateReportDeadline(em, kind, e) {
 	postReportDeadline(em, kind, e.date).done(function(data, status, xhr) {
 		updateInternshipRow(em);
 		defaultSuccess({}, status, xhr)
-	}).fail();
+	}).fail(function(xhr) {
+		var input = $("#deadline").find("input");
+		input.val(e.oldDate.format(input.data("date-format")));
+		notifyError(xhr);
+	});
 }
 
 function showReportModal(r, em) {
@@ -27,7 +31,6 @@ function showReportModal(r, em) {
 	$("#modal").render("report-modal", r, function() {
 		showModal(function() {
 			$(".date").datetimepicker().on("dp.change", function(e) {
-				console.log("here " + em);
 				updateReportDeadline(em, r.Kind, e);
 			});
 		});

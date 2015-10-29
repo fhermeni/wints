@@ -45,7 +45,7 @@ func (s *Session) SetReportPrivacy(kind, email string, p bool) error {
 }
 
 func (s *Session) Report(kind, email string) (schema.ReportHeader, error) {
-	if s.Myself(email) || s.Tutoring(email) || s.Role().Level() > schema.ADMIN_LEVEL {
+	if s.Myself(email) || s.Watching(email) {
 		return s.store.Report(kind, email)
 	}
 	return schema.ReportHeader{}, ErrPermission

@@ -55,11 +55,16 @@ func (s *Session) NewInternship(c schema.Convention, cfg config.Internships) (sc
 //Internships list the internships if the emitter is at least a major leader.
 //Otherwise, all the internships now tutored by the emitter are removed
 func (s *Session) Internships() (schema.Internships, error) {
-	if s.Role().Level() >= schema.MAJOR_LEVEL {
-		return s.store.Internships()
-	}
 	is, err := s.store.Internships()
-	return is.Filter(schema.Tutoring(s.my.Person.Email)), err
+	if s.Role().Level() >= schema.HEAD_LEVEL {
+		return is, err
+	} else if s.Role().Level() == schema.MAJOR_LEVEL {
+		return is.Filter(schema.InMajor(s.my.Role.SubRole())), err
+	} else if s.Role().Level() == schema.TUTOR_LEVEL {
+		return is.Filter(schema.Tutoring(s.my.Person.Email)), err
+	}
+	return schema.Internships{}, ErrPermission
+
 }
 
 //Internship returns the internship of the emitter

@@ -31,7 +31,6 @@ function showRoleEditor(em) {
 }
 
 function updateRole(em) {
-	debugger;
 	postUserRole(em, $("#profile-role").val())
 		.done(successLongUpdateProfile)
 		.fail(function(xhr) {
@@ -54,6 +53,7 @@ function longUpdateProfile(em) {
 }
 
 function successLongUpdateProfile(u) {
+	u.Resetable = true;
 	var row = $("#table-users").find("tr[data-email='" + u.Person.Email + "']");
 	var cnt = Handlebars.partials['users-user'](u);
 	row.replaceWith(cnt);

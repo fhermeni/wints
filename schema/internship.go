@@ -60,3 +60,10 @@ func Tutoring(tut string) func(Internship) bool {
 		return i.Convention.Tutor.Person.Email == tut
 	}
 }
+
+//InMajor is a filter that keep only the internships in the given major
+func InMajor(major string) func(Internship) bool {
+	return func(i Internship) bool {
+		return i.Convention.Student.Major == major
+	}
+}

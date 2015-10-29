@@ -98,7 +98,7 @@ always have tutor in cc. when doing sth. about the student
 	late penalties
 
 
-Roles:
+Roles: OK
 Student
 Tutor (teacher in fact)
 MAJOR_x (see his major)
