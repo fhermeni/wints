@@ -187,7 +187,7 @@ func scanConvention(rows *sql.Rows) (schema.Convention, error) {
 	var nextContact sql.NullString
 	var nextPosition sql.NullString
 	var nextFrance, nextPermanent, nextSameCompany sql.NullBool
-
+	var role string
 	c := schema.Convention{
 		Student: schema.Student{
 			User: schema.User{
@@ -221,7 +221,7 @@ func scanConvention(rows *sql.Rows) (schema.Convention, error) {
 		&c.Tutor.Person.Tel,
 		&c.Tutor.Person.Email,
 		&c.Tutor.LastVisit,
-		&c.Tutor.Role,
+		&role,
 		&c.Begin,
 		&c.End,
 		&c.Company.Name,
@@ -236,6 +236,7 @@ func scanConvention(rows *sql.Rows) (schema.Convention, error) {
 		&c.Supervisor.Email,
 		&c.Supervisor.Tel,
 	)
+	c.Tutor.Role = schema.Role(role)
 	if !nextPosition.Valid {
 		c.Student.Alumni = nil
 	} else {

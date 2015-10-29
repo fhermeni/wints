@@ -18,7 +18,7 @@ var (
 	startPasswordRenewal         = "insert into password_renewal(email,token) values($1,$2)"
 	updateLastVisit              = "update users set lastVisit=$1 where email=$2"
 	updateUserProfile            = "update users set firstname=$1, lastname=$2, tel=$3 where email=$4"
-	updateUserRole               = "update users set role=$2 where email=$1 and role != 1" //cannot change the role of a student
+	updateUserRole               = "update users set role=$2 where email=$1 and role != 'student'" //cannot change the role of a student
 	updateUserPassword           = "update users set password=$2 where email=$1"
 	updateEmail                  = "update users set email=$2 where email=$1"
 	deletePasswordRenewalRequest = "delete from password_renewal where email=$1"
@@ -38,7 +38,7 @@ func (s *Store) addUser(tx *TxErr, u schema.User) {
 		u.Person.Lastname,
 		u.Person.Tel,
 		u.Person.Email,
-		u.Role,
+		u.Role.String(),
 		randomBytes(32),
 	)
 }
@@ -51,14 +51,16 @@ func (s *Store) Visit(u string) error {
 func scanUser(row *sql.Rows) (schema.User, error) {
 	u := schema.User{Person: schema.Person{}}
 	var last pq.NullTime
+	var r string
 	err := row.Scan(
 		&u.Person.Firstname,
 		&u.Person.Lastname,
 		&u.Person.Email,
 		&u.Person.Tel,
-		&u.Role,
+		&r,
 		&last,
 	)
+	u.Role = schema.Role(r)
 	u.LastVisit = nullableTime(last)
 	return u, err
 }
@@ -87,18 +89,10 @@ func (s *Store) Users() ([]schema.User, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		u := schema.User{Person: schema.Person{}}
-		var last pq.NullTime
-		rows.Scan(
-			&u.Person.Firstname,
-			&u.Person.Lastname,
-			&u.Person.Email,
-			&u.Person.Tel,
-			&u.Role,
-			&last,
-		)
-		u.LastVisit = nullableTime(last)
-		//Get the role if exists
+		u, err := scanUser(rows)
+		if err != nil {
+			return users, err
+		}
 		users = append(users, u)
 	}
 	return users, nil
@@ -110,7 +104,7 @@ func (s *Store) SetUserPerson(p schema.Person) error {
 }
 
 //SetUserRole updates the user privilege
-func (s *Store) SetUserRole(email string, priv schema.Privilege) error {
+func (s *Store) SetUserRole(email string, priv schema.Role) error {
 	return s.singleUpdate(updateUserRole, schema.ErrUnknownUser, email, priv)
 }
 
@@ -151,14 +145,14 @@ func (s *Store) NewPassword(token, newP []byte) (string, error) {
 
 //NewUser add a user
 //Basically, calls addUser
-func (s *Store) NewUser(p schema.Person, role schema.Privilege) ([]byte, error) {
+func (s *Store) NewUser(p schema.Person, role schema.Role) ([]byte, error) {
 	if !strings.Contains(p.Email, "@") {
 		return []byte{}, schema.ErrInvalidEmail
 	}
 	token := randomBytes(32)
 	tx := newTxErr(s.db)
 	//s.singleUpdate(insertUser, schema.ErrUserExists, p.Firstname, p.Lastname, p.Tel, p.Email, role, randomBytes(32))
-	nb := tx.Update(insertUser, p.Firstname, p.Lastname, p.Tel, p.Email, role, randomBytes(32))
+	nb := tx.Update(insertUser, p.Firstname, p.Lastname, p.Tel, p.Email, role.String(), randomBytes(32))
 	if nb == 0 {
 		tx.err = schema.ErrUserExists
 	}

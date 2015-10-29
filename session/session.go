@@ -31,7 +31,7 @@ func NewSession(u schema.User, store *sqlstore.Store, conventions feeder.Convent
 }
 
 func (s *Session) RmSession(em string) error {
-	if s.Myself(em) || s.Role() >= schema.ADMIN {
+	if s.Myself(em) || s.Role().Level() >= schema.ADMIN_LEVEL {
 		return s.store.RmSession(em)
 	}
 	return ErrPermission
@@ -41,7 +41,7 @@ func (s *Session) Me() schema.User {
 }
 
 //Role returns the current user role
-func (s *Session) Role() schema.Privilege {
+func (s *Session) Role() schema.Role {
 	return s.my.Role
 }
 

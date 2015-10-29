@@ -1,30 +1,53 @@
 package schema
 
 import (
+	"database/sql/driver"
 	"strings"
 	"time"
 )
 
-//The different level of privileges
+//The different level of Roles
 const (
-	NONE Privilege = iota //Not validated. Cannot connect
-	STUDENT
-	TUTOR
-	MAJOR
-	ADMIN
-	ROOT
+	STUDENT_LEVEL int = iota
+	TUTOR_LEVEL
+	MAJOR_LEVEL
+	HEAD_LEVEL
+	ADMIN_LEVEL
+	ROOT_LEVEL
+
+	STUDENT Role = "student"
+	TUTOR   Role = "tutor"
+	ROOT    Role = "root"
 	//DateLayout indicates the date format
 	DateLayout = "02/01/2006 15:04"
 )
 
-//Privilege aims at giving the possible level of privilege for a user.
-type Privilege int
+//Role aims at giving the possible level of Role for a user.
+type Role string
 
-//Privileges denotes the string value associated to each level of privilege
-var Privileges = [...]string{"none", "student", "tutor", "major", "admin", "root"}
+func (p Role) Level() int {
+	if p == "student" {
+		return STUDENT_LEVEL
+	} else if p == "tutor" {
+		return TUTOR_LEVEL
+	} else if strings.Index(string(p), "major") == 0 {
+		return MAJOR_LEVEL
+	} else if p == "head" {
+		return HEAD_LEVEL
+	} else if p == "admin" {
+		return ADMIN_LEVEL
+	} else if p == "root" {
+		return ROOT_LEVEL
+	}
+	return -1
+}
 
-func (p Privilege) String() string {
-	return Privileges[p]
+func (p Role) Value() (driver.Value, error) {
+	return p.String(), nil
+}
+
+func (p Role) String() string {
+	return string(p)
 }
 
 //Person just gathers contact information for someone.
@@ -45,7 +68,7 @@ type Session struct {
 //User is a person with an account
 type User struct {
 	Person    Person
-	Role      Privilege
+	Role      Role
 	LastVisit *time.Time `,json:"omitempty"`
 }
 

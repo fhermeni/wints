@@ -83,21 +83,26 @@ Handlebars.registerHelper('dateFmt', function(d, fmt) {
 	return moment(d).format(fmt);
 });
 
-var roles = ["none", "student", "tutor", "major", "admin", "root"];
+var roles = ["student", "tutor", "major", "head", "admin", "root"];
 
-Handlebars.registerHelper('role', function(r) {
-	return roles[r];
+Handlebars.registerHelper('roleLevel', function(r) {
+	return level(r);
 });
-
 Handlebars.registerHelper('optionRoles', function(r) {
 	var res = "";
-	for (i = 2; i < roles.length; i++) {
-		if (r == i) {
-			res += "<option value='" + i + "' selected>" + roles[i] + "</option>";
+	roles.forEach(function(role) {
+		if (role == "major") {
+			config.Majors.forEach(function(m) {
+				var full = role + "-" + m;
+				var selected = full == r ? "selected" : "";
+				res += ("<option value='" + full + "' " + selected + ">" + full + "</option>");
+			})
 		} else {
-			res += "<option value='" + i + "'>" + roles[i] + "</option>";
+			var selected = role == r ? "selected" : "";
+			res += "<option value='" + role + "' " + selected + ">" + role + "</option>";
 		}
-	}
+
+	});
 	return new Handlebars.SafeString(res);
 });
 

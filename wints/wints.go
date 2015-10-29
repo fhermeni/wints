@@ -75,8 +75,6 @@ func newStore() *sqlstore.Store {
 	DB, err := sql.Open("postgres", cfg.Db.ConnectionString)
 	not.Fatalln("Database connexion", err)
 	store, _ := sqlstore.NewStore(DB, cfg.Internships)
-	_, err = store.Internships()
-	not.Fatalln("Database communication", err)
 	return store
 }
 
@@ -136,6 +134,9 @@ func main() {
 		install()
 		os.Exit(0)
 	}
+
+	_, err := store.Internships()
+	not.Fatalln("Database communication", err)
 
 	if len(*makeRoot) > 0 {
 		inviteRoot(*makeRoot)

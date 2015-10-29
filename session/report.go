@@ -22,7 +22,7 @@ func (s *Session) SetReportContent(kind, email string, cnt []byte) (time.Time, e
 
 //SetReportGrade set the report grade if the emitter is the student tutor or an admin at minimum
 func (s *Session) SetReportGrade(kind, email string, g int, comment string) error {
-	if s.Tutoring(email) || s.Role() >= schema.ADMIN {
+	if s.Tutoring(email) || s.Role().Level() >= schema.ADMIN_LEVEL {
 		return s.store.SetReportGrade(kind, email, g, comment)
 	}
 	return ErrPermission
@@ -30,7 +30,7 @@ func (s *Session) SetReportGrade(kind, email string, g int, comment string) erro
 
 //SetReportDeadline changes the report deadline if the emitter tutors the student or is an admin at minimum
 func (s *Session) SetReportDeadline(kind, email string, t time.Time) error {
-	if s.Tutoring(email) || s.Role() >= schema.ADMIN {
+	if s.Tutoring(email) || s.Role().Level() >= schema.ADMIN_LEVEL {
 		return s.store.SetReportDeadline(kind, email, t)
 	}
 	return ErrPermission
@@ -38,14 +38,14 @@ func (s *Session) SetReportDeadline(kind, email string, t time.Time) error {
 
 //SetReportPrivacy changes the report privacy status if the emitter tutors the student or is an admin at minimum
 func (s *Session) SetReportPrivacy(kind, email string, p bool) error {
-	if s.Tutoring(email) || s.Role() >= schema.ADMIN {
+	if s.Tutoring(email) || s.Role().Level() >= schema.ADMIN_LEVEL {
 		return s.store.SetReportPrivacy(kind, email, p)
 	}
 	return ErrPermission
 }
 
 func (s *Session) Report(kind, email string) (schema.ReportHeader, error) {
-	if s.Myself(email) || s.Tutoring(email) || s.Role() > schema.ADMIN {
+	if s.Myself(email) || s.Tutoring(email) || s.Role().Level() > schema.ADMIN_LEVEL {
 		return s.store.Report(kind, email)
 	}
 	return schema.ReportHeader{}, ErrPermission
@@ -60,10 +60,10 @@ func (s *Session) ReportContent(kind, email string) ([]byte, error) {
 	}
 	if s.Myself(email) ||
 		s.Tutoring(email) ||
-		s.Role() >= schema.ROOT {
+		s.Role().Level() >= schema.ROOT_LEVEL {
 		return s.store.ReportContent(kind, email)
 	}
-	if s.Role() >= schema.MAJOR && !h.Private {
+	if s.Role().Level() >= schema.MAJOR_LEVEL && !h.Private {
 		return s.store.ReportContent(kind, email)
 	}
 	return []byte{}, ErrPermission

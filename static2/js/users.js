@@ -31,7 +31,8 @@ function showRoleEditor(em) {
 }
 
 function updateRole(em) {
-	postUserRole(em, parseInt($("#profile-role").val()))
+	debugger;
+	postUserRole(em, $("#profile-role").val())
 		.done(successLongUpdateProfile)
 		.fail(function(xhr) {
 			$("#modal").find(".alert-danger").html(xhr.responseText).removeClass("hidden");
@@ -71,7 +72,7 @@ function newUser() {
 			Email: $("#new-email").val().toLowerCase(),
 			Tel: $("#new-tel").val().toLowerCase(),
 		},
-		Role: parseInt($("#new-role").val())
+		Role: $("#new-role").val()
 	}
 	$("#modal").find(".alert-danger").addClass("hidden");
 	postNewUser(u)
@@ -82,14 +83,6 @@ function newUser() {
 
 function usersUI() {
 	$('.btn-file :file').on('fileselect', csvLoaded);
-	$("#cnt").find(".editable-role").each(function(i, e) {
-		$(e).editable({
-			source: editableRoles(),
-			url: function(p) {
-				return postUserRole($(e).data("user"), parseInt(p.value));
-			}
-		});
-	});
 	ui();
 }
 
@@ -135,6 +128,8 @@ function rmUser(em) {
 	delUser(em).done(function() {
 		successDelUser(em)
 		tableCount();
+	}).fail(function(xhr) {
+		notifyError(xhr);
 	})
 }
 

@@ -1,6 +1,6 @@
 Subject:[Wints] Role changed to {{.Data}}
 
-You now have the {{.Data}} rights.
+You now have the '{{.Data}}' rights.
 Log on to your dashboard to check your new capabilities: {{.WWW}}
 
 Regards

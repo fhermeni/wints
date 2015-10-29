@@ -39,6 +39,7 @@ func scanStudent(rows *sql.Rows) (schema.Student, error) {
 	var nextPos sql.NullString
 	var nextFrance, nextPermanent, nextSameCompany sql.NullBool
 	var nextContact sql.NullString
+	var role string
 	s := schema.Student{
 		User: schema.User{
 			Person: schema.Person{},
@@ -51,7 +52,7 @@ func scanStudent(rows *sql.Rows) (schema.Student, error) {
 		&s.User.Person.Lastname,
 		&s.User.Person.Email,
 		&s.User.Person.Tel,
-		&s.User.Role,
+		&role,
 		&lastVisit,
 		&s.Promotion,
 		&s.Major,
@@ -61,6 +62,7 @@ func scanStudent(rows *sql.Rows) (schema.Student, error) {
 		&nextSameCompany,
 		&nextContact,
 		&s.Skip)
+	s.User.Role = schema.Role(role)
 	s.User.LastVisit = nullableTime(lastVisit)
 	if nextPos.Valid {
 		s.Alumni.Contact = nullableString(nextContact)

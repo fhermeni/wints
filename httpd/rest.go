@@ -133,6 +133,7 @@ func (ed *EndPoints) wrap(fn EndPoint) httptreemux.HandlerFunc {
 		s, err := ed.openSession(w, r)
 		if err != nil {
 			status(ed.notifier, w, err)
+			return
 		}
 		ex := Exchange{
 			w:   w,
@@ -201,12 +202,13 @@ func setEmail(ex Exchange) error {
 }
 
 func setUserRole(ex Exchange) error {
-	var p schema.Privilege
+	var p string
 	if err := ex.inJSON(&p); err != nil {
 		return err
 	}
-	err := ex.s.SetUserRole(ex.V("u"), p)
-	ex.not.PrivilegeUpdated(ex.s.Me(), ex.V("u"), p, err)
+	r := schema.Role(p)
+	err := ex.s.SetUserRole(ex.V("u"), r)
+	ex.not.PrivilegeUpdated(ex.s.Me(), ex.V("u"), r, err)
 	if err == nil {
 		u, err := ex.s.User(ex.V("u"))
 		return ex.outJSON(u, err)
@@ -253,7 +255,7 @@ func setStudentSkippable(ex Exchange) error {
 		return err
 	}
 	err := ex.s.SetStudentSkippable(ex.V("s"), b)
-	err = ex.not.SkipStudent(ex.V("s"), b, err)
+	ex.not.SkipStudent(ex.s.Me(), ex.V("s"), b, err)
 	if err != nil {
 		return err
 	}

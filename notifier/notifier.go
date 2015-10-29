@@ -3,6 +3,7 @@ package notifier
 import (
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/fhermeni/wints/journal"
@@ -104,8 +105,8 @@ func (n *Notifier) Logout(s schema.User, err error) {
 	n.Log.UserLog(s, "logout", err)
 }
 
-func (n *Notifier) PrivilegeUpdated(from schema.User, em string, p schema.Privilege, err error) error {
-	n.Log.UserLog(from, p.String()+" privileges for "+em, err)
+func (n *Notifier) PrivilegeUpdated(from schema.User, em string, p schema.Role, err error) error {
+	n.Log.UserLog(from, +"'" string(p)+"' privileges for "+em, err)
 	if err != nil {
 		return err
 	}
@@ -175,6 +176,9 @@ func (n *Notifier) NewStudent(from schema.User, st schema.Student, err error) {
 	n.Log.UserLog(from, "new student "+st.User.Fullname()+"("+st.User.Person.Email+") "+st.Major+"/"+st.Promotion, err)
 }
 
+func (n *Notifier) SkipStudent(from schema.User, em string, skip bool, err error) {
+	n.Log.UserLog(from, "set student "+em+" skip status to "+strconv.FormatBool(skip), err)
+}
 func (n *Notifier) NewTutor(from schema.User, stu string, old, now schema.User, err error) error {
 	n.Log.UserLog(from, stu+" was tutored by "+old.Person.Email+", now "+now.Person.Email, err)
 	if err != nil {

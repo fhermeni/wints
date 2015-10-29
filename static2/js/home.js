@@ -16,8 +16,8 @@ $(document).ready(function() {
 	getConfig().done(function(c) {
 		config = c;
 	})
-	user(getCookie("login")).done(loadSuccess).fail(function() {
-		window.location.href = "/login";
+	user(getCookie("login")).done(loadSuccess).fail(function(xhr) {
+		$("#modal").render("error", xhr.responseText, showModal)
 	});
 });
 
@@ -26,7 +26,7 @@ function loadSuccess(data) {
 	$("#fullname").html(myself.Person.Lastname + ", " + myself.Person.Firstname);
 
 	//my options
-	for (i = 0; i <= myself.Role; i++) {
+	for (i = 0; i <= level(myself.Role); i++) {
 		$(".role-" + i).removeClass("hidden");
 	}
 
@@ -39,6 +39,23 @@ function loadSuccess(data) {
 		//tutor || major
 		showTutored();
 	}
+}
+
+function level(role) {
+	if (role == "student") {
+		return 0;
+	} else if (role == "tutor") {
+		return 1;
+	} else if (role.indexOf("major") == 0) {
+		return 2;
+	} else if (role == "head") {
+		return 3;
+	} else if (role == "admin") {
+		return 4;
+	} else if (role == "root") {
+		return 5;
+	}
+	return -1;
 }
 
 function showModal(next) {

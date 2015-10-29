@@ -2,11 +2,11 @@
     <td><input type='checkbox' data-email='{{Person.Email}}' data-user-fn='{{fullname Person true}}' class="shiftSelectable"/></td>
     <td class="fn click" onclick="showLongProfileEditor('{{Person.Email}}')">{{fullname Person}}</td>    
     <td><a href="mailto:{{Person.Email}}">{{Person.Email}}</a></td>
-    <td data-text="{{Role}}">
-    	{{#ifEq Role 1}}
-    	{{role Role}}    		
+    <td data-text="{{roleLevel Role}}">
+    	{{#ifEq Role "student"}}
+    	{{Role}}    		
     	{{else}}
-    	<a onclick="showRoleEditor('{{Person.Email}}')">{{role Role}}</a>
+    	<a onclick="showRoleEditor('{{Person.Email}}')">{{Role}}</a>
     	{{/ifEq}}    	    
     </td>
     <td>{{dateFmt LastVisit "DD/MM/YY HH:mm"}}</td>
