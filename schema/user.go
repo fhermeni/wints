@@ -25,6 +25,7 @@ const (
 //Role aims at giving the possible level of Role for a user.
 type Role string
 
+//Level returns the authentication level associated to a given role
 func (p Role) Level() int {
 	if p == "student" {
 		return STUDENT_LEVEL
@@ -42,6 +43,7 @@ func (p Role) Level() int {
 	return -1
 }
 
+//SubRole extract the second level role if exists.
 func (p Role) SubRole() string {
 	from := strings.LastIndex(string(p), "-") + 1
 	return string(p)[from:len(p)]
@@ -116,10 +118,10 @@ func (u User) Fullname() string {
 	return u.Person.Fullname()
 }
 
-//Internships aliases slices of internship to exhibit filtering methods
+//Students aliases slices of student to exhibit filtering methods
 type Students []Student
 
-//Filter returns the internships that pass the given filter
+//Filter returns the students that pass the given filter
 func (ss Students) Filter(filter func(Student) bool) Students {
 	res := make(Students, 0)
 	for _, s := range ss {
@@ -130,7 +132,7 @@ func (ss Students) Filter(filter func(Student) bool) Students {
 	return res
 }
 
-//StudentInMajor is a filter that keep only the internships in the given major
+//StudentInMajor is a filter that keep only the students in the given major
 func StudentInMajor(major string) func(Student) bool {
 	return func(s Student) bool {
 		return s.Major == major

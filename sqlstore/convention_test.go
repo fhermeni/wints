@@ -4,98 +4,44 @@ package sqlstore
 
 import (
 	"testing"
-	"time"
 
 	"github.com/fhermeni/wints/schema"
 	"github.com/stretchr/testify/assert"
 )
 
-func prepareStudent(t *testing.T, student schema.User) schema.Student {
-	stu := schema.Student{
-		User:      student,
-		Major:     string(randomBytes(3)),
-		Promotion: string(randomBytes(3)),
-		Male:      true,
-	}
-	assert.Nil(t, store.ToStudent(student.Person.Email, stu.Major, stu.Promotion, stu.Male))
-	return stu
-}
-
-func prepareConvention(t *testing.T, student schema.Student, tutor schema.User) schema.Convention {
-	creation := time.Now()
-	c := schema.Convention{
-		Student: student,
-		Tutor:   tutor,
-		Supervisor: schema.Person{
-			Firstname: string(randomBytes(10)),
-			Lastname:  string(randomBytes(10)),
-			Email:     string(randomBytes(10)),
-			Tel:       string(randomBytes(10)),
-		},
-		Creation:       creation.Truncate(time.Minute),
-		Begin:          creation.Add(time.Minute),
-		End:            creation.Add(time.Hour),
-		Title:          string(randomBytes(10)),
-		Gratification:  10000,
-		Lab:            false,
-		ForeignCountry: true,
-		Skip:           false, //default value
-		Valid:          false, //default value
-		Company: schema.Company{
-			Name: string(randomBytes(10)),
-			WWW:  string(randomBytes(10)),
-		},
-	}
-
-	ok, err := store.NewConvention(student.User.Person.Email,
-		c.Begin,
-		c.End,
-		tutor.Person.Email,
-		c.Company,
-		c.Supervisor,
-		c.Title,
-		c.Creation,
-		c.ForeignCountry,
-		c.Lab,
-		c.Gratification)
+func TestInternship(t *testing.T) {
+	stu := newStudent(t)
+	stuEm := stu.User.Person.Email
+	tut := newTutor(t)
+	//tutEm := tut.Person.Email
+	i := newInternship(t, stu, tut)
+	i2, err := store.Internship(stuEm)
 	assert.Nil(t, err)
-	assert.Equal(t, false, ok) //creation, not updated
-	return c
-}
-
-func convention(t *testing.T, p schema.Person) schema.Convention {
-	c2, err := store.Convention(p.Email)
-	assert.Nil(t, err)
-	return c2
-}
-
-func TestConvention(t *testing.T) {
-	pStudent, _ := preparePerson(t)
-	pTutor, _ := preparePerson(t)
-	student := prepareStudent(t, user(t, pStudent.Email))
-	tutor := user(t, pTutor.Email)
-	prepareConvention(t, student, tutor)
-	c, err := store.Convention(student.User.Person.Email)
-	assert.Nil(t, err)
-
-	//Fullfil with the default values
-	//assert.Equal(t, c, c2)
+	assert.Equal(t, i, i2)
 
 	//The setters
+	unknown := string(randomBytes(12))
 	cpy := schema.Company{}
-	title := string(randomBytes(10))
-	sup := schema.Person{}
-	pTut2, _ := preparePerson(t)
-	tut2 := user(t, pTut2.Email)
-	assert.Nil(t, store.SetCompany(pStudent.Email, cpy))
-	assert.Nil(t, store.SetTitle(pStudent.Email, title))
-	assert.Nil(t, store.SetSupervisor(pStudent.Email, sup))
-	assert.Nil(t, store.SetConventionSkippable(pStudent.Email, !c.Skip))
-	assert.Nil(t, store.SetTutor(pStudent.Email, pTut2.Email))
-	c2 := convention(t, pStudent)
-	assert.Equal(t, cpy, c2.Company)
-	assert.Equal(t, title, c2.Title)
-	assert.Equal(t, sup, c2.Supervisor)
-	assert.Equal(t, !c.Skip, c2.Skip)
-	assert.Equal(t, tut2, c2.Tutor)
+	assert.Nil(t, store.SetCompany(stuEm, cpy))
+	assert.Equal(t, schema.ErrUnknownInternship, store.SetCompany(unknown, cpy))
+
+	sup := person()
+	assert.Nil(t, store.SetSupervisor(stuEm, sup))
+	assert.Equal(t, schema.ErrUnknownInternship, store.SetSupervisor(unknown, sup))
+
+	tut2 := newTutor(t)
+	assert.Nil(t, store.SetTutor(stuEm, tut2.Person.Email))
+	assert.Equal(t, schema.ErrUnknownInternship, store.SetTutor(unknown, tut2.Person.Email))
+	assert.Equal(t, schema.ErrUnknownUser, store.SetTutor(stuEm, unknown))
+
+	i.Convention.Company = cpy
+	i.Convention.Tutor = tut2
+	i.Convention.Supervisor = sup
+
+	i2, err = store.Internship(stuEm)
+	assert.Nil(t, err)
+	assert.Equal(t, i, i2)
+
+	//Remove the tutor
+	assert.Equal(t, schema.ErrUserTutoring, store.RmUser(tut2.Person.Email))
 }

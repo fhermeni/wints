@@ -9,7 +9,7 @@ import (
 
 var (
 	relative = `deadline = "1440h"`
-	absolute = `deadline = "01/09/2015"`
+	absolute = `deadline = "01/09/2015 15:00"`
 )
 
 type D struct {
@@ -40,7 +40,10 @@ func TestAbsoluteDeadline(t *testing.T) {
 	if _, err := toml.Decode(absolute, &d); err != nil {
 		t.Error(err.Error())
 	}
-	expected, _ := time.Parse(DateLayout, "01/09/2015")
+	expected, err := time.Parse(DateTimeLayout, "01/09/2015 15:00")
+	if err != nil {
+		t.Fatalf("%s", err.Error())
+	}
 	if *d.Deadline.absolute != expected {
 		t.Errorf("Got %s but expected %s\n", *d.Deadline.absolute, expected)
 	}

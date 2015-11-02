@@ -58,7 +58,7 @@ func (s *Store) singleUpdate(q string, errNoUpdate error, args ...interface{}) e
 	}
 	nb, err := res.RowsAffected()
 	if err != nil {
-		return err
+		return mapCstrToError(err)
 	}
 	if nb != 1 {
 		return errNoUpdate

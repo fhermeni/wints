@@ -10,35 +10,43 @@ import (
 )
 
 func TestStudents(t *testing.T) {
-	pStudent, _ := preparePerson(t)
-	//log.Println(pStudent)
-	store.ToStudent(pStudent.Email, "ma1", "p1", true)
-
-	student, err := store.Student(pStudent.Email)
+	student := newStudent(t)
+	em := student.User.Person.Email
+	got, err := store.Student(em)
 	assert.Nil(t, err)
-	assert.Equal(t, user(t, pStudent.Email), student.User)
+	assert.Equal(t, student, got)
 	assert.Equal(t, schema.STUDENT, student.User.Role)
-	assert.Equal(t, "ma1", student.Major)
-	assert.Equal(t, "p1", student.Promotion)
+	//Default values
+	assert.Equal(t, "al", student.Major)
+	assert.Equal(t, "si", student.Promotion)
 	assert.Equal(t, true, student.Male)
-	assert.Equal(t, false, student.Skip) //default value
-	assert.Equal(t, 0, student.Alumni.Position)
-	assert.Equal(t, "", student.Alumni.Contact)
+	assert.Equal(t, false, student.Skip)
+	assert.Nil(t, student.Alumni)
 
 	//Setters
-	assert.Nil(t, store.SetMajor(pStudent.Email, "moo"))
-	assert.Nil(t, store.SetPromotion(pStudent.Email, "ppp"))
-	assert.Nil(t, store.SetStudentSkippable(pStudent.Email, !student.Skip))
-	assert.Nil(t, store.SetNextPosition(pStudent.Email, 3))
-	assert.Nil(t, store.SetNextContact(pStudent.Email, "baz"))
-	assert.Nil(t, store.SetMale(pStudent.Email, !student.Male))
-	student2, err := store.Student(pStudent.Email)
-	assert.Equal(t, "moo", student2.Major)
-	assert.Equal(t, "ppp", student2.Promotion)
-	assert.Equal(t, !student.Skip, student2.Skip)
-	assert.Equal(t, !student.Male, student2.Male)
-	assert.Equal(t, 3, student2.Alumni.Position)
-	assert.Equal(t, "baz", student2.Alumni.Contact)
+	assert.Equal(t, schema.ErrInvalidMajor, store.SetMajor(em, "moo"))
+	assert.Equal(t, schema.ErrInvalidPromotion, store.SetPromotion(em, "moo"))
+	assert.Nil(t, store.SetMajor(em, "ihm"))
+	assert.Nil(t, store.SetPromotion(em, "master"))
+	assert.Nil(t, store.SetStudentSkippable(em, !student.Skip))
+	assert.Nil(t, store.SetMale(em, !student.Male))
+	al := schema.Alumni{
+		Contact:     "foo",
+		Position:    "here",
+		France:      true,
+		Permanent:   true,
+		SameCompany: true,
+	}
+	assert.Equal(t, schema.ErrInvalidEmail, store.SetAlumni(em, al))
+	al.Contact = "foo@bar.com"
+	assert.Nil(t, store.SetAlumni(em, al))
+	student.Alumni = &al
+	student.Major = "ihm"
+	student.Promotion = "master"
+	student.Male = !student.Male
+	student.Skip = !student.Skip
+	student2, err := store.Student(em)
+	assert.Equal(t, student, student2)
 	_, err = store.Students()
 	assert.Nil(t, err)
 }

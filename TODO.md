@@ -113,6 +113,8 @@ always have tutor in cc. when doing sth. about the student
 	grade report
 	late penalties
 
+	report deadline: confirmation button to reduce spam
+
 
 Roles: OK
 Student
@@ -126,3 +128,12 @@ ADMIN (+ add student, teachers, validate convention, plan defenses)
 1 cache per user/request
 POST invalidate all the caches
 GET populate local cache
+
+
+## Notes
+rendu/pas rendu
+en retard/ a l'heure
+noté/pas noté
+
+Sur la case= note net
+onhover = note brut - penalty

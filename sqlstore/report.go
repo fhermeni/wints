@@ -20,7 +20,7 @@ var (
 
 //Reports returns all the reports for a given student
 func (s *Store) Reports(email string) ([]schema.ReportHeader, error) {
-	res := make([]schema.ReportHeader, 0, 0)
+	res := make([]schema.ReportHeader, len(s.config.Reports))
 	st := s.stmt(selectReports)
 	rows, err := st.Query(email)
 	if err != nil {
@@ -32,7 +32,13 @@ func (s *Store) Reports(email string) ([]schema.ReportHeader, error) {
 		if hdr, err = scanReport(rows); err != nil {
 			return res, err
 		}
-		res = append(res, hdr)
+		//place at the right offset
+		for idx, r := range s.config.Reports {
+			if r.Kind == hdr.Kind {
+				res[idx] = hdr
+				break
+			}
+		}
 	}
 	return res, err
 

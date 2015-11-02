@@ -2,6 +2,7 @@ package sqlstore
 
 import (
 	"database/sql"
+	"strings"
 
 	"github.com/fhermeni/wints/schema"
 	"github.com/lib/pq"
@@ -95,6 +96,9 @@ func (s *Store) Students() (schema.Students, error) {
 	return students, err
 }
 
+//NewStudent create a new student using a given person, major, promotion and gender
+//The major and the promotion must be valid against the supported values in config.Internships
+//The underlying user account is created
 func (s *Store) NewStudent(p schema.Person, major, promotion string, male bool) error {
 	if !s.config.ValidMajor(major) {
 		return schema.ErrInvalidMajor
@@ -139,5 +143,8 @@ func (s *Store) SetMale(stu string, m bool) error {
 }
 
 func (s *Store) SetAlumni(student string, a schema.Alumni) error {
+	if !strings.Contains(a.Contact, "@") {
+		return schema.ErrInvalidEmail
+	}
 	return s.singleUpdate(updateAlumni, schema.ErrUnknownUser, a.Position, a.France, a.Permanent, a.SameCompany, a.Contact, student)
 }

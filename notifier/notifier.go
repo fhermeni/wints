@@ -30,35 +30,17 @@ func (n *Notifier) Println(s string, err error) {
 	}
 }
 
-func (n *Notifier) ReportPrivacyUpdated(from schema.User, stu, kind string, priv bool, err error) error {
-	status := "public"
-	if priv {
-		status = "private"
-	}
+func (n *Notifier) ReportPrivacyUpdated(from schema.User, stu, kind string, priv bool, err error) error {	
 	buf := fmt.Sprintf("set privacy status for '%s' report of '%s' to '%t'", kind, stu, priv)
 	n.Log.UserLog(from, buf, err)
-	if err != nil {
-		return err
-	}
-	data := struct {
-		Status string
-		Kind   string
-	}{Status: status, Kind: kind}
-	return n.mailer.Send(schema.Person{Email: stu}, "report_status.txt", data, from.Person)
+	return err
 }
 
 func (n *Notifier) ReportDeadlineUpdated(from schema.User, stu, kind string, d time.Time, err error) error {
 	s := d.Format(config.DateTimeLayout)
 	buf := fmt.Sprintf("set deadline for '%s' report of '%s' to '%s'", kind, stu, s)
 	n.Log.UserLog(from, buf, err)
-	if err != nil {
-		return err
-	}
-	data := struct {
-		Date string
-		Kind string
-	}{Date: s, Kind: kind}
-	return n.mailer.Send(schema.Person{Email: stu}, "report_deadline.txt", data, from.Person)
+	return err
 }
 
 func (n *Notifier) Fatalln(s string, err error) {

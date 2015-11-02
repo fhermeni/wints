@@ -10,6 +10,7 @@ var (
 	DateLayout = "02/01/2006"
 )
 
+//Spy defines a job that is executed regularly
 type Spy struct {
 	Kind string
 	Cron string
@@ -54,10 +55,11 @@ type Journal struct {
 
 //Internships declare the internship organization
 type Internships struct {
-	Majors     []string
-	Promotions []string
-	Reports    []Report
-	Surveys    []Survey
+	Majors      []string
+	Promotions  []string
+	Reports     []Report
+	Surveys     []Survey
+	LatePenalty int
 }
 
 func contains(s []string, v string) bool {
@@ -68,10 +70,13 @@ func contains(s []string, v string) bool {
 	}
 	return false
 }
+
+//ValidMajor tests if a given major is supported
 func (i Internships) ValidMajor(m string) bool {
 	return contains(i.Majors, m)
 }
 
+//ValidPromotion tests if a promotion is supported
 func (i Internships) ValidPromotion(p string) bool {
 	return contains(i.Promotions, p)
 }

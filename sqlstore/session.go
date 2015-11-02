@@ -19,6 +19,7 @@ func (s *Store) Session(token []byte) (schema.Session, error) {
 	st := s.stmt(selectSession)
 	ss := schema.Session{}
 	err := st.QueryRow(token).Scan(&ss.Email, &ss.Token, &ss.Expire)
+	ss.Expire = ss.Expire.UTC()
 	return ss, noRowsTo(err, schema.ErrCredentials)
 }
 
@@ -28,7 +29,7 @@ func (s *Store) NewSession(email string, password []byte, expire time.Duration) 
 	ss := schema.Session{
 		Email:  email,
 		Token:  randomBytes(32),
-		Expire: time.Now().Add(expire).Truncate(time.Minute),
+		Expire: time.Now().Add(expire).Truncate(time.Minute).UTC(),
 	}
 	tx := newTxErr(s.db)
 	tx.err = tx.QueryRow(selectPassword, email).Scan(&p)

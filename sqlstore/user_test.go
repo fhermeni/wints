@@ -3,10 +3,7 @@
 package sqlstore
 
 import (
-	"database/sql"
-	"log"
 	"testing"
-	"time"
 
 	"github.com/fhermeni/wints/schema"
 	_ "github.com/lib/pq"
@@ -15,57 +12,52 @@ import (
 
 var store *Store
 
-func init() {
-	conn := "user=fhermeni dbname=wints_test host=localhost sslmode=disable"
-	DB, err := sql.Open("postgres", conn)
-	if err != nil {
-		log.Fatalln("Unable to connect to the Database: " + err.Error())
-	}
-	store, _ = NewStore(DB)
-	err = store.Install()
-	if err != nil {
-		log.Fatalln("Unable to install the DB: " + err.Error())
-	}
-}
-
-func user(t *testing.T, email string) schema.User {
-	u, err := store.User(email)
-	assert.Nil(t, err)
-	return u
-}
-
 func TestUserManagement(t *testing.T) {
-	p, passwd := preparePerson(t)
+	u := newTutor(t)
+
+	//Test token generation
+	_, err := store.ResetPassword(string(randomBytes(12)))
+	assert.Equal(t, schema.ErrUnknownUser, err)
+	token, err := store.ResetPassword(u.Person.Email)
+	assert.Nil(t, err)
+	password := randomBytes(32)
+
+	//Validate the new password
+	em, err := store.NewPassword(token, password)
+	assert.Nil(t, err)
+	assert.Equal(t, u.Person.Email, em)
+
+	//With a bad token
+	_, err = store.NewPassword(randomBytes(12), randomBytes(12))
+	assert.Equal(t, schema.ErrNoPendingRequests, err)
 
 	//User()
-	u, err := store.User(p.Email)
+	u2, err := store.User(em)
 	assert.Nil(t, err)
-	assert.Equal(t, schema.NONE, u.Role)
-	assert.Nil(t, u.LastVisit)
+	assert.Equal(t, u, u2)
+	assert.Nil(t, u2.LastVisit)
 	_, err = store.User(string(randomBytes(10)))
 	assert.Equal(t, schema.ErrUnknownUser, err)
 
 	//Visit
-	assert.Nil(t, store.Visit(p.Email))
+	assert.Nil(t, store.Visit(em))
 	assert.Equal(t, schema.ErrUnknownUser, store.Visit(string(randomBytes(10))))
-	assert.NotNil(t, user(t, p.Email).LastVisit)
+	assert.NotNil(t, user(t, em).LastVisit)
 
 	//Person update
-	p2 := schema.Person{Email: p.Email}
+	p2 := schema.Person{Email: em}
 	assert.Nil(t, store.SetUserPerson(p2))
-	u2 := user(t, p2.Email)
-	assert.Equal(t, p2, u2.Person)
+	u3 := user(t, p2.Email)
+	assert.Equal(t, p2, u3.Person)
 
 	//Change Role
 	assert.Equal(t, schema.ErrUnknownUser, store.SetUserRole(string(randomBytes(10)), schema.STUDENT))
-	assert.Nil(t, store.SetUserRole(p.Email, schema.STUDENT))
+	assert.Nil(t, store.SetUserRole(em, schema.STUDENT))
 
-	//SetPassword
-	passwd2 := randomBytes(10)
-	assert.Equal(t, schema.ErrCredentials, store.SetPassword(string(randomBytes(10)), passwd, passwd2))
-	assert.Nil(t, store.SetPassword(p.Email, passwd, passwd2))
-	_, err = store.NewSession(p.Email, passwd2, time.Hour)
-	assert.Nil(t, err)
-	_, err = store.NewSession(p.Email, passwd, time.Hour)
-	assert.Equal(t, schema.ErrCredentials, err)
+	//Delete account
+	assert.Equal(t, schema.ErrUnknownUser, store.RmUser(string(randomBytes(1))))
+	assert.Nil(t, store.RmUser(u3.Person.Email))
+	_, err = store.User(u3.Person.Email)
+	assert.Equal(t, schema.ErrUnknownUser, err)
+
 }

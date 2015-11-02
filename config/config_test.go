@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
+	"github.com/fhermeni/wints/mail"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 )
@@ -44,25 +45,30 @@ Path = "assets/mails"
 [Internships]
 Majors = ["caspar","ubinet","al","web","gmd","iam","ihm","imafa","inum"]
 
-[Internships.Reports.dow]
+[[Internships.Reports]]
+Kind = "dow"
 Deadline= "504h"
 Grade = false
 
-[Internships.Reports.midterm]
+[[Internships.Reports]]
+Kind = "midterm"
 Delivery = "1440h"
 Review = "504h"
 Grade = true
 
-[Internships.Reports.final]
-Delivery = "01/09/2015"
+[[Internships.Reports]]
+Kind = "final"
+Delivery = "01/09/2015 15:00"
 Review = "168h"
 Grade = true
 
-[Internships.Surveys.midterm]
+[[Internships.Surveys]]
+Kind = "midterm"
 Deadline = "1440h"
 
-[Internships.Surveys.final]
-Deadline = "01/09/2015"
+[[Internships.Surveys]]
+Kind = "final"
+Deadline = "01/09/2015 15:00"
 
 [[Spies]]
 Kind = "tutor"
@@ -81,7 +87,7 @@ Cron = "0 0 9 * * 1"
 			Encoding:   "windows-1252",
 			Promotions: []string{"SI 5", "Master IFI", "Master IMAFA", "MAM 5", "Master 2 SSTIM-images"},
 		},
-		Mailer: Mailer{
+		Mailer: mail.Config{
 			Server:   "smtp.inria.fr:507",
 			Login:    "fooMailer",
 			Password: "barMailer",
@@ -102,16 +108,10 @@ Cron = "0 0 9 * * 1"
 			},
 		},
 		Internships: Internships{
-			Majors: []string{"caspar", "ubinet", "al", "web", "gmd", "iam", "ihm", "imafa", "inum"},
-			Surveys: map[string]Survey{
-				"midterm": {},
-				"final":   {},
-			},
-			Reports: map[string]Report{
-				"dow":     {Grade: false},
-				"midterm": {Grade: true},
-				"final":   {Grade: true},
-			},
+			Majors:      []string{"caspar", "ubinet", "al", "web", "gmd", "iam", "ihm", "imafa", "inum"},
+			Surveys:     make([]Survey, 0),
+			Reports:     make([]Report, 0),
+			LatePenalty: 2,
 		},
 	}
 )
@@ -127,32 +127,50 @@ func TestLoadConfig(t *testing.T) {
 	expected.HTTPd.Rest.RenewalRequestLifetime.Duration, _ = time.ParseDuration("48h")
 
 	rel, _ := time.ParseDuration("1440h")
-	sm := expected.Internships.Surveys["midterm"]
-	sm.Deadline.relative = &rel
-	expected.Internships.Surveys["midterm"] = sm
+	sm := Survey{Kind: "midterm",
+		Deadline: Deadline{
+			relative: &rel,
+		},
+	}
 
-	abs, _ := time.Parse(DateLayout, "01/09/2015")
-	sf := expected.Internships.Surveys["final"]
-	sf.Deadline.absolute = &abs
-	expected.Internships.Surveys["final"] = sf
+	abs, _ := time.Parse(DateLayout, "01/09/2015 15:00")
+	sf := Survey{Kind: "final",
+		Deadline: Deadline{
+			absolute: &abs,
+		},
+	}
+
+	expected.Internships.Surveys = []Survey{sm, sf}
 
 	rel, _ = time.ParseDuration("504h")
-	rd := expected.Internships.Reports["dow"]
-	rd.Delivery.relative = &rel
-	expected.Internships.Reports["dow"] = rd
+	rd := Report{
+		Kind: "dow",
+		Delivery: Deadline{
+			relative: &rel,
+		},
+	}
 
 	rel, _ = time.ParseDuration("1440h")
-	rm := expected.Internships.Reports["midterm"]
-	rm.Delivery.relative = &rel
-	//expected.Reports["midterm"] = rm
+	rm := Report{
+		Kind: "midterm",
+		Delivery: Deadline{
+			relative: &rel,
+		},
+	}
 
-	abs, _ = time.Parse(DateLayout, "01/09/2015")
-	rf := expected.Internships.Reports["final"]
-	rf.Delivery.absolute = &abs
-	//expected.Reports["final"] = rf
+	abs, _ = time.Parse(DateLayout, "01/09/2015 15:00")
+	rf := Report{
+		Kind: "final",
+		Delivery: Deadline{
+			absolute: &abs,
+		},
+	}
+
+	expected.Internships.Reports = []Report{rd, rm, rf}
 
 	assert.Equal(t, expected.Mailer, cfg.Mailer)
 	assert.Equal(t, expected.Feeder, cfg.Feeder)
 	assert.Equal(t, expected.HTTPd, cfg.HTTPd)
 	assert.Equal(t, expected.Db, cfg.Db)
+	assert.Equal(t, 2, expected.Internships.LatePenalty)
 }

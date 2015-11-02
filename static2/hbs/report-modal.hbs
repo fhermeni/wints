@@ -21,13 +21,16 @@
 
 
                     <div class="form-group">
-                        <label for="deadline" class="col-sm-3 control-label">Deadline</label>                        
+                        <label for="deadline" class="col-sm-3 control-label">Deadline <br/>(FR timezone)</label>                        
                         <div class="col-sm-9">
                             <div class="input-group date" id="deadline">
-                            <input type="text" class="form-control" data-date-format="D MMM YYYY HH:mm" value="{{dateFmt Deadline 'D MMM YYYY HH:mm'}}" {{#if Delivery}}disabled{{/if}} />
+                            <input id="report-deadline" type="text" data-old-date="{{Deadline}}" class="form-control" data-date-format="D MMM YYYY" value="{{dateFmt Deadline 'D MMM YYYY'}}" {{#if Delivery}}disabled{{/if}} />
                             <span class="input-group-addon">
                                 <span class="glyphicon glyphicon-calendar"></span>
                             </span>
+                        </div>
+                </span>
+
                             </div>
                         </div>
                     </div>

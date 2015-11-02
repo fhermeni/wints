@@ -2,6 +2,7 @@ package sqlstore
 
 import (
 	"database/sql"
+	"time"
 
 	"github.com/fhermeni/wints/config"
 	"github.com/fhermeni/wints/schema"
@@ -11,8 +12,7 @@ var (
 	updateConventionSkip = "update conventions set skip=$1 where student=$2"
 	updateSupervisor     = "update conventions set supervisorFn=$1, supervisorLn=$2, supervisorTel=$3, supervisorEmail=$4 where student=$5"
 	updateTutor          = "update conventions set tutor=$1 where student=$2"
-	updateCompany        = "update conventions set companyWWW=$1, companyName=$2 where student=$3"
-	updateTitle          = "update conventions set title=$1 where student=$2"
+	updateCompany        = "update conventions set companyWWW=$1, companyName=$2, title=$3 where student=$4"
 	insertConvention     = "insert into conventions(student, startTime, endTime, tutor, companyName, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, creation, foreignCountry, lab, gratification) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)"
 	updateConvention     = "update conventions set startTime=$2, endTime=$3, tutor=$4, companyName=$5, companyWWW=$6, supervisorFn=$7, supervisorLn=$8, supervisorEmail=$9, supervisorTel=$10, title=$11, creation=$12, foreignCountry=$13, lab=$14, gratification=$15, where student=$1 and creation < $12"
 	selectConventions    = "select stup.firstname, stup.lastname, stup.tel, stup.email, stup.lastVisit, " +
@@ -39,11 +39,6 @@ var (
 	validateConvention = "update conventions set valid=$2 where student=$1"
 )
 
-//SetConventionSkippable stores the skipable status for a student convention
-/*func (s *Store) SetConventionSkippable(student string, skip bool) error {
-	return s.singleUpdate(updateConventionSkip, schema.ErrUnknownStudent, skip, student)
-}*/
-
 //SetSupervisor updates the student supervisor
 func (s *Store) SetSupervisor(stu string, t schema.Person) error {
 	return s.singleUpdate(updateSupervisor, schema.ErrUnknownInternship, t.Firstname, t.Lastname, t.Tel, t.Email, stu)
@@ -51,12 +46,17 @@ func (s *Store) SetSupervisor(stu string, t schema.Person) error {
 
 //SetTutor updates the student tutor
 func (s *Store) SetTutor(stu string, t string) error {
-	return s.singleUpdate(updateTutor, schema.ErrUnknownInternship, t, stu)
+	err := s.singleUpdate(updateTutor, schema.ErrUnknownInternship, t, stu)
+	if err == schema.ErrUserTutoring {
+		//Bad case, here it is because the user does not exists
+		return schema.ErrUnknownUser
+	}
+	return err
 }
 
 //SetCompany updates the student company
 func (s *Store) SetCompany(stu string, c schema.Company) error {
-	return s.singleUpdate(updateCompany, schema.ErrUnknownInternship, c.WWW, c.Name, stu)
+	return s.singleUpdate(updateCompany, schema.ErrUnknownInternship, c.WWW, c.Name, c.Title, stu)
 }
 
 func (s *Store) NewInternship(c schema.Convention, cfg config.Internships) (schema.Internship, []byte, error) {
@@ -68,20 +68,24 @@ func (s *Store) NewInternship(c schema.Convention, cfg config.Internships) (sche
 	}
 
 	tx := newTxErr(s.db)
-	tx.Exec(insertConvention, c.Student.User.Person.Email, c.Begin, c.End, c.Tutor.Person.Email, c.Company.Name, c.Company.WWW, c.Supervisor.Firstname, c.Supervisor.Lastname, c.Supervisor.Email, c.Supervisor.Tel, c.Company.Title, c.Creation, c.ForeignCountry, c.Lab, c.Gratification)
-	for _, report := range cfg.Reports {
-		tx.Exec(insertReport, c.Student.User.Person.Email, report.Kind, report.Delivery.Value(c.Begin), false, report.Grade)
-	}
+	tx.Exec(insertConvention, c.Student.User.Person.Email, c.Begin.Truncate(time.Minute).UTC(), c.End.Truncate(time.Minute).UTC(), c.Tutor.Person.Email, c.Company.Name, c.Company.WWW, c.Supervisor.Firstname, c.Supervisor.Lastname, c.Supervisor.Email, c.Supervisor.Tel, c.Company.Title, c.Creation.Truncate(time.Minute).UTC(), c.ForeignCountry, c.Lab, c.Gratification)
 	token := randomBytes(32)
-	//We delete in cast we start a reset a unvalidated account
+	//We delete in case we start a reset over an unvalidated account
 	tx.Exec(deletePasswordRenewalRequest, c.Student.User.Person.Email)
 	tx.Exec(startPasswordRenewal, c.Student.User.Person.Email, token)
+
+	//Instantiate the reports and the surveys
+	for _, report := range cfg.Reports {
+		tx.Exec(insertReport, c.Student.User.Person.Email, report.Kind, report.Delivery.Value(c.Begin).UTC(), false, report.Grade)
+	}
+
 	for _, survey := range cfg.Surveys {
 		token := randomBytes(16)
-		tx.Exec(insertSurvey, c.Student.User.Person.Email, survey.Kind, token, survey.Deadline.Value(c.Begin))
+		tx.Exec(insertSurvey, c.Student.User.Person.Email, survey.Kind, token, survey.Deadline.Value(c.Begin).UTC())
 	}
 
 	//refresh student & tutor informations for a clean version
+	//as here, we only consider in c the person emails
 	stu, err := s.Student(c.Student.User.Person.Email)
 	if err != nil {
 		tx.err = err
@@ -192,6 +196,7 @@ func scanConvention(rows *sql.Rows) (schema.Convention, error) {
 		Student: schema.Student{
 			User: schema.User{
 				Person: schema.Person{},
+				Role:   schema.STUDENT,
 			},
 			Alumni: &schema.Alumni{},
 		},
@@ -236,6 +241,10 @@ func scanConvention(rows *sql.Rows) (schema.Convention, error) {
 		&c.Supervisor.Email,
 		&c.Supervisor.Tel,
 	)
+	c.Begin = c.Begin.UTC()
+	c.End = c.End.UTC()
+	c.Creation = c.Creation.UTC()
+
 	c.Tutor.Role = schema.Role(role)
 	if !nextPosition.Valid {
 		c.Student.Alumni = nil

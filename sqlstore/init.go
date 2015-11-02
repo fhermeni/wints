@@ -19,14 +19,14 @@ create table users(
     tel text,
     password text,
     role text,
-    lastVisit timestamp with time zone,
+    lastVisit timestamp without time zone,
     constraint pk_email PRIMARY KEY(email)
 );
 
 create table sessions(
     email text,
     token text,
-    expire timestamp with time zone,
+    expire timestamp without time zone,
     constraint pk_sessions_email PRIMARY KEY(email),
     constraint fk_sessions_email FOREIGN KEY(email) REFERENCES users(email) on delete cascade on update cascade
 );
@@ -56,8 +56,8 @@ create table students(
 
 create table conventions(
     student text,    
-    startTime timestamp with time zone,
-    endTime timestamp with time zone,
+    startTime timestamp without time zone,
+    endTime timestamp without time zone,
     tutor text,
     companyName text,
     companyWWW text,
@@ -66,7 +66,7 @@ create table conventions(
     supervisorEmail text,
     supervisorTel text,
     title text,
-    creation timestamp with time zone,
+    creation timestamp without time zone,
     foreignCountry boolean,
     lab bool,
     gratification real,
@@ -81,9 +81,9 @@ create table conventions(
 create table reports(
     student text,
     kind text,
-    deadline timestamp with time zone,
-    delivery timestamp with time zone,
-    reviewed timestamp with time zone,
+    deadline timestamp without time zone,
+    delivery timestamp without time zone,
+    reviewed timestamp without time zone,
     grade integer,
     comment text,
     private boolean,
@@ -96,8 +96,8 @@ create table reports(
 create table surveys(
     student text,
     kind text,
-    deadline timestamp with time zone,
-    delivery timestamp with time zone,
+    deadline timestamp without time zone,
+    delivery timestamp without time zone,
     cnt bytea,
     token text UNIQUE,
     constraint pk_surveys_student PRIMARY KEY(student, kind),
@@ -105,13 +105,13 @@ create table surveys(
 );
 
 create table defenseSessions(
-    date timestamp with time zone,
+    date timestamp without time zone,
     room text,    
     constraint pk_defenseSessions PRIMARY KEY(date, room)
 );
 
 create table defenseJuries(
-    date timestamp with time zone,
+    date timestamp without time zone,
     room text,
     jury text,
     constraint fk_defenseJuries FOREIGN KEY(jury) REFERENCES users(email) on delete cascade on update cascade,
@@ -120,7 +120,7 @@ create table defenseJuries(
 );
 
 create table defenses(
-    date timeStamp with time zone,
+    date timeStamp without time zone,
     room text,
     student text,
     grade integer,
