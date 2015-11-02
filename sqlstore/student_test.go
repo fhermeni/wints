@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestStudents(t *testing.T) {
+func TestStudentWorkflow(t *testing.T) {
 	student := newStudent(t)
 	em := student.User.Person.Email
 	got, err := store.Student(em)
@@ -49,4 +49,19 @@ func TestStudents(t *testing.T) {
 	assert.Equal(t, student, student2)
 	_, err = store.Students()
 	assert.Nil(t, err)
+}
+
+func TestStudents(t *testing.T) {
+	assert.Nil(t, store.Install())
+	stus, err := store.Students()
+	assert.Nil(t, err)
+	assert.Empty(t, stus)
+
+	s1 := newStudent(t)
+	s2 := newStudent(t)
+	newTutor(t)
+	stus, err = store.Students()
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(stus))
+	assert.Contains(t, stus, s1, s2)
 }

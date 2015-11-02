@@ -59,5 +59,20 @@ func TestUserManagement(t *testing.T) {
 	assert.Nil(t, store.RmUser(u3.Person.Email))
 	_, err = store.User(u3.Person.Email)
 	assert.Equal(t, schema.ErrUnknownUser, err)
+}
 
+func TestUsers(t *testing.T) {
+	assert.Nil(t, store.Install())
+
+	us, err := store.Users()
+	assert.Nil(t, err)
+	assert.Empty(t, us)
+
+	t1 := newTutor(t)
+	t2 := newTutor(t)
+	s1 := newStudent(t)
+	us, err = store.Users()
+	assert.Nil(t, err)
+	assert.Equal(t, 3, len(us))
+	assert.Contains(t, us, t1, t2, s1.User)
 }

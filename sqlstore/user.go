@@ -151,7 +151,6 @@ func (s *Store) NewUser(p schema.Person, role schema.Role) ([]byte, error) {
 	}
 	token := randomBytes(32)
 	tx := newTxErr(s.db)
-	//s.singleUpdate(insertUser, schema.ErrUserExists, p.Firstname, p.Lastname, p.Tel, p.Email, role, randomBytes(32))
 	nb := tx.Update(insertUser, p.Firstname, p.Lastname, p.Tel, p.Email, role.String(), randomBytes(32))
 	if nb == 0 {
 		tx.err = schema.ErrUserExists

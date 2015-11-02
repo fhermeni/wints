@@ -19,6 +19,10 @@ func TestInternship(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, i, i2)
 
+	c, err := store.Convention(stuEm)
+	assert.Nil(t, err)
+	assert.Equal(t, i.Convention, c)
+
 	//The setters
 	unknown := string(randomBytes(12))
 	cpy := schema.Company{}
@@ -44,4 +48,27 @@ func TestInternship(t *testing.T) {
 
 	//Remove the tutor
 	assert.Equal(t, schema.ErrUserTutoring, store.RmUser(tut2.Person.Email))
+}
+
+func TestInternships(t *testing.T) {
+	assert.Nil(t, store.Install())
+
+	ints, err := store.Internships()
+	assert.Nil(t, err)
+	assert.Empty(t, ints)
+
+	s1 := newStudent(t)
+	s2 := newStudent(t)
+	tut1 := newTutor(t)
+	i1 := newInternship(t, s1, tut1)
+	i2 := newInternship(t, s2, tut1)
+	ints, err = store.Internships()
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(ints))
+	assert.Contains(t, ints, i1, i2)
+
+	cc, err := store.Conventions()
+	assert.Nil(t, err)
+	assert.Equal(t, 2, len(cc))
+	assert.Contains(t, cc, i1.Convention, i2.Convention)
 }
