@@ -7,7 +7,7 @@ var (
 	ErrUnknownConvention  = errors.New("No convention associated to this student")
 	ErrStudentExists      = errors.New("Student already exists")
 	ErrReportExists       = errors.New("Report already exists")
-	ErrUnknownReport      = errors.New("Unknown report")
+	ErrUnknownReport      = errors.New("Unknown report or student")
 	ErrInvalidGrade       = errors.New("The grade must be between 0 and 20 (inclusive)")
 	ErrReportConflict     = errors.New("The report has not been uploaded")
 	ErrInternshipExists   = errors.New("Internship already exists")

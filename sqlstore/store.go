@@ -78,7 +78,8 @@ func randomBytes(s int) []byte {
 
 func nullableTime(t pq.NullTime) *time.Time {
 	if t.Valid {
-		return &t.Time
+		x := t.Time.Truncate(time.Minute).UTC()
+		return &x
 	}
 	return nil
 }

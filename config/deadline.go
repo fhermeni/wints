@@ -26,6 +26,10 @@ type Deadline struct {
 	absolute *time.Time
 }
 
+func AbsoluteDeadline(t time.Time) Deadline {
+	return Deadline{absolute: &t}
+}
+
 //Value returns the concrete deadline depending on its type
 func (d *Deadline) Value(from time.Time) time.Time {
 	if d.absolute != nil {

@@ -16,6 +16,19 @@ import (
 
 var dbUrl = flag.String("db-url", "user=fhermeni2 dbname=wints_next host=localhost sslmode=disable", "database connexion string")
 
+var cfg = config.Internships{
+	Majors:     []string{"al", "ihm"},
+	Promotions: []string{"si", "master"},
+	Surveys:    []config.Survey{},
+	Reports: []config.Report{
+		config.Report{
+			Kind:     "foo",
+			Delivery: config.AbsoluteDeadline(time.Now().Add(time.Minute)),
+		},
+	},
+	LatePenalty: 2,
+}
+
 func person() schema.Person {
 	p := schema.Person{
 		Firstname: string(randomBytes(12)),
@@ -84,15 +97,12 @@ func newInternship(t *testing.T, student schema.Student, tutor schema.User) sche
 		Skip:           false,
 		Valid:          false,
 	}
-
-	i, _, err := store.NewInternship(c, config.Internships{})
+	i, _, err := store.NewInternship(c)
 	assert.Nil(t, err)
 	c.Creation = c.Creation.Truncate(time.Minute).UTC()
 	c.Begin = c.Begin.Truncate(time.Minute).UTC()
 	c.End = c.End.Truncate(time.Minute).UTC()
 	i.Convention = c
-	i.Reports = []schema.ReportHeader{}
-	i.Surveys = []schema.SurveyHeader{}
 	return i
 }
 
@@ -107,13 +117,6 @@ func init() {
 	DB, err := sql.Open("postgres", *dbUrl)
 	if err != nil {
 		log.Fatalln("Unable to connect to the Database: " + err.Error())
-	}
-	cfg := config.Internships{
-		Majors:      []string{"al", "ihm"},
-		Promotions:  []string{"si", "master"},
-		Surveys:     []config.Survey{},
-		Reports:     []config.Report{},
-		LatePenalty: 2,
 	}
 
 	store, _ = NewStore(DB, cfg)

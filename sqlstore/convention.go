@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"time"
 
-	"github.com/fhermeni/wints/config"
 	"github.com/fhermeni/wints/schema"
 )
 
@@ -59,7 +58,7 @@ func (s *Store) SetCompany(stu string, c schema.Company) error {
 	return s.singleUpdate(updateCompany, schema.ErrUnknownInternship, c.WWW, c.Name, c.Title, stu)
 }
 
-func (s *Store) NewInternship(c schema.Convention, cfg config.Internships) (schema.Internship, []byte, error) {
+func (s *Store) NewInternship(c schema.Convention) (schema.Internship, []byte, error) {
 	i := schema.Internship{
 		Convention: c,
 	}
@@ -74,14 +73,28 @@ func (s *Store) NewInternship(c schema.Convention, cfg config.Internships) (sche
 	tx.Exec(deletePasswordRenewalRequest, c.Student.User.Person.Email)
 	tx.Exec(startPasswordRenewal, c.Student.User.Person.Email, token)
 
+	i.Reports = make([]schema.ReportHeader, len(s.config.Reports))
 	//Instantiate the reports and the surveys
-	for _, report := range cfg.Reports {
-		tx.Exec(insertReport, c.Student.User.Person.Email, report.Kind, report.Delivery.Value(c.Begin).UTC(), false, report.Grade)
+	for idx, report := range s.config.Reports {
+		tx.Exec(insertReport, c.Student.User.Person.Email, report.Kind, report.Delivery.Value(c.Begin).Truncate(time.Minute).UTC(), false, report.Grade)
+		i.Reports[idx] = schema.ReportHeader{
+			Kind:     report.Kind,
+			ToGrade:  report.Grade,
+			Grade:    -1,
+			Deadline: report.Delivery.Value(c.Begin).Truncate(time.Minute).UTC(),
+		}
+
 	}
 
-	for _, survey := range cfg.Surveys {
+	i.Surveys = make([]schema.SurveyHeader, len(s.config.Surveys))
+	for idx, survey := range s.config.Surveys {
 		token := randomBytes(16)
-		tx.Exec(insertSurvey, c.Student.User.Person.Email, survey.Kind, token, survey.Deadline.Value(c.Begin).UTC())
+		tx.Exec(insertSurvey, c.Student.User.Person.Email, survey.Kind, token, survey.Deadline.Value(c.Begin).Truncate(time.Minute).UTC())
+		i.Surveys[idx] = schema.SurveyHeader{
+			Kind:     survey.Kind,
+			Token:    string(token),
+			Deadline: survey.Deadline.Value(c.Begin).Truncate(time.Minute).UTC(),
+		}
 	}
 
 	//refresh student & tutor informations for a clean version

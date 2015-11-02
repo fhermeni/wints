@@ -64,6 +64,7 @@ func scanReport(rows *sql.Rows) (schema.ReportHeader, error) {
 	if comment.Valid {
 		hdr.Comment = comment.String
 	}
+	hdr.Deadline = hdr.Deadline.Truncate(time.Minute).UTC()
 	hdr.Delivery = nullableTime(delivery)
 	hdr.Reviewed = nullableTime(reviewed)
 	if grade.Valid {
@@ -83,7 +84,7 @@ func (s *Store) Report(k, email string) (schema.ReportHeader, error) {
 	}
 	defer rows.Close()
 	if !rows.Next() {
-		return hdr, schema.ErrUnknownStudent
+		return hdr, schema.ErrUnknownReport
 	}
 	return scanReport(rows)
 }
@@ -96,22 +97,38 @@ func (s *Store) ReportContent(kind, email string) ([]byte, error) {
 	return cnt, noRowsTo(err, schema.ErrUnknownReport)
 }
 
-//SetReportContent saves the content of a given report
+//SetReportContent saves the content of a given report if the report has not been already graded
+//If the deadline passed, it is however possible to store the report once.
 func (s *Store) SetReportContent(kind, email string, cnt []byte) (time.Time, error) {
-	now := time.Now()
+	//Check if it has already been graded
+	now := time.Now().Truncate(time.Minute).UTC()
+	r, err := store.Report(kind, email)
+	if err != nil {
+		return now, err
+	}
+	if r.Reviewed != nil {
+		//No re-submission once graded
+		return now, schema.ErrGradedReport
+	}
+	if r.Delivery != nil && r.Deadline.Before(now) {
+		//deadline passed and already submitted. no other chance
+		return now, schema.ErrDeadlinePassed
+	}
 	return now, s.singleUpdate(setReportCnt, schema.ErrUnknownReport, email, kind, cnt, now)
 }
 
 //SetReportGrade stores the given report grade
-func (s *Store) SetReportGrade(kind, email string, g int, comment string) error {
+func (s *Store) SetReportGrade(kind, email string, g int, comment string) (time.Time, error) {
 	if g < 0 || g > 20 {
-		return schema.ErrInvalidGrade
+		return time.Time{}, schema.ErrInvalidGrade
 	}
-	return s.singleUpdate(setGrade, schema.ErrUnknownReport, email, kind, g, comment, time.Now())
+	now := time.Now().Truncate(time.Minute).UTC()
+	return now, s.singleUpdate(setGrade, schema.ErrUnknownReport, email, kind, g, comment, now)
 }
 
 //SetReportDeadline change a report deadline
 func (s *Store) SetReportDeadline(kind, email string, t time.Time) error {
+	t = t.Truncate(time.Minute).UTC()
 	return s.singleUpdate(setReportDeadline, schema.ErrUnknownReport, email, kind, t)
 }
 
