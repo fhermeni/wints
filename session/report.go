@@ -21,11 +21,11 @@ func (s *Session) SetReportContent(kind, email string, cnt []byte) (time.Time, e
 }
 
 //SetReportGrade set the report grade if the emitter is the student tutor or an admin at minimum
-func (s *Session) SetReportGrade(kind, email string, g int, comment string) error {
+func (s *Session) SetReportGrade(kind, email string, g int, comment string) (time.Time, error) {
 	if s.Tutoring(email) || s.Role().Level() >= schema.ADMIN_LEVEL {
 		return s.store.SetReportGrade(kind, email, g, comment)
 	}
-	return ErrPermission
+	return time.Time{}, ErrPermission
 }
 
 //SetReportDeadline changes the report deadline if the emitter tutors the student or is an admin at minimum

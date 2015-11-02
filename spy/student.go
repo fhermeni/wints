@@ -6,11 +6,10 @@ import (
 
 	"github.com/fhermeni/wints/config"
 	"github.com/fhermeni/wints/schema"
-	"github.com/fhermeni/wints/sqlstore"
 )
 
 type Students struct {
-	st        *sqlstore.Store
+	st        schema.Internshipser
 	reminders map[string]config.Report
 }
 

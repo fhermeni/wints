@@ -11,6 +11,7 @@ import (
 
 	"github.com/fhermeni/wints/config"
 	"github.com/fhermeni/wints/schema"
+	"github.com/fhermeni/wints/testutil"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,29 +20,24 @@ var dbUrl = flag.String("db-url", "user=fhermeni2 dbname=wints_next host=localho
 var cfg = config.Internships{
 	Majors:     []string{"al", "ihm"},
 	Promotions: []string{"si", "master"},
-	Surveys:    []config.Survey{},
 	Reports: []config.Report{
 		config.Report{
 			Kind:     "foo",
 			Delivery: config.AbsoluteDeadline(time.Now().Add(time.Minute)),
 		},
 	},
+	Surveys: []config.Survey{
+		config.Survey{
+			Kind:     "bar",
+			Deadline: config.AbsoluteDeadline(time.Now().Add(time.Minute)),
+		},
+	},
 	LatePenalty: 2,
-}
-
-func person() schema.Person {
-	p := schema.Person{
-		Firstname: string(randomBytes(12)),
-		Lastname:  string(randomBytes(12)),
-		Tel:       string(randomBytes(12)),
-		Email:     string(randomBytes(12)) + "@fr",
-	}
-	return p
 }
 
 func newTutor(t *testing.T) schema.User {
 	//Preparation
-	p := person()
+	p := testutil.Person()
 	_, err := store.NewUser(p, schema.TUTOR)
 	assert.Nil(t, err)
 	return schema.User{
@@ -61,7 +57,7 @@ func newPassword(t *testing.T, em string) []byte {
 }
 
 func newStudent(t *testing.T) schema.Student {
-	p := person()
+	p := testutil.Person()
 	u := schema.User{
 		Person: p,
 		Role:   schema.STUDENT,
@@ -81,7 +77,7 @@ func newInternship(t *testing.T, student schema.Student, tutor schema.User) sche
 	c := schema.Convention{
 		Student:    student,
 		Tutor:      tutor,
-		Supervisor: person(),
+		Supervisor: testutil.Person(),
 		Creation:   creation,
 		Begin:      creation.Add(time.Minute),
 		End:        creation.Add(time.Hour),

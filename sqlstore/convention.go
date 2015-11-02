@@ -83,7 +83,6 @@ func (s *Store) NewInternship(c schema.Convention) (schema.Internship, []byte, e
 			Grade:    -1,
 			Deadline: report.Delivery.Value(c.Begin).Truncate(time.Minute).UTC(),
 		}
-
 	}
 
 	i.Surveys = make([]schema.SurveyHeader, len(s.config.Surveys))

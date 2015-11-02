@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/fhermeni/wints/schema"
+	"github.com/fhermeni/wints/testutil"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,7 +19,7 @@ func TestInternship(t *testing.T) {
 	i2, err := store.Internship(stuEm)
 	assert.Nil(t, err)
 	assert.Equal(t, i, i2)
-
+	assert.Equal(t, 1, len(i2.Surveys))
 	c, err := store.Convention(stuEm)
 	assert.Nil(t, err)
 	assert.Equal(t, i.Convention, c)
@@ -29,7 +30,7 @@ func TestInternship(t *testing.T) {
 	assert.Nil(t, store.SetCompany(stuEm, cpy))
 	assert.Equal(t, schema.ErrUnknownInternship, store.SetCompany(unknown, cpy))
 
-	sup := person()
+	sup := testutil.Person()
 	assert.Nil(t, store.SetSupervisor(stuEm, sup))
 	assert.Equal(t, schema.ErrUnknownInternship, store.SetSupervisor(unknown, sup))
 

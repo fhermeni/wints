@@ -13,7 +13,7 @@ var (
 	selectSurvey          = "select kind, deadline, delivery, cnt, token from surveys where student=$1 and kind=$2"
 	selectSurveys         = "select kind, deadline, delivery, cnt, token from surveys where student=$1 order by deadline asc"
 	updateSurveyContent   = "update surveys set cnt=$1, delivery=$2 where token=$3"
-	resetSurveyContent    = "update surveys set cnt=null and delivery=null where student=$1 and kind=$2"
+	resetSurveyContent    = "update surveys set cnt=null, delivery=null where student=$1 and kind=$2"
 )
 
 //SurveyFromToken returns a given survey identifier
@@ -44,6 +44,7 @@ func scanSurvey(rows *sql.Rows) (schema.SurveyHeader, error) {
 	if err != nil {
 		return survey, err
 	}
+	survey.Deadline = survey.Deadline.Truncate(time.Minute).UTC()
 	survey.Delivery = nullableTime(delivery)
 	return survey, err
 }
@@ -74,14 +75,24 @@ func (s *Store) Survey(student, kind string) (schema.SurveyHeader, error) {
 	if err != nil {
 		return schema.SurveyHeader{}, err
 	}
-	rows.Next()
 	defer rows.Close()
+	if !rows.Next() {
+		return schema.SurveyHeader{}, schema.ErrUnknownSurvey
+	}
 	return scanSurvey(rows)
 }
 
 //SetSurveyContent stores the survey answers
-func (s *Store) SetSurveyContent(token string, cnt []byte) error {
-	return s.singleUpdate(updateSurveyContent, schema.ErrUnknownSurvey, cnt, time.Now(), token)
+func (s *Store) SetSurveyContent(token string, cnt []byte) (time.Time, error) {
+	now := time.Now().Truncate(time.Minute).UTC()
+	sr, err := s.SurveyFromToken(token)
+	if err != nil {
+		return now, err
+	}
+	if sr.Delivery != nil {
+		return now, schema.ErrSurveyUploaded
+	}
+	return now, s.singleUpdate(updateSurveyContent, schema.ErrUnknownSurvey, cnt, now, token)
 }
 
 func (s *Store) ResetSurveyContent(student, kind string) error {

@@ -102,7 +102,7 @@ func (s *Store) ReportContent(kind, email string) ([]byte, error) {
 func (s *Store) SetReportContent(kind, email string, cnt []byte) (time.Time, error) {
 	//Check if it has already been graded
 	now := time.Now().Truncate(time.Minute).UTC()
-	r, err := store.Report(kind, email)
+	r, err := s.Report(kind, email)
 	if err != nil {
 		return now, err
 	}

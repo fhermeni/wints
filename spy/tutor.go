@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/fhermeni/wints/schema"
-	"github.com/fhermeni/wints/sqlstore"
 )
 
 /*
@@ -16,10 +15,10 @@ import (
 
 type Tutored struct {
 	reviews map[string]time.Duration
-	st      *sqlstore.Store
+	st      schema.Internshipser
 }
 
-func NewTutor(s *sqlstore.Store, r map[string]time.Duration) *Tutored {
+func NewTutor(s schema.Internshipser, r map[string]time.Duration) *Tutored {
 	return &Tutored{st: s, reviews: r}
 }
 

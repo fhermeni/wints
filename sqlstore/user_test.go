@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/fhermeni/wints/schema"
+	"github.com/fhermeni/wints/testutil"
 	_ "github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 )
@@ -23,9 +24,15 @@ func TestUserManagement(t *testing.T) {
 	password := randomBytes(32)
 
 	//Validate the new password
+	_, err = store.NewPassword(token, randomBytes(3))
+	assert.Equal(t, schema.ErrPasswordTooShort, err)
 	em, err := store.NewPassword(token, password)
 	assert.Nil(t, err)
 	assert.Equal(t, u.Person.Email, em)
+
+	//Cannot change again, the token is consumed
+	_, err = store.NewPassword(token, password)
+	assert.Equal(t, schema.ErrNoPendingRequests, err)
 
 	//With a bad token
 	_, err = store.NewPassword(randomBytes(12), randomBytes(12))
@@ -61,6 +68,18 @@ func TestUserManagement(t *testing.T) {
 	assert.Equal(t, schema.ErrUnknownUser, err)
 }
 
+func TestUserCreation(t *testing.T) {
+	p1 := testutil.Person()
+	_, err := store.NewUser(p1, schema.ROOT)
+	assert.Nil(t, err)
+	_, err = store.NewUser(p1, schema.TUTOR)
+	assert.Equal(t, schema.ErrUserExists, err)
+
+	p1.Email = "foo"
+	_, err = store.NewUser(p1, schema.TUTOR)
+	assert.Equal(t, schema.ErrInvalidEmail, err)
+
+}
 func TestUsers(t *testing.T) {
 	assert.Nil(t, store.Install())
 

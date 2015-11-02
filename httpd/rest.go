@@ -329,7 +329,8 @@ func setReportGrade(ex Exchange) error {
 		Comment string
 	}
 	ex.inJSON(&report)
-	return ex.s.SetReportGrade(ex.V("k"), ex.V("s"), report.Grade, report.Comment)
+	_, err := ex.s.SetReportGrade(ex.V("k"), ex.V("s"), report.Grade, report.Comment)
+	return err
 }
 
 func setReportPrivacy(ex Exchange) error {
@@ -392,7 +393,7 @@ func (ed *EndPoints) newInternship(ex Exchange) error {
 	if err := ex.inJSON(&c); err != nil {
 		return err
 	}
-	i, token, err := ex.s.NewInternship(c, ed.organization)
+	i, token, err := ex.s.NewInternship(c)
 	err = ed.notifier.InviteStudent(ex.s.Me(), i, string(token), err)
 	return ex.outJSON(i, err)
 }
