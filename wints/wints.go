@@ -5,8 +5,6 @@ import (
 	"flag"
 	"log"
 	"os"
-	"strings"
-	"time"
 
 	"github.com/BurntSushi/toml"
 	"github.com/fhermeni/wints/config"
@@ -16,10 +14,8 @@ import (
 	"github.com/fhermeni/wints/mail"
 	"github.com/fhermeni/wints/notifier"
 	"github.com/fhermeni/wints/schema"
-	"github.com/fhermeni/wints/spy"
 	"github.com/fhermeni/wints/sqlstore"
 	_ "github.com/lib/pq"
-	"github.com/robfig/cron"
 )
 
 var cfg config.Config
@@ -85,7 +81,7 @@ func newFeeder() feeder.Conventions {
 	return f
 }
 
-func runSpies() {
+/*func runSpies() {
 
 	if len(cfg.Spies) == 0 {
 		log.Println("No spies to schedule")
@@ -98,14 +94,14 @@ func runSpies() {
 			for _, r := range cfg.Internships.Reports {
 				reviews[r.Kind] = r.Review.Duration
 			}
-			cr.AddJob(s.Cron, spy.NewTutor(store, reviews))
+			cr.AddFunc(s.Cron, spy.ReminderReporter)
 		default:
 			log.Fatalln("Unsupported spy '" + s.Kind + "'")
 		}
 		log.Println("Spy '" + s.Kind + "' scheduled")
 	}
 	cr.Start()
-}
+}*/
 
 func install() {
 	if !confirm("This will erase any data. Confirm ") {
@@ -143,7 +139,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	runSpies()
+	//runSpies()
 	conventions := newFeeder()
 	not.Println("Listening on "+cfg.HTTPd.WWW, nil)
 	httpd := httpd.NewHTTPd(not, store, conventions, cfg.HTTPd, cfg.Internships)

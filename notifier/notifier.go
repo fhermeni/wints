@@ -30,7 +30,7 @@ func (n *Notifier) Println(s string, err error) {
 	}
 }
 
-func (n *Notifier) ReportPrivacyUpdated(from schema.User, stu, kind string, priv bool, err error) error {	
+func (n *Notifier) ReportPrivacyUpdated(from schema.User, stu, kind string, priv bool, err error) error {
 	buf := fmt.Sprintf("set privacy status for '%s' report of '%s' to '%t'", kind, stu, priv)
 	n.Log.UserLog(from, buf, err)
 	return err
@@ -52,16 +52,6 @@ func (n *Notifier) Fatalln(s string, err error) {
 	}
 }
 
-/*func (n *Notifier) NewInternship(i schema.Internship, token []byte, err error) {
-	//
-	ed.notifier.InviteStudent(ex.s.Me(), i, string(token), err)
-
-	//invite the student
-	//Invitation mail
-	//notify the tutor
-
-	//log
-}*/
 func (n *Notifier) AccountReseted(em string, token []byte, err error) error {
 	//mail with token
 	//log
