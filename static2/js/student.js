@@ -8,9 +8,8 @@ function showStudentDashboard(m) {
 	mine = m;
 	Object.keys(mine.Reports).forEach(function(kind) {
 		var passed = moment(mine.Reports[kind].Deadline).isBefore(moment());
-		var r = mine.Reports[kind];
-		//can upload if not reviewed and either the deadline passed or not passed but not uploaded
-		mine.Reports[kind].Open = !r.Reviewed && (!passed || !r.Delivery)
+		var r = mine.Reports[kind];		
+		mine.Reports[kind].Open = isReportUpdloadeable(r);
 	});
 	$("#cnt").render("student-dashboard", m, function() {
 		syncAlumniEditor($("#position"))
@@ -130,19 +129,30 @@ function loadReport(input, kind) {
 }
 
 function reportLoaded(kind, cnt) {
-	console.log(kind);
-	console.log(cnt);
-
 	$("#modal").render("progress", {}, function() {
 		showModal(function() {
-			postReport(myself.Person.Email, kind, cnt, progress).done(hideModal);
+			postReport(myself.Person.Email, kind, cnt, progress).done(refreshReports);
 		});
 	});
 
 }
 
-function progress(ev) {
-	console.log(arguments);
+//can upload if not reviewed and either the deadline passed or not passed but not uploaded
+function isReportUpdloadeable(r) {
+	console.log(r);
+	var passed = moment(r.Deadline).isBefore(moment());
+	return !r.Reviewed && (!passed || !r.Delivery);
+}
+
+function refreshReports(r) {	
+	hideModal();
+	r.Open = isReportUpdloadeable(r);
+	var buf = Handlebars.partials["student-dashboard-report"](r);
+	$("#report-" + r.Kind).replaceWith(buf);
+}
+
+
+function progress(ev) {	
 	var val = (ev.loaded / ev.total) * 100;
 	$("#progress-value")
 		.attr('aria-valuenow', Math.round(val))

@@ -27,7 +27,7 @@ func NewHTTPd(not *notifier.Notifier, store *sqlstore.Store, conventions feeder.
 	http.Handle("/"+cfg.Assets, http.StripPrefix("/"+cfg.Assets, fileHandler))
 	//The rest endpoints
 	rest := NewEndPoints(not, store, conventions, cfg.Rest, org)
-	http.Handle(cfg.Rest.Prefix, Mon(not, rest.router.ServeHTTP))
+	http.HandleFunc(cfg.Rest.Prefix, Mon(not, rest.router.ServeHTTP))
 
 	httpd := HTTPd{
 		cfg:   cfg,

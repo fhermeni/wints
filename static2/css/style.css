@@ -39,6 +39,10 @@ div.bootstrap-filestyle {
 	position: fixed;
 }
 
+table {
+	margin-top: 2em;	
+}
+
 /*.list-group-item a {
 	color: inherit;
 }*/

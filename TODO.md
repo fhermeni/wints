@@ -1,5 +1,19 @@
 # TODO
 
+## Workplan
+
+1. student can upload reports
+	- whenever before deadline
+	- only once after deadline
+	/!\ check deadline/privacy can be changed	
+1. grade/review reports
+	- review with/without report
+1. penalty management
+	- see net grade on table
+	- see raw + penalty on detail
+1. cron
+
+
 ## Features
 
 - Normalise relative deadline for reports: the next day at 2am wrt. the theoretical value
