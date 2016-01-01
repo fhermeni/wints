@@ -157,7 +157,7 @@ function showInternship(em, edit) {
 		$.when(internship(em), users()).done(function(i, uss) {
 			i = i[0];
 			uss = uss[0].filter(function(u) {
-				return u.Role > 1
+				return level(u.Role) != STUDENT_LEVEL && u.Person.Email != i.Convention.Tutor.Person.Email;
 			});
 			internshipModal(i, uss, edit);
 		}).fail(logFail);

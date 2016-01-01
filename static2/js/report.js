@@ -1,8 +1,7 @@
 function showReport(email, kind) {
-	$.when(internship(email), getReport(email, kind)).done(showReportModal)
-	/*getReport(email, kind).done(function(r) {
-		showReportModal(r, email);
-	});*/
+	internship(email).done(function(i) {
+		showReportModal(i, kind);
+	});
 }
 
 function toggleReportConfidential(k, em, chk) {
@@ -26,9 +25,14 @@ function updateReportDeadline(em, kind, e) {
 	});
 }
 
-function showReportModal(i, r) {
-	var i = i[0];
-	var r = r[0];
+function showReportModal(i, kind) {
+	var r;
+	i.Reports.forEach(function (rr) {
+		if (rr.Kind == kind) {
+			r = rr;
+			return false;
+		}
+	})		
 	r.Email = i.Convention.Student.User.Person.Email;
 	r.Tutor = i.Convention.Tutor.Person.Email;
 	$("#modal").render("report-modal", r, function() {
@@ -55,20 +59,13 @@ function review(student, kind, toGrade) {
 
 	var comment = $("#comment").val();
 	var g = $("#grade").val();	
-	postReview(student, kind, comment, parseInt(g)).done(function() {
-		updateStudentWatchlist(student);
+	postReview(student, kind, comment, parseInt(g)).done(function(dta, status, xhr) {
+		//updateStudentWatchlist(student);
+		updateInternshipRow(student);
+		defaultSuccess({}, status, xhr)
 		hideModal();
 	});
 }
-/*function showReportModal(r, em) {
-	r.Email = em;	
-	$("#modal").render("report-modal", r, function() {
-		$("#report-deadline").datetimepicker().on("dp.change", function(e) {
-			updateReportDeadline(em, r.Kind, e);
-		});
-		showModal()
-	});
-}*/
 
 function penalty(deadline, delivery) {
 	var dead = moment(deadline);

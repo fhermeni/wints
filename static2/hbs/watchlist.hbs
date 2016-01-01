@@ -53,15 +53,15 @@ As a major leader or an administrator, you can follow the progress of every stud
         <th rowspan="2" >Tutor</th>
         <th class="sorter-false text-center" colspan="{{len Org.Reports}}">Reports</th>
         <th class="sorter-false text-center" colspan="{{len Org.Surveys}}">Surveys</th>
-        <th rowspan="2" >Def</th>
-        <th rowspan="2">Alumni</th>
+        <th class="text-center" rowspan="2" >Def</th>
+        <th class="text-center" rowspan="2">Alumni</th>
     </tr>
     <tr>        
         {{#each Org.Reports}}        
-        <th><small>{{this.Kind}}</small></th>
+        <th class="text-center"><small>{{this.Kind}}</small></th>
         {{/each}}        
         {{#each Org.Surveys}}        
-        <th><small>{{this.Kind}}</small></th>
+        <th class="text-center"><small>{{this.Kind}}</small></th>
         {{/each}}        
     </tr>    
     </thead>

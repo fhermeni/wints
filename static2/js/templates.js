@@ -131,6 +131,7 @@ Handlebars.registerHelper('optionPromotions', function(p) {
 });
 
 Handlebars.registerHelper('optionUsers', function(users, u) {
+	console.log(users);
 	var b = "";
 	users.forEach(function(o) {
 		b += "<option value='" + o.Person.Email + "'" + (o.Person.Email == u.Person.Email ? "selected" : "") + ">" + o.Person.Lastname + ", " + o.Person.Firstname + "</option>";
@@ -233,7 +234,7 @@ Handlebars.registerHelper('grade', function(r) {
 		if (days <= 0) {
 			buf = ""+r.Grade;
 		} else {
-			buf = "<span title='Tutor: " + r.Grade + "; late penalty: -	" + (config.LatePenalty * days) + "'>" + netGrade(r) + "</span>";
+			buf = "<span title='Tutor: " + r.Grade + "; Late penalty: -" + (config.LatePenalty * days) + "'>" + netGrade(r) + "</span>";
 		}
 	}
 	return new Handlebars.SafeString(buf)	

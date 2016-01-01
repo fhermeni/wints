@@ -1,4 +1,3 @@
-
 <tr data-email="{{Convention.Student.User.Person.Email}}">
     <td>
     <input class="shiftSelectable" type='checkbox'
