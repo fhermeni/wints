@@ -15,12 +15,13 @@ function toggleReportConfidential(k, em, chk) {
 }
 
 
-function updateReportDeadline(em, kind, e) {
-	postReportDeadline(em, kind, e.date.toJSON()).done(function(data, status, xhr) {
+function updateReportDeadline(em, kind) {
+	var now = $('#report-deadline').data("DateTimePicker").date();
+	postReportDeadline(em, kind, now.toJSON()).done(function(data, status, xhr) {
 		updateInternshipRow(em);
 		defaultSuccess({}, status, xhr)
 	}).fail(function(xhr) {
-		input.val(e.oldDate.format(input.data("date-format")));
+		input.val($("#report-deadline").data("old-date"));
 		notifyError(xhr);
 	});
 }
@@ -36,9 +37,9 @@ function showReportModal(i, kind) {
 	r.Email = i.Convention.Student.User.Person.Email;
 	r.Tutor = i.Convention.Tutor.Person.Email;
 	$("#modal").render("report-modal", r, function() {
-		$("#report-deadline").datetimepicker().on("dp.change", function(e) {
+		$("#report-deadline").datetimepicker()/*.on("dp.change", function(e) {
 			updateReportDeadline(r.Email, r.Kind, e);
-		});
+		});*/
 		showModal()
 	});
 }
@@ -60,7 +61,6 @@ function review(student, kind, toGrade) {
 	var comment = $("#comment").val();
 	var g = $("#grade").val();	
 	postReview(student, kind, comment, parseInt(g)).done(function(dta, status, xhr) {
-		//updateStudentWatchlist(student);
 		updateInternshipRow(student);
 		defaultSuccess({}, status, xhr)
 		hideModal();
