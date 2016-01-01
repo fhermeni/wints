@@ -1,6 +1,0 @@
-Subject:[Wints] {{.Tutor.Fullname}} graded your {{.Kind}} report
-
-Log on your dashboard to access the grade: {{.WWW}}
-
-Regards,
-{{.Fullname}}

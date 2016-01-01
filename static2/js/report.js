@@ -1,7 +1,8 @@
 function showReport(email, kind) {
-	getReport(email, kind).done(function(r) {
+	$.when(internship(email), getReport(email, kind)).done(showReportModal)
+	/*getReport(email, kind).done(function(r) {
 		showReportModal(r, email);
-	});
+	});*/
 }
 
 function toggleReportConfidential(k, em, chk) {
@@ -25,16 +26,49 @@ function updateReportDeadline(em, kind, e) {
 	});
 }
 
-function showReportModal(r, em) {
-	r.Email = em;
-	console.log(r);
+function showReportModal(i, r) {
+	var i = i[0];
+	var r = r[0];
+	r.Email = i.Convention.Student.User.Person.Email;
+	r.Tutor = i.Convention.Tutor.Person.Email;
+	$("#modal").render("report-modal", r, function() {
+		$("#report-deadline").datetimepicker().on("dp.change", function(e) {
+			updateReportDeadline(r.Email, r.Kind, e);
+		});
+		showModal()
+	});
+}
+
+function reviewDelay(r) {
+	return Math.floor(moment.duration(moment(r.Delivery).diff(moment(r.Deadline))).asDays());
+}
+function netGrade(r) {
+	var duration = moment.duration(moment(r.Delivery).diff(moment(r.Deadline)));
+	var days = Math.floor(duration.asDays());
+	return Math.max(0, r.Grade - config.LatePenalty * days);
+}
+
+function review(student, kind, toGrade) {
+	if (empty("#comment")|| (toGrade && empty("#grade"))) {
+		return;
+	}	
+
+	var comment = $("#comment").val();
+	var g = $("#grade").val();	
+	postReview(student, kind, comment, parseInt(g)).done(function() {
+		updateStudentWatchlist(student);
+		hideModal();
+	});
+}
+/*function showReportModal(r, em) {
+	r.Email = em;	
 	$("#modal").render("report-modal", r, function() {
 		$("#report-deadline").datetimepicker().on("dp.change", function(e) {
 			updateReportDeadline(em, r.Kind, e);
 		});
 		showModal()
 	});
-}
+}*/
 
 function penalty(deadline, delivery) {
 	var dead = moment(deadline);

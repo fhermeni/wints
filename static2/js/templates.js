@@ -193,9 +193,6 @@ Handlebars.registerHelper('ifLate', function(d, opts) {
 });
 
 Handlebars.registerHelper('ifAfter', function(d1, d2, opts) {
-console.log("after");
-console.log(d1);	
-console.log(d2);
 	if (!d1 || moment(d1).isAfter(d2))
 		return opts.fn(this);
 	else
@@ -209,12 +206,39 @@ Handlebars.registerHelper('ifRole', function(d, opts) {
 		return opts.inverse(this);
 });
 
+Handlebars.registerHelper('ifManage', function(r, opts) {
+	if (myself.Person.Email == r.Tutor || level(myself.Role) >= ADMIN_LEVEL) {
+		return opts.fn(this);	
+	} else {
+		return opts.inverse(this);
+	}
+});
+
 Handlebars.registerHelper('fullname', function(p, pretty) {
 	if (pretty) {
 		return p.Lastname.capitalize() + ", " + p.Firstname.capitalize();
 	}
 	return p.Lastname + ", " + p.Firstname;
 });
+
+Handlebars.registerHelper('grade', function(r) {
+	var buf;	
+	if (!r.Reviewed) {
+		buf = "-";
+	} else if (!r.ToGrade) {		
+		buf= "<i class='glyphicon glyphicon-ok'></i>";
+	} else {
+		var duration = moment.duration(moment(r.Delivery).diff(moment(r.Deadline)));
+		var days = Math.floor(duration.asDays());		
+		if (days <= 0) {
+			buf = ""+r.Grade;
+		} else {
+			buf = "<span title='Tutor: " + r.Grade + "; late penalty: -	" + (config.LatePenalty * days) + "'>" + netGrade(r) + "</span>";
+		}
+	}
+	return new Handlebars.SafeString(buf)	
+});
+
 
 Handlebars.registerHelper('survey', function(s, stu) {
 	var value = -10;
@@ -249,31 +273,31 @@ Handlebars.registerHelper('survey', function(s, stu) {
 });
 
 Handlebars.registerHelper('report', function(r, em, cb) {
-	var value = -10;
-	var grade = "-";
 	var bg = "";
-	/*if (s.Delivery) {
-		if (s.Kind == "midterm") {
-			if (Object.keys(s.Cnt).length > 0) {
-				if (s.Cnt[19] == "false") {
-					value = -1;
-					grade = "x";
-					bg = "bg-danger";
-				} else {
-					value = 1;
-					grade = "&#10003;";
-					bg = "bg-success";
-				}
-			}
-		} else { //final
-			if (Object.keys(s.Cnt).length > 0) {
-				value = s.Cnt[q17];
-				grade = s.Cnt[q17];
-				bg = grade >= 10 ? "bg-success" : "bg-danger";
-			}
+	var value, grade;
+	var cnt = '-';
+	if (r.Delivery && !r.Reviewed) {
+		bg = "info";
+		var delay = reviewDelay(r);		
+		value = -100 + delay;
+		cnt = "<i class='glyphicon glyphicon-time'></i> " + delay + " d.";
+	}
+	if (r.Reviewed) {
+			grade = netGrade(r);
+			cnt = Handlebars.helpers['grade'](r).string;
+		if (r.ToGrade) {			
+			value = grade;
+		} else {
+			value = -1;			
 		}
-	}*/
-	var buf = '<td onclick="showReport(\'' + em + '\', \'' + r.Kind + '\')" class="click ' + bg + 'text-center" data-text="' + value + '">' + grade + '</td>';
+	}
+	if (r.Reviewed && r.ToGrade && grade < 10) {
+		bg = "danger";
+	}
+
+	var buf = '<td data-text=' + value + ' onclick="showReport(\'' + em + '\', \'' + r.Kind + '\')" class="click ' + bg + ' text-center">';
+	
+	var buf = buf + cnt + '</td>';
 	return new Handlebars.SafeString(buf);
 });
 

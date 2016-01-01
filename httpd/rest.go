@@ -336,8 +336,12 @@ func setReportGrade(ex Exchange) error {
 		Comment string
 	}
 	ex.inJSON(&report)
-	_, err := ex.s.SetReportGrade(ex.V("k"), ex.V("s"), report.Grade, report.Comment)
-	return err
+	i, err := ex.s.Internship(ex.V("s"))
+	if err != nil {
+		return err
+	}
+	_, err = ex.s.SetReportGrade(ex.V("k"), ex.V("s"), report.Grade, report.Comment)
+	return ex.not.ReportReviewed(ex.s.Me(), i.Convention.Student.User, i.Convention.Tutor, ex.V("k"), err)
 }
 
 func setReportPrivacy(ex Exchange) error {

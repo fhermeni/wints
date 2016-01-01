@@ -72,8 +72,18 @@ func (n *Notifier) ReportUploaded(student schema.User, tutor schema.User, kind s
 	return n.mailer.Send(student.Person, "report_uploaded.txt", data, tutor.Person)
 }
 
-func (n *Notifier) ReportReviewed() {
+func (n *Notifier) ReportReviewed(from, student, tutor schema.User, kind string, err error) error {
 	//mail student, cc tutor
+	//Report XX has been reviewed. Log to access the comments
+	data := struct {
+		Kind  string
+		Tutor schema.User
+	}{Kind: kind, Tutor: tutor}
+	n.Log.UserLog(from, "report '"+kind+"' reviewed for '"+student.Person.Email+"'", err)
+	if err != nil {
+		return err
+	}
+	return n.mailer.Send(student.Person, "report_reviewed.txt", data, tutor.Person)
 }
 
 func (n *Notifier) Login(s schema.Session, err error) {

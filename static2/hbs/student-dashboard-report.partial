@@ -2,16 +2,7 @@
 <td>{{Kind}}</td>
 <td>{{dateFmt Deadline "D MMM YYYY HH:mm"}}</td>
 <td>{{dateFmt Delivery "D MMM YYYY HH:mm"}}</td>
-<td>
-{{#if ToGrade}}
-	{{#if Reviewed}}
-		{{Grade}}
-	{{else}}
-	-
-	{{/if}}	
-{{/if}}
-{{#unless ToGrade}}-{{/unless}}
-</td>
+<td>{{grade this}}</td>
 <td class="text-right">
 
 	<button type="button" class="btn btn-success btn-sm btn-file" title="upload" {{#unless Open}}disabled{{/unless}}>
@@ -20,7 +11,7 @@
 	<a href="api/v2/reports/{{Email}}/{{Kind}}/content" class="btn btn-primary btn-sm btn-file" title="download" {{#unless Delivery}}disabled{{/unless}}>		
     	<i class="glyphicon glyphicon-cloud-download"></i>
     	</a>	
-	<button onclick="showReportComment('{{Kind}}')" type="button" class="btn btn-primary btn-sm" title="tutor review" {{#unless Reviews}}disabled{{/unless}}>
+	<button onclick="showReportComment('{{Kind}}')" type="button" class="btn btn-primary btn-sm" title="tutor review" {{#unless Comment}}disabled{{/unless}}>
 		<i class="glyphicon glyphicon-comment"></i>
 	</button>
 </td>

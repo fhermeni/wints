@@ -165,6 +165,19 @@ function progress(ev) {
 		.width(val + "%")
 		.html(val + "%");
 }
+
+function showReportComment(kind) {
+	mine.Reports.forEach(function(r) {
+		if (r.Kind == kind) {		
+			$("#modal").render("raw", {
+				Title: "Comments for report '" + kind + "'",
+				Cnt: r.Comment
+			}, showModal);
+		}
+		return false;
+	});
+}
+
 /*
 
 

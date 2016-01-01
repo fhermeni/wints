@@ -305,6 +305,18 @@ function postReport(email, kind, dta, progress) {
 function postNewTutor(stu, now) {
 	return post("/internships/" + stu + "/tutor", now);
 }
+
+function postReview(e, k, c, g) {
+	buf = {
+		Comment: c
+	};
+	if (g) {
+		buf.Grade = g;
+	}
+	return post("/reports/" + e + "/" + k + "/grade", buf);
+}
+
+
 /*function user(email, ok, no) {
 	return get("/users/" + email, ok, no);
 }
