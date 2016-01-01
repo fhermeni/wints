@@ -7,15 +7,15 @@
 	- only once after deadline OK
 	/!\ check deadline/privacy can be changed
 	- send email each time report uploaded (student cc. tutor) OK
-	- send mail automatically once the deadline reached (cc. tutor)
-	 	ready for review | deadline missed, consequences
 1. grade/review reports
 	- review with/without report OK
 	- send mail to notify OK
 1. penalty management
-	- see net grade on table
-	- see raw + penalty on detail
+	- see net grade on table OK
+	- see raw + penalty on detail OK
 1. cron
+	- send mail automatically once the deadline reached (cc. tutor)
+	 	ready for review | deadline missed, consequences
 
 
 ## Features

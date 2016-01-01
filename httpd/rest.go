@@ -2,7 +2,6 @@
 package httpd
 
 import (
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -293,7 +292,6 @@ func internship(ex Exchange) error {
 
 func reportContent(ex Exchange) error {
 	r, err := ex.s.ReportContent(ex.V("k"), ex.V("s"))
-	log.Println(len(r))
 	return ex.outFile("application/pdf", ex.V("k")+".pdf", r, err)
 }
 
