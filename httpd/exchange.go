@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"sync"
 
@@ -81,4 +82,19 @@ func (ex *Exchange) inJSON(j interface{}) error {
 	dec := json.NewDecoder(ex.r.Body)
 	ex.err = dec.Decode(&j)
 	return ex.err
+}
+
+func (ex *Exchange) outFile(mime, filename string, cnt []byte, e error) error {
+	if e != nil {
+		return e
+	}
+	ex.w.Header().Set("Content-type", mime)
+	ex.w.Header().Set("Content-disposition", "attachment; filename="+filename)
+	x, err := ex.w.Write(cnt)
+	log.Println(x)
+	if err != nil {
+		ex.not.Log.UserLog(ex.s.Me(), "Unable to send the report", err)
+		http.Error(ex.w, "", http.StatusInternalServerError)
+	}
+	return err
 }

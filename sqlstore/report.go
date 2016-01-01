@@ -2,6 +2,7 @@ package sqlstore
 
 import (
 	"database/sql"
+	"encoding/base64"
 	"time"
 
 	"github.com/fhermeni/wints/schema"
@@ -11,7 +12,7 @@ import (
 var (
 	selectReport      = "select kind, deadline, delivery, reviewed, grade, comment, private, toGrade from reports where student=$1 and kind=$2"
 	selectReports     = "select kind, deadline, delivery, reviewed, grade, comment, private, toGrade from reports where student=$1 order by deadline asc"
-	selectReportCnt   = "select delivery, cnt from reports where student=$1 and kind=$2"
+	selectReportCnt   = "select cnt from reports where student=$1 and kind=$2"
 	setReportCnt      = "update reports set cnt=$3, delivery=$4 where student=$1 and kind=$2"
 	setGrade          = "update reports set grade=$3, comment=$4,reviewed=$5 where student=$1 and kind=$2"
 	setReportDeadline = "update reports set deadline=$3 where student=$1 and kind=$2"
@@ -92,9 +93,14 @@ func (s *Store) Report(k, email string) (schema.ReportHeader, error) {
 //ReportContent returns the content of a given report
 func (s *Store) ReportContent(kind, email string) ([]byte, error) {
 	var cnt []byte
+
 	st := s.stmt(selectReportCnt)
 	err := st.QueryRow(email, kind).Scan(&cnt)
-	return cnt, noRowsTo(err, schema.ErrUnknownReport)
+	if err != nil {
+		return []byte{}, noRowsTo(err, schema.ErrUnknownReport)
+	}
+	res, err := base64.StdEncoding.DecodeString(string(cnt))
+	return res, err
 }
 
 //SetReportContent saves the content of a given report if the report has not been already graded
@@ -114,7 +120,8 @@ func (s *Store) SetReportContent(kind, email string, cnt []byte) (time.Time, err
 		//deadline passed and already submitted. no other chance
 		return now, schema.ErrDeadlinePassed
 	}
-	return now, s.singleUpdate(setReportCnt, schema.ErrUnknownReport, email, kind, cnt, now)
+	res := base64.StdEncoding.EncodeToString(cnt)
+	return now, s.singleUpdate(setReportCnt, schema.ErrUnknownReport, email, kind, res, now)
 }
 
 //SetReportGrade stores the given report grade

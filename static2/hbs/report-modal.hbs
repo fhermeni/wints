@@ -9,51 +9,54 @@
                     <div class="form-group">
                         <div class="col-sm-3 control-label">Confidential</div>
                         <div class="col-sm-9">
-                          <div class="checkbox">
+                            <div class="checkbox">
                                 <label for="private">
                                     <input onchange="toggleReportConfidential('{{Kind}}','{{Email}}',this)" type="checkbox" id="private" {{#if Private}}checked{{/if}}>
                                     <i>(access limited to the tutor and root)</i>
                                 </label>
-
                             </div>
                         </div>
                     </div>
-
 
                     <div class="form-group">
-                        <label for="deadline" class="col-sm-3 control-label">Deadline <br/>(FR timezone)</label>                        
+                        <label for="deadline" class="col-sm-3 control-label">Deadline</label>                        
                         <div class="col-sm-9">
                             <div class="input-group date" id="deadline">
-                            <input id="report-deadline" type="text" data-old-date="{{Deadline}}" class="form-control" data-date-format="D MMM YYYY" value="{{dateFmt Deadline 'D MMM YYYY'}}" {{#if Delivery}}disabled{{/if}} />
-                            <span class="input-group-addon">
-                                <span class="glyphicon glyphicon-calendar"></span>
-                            </span>
-                        </div>
-                </span>
-
-                            </div>
-                        </div>
-                    </div>
-                    {{#if Delivery}}
+                                <input id="report-deadline" type="text" data-old-date="{{Deadline}}" class="form-control" data-date-format="D MMM YYYY" value="{{dateFmt Deadline 'D MMM YYYY'}}" />
+                                <span class="input-group-addon">
+                                    <span class="glyphicon glyphicon-calendar"></span>
+                                </span>
+                            </div>                
+                        </div>                    
+                    </div>                    
                     <div class="form-group">
                         <label for="down" class="col-sm-3 control-label">Document</label>                        
                         <div class="col-sm-9">
-                            <a class="btn btn-primary" href="api/v2/reports/{{Email}}/{{Kind}}/content">
+                            <label class="form-control-static">
+                            {{#if Delivery}}
+                            <a href="api/v2/reports/{{Email}}/{{Kind}}/content">
                                 <i class="glyphicon glyphicon-cloud-download"></i> download                    
                             </a>
+                            {{else}}
+                            n/a
+                            {{/if}} 
+                            </label>
                         </div>
-                    </div>
-                    {{/if}}
+                    </div>             
+                                        
                     <div class="form-group">
                         <label for="delivery" class="col-sm-3 control-label">Delivery date</label>
                         <div class="col-sm-9">
-                            {{#if Delivery}}                            
-                                <p class="form-control-static">{{dateFmt Delivery "D MMM YYYY HH:mm"}} {{#ifLate Delivery}}<span class="alert-text">Deadline missed !</span>{{/ifLate}}</p>
+                            <label class="form-control-static">
+                            {{#if Delivery}}
+                                {{dateFmt Delivery "D MMM YYYY HH:mm"}}     
                             {{else}}
-                                <p class="form-control-static"><i>n/a</i></p>
-                            {{/if}}                            
-                        </div>
-                    </div>
+                                n/a
+                            {{/if}}
+                            {{#ifAfter Delivery Deadline}}<span class="text-danger">Deadline missed !</span>{{/ifAfter}}
+                            </label>
+                        </div> 
+                    </div>                     
                     {{#if ToGrade}}                  
                         <div class="form-group">
                             <label for="grade" class="col-sm-2 control-label">Grade</label>
@@ -63,14 +66,19 @@
                         </div>
                     {{/if}}
                     <div class="form-group">
-                        <label for="comments" class="control-label col-sm-offset-1">Comment  <small><a href="/static/consignes-rapports.pdf">(expectations)</a></small></label>                        
-                        <textarea id="comment" rows="9" class="col-sm-10 col-sm-offset-1" {{#unless Mine}}readonly{{/unless}}>{{Comment}}</textarea>
+                        <label for="comments" class="control-label col-sm-offset-1">Comment <small><a href="/static/consignes-rapports.pdf">(expectations)</a></small></label>                        
+                        <textarea placeholder="insert review here..." id="comment" rows="9" class="col-sm-10 col-sm-offset-1" {{#unless Mine}}readonly{{/unless}}>{{Comment}}</textarea>
                     </div>                        
-                    {{#if Delivery}}
-                        <div class="text-center form-group">
-                            <button type="button" class="btn btn-success" onclick="gradeReport({{ToGrade}},'{{Email}}','{{Kind}}')">Grade</button>
-                        </div>                                
-                    {{/if}} 
+                    
+                    <div class="text-right form-group">
+                        <button type="button" class="btn btn-default" onclick="hideModal();">Cancel</button>
+                        <button type="button" class="btn btn-success" onclick="gradeReport({{ToGrade}},'{{Email}}','{{Kind}}')"
+                        {{#ifLate Deadline}}{{else}}disabled title="No review before the deadline"{{/ifLate}}>
+                            <i class="glyphicon glyphicon-floppy-save"></i>
+                            Save
+                        </button>
+                        
+                    </div>                                                    
                     {{#if ToGrade}}
                         <div class="form-group">
                         <label for="notes" class="control-label col-sm-offset-1">Notation</label>                            
@@ -91,11 +99,9 @@
                         </ul>
                         </small>    
                         </div>    
-                    {{/if}}                
+                    {{/if}}      
+                    </div>          
             </div>
         </fieldset>            
-        <div class="text-center form-group">
-            <button type="button" class="btn btn-default" onclick="hideModal()">Done</button>            
-        </div>
     </div>    
 </div>

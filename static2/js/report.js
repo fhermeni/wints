@@ -27,6 +27,7 @@ function updateReportDeadline(em, kind, e) {
 
 function showReportModal(r, em) {
 	r.Email = em;
+	console.log(r);
 	$("#modal").render("report-modal", r, function() {
 		$("#report-deadline").datetimepicker().on("dp.change", function(e) {
 			updateReportDeadline(em, r.Kind, e);

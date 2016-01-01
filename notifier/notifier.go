@@ -62,8 +62,14 @@ func (n *Notifier) AccountReseted(em string, token []byte, err error) error {
 	return n.mailer.Send(schema.Person{Email: em}, "reset.txt", string(token))
 }
 
-func (n *Notifier) ReportUploaded() {
-	//mail tutor, cc student
+func (n *Notifier) ReportUploaded(student schema.User, tutor schema.User, kind string, err error) error {
+	n.Log.UserLog(student, "Report "+kind+" uploaded", err)
+	data := struct {
+		Kind    string
+		Student schema.Person
+	}{Kind: kind, Student: student.Person}
+
+	return n.mailer.Send(student.Person, "report_uploaded.txt", data, tutor.Person)
 }
 
 func (n *Notifier) ReportReviewed() {

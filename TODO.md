@@ -3,9 +3,11 @@
 ## Workplan
 
 1. student can upload reports
-	- whenever before deadline
-	- only once after deadline
-	/!\ check deadline/privacy can be changed	
+	- whenever before deadline OK
+	- only once after deadline OK
+	/!\ check deadline/privacy can be changed
+	- send email each time report uploaded (student cc. tutor)
+	- send mail automatically once the deadline reached: ready for review | last chance then ready for reviesw
 1. grade/review reports
 	- review with/without report
 1. penalty management

@@ -185,8 +185,18 @@ Handlebars.registerHelper('ifEq', function(n, val, opts) {
 		return opts.inverse(this);
 });
 
-Handlebars.registerHelper('ifLate', function(d, opts) {
-	if (moment(d).isBefore(moment()))
+Handlebars.registerHelper('ifLate', function(d, opts) {	
+	if (!d || moment(d).isBefore(moment()))
+		return opts.fn(this);
+	else
+		return opts.inverse(this);
+});
+
+Handlebars.registerHelper('ifAfter', function(d1, d2, opts) {
+console.log("after");
+console.log(d1);	
+console.log(d2);
+	if (!d1 || moment(d1).isAfter(d2))
 		return opts.fn(this);
 	else
 		return opts.inverse(this);

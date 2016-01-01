@@ -9,7 +9,8 @@ function showStudentDashboard(m) {
 	Object.keys(mine.Reports).forEach(function(kind) {
 		var passed = moment(mine.Reports[kind].Deadline).isBefore(moment());
 		var r = mine.Reports[kind];		
-		mine.Reports[kind].Open = isReportUpdloadeable(r);
+		mine.Reports[kind].Open = isReportUpdloadeable(r);		
+		mine.Reports[kind].Email = myself.Person.Email;
 	});
 	$("#cnt").render("student-dashboard", m, function() {
 		syncAlumniEditor($("#position"))
@@ -122,10 +123,10 @@ function loadReport(input, kind) {
 		return
 	}
 	var reader = new FileReader();
-	reader.onload = function(e) {
+	reader.onload = function(e) {			
 		return reportLoaded(kind, reader.result);
 	};
-	reader.readAsDataURL(file);
+	reader.readAsArrayBuffer(file);
 }
 
 function reportLoaded(kind, cnt) {
@@ -138,15 +139,20 @@ function reportLoaded(kind, cnt) {
 }
 
 //can upload if not reviewed and either the deadline passed or not passed but not uploaded
-function isReportUpdloadeable(r) {
-	console.log(r);
+function isReportUpdloadeable(r) {	
 	var passed = moment(r.Deadline).isBefore(moment());
 	return !r.Reviewed && (!passed || !r.Delivery);
+}
+
+function isReportReviewable(r) {
+	var passed = moment(r.Deadline).isBefore(moment());
+	return passed;
 }
 
 function refreshReports(r) {	
 	hideModal();
 	r.Open = isReportUpdloadeable(r);
+	r.Email = myself.Person.Email;
 	var buf = Handlebars.partials["student-dashboard-report"](r);
 	$("#report-" + r.Kind).replaceWith(buf);
 }
