@@ -36,14 +36,12 @@ function loadConventionValidator(students, internships, convs, us) {
 	}
 
 	if (us) {
-		us = us[0];
-		console.log(us);
+		us = us[0];		
 		allTeachers = us.filter(function(u) { 
 			return level(u.Role) != STUDENT_LEVEL;
 		});		
 	}
-	allTeachers.sort(userSort);
-	console.log(allTeachers);
+	allTeachers.sort(userSort);	
 	internships.forEach(function(i) {
 		allStudents.forEach(function(s, idx, arr) {
 			if (s.User.Person.Email == i.Convention.Student.User.Person.Email) {
@@ -124,8 +122,7 @@ function showConvention(cnt) {
 	allConventions.forEach(function(c) {
 		if (c.Student.User.Person.Email == em) {
 			dta.C = c;
-			$("#convention-detail").html(Handlebars.partials['convention-editor'](dta));
-			console.log(dta.Teachers);			
+			$("#convention-detail").html(Handlebars.partials['convention-editor'](dta));			
 			cleanError("#tutor-selecter");
 			$('#modal').find('[data-toggle="confirmation"]').confirmation();
 			propose(c.Tutor, allTeachers, $("#tutor-group"));
