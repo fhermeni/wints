@@ -24,7 +24,7 @@
                             <div class="input-group date" id="deadline">
                                 <input id="report-deadline" type="text" data-old-date="{{Deadline}}" class="form-control" data-date-format="D MMM YYYY" value="{{dateFmt Deadline 'D MMM YYYY'}}" />
                                 <span class="input-group-btn">
-                                    <button onclick="updateReportDeadline('{{Email}}','{{Kind}}');" class="btn btn-success" type="button"><i class="glyphicon glyphicon-floppy-disk"></i></button>
+                                    <button onclick="updateReportDeadline('{{Email}}','{{Kind}}');" class="btn btn-info" type="button"><i class="glyphicon glyphicon-floppy-disk"></i></button>
                                 </span>
                             </div>                
                         </div>                    
@@ -72,7 +72,7 @@
                     
                     <div class="text-right form-group">
                         <button type="button" class="btn btn-default" onclick="hideModal();">Cancel</button>
-                        <button type="button" class="btn btn-success" onclick="review('{{Email}}','{{Kind}}',{{ToGrade}})"
+                        <button type="button" class="btn btn-danger" onclick="review('{{Email}}','{{Kind}}',{{ToGrade}})"
                         {{#ifLate Deadline}}{{else}}disabled title="No review before the deadline"{{/ifLate}}>
                             <i class="glyphicon glyphicon-floppy-save"></i>
                             Review

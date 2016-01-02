@@ -28,54 +28,56 @@
      <div class="form-group">
         <label class="col-lg-3 control-label">Major/Promotion</label>
         <div class="col-lg-9">
-         <p class="form-control-static">{{I.Convention.Student.Major}}/{{I.Convention.Student.Promotion}}</p>
+         <label class="form-control-static">{{I.Convention.Student.Major}}/{{I.Convention.Student.Promotion}}</label>
         </div>             
      </div>
     {{/if}}
 		<div class="form-group">
 			<label class="col-lg-3 control-label">Company</label>
                 <div class="col-lg-9">
-                	<p class="form-control-static"><a href="{{I.Convention.Company.WWW}}">{{I.Convention.Company.Name}}</a></p>
+                	<label class="form-control-static">
+                        <a href="{{I.Convention.Company.WWW}}">{{I.Convention.Company.Name}}</a>
+                    </label>
                 </div>
 		</div>	
 		<div class="form-group">
 			<label class="col-lg-3 control-label">Title</label>
-                <div class="col-lg-9">
-                	<p class="form-control-static text-justify">{{I.Convention.Company.Title}}</p>
-                </div>
+            <div class="col-lg-9">
+                <label class="form-control-static text-justify">{{I.Convention.Company.Title}}</label>
+            </div>
 		</div>				
 		<div class="form-group">
 			<label class="col-lg-3 control-label">Period</label>
                 <div class="col-lg-9">
-                	<p class="form-control-static">
+                	<label class="form-control-static">
                 	{{dateFmt I.Convention.Begin "ddd DD MMM YY"}}
                 	- 
                 	{{dateFmt I.Convention.End "ddd DD MMM YY"}}
-                	</p>
+                	</label>
                 </div>
 		</div>
 		<div class="form-group">
 			<label class="col-lg-3 control-label">Gratification</label>
                 <div class="col-lg-9">
-                	<p class="form-control-static">{{I.Convention.Gratification}} €</p>
+                	<label class="form-control-static">{{I.Convention.Gratification}} €</label>
                 </div>
 		</div>				
 
         <div class="form-group" id="supervisor-group">
             <label class="col-lg-3 control-label">Supervisor</label>
                 <div class="col-lg-9">
-                    <p class="form-control-static fn">
+                    <label class="form-control-static fn">
                     {{> person I.Convention.Supervisor}}
-                    </p>
+                    </label>
                 </div>
         </div>  
 
 		<div class="form-group" id="tutor-group">
 			<label class="col-lg-3 control-label">Academic tutor</label>
                 <div class="col-lg-9">
-                	<p class="form-control-static fn">
+                	<label class="form-control-static fn">
                     {{> person I.Convention.Tutor.Person}}                    
-                    </p>
+                    </label>
                 </div>
 		</div>	    
         {{#if Editable}}
