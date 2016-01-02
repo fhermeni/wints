@@ -31,6 +31,7 @@ $(document).ready(function() {
 
 function loadSuccess(data) {
 	myself = data;
+	console.log(data);
 	$("#fullname").html(myself.Person.Lastname + ", " + myself.Person.Firstname);
 
 	//my options
