@@ -33,14 +33,6 @@
 - ease the daemon installation
 	1. normalise parameters
 
-## Development
-- clean a bit the code
-	1. Reduce/compose structures better
-	2. Reduce the number of queries ?
-	3. nicer rest middleware. Explicit context
-- tests and comments
-- simplify DB with less fake values and more optional fields hidden in JSONs
-
 ## Mailing
 - when I act on behalf of tutor, cc tutor
 - cc. emitter as well
