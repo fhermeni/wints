@@ -1,4 +1,4 @@
-Subject:[Wints] '{{.Kind}}' survey uploaded for student {{.Student.Fullname}}
+Subject:[Wints] '{{.Data.Kind}}' survey uploaded for student {{.Data.Student.Fullname}}
 
 Log on your dashboard to read the tutor observations: {{.WWW}}
 

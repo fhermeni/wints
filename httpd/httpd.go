@@ -39,6 +39,7 @@ func NewHTTPd(not *notifier.Notifier, store *sqlstore.Store, conventions feeder.
 		http.HandleFunc("/"+p, httpd.page(p+".html"))
 	}
 	http.HandleFunc("/", httpd.home)
+	http.HandleFunc("/survey", httpd.survey)
 	return httpd
 }
 

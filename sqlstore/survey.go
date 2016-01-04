@@ -2,6 +2,7 @@ package sqlstore
 
 import (
 	"database/sql"
+	"encoding/json"
 	"time"
 
 	"github.com/fhermeni/wints/schema"
@@ -9,44 +10,51 @@ import (
 )
 
 var (
-	selectSurveyFromToken = "select kind, deadline, delivery, cnt, token from surveys where token=$1"
-	selectSurvey          = "select kind, deadline, delivery, cnt, token from surveys where student=$1 and kind=$2"
-	selectSurveys         = "select kind, deadline, delivery, cnt, token from surveys where student=$1 order by deadline asc"
+	selectSurveyFromToken = "select student, kind, deadline, delivery, cnt, token from surveys where token=$1"
+	selectSurvey          = "select student, kind, deadline, delivery, cnt, token from surveys where student=$1 and kind=$2"
+	selectSurveys         = "select student, kind, deadline, delivery, cnt, token from surveys where student=$1 order by deadline asc"
 	updateSurveyContent   = "update surveys set cnt=$1, delivery=$2 where token=$3"
 	resetSurveyContent    = "update surveys set cnt=null, delivery=null where student=$1 and kind=$2"
 )
 
 //SurveyFromToken returns a given survey identifier
-func (s *Store) SurveyFromToken(token string) (schema.SurveyHeader, error) {
+func (s *Store) SurveyFromToken(token string) (string, schema.SurveyHeader, error) {
 	st := s.stmt(selectSurveyFromToken)
 	rows, err := st.Query(token)
 	if err != nil {
-		return schema.SurveyHeader{}, err
+		return "", schema.SurveyHeader{}, err
 	}
 	defer rows.Close()
 	if !rows.Next() {
-		return schema.SurveyHeader{}, schema.ErrUnknownSurvey
+		return "", schema.SurveyHeader{}, schema.ErrUnknownSurvey
 	}
 	return scanSurvey(rows)
 }
 
-func scanSurvey(rows *sql.Rows) (schema.SurveyHeader, error) {
+func scanSurvey(rows *sql.Rows) (string, schema.SurveyHeader, error) {
 	survey := schema.SurveyHeader{}
 	var delivery pq.NullTime
-
+	var student string
+	var buf sql.NullString
 	err := rows.Scan(
+		&student,
 		&survey.Kind,
 		&survey.Deadline,
 		&delivery,
-		&survey.Cnt,
+		&buf,
 		&survey.Token)
 	err = mapCstrToError(err)
 	if err != nil {
-		return survey, err
+		return student, survey, err
+	}
+	if buf.Valid {
+		if err := json.Unmarshal([]byte(buf.String), &survey.Cnt); err != nil {
+			return student, survey, err
+		}
 	}
 	survey.Deadline = survey.Deadline.Truncate(time.Minute).UTC()
 	survey.Delivery = nullableTime(delivery)
-	return survey, err
+	return student, survey, err
 }
 
 //Surveys returns all the survey related to a student
@@ -59,7 +67,7 @@ func (s *Store) Surveys(student string) ([]schema.SurveyHeader, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		s, err := scanSurvey(rows)
+		_, s, err := scanSurvey(rows)
 		if err != nil {
 			return res, err
 		}
@@ -79,20 +87,25 @@ func (s *Store) Survey(student, kind string) (schema.SurveyHeader, error) {
 	if !rows.Next() {
 		return schema.SurveyHeader{}, schema.ErrUnknownSurvey
 	}
-	return scanSurvey(rows)
+	_, srv, err := scanSurvey(rows)
+	return srv, err
 }
 
 //SetSurveyContent stores the survey answers
-func (s *Store) SetSurveyContent(token string, cnt []byte) (time.Time, error) {
+func (s *Store) SetSurveyContent(token string, cnt interface{}) (time.Time, error) {
+	buf, err := json.Marshal(cnt)
+	if err != nil {
+		return time.Now(), err
+	}
 	now := time.Now().Truncate(time.Minute).UTC()
-	sr, err := s.SurveyFromToken(token)
+	_, sr, err := s.SurveyFromToken(token)
 	if err != nil {
 		return now, err
 	}
 	if sr.Delivery != nil {
 		return now, schema.ErrSurveyUploaded
 	}
-	return now, s.singleUpdate(updateSurveyContent, schema.ErrUnknownSurvey, cnt, now, token)
+	return now, s.singleUpdate(updateSurveyContent, schema.ErrUnknownSurvey, buf, now, token)
 }
 
 func (s *Store) ResetSurveyContent(student, kind string) error {

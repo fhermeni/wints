@@ -16,7 +16,8 @@
 1. cron
 	- send mail automatically once the deadline reached (cc. tutor)
 	 	ready for review | deadline missed, consequences
-
+1. cron
+	- send survey link to supervisors
 
 ## Features
 

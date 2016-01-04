@@ -98,7 +98,7 @@ create table surveys(
     kind text,
     deadline timestamp without time zone,
     delivery timestamp without time zone,
-    cnt bytea,
+    cnt text,
     token text UNIQUE,
     constraint pk_surveys_student PRIMARY KEY(student, kind),
     constraint fk_surveys_student FOREIGN KEY(student) REFERENCES students(email) on delete cascade on update cascade

@@ -12,5 +12,26 @@ type SurveyHeader struct {
 	//The token to access in write mode
 	Token string
 	//Survey content
-	Cnt []byte
+	Cnt interface{}
+}
+
+type Survey struct {
+	En string
+	Fr string
+
+	Categories []Category
+}
+
+type Category struct {
+	En string
+	Fr string
+	Q  []Question
+}
+
+type Question struct {
+	En       string
+	Fr       string
+	Type     string
+	Required bool
+	IsMark   bool
 }

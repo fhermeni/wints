@@ -102,8 +102,13 @@ func (n *Notifier) PrivilegeUpdated(from schema.User, em string, p schema.Role, 
 	return n.mailer.Send(schema.Person{Email: em}, "privileges.txt", p, from.Person)
 }
 
-func (n *Notifier) SurveyUploaded() {
-	//mail tutor, cc supervisor
+func (n *Notifier) SurveyUploaded(student, tutor schema.User, supervisor schema.Person, kind string, err error) error {
+	data := struct {
+		Student schema.Person
+		Kind    string
+	}{Student: student.Person, Kind: kind}
+	n.Log.UserLog(schema.User{Person: supervisor}, "'"+kind+"' survey uploaded for student '"+student.Person.Email+"'", err)
+	return n.mailer.Send(tutor.Person, "survey_uploaded.txt", data)
 }
 
 func (n *Notifier) SurveyReseted() {

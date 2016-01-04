@@ -227,7 +227,7 @@ Handlebars.registerHelper('grade', function(r) {
 	if (!r.Reviewed) {
 		buf = "-";
 	} else if (!r.ToGrade) {		
-		buf= "<i class='glyphicon glyphicon-ok'></i>";
+		buf= "&#10003;";
 	} else {
 		var duration = moment.duration(moment(r.Delivery).diff(moment(r.Deadline)));
 		var days = Math.floor(duration.asDays());		
@@ -246,30 +246,31 @@ Handlebars.registerHelper('survey', function(s, stu) {
 	var grade = "-";
 	var bg = "";
 	if (s.Delivery) {
-		if (s.Kind == "midterm") {
-			if (Object.keys(s.Cnt).length > 0) {
-				if (s.Cnt[19] == "false") {
-					value = -1;
-					grade = "x";
-					bg = "bg-danger";
-				} else {
-					value = 1;
-					grade = "&#10003;";
-					bg = "bg-success";
-				}
-			}
-		} else { //final
-			if (Object.keys(s.Cnt).length > 0) {
-				value = s.Cnt[q17];
-				grade = s.Cnt[q17];
-				bg = grade >= 10 ? "bg-success" : "bg-danger";
-			}
+		var mark = s.Cnt["__MARK__"];		
+		if (mark == "false") {
+			bg = "bg-danger";
+			value = -1;
+			grade = "x";	
+		} else if (mark == "true") {
+			value = 1;
+			grade = "&#10003;";
+		} else {
+			value = mark;
+			grade = mark;
+			if (mark < 10) {
+				bg = "bg-danger";
+			}			
 		}
-	} else if (moment(s.Deadline).isBefore(new Date())) {
-		bg = "bg-warning";
-		value = -20;
+	} else if (moment(s.Deadline).isBefore(new Date()) && !s.Delivery) {		
+			var delay = Math.floor(moment.duration(moment().diff(moment(s.Deadline))).asDays());
+			bg = "info";			
+			value = -100 + delay;
+			grade = "<i class='glyphicon glyphicon-time'></i> " + delay + " d.";		
 	}
-	var buf = '<td class="click ' + bg + ' text-center" data-text="' + value + '" onclick="showSurvey(\'' + stu + '\', \'' + s.Kind + '\')">' + grade + '</td>';
+	var buf = '<td class="' + bg + ' text-center" data-text="' + value + '">';
+	buf += "<a target='_blank' href='/survey?kind=" + s.Kind + "&student=" + stu  +"'>";
+	buf += grade;
+	buf += '</a></td>';
 	return new Handlebars.SafeString(buf);
 });
 

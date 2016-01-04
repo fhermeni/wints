@@ -213,7 +213,15 @@ function newInternship(c) {
 }
 
 function resetPassword(email) {
-	return post("/resetPassword", email)
+	return post("/resetPassword", email);
+}
+
+function surveyFromToken(token) {
+	return get("/surveys/" + token);
+}
+
+function postSurvey(token, answers) {
+	return post("/surveys/" + token, answers);
 }
 
 function logFail(xhr) {

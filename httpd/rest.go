@@ -80,6 +80,8 @@ func NewEndPoints(not *notifier.Notifier, store *sqlstore.Store, convs feeder.Co
 	ed.router.POST(ed.prefix+"/resetPassword", ed.anon(ed.resetPassword))
 	ed.router.POST(ed.prefix+"/newPassword", ed.anon(ed.newPassword))
 	ed.router.GET(ed.prefix+"/config", ed.anon(ed.config))
+	ed.router.GET(ed.prefix+"/surveys/:t", ed.anon(ed.survey))
+	ed.router.POST(ed.prefix+"/surveys/:t", ed.anon(ed.setSurvey))
 	return ed
 }
 
@@ -488,4 +490,44 @@ func (ed *EndPoints) newPassword(ex Exchange) error {
 	email, err := ed.store.NewPassword([]byte(req.Token), []byte(req.Password))
 	ex.not.PasswordChanged(email, err)
 	return ex.outJSON(email, err)
+}
+
+func (ed *EndPoints) survey(ex Exchange) error {
+	tok := ex.V("t")
+	student, s, err := ed.store.SurveyFromToken(tok)
+	if err != nil {
+		return err
+	}
+	i, err := ed.store.Internship(student)
+	if err != nil {
+		return err
+	}
+	req := struct {
+		Student schema.Person
+		Tutor   schema.Person
+		Survey  schema.SurveyHeader
+	}{Student: i.Convention.Student.User.Person, Tutor: i.Convention.Tutor.Person, Survey: s}
+	return ex.outJSON(req, err)
+}
+
+func (ed *EndPoints) setSurvey(ex Exchange) error {
+	tok := ex.V("t")
+	answers := make(map[string]interface{})
+	if err := ex.inJSON(&answers); err != nil {
+		return err
+	}
+	if _, err := ed.store.SetSurveyContent(tok, answers); err != nil {
+		return err
+	}
+
+	stu, s, err := ed.store.SurveyFromToken(tok)
+	if err != nil {
+		return err
+	}
+	i, err := ed.store.Internship(stu)
+	if err != nil {
+		return err
+	}
+	err = ex.not.SurveyUploaded(i.Convention.Student.User, i.Convention.Tutor, i.Convention.Supervisor, s.Kind, err)
+	return ex.outJSON(s, err)
 }
