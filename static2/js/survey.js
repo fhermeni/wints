@@ -60,7 +60,7 @@ function commitPost(s) {
 	if ($.urlParam("token")) {	
 		$(".commit").removeClass("hidden");
 	}
-	readonly();
+	readOnly();
 }
 
 function readOnly() {
@@ -112,7 +112,7 @@ function fill(stu, tut, survey) {
 		$("#submit").addClass("hidden");		
 	}
 	if (!$.urlParam("token")) {		
-		readOnly();
+		readOnly();		
 	}
 }
 

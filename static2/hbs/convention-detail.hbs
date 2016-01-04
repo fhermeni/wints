@@ -32,6 +32,7 @@
         </div>             
      </div>
     {{/if}}
+    {{#unless Editable}}
 		<div class="form-group">
 			<label class="col-lg-3 control-label">Company</label>
                 <div class="col-lg-9">
@@ -71,7 +72,7 @@
                     </label>
                 </div>
         </div>  
-
+        {{/unless}}
 		<div class="form-group" id="tutor-group">
 			<label class="col-lg-3 control-label">Academic tutor</label>
                 <div class="col-lg-9">
@@ -95,6 +96,17 @@
                 </span>
                 </div>
             </div>
+        </div>
+        <div class="form-group">
+        <label class="col-lg-3 control-label">Reset surveys</label>
+        <div class="col-lg-9">
+               {{#each I.Surveys}}                    
+                    {{log ../I.Convention}}
+                    <button type="button" class="btn btn-warning btn-sm" data-placement='bottom' data-toggle="confirmation" data-on-confirm="resetSurvey(this,'{{../I.Convention.Student.User.Person.Email}}','{{Kind}}')" {{#unless Delivery}}disabled{{/unless}}>
+                        {{Kind}}
+                    </button>                    
+                {{/each}}
+        </div>
         </div>
         {{/if}}            
 </div>

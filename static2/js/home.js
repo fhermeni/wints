@@ -150,7 +150,7 @@ function updateInternshipRow(em) {
 
 function showInternship(em, edit) {
 	if (!edit || level(myself.Role) < ADMIN_LEVEL) {
-		internship(em).done(function(i) {
+		internship(em).done(function(i) {			
 			internshipModal(i, [], edit && level(myself.Role) >= ADMIN_LEVEL);
 		}).fail(logFail);
 	} else {
@@ -158,17 +158,24 @@ function showInternship(em, edit) {
 			i = i[0];
 			uss = uss[0].filter(function(u) {
 				return level(u.Role) != STUDENT_LEVEL && u.Person.Email != i.Convention.Tutor.Person.Email;
-			});
+			});			
 			internshipModal(i, uss, edit);
 		}).fail(logFail);
 	}
 }
 
+function resetSurvey(btn, student, kind) {
+	postResetSurvey(student, kind).done(function(data, status, xhr) {
+		$(btn).attr("disabled","disabled");
+		defaultSuccess(data, status, xhr);
+	}).fail(notifyError);
+}
 function internshipModal(i, uss, edit) {
 	var dta = {
 		I: i,
 		Editable: edit,
 		Teachers: uss
 	}
+	console.log(dta);
 	$("#modal").render("convention-detail", dta, showModal);
 }

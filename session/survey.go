@@ -11,3 +11,10 @@ func (s *Session) Survey(student, kind string) (schema.SurveyHeader, error) {
 	}
 	return schema.SurveyHeader{}, ErrPermission
 }
+
+func (s *Session) ResetSurvey(student, kind string) error {
+	if s.Role().Level() >= schema.ADMIN_LEVEL {
+		return s.store.ResetSurveyContent(student, kind)
+	}
+	return ErrPermission
+}

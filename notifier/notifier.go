@@ -111,8 +111,9 @@ func (n *Notifier) SurveyUploaded(student, tutor schema.User, supervisor schema.
 	return n.mailer.Send(tutor.Person, "survey_uploaded.txt", data)
 }
 
-func (n *Notifier) SurveyReseted() {
-	//mail supervisor, cc tutor
+func (n *Notifier) SurveyReseted(from schema.User, student, kind string, err error) error {
+	n.Log.UserLog(from, "'"+kind+"' survey content reseted for '"+student+"'", err)
+	return err
 }
 
 func (n *Notifier) CompanyUpdated(from schema.User, c schema.Company, err error) {

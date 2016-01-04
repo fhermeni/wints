@@ -19,6 +19,7 @@
 1. cron
 	- send survey link to supervisors
 
+- reset link for admin+
 ## Features
 
 - Normalise relative deadline for reports: the next day at 2am wrt. the theoretical value

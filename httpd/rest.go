@@ -66,6 +66,7 @@ func NewEndPoints(not *notifier.Notifier, store *sqlstore.Store, convs feeder.Co
 	ed.post("/internships/:s/tutor", setTutor)
 	ed.post("/internships/", ed.newInternship)
 
+	ed.del("/surveys/:s/:k", resetSurvey)
 	ed.get("/reports/:s/:k/", report)
 	ed.get("/reports/:s/:k/content", reportContent)
 	ed.post("/reports/:s/:k/content", setReportContent)
@@ -378,6 +379,13 @@ func setSupervisor(ex Exchange) error {
 	err := ex.s.SetSupervisor(ex.V("s"), p)
 	ex.not.SupervisorUpdated(ex.s.Me(), p, err)
 	return ex.outJSON(p, err)
+}
+
+func resetSurvey(ex Exchange) error {
+	stu := ex.V("s")
+	kind := ex.V("k")
+	err := ex.s.ResetSurvey(stu, kind)
+	return ex.not.SurveyReseted(ex.s.Me(), stu, kind, err)
 }
 
 func setTutor(ex Exchange) error {

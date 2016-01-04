@@ -9,7 +9,7 @@ import (
 )
 
 func (ed *HTTPd) survey(w http.ResponseWriter, r *http.Request) {
-	//Cache
+	//Cache ?
 	kind := r.URL.Query().Get("kind")
 	s := schema.Survey{}
 	if _, err := toml.DecodeFile("static/surveys/"+kind+".toml", &s); err != nil {

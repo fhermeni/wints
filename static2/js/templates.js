@@ -62,6 +62,7 @@ moment.locale('fr', {
 	}
 });*/
 
+Handlebars.logger.level = 0;
 $.handlebars({
 	templatePath: '/static/hbs/',
 	templateExtension: 'hbs',
@@ -130,8 +131,7 @@ Handlebars.registerHelper('optionPromotions', function(p) {
 	return new Handlebars.SafeString(b);
 });
 
-Handlebars.registerHelper('optionUsers', function(users, u) {
-	console.log(users);
+Handlebars.registerHelper('optionUsers', function(users, u) {	
 	var b = "";
 	users.forEach(function(o) {
 		b += "<option value='" + o.Person.Email + "'" + (o.Person.Email == u.Person.Email ? "selected" : "") + ">" + o.Person.Lastname + ", " + o.Person.Firstname + "</option>";
@@ -244,7 +244,7 @@ Handlebars.registerHelper('grade', function(r) {
 Handlebars.registerHelper('survey', function(s, stu) {
 	var value = -10;
 	var grade = "-";
-	var bg = "";
+	var bg = "";	
 	if (s.Delivery) {
 		var mark = s.Cnt["__MARK__"];		
 		if (mark == "false") {
@@ -265,7 +265,15 @@ Handlebars.registerHelper('survey', function(s, stu) {
 			var delay = Math.floor(moment.duration(moment().diff(moment(s.Deadline))).asDays());
 			bg = "info";			
 			value = -100 + delay;
+			var buf = '<td class="' + bg + ' text-center" data-text="' + value + '">';
 			grade = "<i class='glyphicon glyphicon-time'></i> " + delay + " d.";		
+			buf += grade;
+			buf += '</a></td>';
+			return new Handlebars.SafeString(buf); 
+	} else {
+		//Nothing special
+		buf = '<td class="' + bg + ' text-center" data-text="' + value + '">' + grade + "</td>";
+		return new Handlebars.SafeString(buf); 
 	}
 	var buf = '<td class="' + bg + ' text-center" data-text="' + value + '">';
 	buf += "<a target='_blank' href='/survey?kind=" + s.Kind + "&student=" + stu  +"'>";

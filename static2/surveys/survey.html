@@ -36,7 +36,6 @@
         </p>            
     </div>
 
-
     {{range $ci, $ce := .Categories}}
     <div class="page-header">
     <h3>
@@ -78,6 +77,13 @@
 </div>
 
 
+    <div class="commit alert alert-success text-center hidden">
+        <p>
+        <span class="en">Your feedbacks have been sent to the tutor. Thanks for your involvement.</span>
+        <span class="fr">Votre avis a été remonté à son tuteur. Merci pour votre implication.</span>
+        </p>            
+    </div>   
+
     <div class="text-center">
     <button type="button hidden" class="btn btn-lg btn-success submit" id="submit" onclick="submit()">
         <span class="en">Submit</span>
@@ -85,12 +91,6 @@
     </button>    
     </div>
 
-    <div class="commit alert alert-success text-center hidden">
-        <p>
-        <span class="en">Your feedbacks have been sent to the tutor. Thanks for your involvement.</span>
-        <span class="fr">Votre avis a été remonté à son tuteur. Merci pour votre implication.</span>
-        </p>            
-    </div>   
 </div>
 
 <div id="modal" class="modal fade">
