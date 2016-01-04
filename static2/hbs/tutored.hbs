@@ -54,6 +54,7 @@ This is the students you are following as an academic tutor. Your role is to:
         <th rowspan="2" class="sorter-false">Company</th>
         <th class="sorter-false text-center" colspan="{{len Org.Reports}}">Reports</th>
         <th class="sorter-false text-center" colspan="{{len Org.Surveys}}">Surveys</th>        
+        <th class="text-center" rowspan="2">Alumni</th>
     </tr>
     <tr>        
         {{#each Org.Reports}}        
@@ -61,7 +62,7 @@ This is the students you are following as an academic tutor. Your role is to:
         {{/each}}        
         {{#each Org.Surveys}}        
         <th class="text-center"><small>{{this.Kind}}</small></th>
-        {{/each}}        
+        {{/each}}                
     </tr>    
     </thead>
     <tbody>

@@ -108,27 +108,41 @@ function ui() {
 	});
 
 	tableCount();
-	/*$("#cnt").find(".editable-promotion").each(function(i, e) {
-		$(e).editable({
-			source: editablePromotions(),
-			url: function(p) {
-				return postStudentPromotion($(e).data("email"), p.value);
-			}
-		});
-	});
-
-	$("#cnt").find(".editable-major").each(function(i, e) {
-		$(e).editable({
-			source: editableMajors(),
-			url: function(m) {
-				return postStudentMajor($(e).data("email"), m.value);
-			}
-		});
-	});*/
 
 	$(".globalSelect").change(function() {
 		var ctx = $(this).data("context");
 		$("#" + ctx).find("input:checkbox").prop("checked", this.checked);
+	});
+}
+
+function showAlumni(student) {
+	internship(student).done(function(i) {
+		console.log(i.Convention.Student);
+		$("#modal").render("alumni-modal", i.Convention.Student, function() {
+			var val = i.Convention.Student.Alumni.Position;
+			if (val == "sabbatical") {
+				$("#country").addClass("hidden");
+				$("#contract").addClass("hidden");
+				$("#company").addClass("hidden");
+			} else if (val == "entrepreneurship") {
+				$("#country").removeClass("hidden");
+				$("#contract").addClass("hidden");
+				$("#company").addClass("hidden");
+			} else if (val == "study") {
+				$("#country").removeClass("hidden");
+				$("#contract").addClass("hidden");
+				$("#company").addClass("hidden");
+			} else if (val == "company") {
+				$("#country").removeClass("hidden");
+				$("#contract").removeClass("hidden");
+				$("#company").removeClass("hidden");
+		} else if (val == "looking") {
+				$("#country").addClass("hidden");
+				$("#contract").addClass("hidden");
+				$("#company").addClass("hidden");
+		}
+		showModal();
+		});
 	});
 }
 
@@ -175,7 +189,6 @@ function internshipModal(i, uss, edit) {
 		I: i,
 		Editable: edit,
 		Teachers: uss
-	}
-	console.log(dta);
+	}	
 	$("#modal").render("convention-detail", dta, showModal);
 }

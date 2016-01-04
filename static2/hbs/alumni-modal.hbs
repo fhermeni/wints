@@ -1,0 +1,54 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-body">                    
+                <fieldset>
+                <legend>The future of {{fullname User.Person}}</legend>
+                <div class="form-horizontal">
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Email</label>                    
+                    <div class="col-sm-9">
+                        <label class="form-control-static">{{Alumni.Contact}}</label>
+                    </div>
+                </div>
+                 
+                <div class="form-group">
+                    <label class="col-sm-3 control-label">Position</label>
+                    <div class="col-sm-9">
+                        <label class="form-control-static">{{alumniPosition Alumni.Position}}</label>
+                    </div>
+                </div>
+
+                <div class="form-group" id="contract">
+                    <label class="col-sm-3 control-label">Contract</label>
+                    <div class="col-sm-9">
+                        <label class="form-control-static">
+                        {{#if Alumni.Permanent}}Permanent (CDI){{else}}Fixed (CDD){{/if}}                        
+                        </label>
+                    </div>                    
+                </div>   
+
+                <div class="form-group" id="company">
+                    <label class="col-sm-3 control-label">Company</label>
+                    <div class="col-sm-9">
+                        <label class="form-control-static">
+                        {{#if Alumni.SameCompany}}internship company{{else}}other company{{/if}}                                            
+                        </label>
+                    </div>
+                </div> 
+
+                <div class="form-group" id="country">
+                    <label class="col-sm-3 control-label">Country</label>
+                    <div class="col-sm-9">
+                        <label class="form-control-static">
+                        {{#if Alumni.France}}France{{else}}foreign country{{/if}}                                            
+                        </label>
+                    </div>
+                </div>          
+                </div>                                  
+                </fieldset>
+            <div class="text-right form-group">
+                <button type="button" class="btn btn-default" onclick="hideModal()">Close</button>            
+            </div>                            
+        </div>
+    </div>
+</div>   

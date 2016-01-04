@@ -18,5 +18,15 @@
             
             {{#each Surveys}}
             {{survey this ../Convention.Student.User.Person.Email}}
-            {{/each}}            
+            {{/each}}  
+
+            {{#if Convention.Student.Alumni}}
+            <td class="text-center" data-text="1">
+                <a href="#" onclick="showAlumni('{{Convention.Student.User.Person.Email}}')">
+                    <i class="glyphicon glyphicon-star-empty"></i>
+                </a>
+            </td>
+            {{else}}
+            <td class="text-center" data-text="0"></td>           
+            {{/if}}             
         </tr>

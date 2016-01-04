@@ -27,7 +27,11 @@ data-sup='{{Convention.Supervisor.Email}}' data-sup-fn='{{fullname Convention.Su
     {{/if}}
                 
     {{#if Convention.Student.Alumni}}
-    <td class="text-center" data-text="1"><i class="glyphicon glyphicon-star-empty"></i></td>
+    <td class="text-center" data-text="1">
+        <a href="#" onclick="showAlumni('{{Convention.Student.User.Person.Email}}')">
+            <i class="glyphicon glyphicon-star-empty"></i>
+        </a>
+    </td>
     {{else}}
     <td class="text-center" data-text="0"></td>           
     {{/if}}            

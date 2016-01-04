@@ -84,6 +84,19 @@ Handlebars.registerHelper('dateFmt', function(d, fmt) {
 	return moment(d).format(fmt);
 });
 
+var positions = {
+	"looking" : "Looking for a job",
+	"sabbatical" : "Sabattical leave",
+	"company" : "Working in a company",
+	"entrepreneurship" : "Entrepreneurship",
+	"study" : "Pursuit of higher education"	
+}
+
+Handlebars.registerHelper('alumniPosition', function(r) {
+	return positions[r];
+});
+
+
 var roles = ["student", "tutor", "major", "head", "admin", "root"];
 
 Handlebars.registerHelper('roleLevel', function(r) {
