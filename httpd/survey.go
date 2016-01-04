@@ -1,6 +1,7 @@
 package httpd
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 
@@ -18,7 +19,13 @@ func (ed *HTTPd) survey(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tpl, err := template.New("survey.html").ParseFiles("static/surveys/survey.html")
+	tpl, err := template.New("survey.html").Funcs(
+		template.FuncMap{
+			"html": func(value interface{}) template.HTML {
+				return template.HTML(fmt.Sprint(value))
+			},
+		}).ParseFiles("static/surveys/survey.html")
+
 	if err != nil {
 		ed.not.Log.Log("root", "Unable to read the survey template", err)
 		http.Error(w, "", http.StatusInternalServerError)

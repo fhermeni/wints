@@ -25,6 +25,8 @@ function submit() {
 				val = $("[name='" + id + "']:checked").val();
 				break;
 			case "comment":
+			case "rank":
+			case "number":
 				val = $("[name='" + id + "']").val();
 				break;
 		}
@@ -66,7 +68,9 @@ function commitPost(s) {
 function readOnly() {
 	$("#submit").addClass("hidden");
 	$("textarea").attr('readonly','readonly');
-	$("input:radio").attr('disabled','disabled');
+	$("input[type=number]").attr('readonly','readonly');
+	$("input:radio").attr('disabled','disabled');		
+	$("select").attr('disabled','disabled');
 }
 function loadSurvey(ok) {
 	var kind = $.urlParam("kind");
@@ -105,6 +109,8 @@ function fill(stu, tut, survey) {
 					$("[name='" + k + "'][value='" + v + "']").attr("checked","checked");					
 					break;
 				case "comment":
+				case "number":
+				case "rank":
 					$("[name='" + k + "']").val(v);
 					break;
 			}

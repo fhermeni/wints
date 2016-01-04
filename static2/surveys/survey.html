@@ -45,11 +45,16 @@
     </div>
         {{range $i, $e := $ce.Q}}
         <div class="form-group" id="C{{$ci}}-Q{{$i}}" data-type="{{$e.Type}}" data-required="{{$e.Required}}" data-isMark="{{$e.IsMark}}">
+            {{if eq $e.Type "html"}}
+                <label class="fr">{{html $e.Fr}}</label>
+                <label class="en">{{html $e.En}}</label>            
+            {{else}}
             <label>
                 {{if $e.Required}}*{{end}}
                 <span class="fr">{{$e.Fr}}</span>
                 <span class="en">{{$e.En}}</span>
             </label>            
+            {{end}}
             {{if eq $e.Type "yesno"}}
                 <label class="radio-inline">
                     <input type="radio" name="C{{$ci}}-Q{{$i}}" value="true">
@@ -64,6 +69,24 @@
             {{else if eq $e.Type "comment"}}
                 <br>
                 <textarea cols="80" name="C{{$ci}}-Q{{$i}}"></textarea>
+            {{else if eq $e.Type "number"}}
+                <input type="number" name="C{{$ci}}-Q{{$i}}">
+            {{else if eq $e.Type "rank"}}
+                <br>
+                <select name="C{{$ci}}-Q{{$i}}" class='col-md-3'>
+                    <option value=''> - </option>                    
+                    <option value='4' class='fr'>Excellent</option>
+                    <option value='4' class='en'>Excellent</option>
+                    <option value='3' class='fr'>Bon</option>
+                    <option value='3' class='en'>Good</option>
+                    <option value='2' class='fr'>Satisfaisant</option>
+                    <option value='2' class='en'>Satisfying</option>
+                    <option value='1' class='fr'>Insatisfaisant</option>
+                    <option value='1' class='en'>Unsatisfying</option>
+                    <option value='0' class='fr'>Non applicable</option>                   
+                    <option value='0' class='en'>Not applicable</option>                   
+                </select>
+                <br>
             {{end}}
         </div>
         {{end}}

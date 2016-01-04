@@ -9,7 +9,13 @@
 		<dt>Period</dt>
 		<dd>{{dateFmt Convention.Begin "D MMM YYYY"}} - {{dateFmt Convention.End "D MMM YYYY"}}</dd>
 		<dt>Name</dt>
-		<dd><a href="{{Convention.Company.WWW}}">{{Convention.Company.Name}}</a></dd>
+		<dd>
+			{{#if Convention.Company.WWW}}
+				<a href="{{Convention.Company.WWW}}">{{Convention.Company.Name}}</a>
+			{{else}}
+				{{Convention.Company.Name}}
+			{{/if}}		
+		</dd>
 		<dt>Subject</dt>
 		<dd>{{Convention.Company.Title}}</dd>
 	</dl>	
