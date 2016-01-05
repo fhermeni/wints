@@ -200,3 +200,13 @@ func (n *Notifier) NewTutor(from schema.User, stu string, old, now schema.User, 
 	//Mail the student, cc the tutors
 	return n.mailer.Send(schema.Person{Email: stu}, "tutor_switch.txt", dta, old.Person, now.Person, from.Person)
 }
+
+//Survey reminders
+func (n *Notifier) SurveyRequest(sup schema.Person, tutor schema.User, student schema.Student, survey schema.SurveyHeader) error {
+	n.Log.Log("cron", "send invitation for survey '"+student.User.Person.Email+"/"+survey.Kind+"' to '"+sup.Email+"'", nil)
+	dta := struct {
+		Student schema.User
+		Survey  schema.SurveyHeader
+	}{Student: student.User, Survey: survey}
+	return n.mailer.Send(sup, "survey_request.txt", dta, tutor.Person)
+}

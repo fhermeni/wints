@@ -1,11 +1,11 @@
-Subject: {{.Internship.Student.Fullname}} - {{.Survey.Kind}} Evaluation
+Subject: {{.Data.Student.Fullname}} - {{.Data.Survey.Kind}} Evaluation
 
 Bonjour
 
-Vous encadrez actuellement {{.Internship.Student.Fullname}}.
+Vous encadrez actuellement {{.Data.Student.Fullname}}.
 À ce titre, je me permets de vous communiquer l'adresse Web où déposer votre fiche d'évaluation:
 
-{{.WWW}}/surveys/{{.Survey.Kind}}?token={{.Survey.Token}}
+{{.WWW}}/survey?kind={{.Data.Survey.Kind}}&token={{.Data.Survey.Token}}
 
 Cette évaluation nous est indispensable pour évaluer correctement le travail de nos étudiants.
 Remplir cette fiche d'évaluation devrait vous prendre 10 minutes.
@@ -14,15 +14,15 @@ La saisie de la fiche d'évaluation a été testée sur Mozilla Firefox et sur C
 La saisie ne fonctionne pas sur Internet Explorer 8.
 
 Cordialement,
-Fabien Hermenier - responsable des stages informatique.
+{{.Fullname}} - responsable des stages informatique.
 
 ----
 Hello
 
-You are currently tutoring {{.Internship.Student.Fullname}}.
+You are currently tutoring {{.Data.Student.Fullname}}.
 Accordingly, could you provide your final evaluation at this address:
 
-{{.WWW}}/surveys/{{.Survey.Kind}}?token={{.Survey.Token}}
+{{.WWW}}/survey?kind={{.Data.Survey.Kind}}&token={{.Data.Survey.Token}}
 
 This evaluation is required for a correct evaluation of our students.
 It should take about 10 minutes to complete the form.

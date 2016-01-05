@@ -227,6 +227,11 @@ function postSurvey(token, answers) {
 function postResetSurvey(student, kind) {
 	return del("/surveys/" + student + "/" + kind)
 }
+
+function postRequestSurvey(student, kind) {
+	return post("/surveys/" + student + "/" + kind)
+}
+
 function logFail(xhr) {
 	if (xhr.status == 403) {
 		$("#modal").render("error", xhr.responseText, showModal)

@@ -184,6 +184,13 @@ function resetSurvey(btn, student, kind) {
 		defaultSuccess(data, status, xhr);
 	}).fail(notifyError);
 }
+
+function requestSurvey(btn, student, kind) {
+	postRequestSurvey(student, kind).done(function(data, status, xhr) {		
+		defaultSuccess(data, status, xhr);
+	}).fail(notifyError);
+}
+
 function internshipModal(i, uss, edit) {
 	var dta = {
 		I: i,

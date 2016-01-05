@@ -67,6 +67,7 @@ func NewEndPoints(not *notifier.Notifier, store *sqlstore.Store, convs feeder.Co
 	ed.post("/internships/", ed.newInternship)
 
 	ed.del("/surveys/:s/:k", resetSurvey)
+	ed.post("/surveys/:s/:k", requestSurvey)
 	ed.get("/reports/:s/:k/", report)
 	ed.get("/reports/:s/:k/content", reportContent)
 	ed.post("/reports/:s/:k/content", setReportContent)
@@ -386,6 +387,24 @@ func resetSurvey(ex Exchange) error {
 	kind := ex.V("k")
 	err := ex.s.ResetSurvey(stu, kind)
 	return ex.not.SurveyReseted(ex.s.Me(), stu, kind, err)
+}
+
+func requestSurvey(ex Exchange) error {
+	if ex.s.Me().Role.Level() < schema.ADMIN_LEVEL {
+		return session.ErrPermission
+	}
+	stu := ex.V("s")
+	kind := ex.V("k")
+	i, err := ex.s.Internship(stu)
+	if err != nil {
+		return err
+	}
+	for _, s := range i.Surveys {
+		if s.Kind == kind {
+			return ex.not.SurveyRequest(i.Convention.Supervisor, i.Convention.Tutor, i.Convention.Student, s)
+		}
+	}
+	return schema.ErrUnknownSurvey
 }
 
 func setTutor(ex Exchange) error {

@@ -108,6 +108,19 @@
                 {{/each}}
         </div>
         </div>
+
+        <div class="form-group">
+        <label class="col-lg-3 control-label">Request surveys</label>
+        <div class="col-lg-9">
+               {{#each I.Surveys}}                    
+                    {{log ../I.Convention}}
+                    <button type="button" class="btn btn-warning btn-sm" data-placement='bottom' data-toggle="confirmation" data-on-confirm="requestSurvey(this,'{{../I.Convention.Student.User.Person.Email}}','{{Kind}}')" {{#if Delivery}}disabled{{/if}}>
+                        {{Kind}}
+                    </button>                    
+                {{/each}}
+        </div>
+        </div>
+
         {{/if}}            
 </div>
     </fieldset>
