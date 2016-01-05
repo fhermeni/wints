@@ -39,3 +39,11 @@
 .popover.left>.arrow:after {
 	border-top-color: #d9534f;
 }
+
+#sessionExpired {
+	display: none;
+}
+
+#sessionExpired:target {
+   display: block;
+}

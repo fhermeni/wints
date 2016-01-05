@@ -35,6 +35,9 @@
 - ease the daemon installation
 	1. normalise parameters
 
+## Survey
+Clarify deadline, invitation, reminders
+
 ## Mailing
 - when I act on behalf of tutor, cc tutor
 - cc. emitter as well

@@ -9,17 +9,15 @@ import (
 	"github.com/fhermeni/wints/session"
 )
 
-func status(not *notifier.Notifier, w http.ResponseWriter, e error) {
+func status(not *notifier.Notifier, w http.ResponseWriter, r *http.Request, e error) {
 	switch e {
-	case schema.ErrInvalidToken, schema.ErrSessionExpired:
-		return
 	case schema.ErrUnknownConvention, schema.ErrUnknownStudent, schema.ErrUnknownSurvey, schema.ErrUnknownUser, schema.ErrUnknownReport, schema.ErrUnknownInternship, schema.ErrNoPendingRequests:
 		http.Error(w, e.Error(), http.StatusNotFound)
 		return
 	case schema.ErrReportExists, schema.ErrUserExists, schema.ErrInternshipExists, schema.ErrUserTutoring:
 		http.Error(w, e.Error(), http.StatusConflict)
 		return
-	case schema.ErrCredentials:
+	case schema.ErrCredentials, schema.ErrInvalidToken, schema.ErrSessionExpired:
 		http.Error(w, e.Error(), http.StatusUnauthorized)
 	case ErrMalformedJSON, schema.ErrInvalidSurvey, schema.ErrInvalidAlumniEmail, schema.ErrInvalidEmail, schema.ErrDeadlinePassed, schema.ErrInvalidGrade, schema.ErrInvalidMajor, schema.ErrInvalidPromotion, schema.ErrInvalidPeriod, schema.ErrGradedReport, schema.ErrPasswordTooShort:
 		http.Error(w, e.Error(), http.StatusBadRequest)

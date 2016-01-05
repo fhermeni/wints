@@ -149,7 +149,7 @@ function internship(em) {
 }
 
 function getConfig() {
-	return get("/config/");
+	return get("/config");
 }
 
 function users() {
@@ -232,8 +232,8 @@ function postRequestSurvey(student, kind) {
 	return post("/surveys/" + student + "/" + kind)
 }
 
-function logFail(xhr) {
-	if (xhr.status == 403) {
+function logFail(xhr) {	
+	if (xhr.status == 403 || xhr.status == 401) {
 		$("#modal").render("error", xhr.responseText, showModal)
 	}
 	console.log(xhr.status + " " + xhr.responseText)

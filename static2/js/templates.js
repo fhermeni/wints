@@ -62,7 +62,7 @@ moment.locale('fr', {
 	}
 });*/
 
-Handlebars.logger.level = 0;
+//Handlebars.logger.level = 0;
 $.handlebars({
 	templatePath: '/static/hbs/',
 	templateExtension: 'hbs',

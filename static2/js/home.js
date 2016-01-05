@@ -17,19 +17,23 @@ $(document).ready(function() {
 	waitingBlock = $("#cnt").clone().html();
 
 
+	$( document ).ajaxError(function(e, xhr) {		
+  		if (xhr.responseText.indexOf("expired")) {
+  			window.location = "/#sessionExpired";
+  		}
+	});
 	$.tablesorter.defaults.widgets = ["uitheme"]
 	$.tablesorter.defaults.theme = 'bootstrap';
 	$.tablesorter.defaults.headerTemplate = '{content} {icon}';
 
 	getConfig().done(function(c) {
 		config = c;
+		user(getCookie("login")).done(loadSuccess).fail(logFail);
 	})
-	user(getCookie("login")).done(loadSuccess).fail(function(xhr) {
-		$("#modal").render("error", xhr.responseText, showModal)
-	});
 });
 
 function loadSuccess(data) {
+	console.log(arguments);
 	myself = data;	
 	$("#fullname").html(myself.Person.Lastname + ", " + myself.Person.Firstname);
 
@@ -116,8 +120,7 @@ function ui() {
 }
 
 function showAlumni(student) {
-	internship(student).done(function(i) {
-		console.log(i.Convention.Student);
+	internship(student).done(function(i) {		
 		$("#modal").render("alumni-modal", i.Convention.Student, function() {
 			var val = i.Convention.Student.Alumni.Position;
 			if (val == "sabbatical") {

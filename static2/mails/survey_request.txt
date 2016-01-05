@@ -11,7 +11,7 @@ Cette évaluation nous est indispensable pour évaluer correctement le travail d
 Remplir cette fiche d'évaluation devrait vous prendre 10 minutes.
 
 La saisie de la fiche d'évaluation a été testée sur Mozilla Firefox et sur Chrome.
-La saisie ne fonctionne pas sur Internet Explorer 8.
+Internet Explorer 8 n'est pas supporté.
 
 Cordialement,
 {{.Fullname}} - responsable des stages informatique.

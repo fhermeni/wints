@@ -127,7 +127,7 @@ func (ed *EndPoints) anon(fn EndPoint) httptreemux.HandlerFunc {
 			cfg: ed.cfg,
 			not: ed.notifier,
 		}
-		status(ed.notifier, w, fn(ex))
+		status(ed.notifier, w, r, fn(ex))
 	}
 }
 
@@ -136,7 +136,7 @@ func (ed *EndPoints) wrap(fn EndPoint) httptreemux.HandlerFunc {
 		//Create a session
 		s, err := ed.openSession(w, r)
 		if err != nil {
-			status(ed.notifier, w, err)
+			status(ed.notifier, w, r, err)
 			return
 		}
 		ex := Exchange{
@@ -147,7 +147,7 @@ func (ed *EndPoints) wrap(fn EndPoint) httptreemux.HandlerFunc {
 			cfg: ed.cfg,
 			not: ed.notifier,
 		}
-		status(ed.notifier, w, fn(ex))
+		status(ed.notifier, w, r, fn(ex))
 	}
 }
 
@@ -487,7 +487,7 @@ func (ed *EndPoints) signin(ex Exchange) error {
 	}
 	http.SetCookie(ex.w, token)
 	http.SetCookie(ex.w, login)
-	http.Redirect(ex.w, ex.r, "/", 302)
+	http.Redirect(ex.w, ex.r, "/", http.StatusTemporaryRedirect)
 	ed.store.Visit(cred.Login)
 	return err
 }
