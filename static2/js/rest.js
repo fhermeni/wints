@@ -93,14 +93,14 @@ function get(URL) {
 	return $.ajax({
 		method: "GET",
 		url: ROOT_API + URL,
-	}).fail(logFail)
+	}).fail(notifyError)
 }
 
 function del(URL, ok, no) {
 	return $.ajax({
 		method: "DELETE",
 		url: ROOT_API + URL,
-	}).fail(logFail);
+	}).fail(notifyError);
 }
 
 function signin(login, password) {

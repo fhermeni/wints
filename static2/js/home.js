@@ -18,7 +18,7 @@ $(document).ready(function() {
 
 
 	$( document ).ajaxError(function(e, xhr) {		
-  		if (xhr.responseText.indexOf("expired")) {
+  		if (xhr.responseText.indexOf("expired") >0) {
   			window.location = "/#sessionExpired";
   		}
 	});
@@ -32,8 +32,7 @@ $(document).ready(function() {
 	})
 });
 
-function loadSuccess(data) {
-	console.log(arguments);
+function loadSuccess(data) {	
 	myself = data;	
 	$("#fullname").html(myself.Person.Lastname + ", " + myself.Person.Firstname);
 
