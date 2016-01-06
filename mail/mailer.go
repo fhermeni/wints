@@ -8,7 +8,11 @@ import (
 )
 
 var (
+	//NONE points a default person
 	NONE = []schema.Person{}
+
+	//cache the templates to speed up spaming
+	cache = make(map[string]*template.Template)
 )
 
 //Mailer is an interface to specify a mail must be send
@@ -19,15 +23,20 @@ type Mailer interface {
 }
 
 func fill(path string, data interface{}) ([]byte, error) {
-	tpl, err := template.ParseFiles(path)
-	if err != nil {
-		return []byte{}, err
+	tpl, ok := cache[path]
+	var err error
+	if !ok {
+		tpl, err = template.ParseFiles(path)
+		if err != nil {
+			return []byte{}, err
+		}
+		cache[path] = tpl
 	}
 	var b bytes.Buffer
-	if err = tpl.Execute(&b, data); err != nil {
+	if err := tpl.Execute(&b, data); err != nil {
 		return []byte{}, err
 	}
-	return b.Bytes(), err
+	return b.Bytes(), nil
 }
 
 func emails(persons ...schema.Person) []string {

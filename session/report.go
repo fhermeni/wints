@@ -44,6 +44,7 @@ func (s *Session) SetReportPrivacy(kind, email string, p bool) error {
 	return ErrPermission
 }
 
+//Report returns a report header if the emitter if the student or if he is watching the student
 func (s *Session) Report(kind, email string) (schema.ReportHeader, error) {
 	if s.Myself(email) || s.Watching(email) {
 		return s.store.Report(kind, email)

@@ -31,11 +31,12 @@ type Db struct {
 	ConnectionString string
 }
 
-//EndPoint configures the rest endpoints
+//Rest configures the rest service
 type Rest struct {
 	SessionLifeTime        Duration
 	RenewalRequestLifetime Duration
-	Prefix                 string
+	//The endpoints prefix
+	Prefix string
 }
 
 //HTTPd configures the http daemon

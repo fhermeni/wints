@@ -108,6 +108,7 @@ func (s *Store) SetSurveyContent(token string, cnt interface{}) (time.Time, erro
 	return now, s.singleUpdate(updateSurveyContent, schema.ErrUnknownSurvey, buf, now, token)
 }
 
+//ResetSurveyContent delete an uploaded survey
 func (s *Store) ResetSurveyContent(student, kind string) error {
 	return s.singleUpdate(resetSurveyContent, schema.ErrUnknownSurvey, student, kind)
 }

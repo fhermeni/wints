@@ -26,6 +26,7 @@ type Deadline struct {
 	absolute *time.Time
 }
 
+//AbsoluteDeadline returns a deadline from a timestamp
 func AbsoluteDeadline(t time.Time) Deadline {
 	return Deadline{absolute: &t}
 }

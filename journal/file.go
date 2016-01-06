@@ -44,6 +44,7 @@ func (f *File) UserLog(u schema.User, msg string, err error) {
 	}()
 }
 
+//Log a message with a possible error
 func (f *File) Log(em, msg string, err error) {
 	go func() {
 		f.log(EventLog, "[%s] %s - %s: %s\n", time.Now().Format(TimeFmt), em, msg, status(err))
@@ -70,12 +71,15 @@ func (f *File) log(fn, format string, args ...interface{}) {
 	fmt.Fprintf(fi, format, args...)
 
 }
+
+//Wipe signals the application has been restarted
 func (f *File) Wipe() {
 	go func() {
 		f.log(EventLog, "[%s] *** WIPE ***\n", time.Now().Format(TimeFmt))
 	}()
 }
 
+//Access logs an access to a file through HTTP
 func (f *File) Access(method, url string, statusCode, latency int) {
 	go func() {
 		f.log(AccessLog, "[%s] \"%s %s\" %d %d\n", time.Now().Format(TimeFmt), method, url, statusCode, latency)

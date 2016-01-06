@@ -15,19 +15,19 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var dbUrl = flag.String("db-url", "user=fhermeni2 dbname=wints_next host=localhost sslmode=disable", "database connexion string")
+var dbURL = flag.String("db-url", "user=fhermeni2 dbname=wints_next host=localhost sslmode=disable", "database connexion string")
 
 var cfg = config.Internships{
 	Majors:     []string{"al", "ihm"},
 	Promotions: []string{"si", "master"},
 	Reports: []config.Report{
-		config.Report{
+		{
 			Kind:     "foo",
 			Delivery: config.AbsoluteDeadline(time.Now().Add(time.Minute)),
 		},
 	},
 	Surveys: []config.Survey{
-		config.Survey{
+		{
 			Kind:     "bar",
 			Deadline: config.AbsoluteDeadline(time.Now().Add(time.Minute)),
 		},

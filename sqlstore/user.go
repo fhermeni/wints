@@ -164,6 +164,7 @@ func (s *Store) RmUser(email string) error {
 	return s.singleUpdate(deleteUser, schema.ErrUnknownUser, email)
 }
 
+//SetEmail change a user email to another
 func (s *Store) SetEmail(old, now string) error {
 	return s.singleUpdate(updateEmail, schema.ErrUnknownUser, old, now)
 }

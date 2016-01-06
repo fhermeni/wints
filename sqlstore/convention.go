@@ -58,6 +58,8 @@ func (s *Store) SetCompany(stu string, c schema.Company) error {
 	return s.singleUpdate(updateCompany, schema.ErrUnknownInternship, c.WWW, c.Name, c.Title, stu)
 }
 
+//NewInternship turns a convention into an internship.
+//Returns the internship, the student token and an error
 func (s *Store) NewInternship(c schema.Convention) (schema.Internship, []byte, error) {
 	i := schema.Internship{
 		Convention: c,

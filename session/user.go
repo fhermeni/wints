@@ -58,6 +58,7 @@ func (s *Session) NewStudent(p schema.Person, major, promotion string, male bool
 	return ErrPermission
 }
 
+//ReplaceUserWith allowed if the emitter is an admin at least
 func (s *Session) ReplaceUserWith(src, dst string) error {
 	if s.Role().Level() >= schema.ADMIN_LEVEL {
 		return s.store.ReplaceUserWith(src, dst)
@@ -65,6 +66,7 @@ func (s *Session) ReplaceUserWith(src, dst string) error {
 	return ErrPermission
 }
 
+//SetEmail change the person email if the emitter is at least an admin
 func (s *Session) SetEmail(old, cur string) error {
 	if s.Role().Level() >= schema.ADMIN_LEVEL {
 		return s.store.SetEmail(old, cur)

@@ -10,6 +10,7 @@ func (s *Session) Conventions() ([]schema.Convention, error) {
 	return []schema.Convention{}, ErrPermission
 }
 
+//Convention returns the convention of a given student if the emitter is the student or at least an admin
 func (s *Session) Convention(stu string) (schema.Convention, error) {
 	if s.Myself(stu) || s.Role().Level() >= schema.ADMIN_LEVEL {
 		return s.store.Convention(stu)
@@ -41,7 +42,7 @@ func (s *Session) SetCompany(stu string, c schema.Company) error {
 	return ErrPermission
 }
 
-//ValidateConvention validates the convention if the emitter is an admin at minimum
+//NewInternship validates the convention if the emitter is an admin at minimum
 func (s *Session) NewInternship(c schema.Convention) (schema.Internship, []byte, error) {
 	if s.Role().Level() >= schema.ADMIN_LEVEL {
 		return s.store.NewInternship(c)
@@ -64,7 +65,7 @@ func (s *Session) Internships() (schema.Internships, error) {
 
 }
 
-//Internship returns the internship of the emitter
+//Internship returns the internship of the emitter or if the emitter is at least a major leader
 func (s *Session) Internship(stu string) (schema.Internship, error) {
 	if s.Myself(stu) || s.Role().Level() >= schema.MAJOR_LEVEL {
 		return s.store.Internship(stu)

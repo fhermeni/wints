@@ -22,6 +22,7 @@ func (s *Session) Students() (schema.Students, error) {
 	return []schema.Student{}, ErrPermission
 }
 
+//Student returns the student if the emitter is the student or a watcher
 func (s *Session) Student(stu string) (schema.Student, error) {
 	if s.Myself(stu) || s.Watching(stu) {
 		return s.store.Student(stu)
@@ -29,7 +30,7 @@ func (s *Session) Student(stu string) (schema.Student, error) {
 	return schema.Student{}, ErrPermission
 }
 
-//SetNextPosition changes the student next position if the emitter is the targetted student,
+//SetAlumni changes the student next position if the emitter is the targetted student,
 //the tutor, a member of his jury or a major leader at minimum
 func (s *Session) SetAlumni(student string, a schema.Alumni) error {
 	if s.Myself(student) || s.Role().Level() >= schema.MAJOR_LEVEL || s.Tutoring(student) || s.JuryOf(student) {

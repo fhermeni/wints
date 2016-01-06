@@ -30,12 +30,15 @@ func NewSession(u schema.User, store *sqlstore.Store, conventions feeder.Convent
 	return Session{my: u, store: store, conventions: conventions}
 }
 
+//RmSession delete the session if the emitter is the session owner or at least an admin
 func (s *Session) RmSession(em string) error {
 	if s.Myself(em) || s.Role().Level() >= schema.ADMIN_LEVEL {
 		return s.store.RmSession(em)
 	}
 	return ErrPermission
 }
+
+//Me returns the session emitter
 func (s *Session) Me() schema.User {
 	return s.my
 }
@@ -59,7 +62,8 @@ func (s *Session) Tutoring(student string) bool {
 	return c.Tutor.Person.Email == s.my.Person.Email
 }
 
-//InMyMajor checks if the student is in the major I am the leader of
+//Watching checks if the student is in the major I am the leader of, an head or not or
+//the student tutor
 func (s *Session) Watching(student string) bool {
 	//wathing
 	if s.my.Role.Level() >= schema.HEAD_LEVEL {

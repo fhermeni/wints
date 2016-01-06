@@ -8,11 +8,13 @@ import (
 	"github.com/fhermeni/wints/schema"
 )
 
+//Fake to mock the mailing system
 type Fake struct {
 	Config Config
 	WWW    string
 }
 
+//Send just print the mailing on stdout
 func (fake *Fake) Send(to schema.Person, tpl string, data interface{}, cc ...schema.Person) error {
 	path := fmt.Sprintf("%s%c%s", fake.Config.Path, os.PathSeparator, tpl)
 	dta := metaData{
@@ -20,7 +22,7 @@ func (fake *Fake) Send(to schema.Person, tpl string, data interface{}, cc ...sch
 		Fullname: fake.Config.Fullname,
 		Data:     data,
 	}
-	body, err := fill(path, dta)	
+	body, err := fill(path, dta)
 	if err != nil {
 		return err
 	}

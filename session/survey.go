@@ -12,6 +12,7 @@ func (s *Session) Survey(student, kind string) (schema.SurveyHeader, error) {
 	return schema.SurveyHeader{}, ErrPermission
 }
 
+//ResetSurvey if the emitter is at least an administrator
 func (s *Session) ResetSurvey(student, kind string) error {
 	if s.Role().Level() >= schema.ADMIN_LEVEL {
 		return s.store.ResetSurveyContent(student, kind)

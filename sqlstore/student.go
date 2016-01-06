@@ -142,6 +142,7 @@ func (s *Store) SetMale(stu string, m bool) error {
 	return s.singleUpdate(updateMale, schema.ErrUnknownStudent, stu, m)
 }
 
+//SetAlumni update a student alumni status
 func (s *Store) SetAlumni(student string, a schema.Alumni) error {
 	if !strings.Contains(a.Contact, "@") {
 		return schema.ErrInvalidEmail

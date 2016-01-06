@@ -55,18 +55,19 @@ func NewSMTP(cfg Config, www string) (*SMTP, error) {
 	return &m, err
 }
 
-func (smtp *SMTP) Send(to schema.Person, tpl string, data interface{}, cc ...schema.Person) error {
-	path := fmt.Sprintf("%s%c%s", smtp.path, os.PathSeparator, tpl)
+//Send the mail to the smtp server
+func (m *SMTP) Send(to schema.Person, tpl string, data interface{}, cc ...schema.Person) error {
+	path := fmt.Sprintf("%s%c%s", m.path, os.PathSeparator, tpl)
 	dta := metaData{
-		WWW:      smtp.www,
-		Fullname: smtp.fullname,
+		WWW:      m.www,
+		Fullname: m.fullname,
 		Data:     data,
 	}
 	body, err := fill(path, dta)
 	if err != nil {
 		return err
 	}
-	return smtp.sendMail(to.Email, emails(cc...), body)
+	return m.sendMail(to.Email, emails(cc...), body)
 }
 
 func (m *SMTP) sendMail(to string, cc []string, msg []byte) error {
