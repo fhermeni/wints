@@ -1,6 +1,8 @@
 package session
 
 import (
+	"time"
+
 	"github.com/fhermeni/wints/schema"
 )
 
@@ -18,4 +20,11 @@ func (s *Session) ResetSurvey(student, kind string) error {
 		return s.store.ResetSurveyContent(student, kind)
 	}
 	return ErrPermission
+}
+
+func (s *Session) SetSurveyInvitation(student, kind string) (time.Time, error) {
+	if s.Role().Level() >= schema.ADMIN_LEVEL {
+		return s.store.SetSurveyInvitation(student, kind)
+	}
+	return time.Time{}, ErrPermission
 }

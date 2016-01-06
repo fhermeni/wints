@@ -193,6 +193,7 @@ function resetSurvey(btn, student, kind) {
 function requestSurvey(btn, student, kind) {
 	postRequestSurvey(student, kind).done(function(data, status, xhr) {		
 		defaultSuccess(data, status, xhr);
+		$(btn).html(kind);
 	}).fail(notifyError);
 }
 

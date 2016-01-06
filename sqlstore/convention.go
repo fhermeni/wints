@@ -34,7 +34,7 @@ var (
 		" inner join users as tutp on (tutp.email = conventions.tutor)  " +
 		" where stup.email=$1"
 	insertReport       = "insert into reports(student, kind, deadline, private, toGrade) values($1,$2,$3,$4,$5)"
-	insertSurvey       = "insert into surveys(student, kind, token, deadline) values($1,$2,$3,$4)"
+	insertSurvey       = "insert into surveys(student, kind, token, invitation, lastInvitation, deadline) values($1,$2,$3,$4,$5,$6)"
 	validateConvention = "update conventions set valid=$2 where student=$1"
 )
 
@@ -90,11 +90,15 @@ func (s *Store) NewInternship(c schema.Convention) (schema.Internship, []byte, e
 	i.Surveys = make([]schema.SurveyHeader, len(s.config.Surveys))
 	for idx, survey := range s.config.Surveys {
 		token := randomBytes(16)
-		tx.Exec(insertSurvey, c.Student.User.Person.Email, survey.Kind, token, survey.Deadline.Value(c.Begin).Truncate(time.Minute).UTC())
+		inv := survey.Invitation.Value(c.Begin).Truncate(time.Minute).UTC()
+		dead := inv.Add(survey.Deadline.Duration).Truncate(time.Minute).UTC()
+		tx.Exec(insertSurvey, c.Student.User.Person.Email, survey.Kind, token, inv, inv, dead)
 		i.Surveys[idx] = schema.SurveyHeader{
-			Kind:     survey.Kind,
-			Token:    string(token),
-			Deadline: survey.Deadline.Value(c.Begin).Truncate(time.Minute).UTC(),
+			Kind:           survey.Kind,
+			Token:          string(token),
+			Deadline:       dead,
+			Invitation:     inv,
+			LastInvitation: inv,
 		}
 	}
 

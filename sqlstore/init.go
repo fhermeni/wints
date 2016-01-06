@@ -96,6 +96,8 @@ create table reports(
 create table surveys(
     student text,
     kind text,
+    invitation timestamp without time zone,
+    lastInvitation timestamp without time zone,
     deadline timestamp without time zone,
     delivery timestamp without time zone,
     cnt text,

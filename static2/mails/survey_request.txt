@@ -7,8 +7,10 @@ Vous encadrez actuellement {{.Data.Student.Fullname}}.
 
 {{.WWW}}/survey?kind={{.Data.Survey.Kind}}&token={{.Data.Survey.Token}}
 
-Cette évaluation nous est indispensable pour évaluer correctement le travail de nos étudiants.
 Remplir cette fiche d'évaluation devrait vous prendre 10 minutes.
+Cette évaluation nous est indispensable pour évaluer correctement le travail de nos étudiants.
+À ce titre, pourriez-vous la remplir avant le {{.Data.FrDate}} ?
+
 
 La saisie de la fiche d'évaluation a été testée sur Mozilla Firefox et sur Chrome.
 Internet Explorer 8 n'est pas supporté.
@@ -24,8 +26,10 @@ Accordingly, could you provide your final evaluation at this address:
 
 {{.WWW}}/survey?kind={{.Data.Survey.Kind}}&token={{.Data.Survey.Token}}
 
-This evaluation is required for a correct evaluation of our students.
 It should take about 10 minutes to complete the form.
+This evaluation is required for a correct evaluation of our students.
+Accordingly, shall you complete it before {{.Data.EnDate}} ?
+
 
 Fullfilling the form has been tested with Mozilla Firefox and Google Chrome.
 Internet Explorer 8 is not supported.

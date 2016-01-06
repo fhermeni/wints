@@ -15,7 +15,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var dbURL = flag.String("db-url", "user=fhermeni2 dbname=wints_next host=localhost sslmode=disable", "database connexion string")
+var dbURL = flag.String("db-url", "user=fhermeni dbname=wints_next host=localhost sslmode=disable", "database connexion string")
 
 var cfg = config.Internships{
 	Majors:     []string{"al", "ihm"},
@@ -28,8 +28,9 @@ var cfg = config.Internships{
 	},
 	Surveys: []config.Survey{
 		{
-			Kind:     "bar",
-			Deadline: config.AbsoluteDeadline(time.Now().Add(time.Minute)),
+			Kind:       "bar",
+			Deadline:   config.Duration{Duration: time.Second}, //config.AbsoluteDeadline(time.Now().Add(time.Minute)),
+			Invitation: config.AbsoluteDeadline(time.Now()),
 		},
 	},
 	LatePenalty: 2,
@@ -109,8 +110,8 @@ func convention(t *testing.T, u schema.User) schema.Convention {
 }
 
 func init() {
-	log.Println("Initiate database connexion using url '" + *dbUrl + "'")
-	DB, err := sql.Open("postgres", *dbUrl)
+	log.Println("Initiate database connexion using url '" + *dbURL + "'")
+	DB, err := sql.Open("postgres", *dbURL)
 	if err != nil {
 		log.Fatalln("Unable to connect to the Database: " + err.Error())
 	}

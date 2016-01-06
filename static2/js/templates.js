@@ -62,7 +62,7 @@ moment.locale('fr', {
 	}
 });*/
 
-//Handlebars.logger.level = 0;
+Handlebars.logger.level = 0;
 $.handlebars({
 	templatePath: '/static/hbs/',
 	templateExtension: 'hbs',
@@ -143,6 +143,17 @@ Handlebars.registerHelper('optionPromotions', function(p) {
 	});
 	return new Handlebars.SafeString(b);
 });
+
+Handlebars.registerHelper('daysSince', function(d1, d2) {
+	if (!d2) {
+		d2 = moment();
+	} else {
+		d2 = moment(d2);
+	}	
+	var duration = moment.duration(moment(d1).diff(d2));
+	return -Math.floor(duration.asDays());			
+});
+
 
 Handlebars.registerHelper('optionUsers', function(users, u) {	
 	var b = "";
@@ -274,25 +285,30 @@ Handlebars.registerHelper('survey', function(s, stu) {
 				bg = "bg-danger";
 			}			
 		}
-	} else if (moment(s.Deadline).isBefore(new Date()) && !s.Delivery) {		
-			var delay = Math.floor(moment.duration(moment().diff(moment(s.Deadline))).asDays());
-			bg = "info";			
-			value = -100 + delay;
-			var buf = '<td class="' + bg + ' text-center" data-text="' + value + '">';
-			grade = "<i class='glyphicon glyphicon-time'></i> " + delay + " d.";		
-			buf += grade;
-			buf += '</a></td>';
-			return new Handlebars.SafeString(buf); 
-	} else {
-		//Nothing special
-		buf = '<td class="' + bg + ' text-center" data-text="' + value + '">' + grade + "</td>";
-		return new Handlebars.SafeString(buf); 
+		var buf = '<td class="' + bg + ' text-center" data-text="' + value + '">';
+		buf += "<a target='_blank' href='/survey?kind=" + s.Kind + "&student=" + stu  +"'>";
+		buf += grade;
+		buf += '</a></td>';
+		return new Handlebars.SafeString(buf);
 	}
-	var buf = '<td class="' + bg + ' text-center" data-text="' + value + '">';
-	buf += "<a target='_blank' href='/survey?kind=" + s.Kind + "&student=" + stu  +"'>";
+	
+	var delay;
+	if (moment(s.Deadline).isBefore(new Date)) {			
+			bg = "bg-danger";
+			delay = Math.floor(moment.duration(moment().diff(moment(s.Deadline))).asDays());
+			value = -1000 + delay;
+			grade = "<i class='glyphicon glyphicon-time'></i> " + delay + " d.";		
+	} else if (moment(s.Invitation).isBefore(new Date)) {
+			bg = "bg-info";			
+			delay = Math.floor(moment.duration(moment().diff(moment(s.Invitation))).asDays());
+			value = -100 + delay;
+			grade = "<i class='glyphicon glyphicon-time'></i> " + delay + " d.";		
+	}	
+	
+	var buf = '<td class="' + bg + ' text-center" data-text="' + value + '">';	
 	buf += grade;
 	buf += '</a></td>';
-	return new Handlebars.SafeString(buf);
+	return new Handlebars.SafeString(buf); 
 });
 
 Handlebars.registerHelper('report', function(r, em, cb) {

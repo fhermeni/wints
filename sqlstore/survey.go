@@ -10,11 +10,12 @@ import (
 )
 
 var (
-	selectSurveyFromToken = "select student, kind, deadline, delivery, cnt, token from surveys where token=$1"
-	selectSurvey          = "select student, kind, deadline, delivery, cnt, token from surveys where student=$1 and kind=$2"
-	selectSurveys         = "select student, kind, deadline, delivery, cnt, token from surveys where student=$1 order by deadline asc"
-	updateSurveyContent   = "update surveys set cnt=$1, delivery=$2 where token=$3"
-	resetSurveyContent    = "update surveys set cnt=null, delivery=null where student=$1 and kind=$2"
+	selectSurveyFromToken  = "select student, kind, invitation, lastInvitation, deadline, delivery, cnt, token from surveys where token=$1"
+	selectSurvey           = "select student, kind, invitation, lastInvitation, deadline, delivery, cnt, token from surveys where student=$1 and kind=$2"
+	selectSurveys          = "select student, kind, invitation, lastInvitation, deadline, delivery, cnt, token from surveys where student=$1 order by deadline asc"
+	updateSurveyContent    = "update surveys set cnt=$1, delivery=$2 where token=$3"
+	resetSurveyContent     = "update surveys set cnt=null, delivery=null where student=$1 and kind=$2"
+	updateSurveyInvitation = "update surveys set lastInvitation=$3 where student=$1 and kind=$2"
 )
 
 //SurveyFromToken returns a given survey identifier
@@ -39,6 +40,8 @@ func scanSurvey(rows *sql.Rows) (string, schema.SurveyHeader, error) {
 	err := rows.Scan(
 		&student,
 		&survey.Kind,
+		&survey.Invitation,
+		&survey.LastInvitation,
 		&survey.Deadline,
 		&delivery,
 		&buf,
@@ -53,6 +56,8 @@ func scanSurvey(rows *sql.Rows) (string, schema.SurveyHeader, error) {
 		}
 	}
 	survey.Deadline = survey.Deadline.Truncate(time.Minute).UTC()
+	survey.Invitation = survey.Invitation.Truncate(time.Minute).UTC()
+	survey.LastInvitation = survey.LastInvitation.Truncate(time.Minute).UTC()
 	survey.Delivery = nullableTime(delivery)
 	return student, survey, err
 }
@@ -89,6 +94,11 @@ func (s *Store) Survey(student, kind string) (schema.SurveyHeader, error) {
 	}
 	_, srv, err := scanSurvey(rows)
 	return srv, err
+}
+
+func (s *Store) SetSurveyInvitation(student, kind string) (time.Time, error) {
+	t := time.Now()
+	return t, s.singleUpdate(updateSurveyInvitation, schema.ErrUnknownSurvey, student, kind, t)
 }
 
 //SetSurveyContent stores the survey answers

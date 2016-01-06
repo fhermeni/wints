@@ -401,7 +401,8 @@ func requestSurvey(ex Exchange) error {
 	}
 	for _, s := range i.Surveys {
 		if s.Kind == kind {
-			return ex.not.SurveyRequest(i.Convention.Supervisor, i.Convention.Tutor, i.Convention.Student, s)
+			_, err := ex.s.SetSurveyInvitation(stu, kind)
+			return ex.not.SurveyRequest(i.Convention.Supervisor, i.Convention.Tutor, i.Convention.Student, s, err)
 		}
 	}
 	return schema.ErrUnknownSurvey

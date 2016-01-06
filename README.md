@@ -27,3 +27,6 @@ In your `$GOPATH`:
 ## Running
 - `wintsd` launches the daemon. For test purposes, it is preferable to launch it with the `--fakeMailer` option to prevent to send mails (they will be printed on stdout instead)
 
+## Benchmarks, tests
+
+go test -x -v -tags=integration -bench BenchmarkInternships -cpuprofile=cpu.prof

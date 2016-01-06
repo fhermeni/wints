@@ -73,3 +73,18 @@ func TestInternships(t *testing.T) {
 	assert.Equal(t, 2, len(cc))
 	assert.Contains(t, cc, i1.Convention, i2.Convention)
 }
+
+func BenchmarkInternships(t *testing.B) {
+	for i := 0; i < 100; i++ {
+		stu := newStudent(nil)
+		tut := newTutor(nil)
+		newInternship(nil, stu, tut)
+		//_, _, err := store.NewInternship(x.Convention)
+		//assert.Nil(t, err)
+	}
+	t.ResetTimer()
+	for i := 0; i < t.N; i++ {
+		_, err := store.Internships()
+		assert.Nil(t, err)
+	}
+}

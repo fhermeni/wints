@@ -31,14 +31,19 @@ func TestSurveyMgnt(t *testing.T) {
 	assert.Nil(t, err)
 	assert.Equal(t, 1, len(ss))
 	assert.Contains(t, ss, s)
-	s2, err = store.SurveyFromToken(s.Token)
+	_, s2, err = store.SurveyFromToken(s.Token)
 	assert.Nil(t, err)
 	assert.Equal(t, s, s2)
 
-	_, err = store.SurveyFromToken(em)
+	_, _, err = store.SurveyFromToken(em)
 	assert.Equal(t, schema.ErrUnknownSurvey, err)
 
-	cnt := randomBytes(32)
+	cnt := map[string]string{
+		"rsc": "3711",
+		"r":   "2138",
+		"gri": "1908",
+		"adg": "912",
+	}
 	d, err := store.SetSurveyContent(s.Token, cnt)
 	assert.Nil(t, err)
 

@@ -93,8 +93,9 @@ type Report struct {
 
 //Survey configures a survey definition
 type Survey struct {
-	Deadline Deadline
-	Kind     string
+	Invitation Deadline
+	Deadline   Duration
+	Kind       string
 }
 
 //Config aggregates all the subcomponents configuration parameters

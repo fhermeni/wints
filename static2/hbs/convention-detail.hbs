@@ -100,8 +100,7 @@
         <div class="form-group">
         <label class="col-lg-3 control-label">Reset surveys</label>
         <div class="col-lg-9">
-               {{#each I.Surveys}}                    
-                    {{log ../I.Convention}}
+               {{#each I.Surveys}}                                        
                     <button type="button" class="btn {{#if Delivery}}btn-danger{{else}}btn-default{{/if}} btn-sm" data-placement='bottom' data-toggle="confirmation" data-on-confirm="resetSurvey(this,'{{../I.Convention.Student.User.Person.Email}}','{{Kind}}')" {{#unless Delivery}}disabled title="not uploaded"{{/unless}}>
                         {{Kind}}
                     </button>                    
@@ -112,11 +111,15 @@
         <div class="form-group">
         <label class="col-lg-3 control-label">Request surveys</label>
         <div class="col-lg-9">
-               {{#each I.Surveys}}                    
-                    {{log ../I.Convention}}
-                    <button type="button" class="btn {{#if Delivery}}btn-default{{else}}btn-danger{{/if}} btn-sm" data-placement='bottom' data-toggle="confirmation" data-on-confirm="requestSurvey(this,'{{../I.Convention.Student.User.Person.Email}}','{{Kind}}')" {{#if Delivery}}disabled title="already uploaded" {{/if}}>
-                        {{Kind}}
+               {{#each I.Surveys}}                     
+                    {{#if Delivery}}
+                    <button type="button" class="btn btn-default btn-sm" disabled title="already uploaded">{{Kind}}</button>
+                    {{else}}                    
+                    <button type="button" class="btn btn-danger btn-sm" data-placement='bottom' data-toggle="confirmation" data-on-confirm="requestSurvey(this,'{{../../I.Convention.Student.User.Person.Email}}','{{Kind}}')">
+                        {{Kind}}                        
+                        (<i class="glyphicon glyphicon-time"></i> {{daysSince LastInvitation}}  days.)
                     </button>                    
+                    {{/if}}                    
                 {{/each}}
         </div>
         </div>
