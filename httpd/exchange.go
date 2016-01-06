@@ -1,13 +1,14 @@
 package httpd
 
 import (
-	"compress/gzip"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"sync"
+
+	"github.com/klauspost/compress/gzip"
 
 	"github.com/fhermeni/wints/config"
 	"github.com/fhermeni/wints/notifier"

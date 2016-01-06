@@ -1,6 +1,7 @@
 var mine;
 
 function showStudent() {
+	showWait();
 	internship(myself.Person.Email).done(showStudentDashboard)
 }
 

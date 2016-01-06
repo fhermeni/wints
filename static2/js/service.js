@@ -1,4 +1,5 @@
 function showService() {
+	showWait();
 	internships().done(function(ints) {
 		var service = {};
 		ints.forEach(function(i) {

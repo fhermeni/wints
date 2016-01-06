@@ -12,7 +12,6 @@ String.prototype.capitalize = function() {
 	return this.charAt(0).toUpperCase() + this.substring(1)
 }
 
-
 $(document).ready(function() {
 	waitingBlock = $("#cnt").clone().html();
 
@@ -31,6 +30,10 @@ $(document).ready(function() {
 		user(getCookie("login")).done(loadSuccess).fail(logFail);
 	})
 });
+
+function showWait() {
+	$("#cnt").html(waitingBlock);
+}
 
 function loadSuccess(data) {	
 	myself = data;	

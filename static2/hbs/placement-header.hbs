@@ -1,4 +1,10 @@
-    <h3>{{len Students}} Student(s) - <small><span id="placed_cnt">{{Ints}}</span> placed</small></h3>
+{{#if FeederWarning}}
+<div id="feeder-issue" class="alert alert-warning text-center">
+    <p>{{FeederWarning}}</p>
+</div>
+{{/if}}
+
+<h3>{{len Students}} Student(s) - <small><span id="placed_cnt">{{Ints}}</span> placed</small></h3>
 
 <button type="button" class="btn btn-default btn-sm" onclick="userMailing('#table-placement')">
     <i class="glyphicon glyphicon-envelope"></i> mail selection

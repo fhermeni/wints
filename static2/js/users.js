@@ -7,6 +7,7 @@ $(document).on('change', '.btn-file :file', function() {
 
 
 function showUsers() {
+	showWait();
 	$.when(users(), internships()).done(loadUsers);
 }
 

@@ -3,14 +3,13 @@ package feeder
 import (
 	"encoding/csv"
 	"io"
-	"log"
-	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/fhermeni/wints/journal"
 	"github.com/fhermeni/wints/schema"
 )
 
@@ -48,7 +47,7 @@ var (
 
 //CsvConventions parses conventions from CSV files
 type CsvConventions struct {
-	//j          journal.Journal
+	j          journal.Journal
 	Reader     ConventionReader
 	Year       int
 	promotions []string
@@ -56,10 +55,10 @@ type CsvConventions struct {
 
 //NewCsvConventions creates an importer from a given reader
 //By default, the parsed year is the current year
-func NewCsvConventions(r ConventionReader, promotions []string) *CsvConventions {
+func NewCsvConventions(r ConventionReader, promotions []string, j journal.Journal) *CsvConventions {
 	return &CsvConventions{
-		Reader: r,
-		//j:          j,
+		Reader:     r,
+		j:          j,
 		promotions: promotions,
 		Year:       time.Now().Year()}
 }
@@ -89,8 +88,7 @@ func clean(str string) string {
 }
 
 func (f *CsvConventions) log(msg string, err error) {
-	log.Println(msg + " - " + err.Error())
-	//	f.j.Log("feeder", msg, err)
+	f.j.Log("feeder", msg, err)
 }
 
 func cleanInt(str string) int {
@@ -122,7 +120,6 @@ func (f *CsvConventions) scan(prom string) ([]schema.Convention, error) {
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			log.Println("buggy: " + reflect.TypeOf(err).String())
 			return conventions, err
 		}
 		student := cleanPerson(record[stuFn], record[stuLn], record[stuEmail], record[stuTel])
@@ -170,7 +167,6 @@ func (f *CsvConventions) scan(prom string) ([]schema.Convention, error) {
 				Role:   schema.TUTOR,
 			},
 		}
-		log.Println(c.Student.User.Person.Fullname())
 		conventions = append(conventions, c)
 	}
 	return conventions, err
@@ -182,17 +178,16 @@ func (f *CsvConventions) Import() ([]schema.Convention, error) {
 	var error error
 	all := make([]schema.Convention, 0, 0)
 	var wg sync.WaitGroup
-
 	for i, prom := range f.promotions {
 		wg.Add(1)
 		go func(i int, p string) {
 			convs, err := f.scan(p)
+			f.j.Log("feeder", "Scanning conventions of promotion '"+p+"'", err)
+			if err == ErrAuthorization {
+				error = err
+			}
 			lock.Lock()
 			defer lock.Unlock()
-			if error == nil && err != nil {
-				log.Println("Import " + p + ": " + err.Error())
-				//error = err
-			}
 			all = append(all, convs...)
 			wg.Done()
 		}(i, prom)

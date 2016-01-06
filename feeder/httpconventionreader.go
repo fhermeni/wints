@@ -4,12 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net"
 	"net/http"
 	"net/url"
-	"reflect"
 	"time"
+
+	"github.com/fhermeni/wints/journal"
 
 	"code.google.com/p/go-charset/charset"
 	_ "code.google.com/p/go-charset/data"
@@ -21,16 +21,18 @@ type HTTPConventionReader struct {
 	login    string
 	password string
 	Encoding string
+	j        journal.Journal
 }
 
 //NewHTTPConventionReader creates a new reader.
 //Default encoding is "windows-1252"
-func NewHTTPConventionReader(url, login, password string) *HTTPConventionReader {
+func NewHTTPConventionReader(url, login, password string, j journal.Journal) *HTTPConventionReader {
 	return &HTTPConventionReader{
 		url:      url,
 		login:    login,
 		password: password,
 		Encoding: "windows-1252",
+		j:        j,
 	}
 }
 
@@ -53,12 +55,9 @@ func (h *HTTPConventionReader) Reader(year int, promotion string) (io.Reader, er
 		} else if e, ok := err.(net.Error); ok && e.Timeout() {
 			return nil, ErrTimeout
 		}
-		log.Println("Unexpected error: " + reflect.TypeOf(err).String())
 		return nil, err
 	}
-
 	if res.StatusCode != 200 {
-		log.Println(res.StatusCode)
 		return nil, ErrAuthorization
 	}
 	return charset.NewReader(h.Encoding, res.Body)

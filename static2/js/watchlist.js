@@ -1,4 +1,5 @@
 function showWatchlist() {
+	showWait();
 	internships().done(loadWatchlist);
 }
 

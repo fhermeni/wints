@@ -1,4 +1,5 @@
 function showTutored() {
+	showWait();
 	internships().done(loadTutored);
 }
 

@@ -42,8 +42,8 @@ func inviteRoot(em string) {
 	}
 }
 
-func newConventionReader(cfg config.Feeder) feeder.ConventionReader {
-	reader := feeder.NewHTTPConventionReader(cfg.URL, cfg.Login, cfg.Password)
+func newConventionReader(cfg config.Feeder, not *notifier.Notifier) feeder.ConventionReader {
+	reader := feeder.NewHTTPConventionReader(cfg.URL, cfg.Login, cfg.Password, not.Log)
 	reader.Encoding = cfg.Encoding
 	return reader
 }
@@ -74,10 +74,10 @@ func newStore() *sqlstore.Store {
 	return store
 }
 
-func newFeeder() feeder.Conventions {
-	r := feeder.NewHTTPConventionReader(cfg.Feeder.URL, cfg.Feeder.Login, cfg.Feeder.Password)
+func newFeeder(not *notifier.Notifier) feeder.Conventions {
+	r := feeder.NewHTTPConventionReader(cfg.Feeder.URL, cfg.Feeder.Login, cfg.Feeder.Password, not.Log)
 	r.Encoding = cfg.Feeder.Encoding
-	f := feeder.NewCsvConventions(r, cfg.Feeder.Promotions)
+	f := feeder.NewCsvConventions(r, cfg.Feeder.Promotions, not.Log)
 	return f
 }
 
@@ -140,7 +140,7 @@ func main() {
 	}
 
 	//runSpies()
-	conventions := newFeeder()
+	conventions := newFeeder(not)
 	not.Println("Listening on "+cfg.HTTPd.WWW, nil)
 	httpd := httpd.NewHTTPd(not, store, conventions, cfg.HTTPd, cfg.Internships)
 	not.Fatalln("%s\n", httpd.Listen())

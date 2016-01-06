@@ -1,10 +1,19 @@
 var allStudents, allConventions, allTeachers;
 
+var feederWarning = false
 function showConventionValidator() {
+	showWait();
 	if (level(myself.Role) >= ADMIN_LEVEL) {
-		$.when(students(), internships(), conventions(), users()).done(loadConventionValidator).fail(logFail)
+		$.when(students(), internships(), conventions(), users()).done(loadConventionValidator).fail(function(xhr) {
+			if (xhr.responseText.indexOf("feeder")) {
+				//conventions() failed, so, an error message and we retry without this call
+				//we don't notify error because it is done by the default fail				
+				feederWarning = xhr.responseText
+				$.when(students(), internships()).done(loadConventionValidator).fail(notifyError)
+			}
+		})
 	} else {
-		$.when(students(), internships()).done(loadConventionValidator).fail(logFail)
+		$.when(students(), internships()).done(loadConventionValidator).fail(notifyError)
 	}
 }
 
@@ -54,7 +63,8 @@ function loadConventionValidator(students, internships, convs, us) {
 	});
 	$("#cnt").render("placement-header", {
 		Students: allStudents,
-		Ints: internships.length
+		Ints: internships.length,	
+		FeederWarning: feederWarning
 	}, ui);
 }
 

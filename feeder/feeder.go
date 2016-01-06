@@ -9,7 +9,7 @@ import (
 	"github.com/fhermeni/wints/schema"
 )
 
-//Importer imports data into the system
+//Conventions allows to import conventions
 type Conventions interface {
 	Import() ([]schema.Convention, error)
 }
