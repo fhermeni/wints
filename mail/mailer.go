@@ -2,6 +2,8 @@ package mail
 
 import (
 	"bytes"
+	"sync"
+
 	"text/template"
 
 	"github.com/fhermeni/wints/schema"
@@ -13,6 +15,7 @@ var (
 
 	//cache the templates to speed up spaming
 	cache = make(map[string]*template.Template)
+	lock  = sync.Mutex{}
 )
 
 //Mailer is an interface to specify a mail must be send
@@ -22,15 +25,25 @@ type Mailer interface {
 	Send(to schema.Person, tpl string, data interface{}, cc ...schema.Person) error
 }
 
-func fill(path string, data interface{}) ([]byte, error) {
+func getTemplate(path string) (*template.Template, error) {
+	lock.Lock()
+	defer lock.Unlock()
 	tpl, ok := cache[path]
 	var err error
 	if !ok {
 		tpl, err = template.ParseFiles(path)
 		if err != nil {
-			return []byte{}, err
+			return tpl, err
 		}
 		cache[path] = tpl
+	}
+	return tpl, err
+}
+
+func fill(path string, data interface{}) ([]byte, error) {
+	tpl, err := getTemplate(path)
+	if err != nil {
+		return []byte{}, err
 	}
 	var b bytes.Buffer
 	if err := tpl.Execute(&b, data); err != nil {
