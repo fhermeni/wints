@@ -64,11 +64,13 @@ Grade = true
 
 [[Internships.Surveys]]
 Kind = "midterm"
-Deadline = "1440h"
+Deadline = "168h"
+Invitation = "1440h"
 
 [[Internships.Surveys]]
 Kind = "final"
-Deadline = "01/09/2015 15:00"
+Invitation = "01/09/2015 15:00"
+Deadline = "168h"
 
 [[Spies]]
 Kind = "tutor"
@@ -127,17 +129,18 @@ func TestLoadConfig(t *testing.T) {
 	expected.HTTPd.Rest.RenewalRequestLifetime.Duration, _ = time.ParseDuration("48h")
 
 	rel, _ := time.ParseDuration("1440h")
+	oneWeek, _ := time.ParseDuration("168h")
 	sm := Survey{Kind: "midterm",
-		Deadline: Deadline{
-			relative: &rel,
-		},
+		Invitation: Deadline{relative: &rel},
+		Deadline:   Duration{Duration: oneWeek},
 	}
 
 	abs, _ := time.Parse(DateLayout, "01/09/2015 15:00")
 	sf := Survey{Kind: "final",
-		Deadline: Deadline{
+		Invitation: Deadline{
 			absolute: &abs,
 		},
+		Deadline: Duration{Duration: oneWeek},
 	}
 
 	expected.Internships.Surveys = []Survey{sm, sf}

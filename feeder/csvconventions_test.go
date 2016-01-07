@@ -5,6 +5,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/fhermeni/wints/schema"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -549,14 +550,21 @@ type BufferReader struct {
 	input string
 }
 
+type MockJournal struct{}
+
+func (m *MockJournal) UserLog(u schema.User, msg string, err error)       {}
+func (m *MockJournal) Log(em, msg string, err error)                      {}
+func (m *MockJournal) Wipe()                                              {}
+func (m *MockJournal) Access(method, url string, statusCode, latency int) {}
+
 func (b BufferReader) Reader(year int, promotion string) (io.Reader, error) {
 	return strings.NewReader(b.input), nil
 }
 
 func TestCSVParsing(t *testing.T) {
 	r := BufferReader{input: buf}
-	x := NewCsvConventions(r, []string{"si5"})
+	x := NewCsvConventions(r, []string{"si5"}, &MockJournal{})
 	conventions, errors := x.Import()
 	assert.Nil(t, errors)
-	assert.Equal(t, 1, len(conventions))
+	assert.Equal(t, 40, len(conventions))
 }

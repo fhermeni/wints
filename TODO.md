@@ -3,9 +3,7 @@
 - server-side caching of the store
 	- store interface
 	- cache implement interface
-- Makefile to control the build workflow
-	- test
-	- build
+- Makefile to control the build workflow		
 	- deploy
 	- bench
 	- dependency management
