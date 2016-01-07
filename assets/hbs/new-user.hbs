@@ -1,0 +1,54 @@
+<div class="modal-dialog">
+<div class="modal-content"> 
+    <div class="modal-body">
+        <button type="button" class="close" aria-hidden="true" onclick="hideModal()">×</button>
+        <div class="form-horizontal">
+            <fieldset>     
+            <legend>New user</legend>   
+                <div class="alert alert-dismissible alert-danger hidden">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                </div>
+
+                <div class="form-group">
+                    <label for="new-firstname" class="col-lg-2 control-label">Firstname</label>
+                    <div class="col-lg-10">
+                        <input data-placement="right" data-container="body" data-toggle="popover" type="text" class="form-control" id="new-firstname" value="{{Person.Firstname}}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="new-lastname" class="col-lg-2 control-label">Lastname</label>
+                    <div class="col-lg-10">
+                        <input data-placement="right" data-container="body" data-toggle="popover" type="text" class="form-control" id="new-lastname" value="{{Person.Lastname}}">
+                    </div>
+                </div>
+                                <div class="form-group">
+                    <label for="new-lastname" class="col-lg-2 control-label">Email</label>
+                    <div class="col-lg-10">
+                        <input data-placement="right" data-container="body" data-toggle="popover" type="text" class="form-control" id="new-email" value="{{Person.Lastname}}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="new-tel" class="col-lg-2 control-label">Telephon</label>
+                    <div class="col-lg-10">
+                        <input data-placement="right" data-container="body" data-toggle="popover" type="text" class="form-control" id="new-tel" value="{{Person.Tel}}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="new-role" class="col-lg-2 control-label">Role</label>
+                    <div class="col-lg-10">
+                            <select id="new-role" class="form-control">
+                            {{optionRoles ""}}
+                        </select>
+                    </div>
+                </div>
+
+            </fieldset>
+        </div>
+        <div class="text-right form-group">
+            <button type="button" class="btn btn-default" onclick="hideModal()">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="newUser()">Create</button>            
+        </div>
+    </div>    
+</div>    
+</div>
+        

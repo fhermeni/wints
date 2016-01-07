@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Survey</title>    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">        
+    <link rel="stylesheet" title="yeti" href="assets/css/vendor/bootstrap-yeti.min.css">
+    <link rel="stylesheet" href="assets/css/error.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/survey.css">
+<body>
+<div class="container">
+    <div class="text-center">
+    <h1>
+        <span class="en">{{.En}}</span>
+        <span class="fr">{{.Fr}}</span>    
+    </h1>
+    <div class="pull-right">
+        <a href="#" onclick="setLang('.fr','.en')"><img src="assets/img/fr.gif" alt="french"></a>
+        <a href="#" onclick="setLang('.en','.fr')"><img src="assets/img/en.gif" alt="english"></a>
+    </div>    
+    </div>
+
+
+    <h4 class="fr">Stagiaire: <small class="student">Bob</small></h4>
+    <h4 class="en">Trainee: <small class="student">Bob</small></h4>
+
+    <h4 class="fr">Tuteur: <small class="tutor">le tuteur</small></h4>
+    <h4 class="en">Tutor: <small class="tutor">the tutor</small></h4>
+
+    <div class="commit alert alert-success text-center hidden">
+        <p>
+        <span class="en">Your feedbacks have been sent to the tutor. Thanks for your involvement.</span>
+        <span class="fr">Votre avis a été remonté à son tuteur. Merci pour votre implication.</span>
+        </p>            
+    </div>
+
+    {{range $ci, $ce := .Categories}}
+    <div class="page-header">
+    <h3>
+        <span class="fr">{{$ce.Fr}}</span>
+        <span class="en">{{$ce.En}}</span>
+    </h3>    
+    </div>
+        {{range $i, $e := $ce.Q}}
+        <div class="form-group" id="C{{$ci}}-Q{{$i}}" data-type="{{$e.Type}}" data-required="{{$e.Required}}" data-isMark="{{$e.IsMark}}">
+            {{if eq $e.Type "html"}}
+                <label class="fr">{{html $e.Fr}}</label>
+                <label class="en">{{html $e.En}}</label>            
+            {{else}}
+            <label>
+                {{if $e.Required}}*{{end}}
+                <span class="fr">{{$e.Fr}}</span>
+                <span class="en">{{$e.En}}</span>
+            </label>            
+            {{end}}
+            {{if eq $e.Type "yesno"}}
+                <label class="radio-inline">
+                    <input type="radio" name="C{{$ci}}-Q{{$i}}" value="true">
+                    <span class="en">yes</span>
+                    <span class="fr">oui</span>
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" name="C{{$ci}}-Q{{$i}}" value="false">
+                    <span class="en">no</span>
+                    <span class="fr">non</span>
+                </label>
+            {{else if eq $e.Type "comment"}}
+                <br>
+                <textarea cols="80" name="C{{$ci}}-Q{{$i}}"></textarea>
+            {{else if eq $e.Type "number"}}
+                <input type="number" name="C{{$ci}}-Q{{$i}}">
+            {{else if eq $e.Type "rank"}}
+                <br>
+                <select name="C{{$ci}}-Q{{$i}}" class='col-md-3'>
+                    <option value=''> - </option>                    
+                    <option value='4' class='fr'>Excellent</option>
+                    <option value='4' class='en'>Excellent</option>
+                    <option value='3' class='fr'>Bon</option>
+                    <option value='3' class='en'>Good</option>
+                    <option value='2' class='fr'>Satisfaisant</option>
+                    <option value='2' class='en'>Satisfying</option>
+                    <option value='1' class='fr'>Insatisfaisant</option>
+                    <option value='1' class='en'>Unsatisfying</option>
+                    <option value='0' class='fr'>Non applicable</option>                   
+                    <option value='0' class='en'>Not applicable</option>                   
+                </select>
+                <br>
+            {{end}}
+        </div>
+        {{end}}
+    {{end}} 
+
+<div id="missingRequired" class="alert alert-danger text-center hidden">
+    <p>
+        <span class="fr">Certains champs n'ont pas été remplis</span>
+        <span class="en">missing required fields</span>
+    </p>
+</div>
+
+
+    <div class="commit alert alert-success text-center hidden">
+        <p>
+        <span class="en">Your feedbacks have been sent to the tutor. Thanks for your involvement.</span>
+        <span class="fr">Votre avis a été remonté à son tuteur. Merci pour votre implication.</span>
+        </p>            
+    </div>   
+
+    <div class="text-center">
+    <button type="button hidden" class="btn btn-lg btn-success submit" id="submit" onclick="submit()">
+        <span class="en">Submit</span>
+        <span class="fr">Soumettre</span>
+    </button>    
+    </div>
+
+</div>
+
+<div id="modal" class="modal fade">
+    <div class="modal-dialog">
+    <div class="modal-content alert alert-danger">
+        <div class="modal-header">
+            <h3 class="modal-title">Error</h3>
+        </div>
+        <div class="modal-body alert alert-danger">
+            <div id="errorMessage"></div>
+        </div>
+    </div>
+</div>   
+</div>
+<footer>
+    <div class="container">
+        <p>© University Nice Sophia Antipolis 2015-2016</p>
+    </div>
+</footer>
+
+<script src="assets/js/vendor/jquery-1.11.3.min.js"></script>
+<script src="assets/js/vendor/bootstrap.min.js"></script>
+<script src="assets/js/rest.js"></script>    
+<script src="assets/js/survey.js"></script>    
+</body>
+</html>

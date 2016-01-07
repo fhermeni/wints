@@ -337,7 +337,9 @@ func setReportGrade(ex Exchange) error {
 		Grade   int
 		Comment string
 	}
-	ex.inJSON(&report)
+	if err := ex.inJSON(&report); err != nil {
+		return err
+	}
 	i, err := ex.s.Internship(ex.V("s"))
 	if err != nil {
 		return err
@@ -348,7 +350,9 @@ func setReportGrade(ex Exchange) error {
 
 func setReportPrivacy(ex Exchange) error {
 	var p bool
-	ex.inJSON(&p)
+	if err := ex.inJSON(&p); err != nil {
+		return err
+	}
 	err := ex.s.SetReportPrivacy(ex.V("k"), ex.V("s"), p)
 	ex.not.ReportPrivacyUpdated(ex.s.Me(), ex.V("s"), ex.V("k"), p, err)
 	return err
@@ -489,8 +493,7 @@ func (ed *EndPoints) signin(ex Exchange) error {
 	http.SetCookie(ex.w, token)
 	http.SetCookie(ex.w, login)
 	http.Redirect(ex.w, ex.r, "/", http.StatusTemporaryRedirect)
-	ed.store.Visit(cred.Login)
-	return err
+	return ed.store.Visit(cred.Login)
 }
 
 func (ed *EndPoints) resetPassword(ex Exchange) error {

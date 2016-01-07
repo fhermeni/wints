@@ -1,0 +1,5 @@
+Subject: [Wints] Test mail
+
+This is a testing mail emitted by the Wints mailer
+
+{{.Fullname}}

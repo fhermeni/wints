@@ -115,10 +115,10 @@ func main() {
 	makeRoot := flag.String("new-root", "", "Invite a root user")
 	fakeMailer := flag.Bool("fake-mailer", false, "Don't send emails. Print them out stdout")
 	installStore := flag.Bool("install-db", false, "install the database")
-
+	conf := flag.String("conf", "wints.conf", "Wints configuration file")
 	flag.Parse()
 
-	if _, err := toml.DecodeFile("wints_test.conf", &cfg); err != nil {
+	if _, err := toml.DecodeFile(*conf, &cfg); err != nil {
 		log.Fatalln(err.Error())
 	}
 

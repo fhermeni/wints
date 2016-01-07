@@ -1,0 +1,1 @@
+	<a href="mailto:{{Email}}">{{fullname this}}</a>  (<i class="glyphicon glyphicon-earphone"></i> {{Tel}})

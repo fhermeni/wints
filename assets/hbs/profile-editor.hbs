@@ -1,0 +1,35 @@
+<div class="modal-dialog">
+<div class="modal-content"> 
+    <div class="modal-body">
+        <button type="button" class="close" aria-hidden="true" onclick="hideModal()">×</button>
+        <div class="form-horizontal">
+            <fieldset>     
+            <legend>Profile</legend>   
+                <div class="form-group">
+                    <label for="profile-telephon" class="col-lg-2 control-label">Firstname</label>
+                    <div class="col-lg-10">
+                        <input data-placement="right" data-container="body" data-toggle="popover" type="text" class="form-control" id="profile-firstname" value="{{Person.Firstname}}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="profile-lastname" class="col-lg-2 control-label">Lastname</label>
+                    <div class="col-lg-10">
+                        <input data-placement="right" data-container="body" data-toggle="popover" type="text" class="form-control" id="profile-lastname" value="{{Person.Lastname}}">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="profile-tel" class="col-lg-2 control-label">Telephon</label>
+                    <div class="col-lg-10">
+                        <input data-placement="right" data-container="body" data-toggle="popover" type="text" class="form-control" id="profile-tel" value="{{Person.Tel}}">
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+        <div class="text-right form-group">
+            <button type="button" class="btn btn-default" onclick="hideModal()">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="updateProfile('{{Person.Email}}')">Update</button>            
+        </div>
+    </div>    
+</div>    
+</div>
+        

@@ -11,7 +11,8 @@ A web application to manage final internships at Polytech.
 ## Installation
 
 go get github.com/pierrre/gotestcover
-
+go get github.com/tools/godep
+	
 In your `$GOPATH`:
 
 - `git clone git@scm-oasis.inria.fr:fhermeni/wints.git src/scm-oasis.inria.fr/fhermeni/wints` to get the source

@@ -1,0 +1,138 @@
+en = "Final evaluation" 
+fr = "Évaluation finale"
+
+[[Categories]]
+en = "Scientific and technical knowledge"
+fr = "Maîtrise des domaines scientifiques et techniques"
+
+[[Categories.Q]]
+en = "Analytical skills and understanding problems"
+fr = "Capacité d’analyse / compréhension des problèmes"
+type = "rank"
+required = true
+
+[[Categories.Q]]
+en = "Application of knowledge"
+fr = "Mise en œuvre de ses connaissance"
+type = "rank"
+required = true
+
+[[Categories.Q]]
+en = "Willingness and capacity to learn"
+fr = "Aptitude à acquérir de nouvelles connaissances"
+type = "rank"
+required = true
+
+[[Categories]]
+en = "Mastery of methods and tools for the engineer"
+fr = "Maîtrise des méthodes et des outils de l'ingénieur"
+
+[[Categories.Q]]
+en = "Organizational skills and project management"
+fr = "Méthodologie / organisation du travail, gestion de projet"
+type = "rank"
+required = true
+
+[[Categories.Q]]
+en = "Ability to summarize and present results  clearly using communication tools"
+fr = "Synthèse et communication des résultats, maîtrise des outils de communication"
+type = "rank"
+required = true
+
+[[Categories]]
+en = "Task management and decision making"
+fr = "Conduite de l’action et prise de décision"
+
+[[Categories.Q]]
+en = "Targets reached. Quality of work"
+fr = "Réalisation des objectifs - Qualité du travail réalisé"
+type = "rank"
+required = true
+
+[[Categories.Q]]
+en = "Autonomy, initiative/creativity/open-mindedness"
+fr = "Autonomie - initiative /créativité / ouverture d’esprit"
+type = "rank"
+required = true
+
+
+[[Categories]]
+en = "Aptitude to integrate into an organisation and manage a team"
+fr = "Intégration dans une organisation et capacité d’animation"
+
+[[Categories.Q]]
+en = "Aptitude to integrate into a team"
+fr = "Capacité à s’intégrer dans une équipe"
+type = "rank"
+required = true
+
+[[Categories.Q]]
+en = "Communication skills : ability to report on work"
+fr = "Communication sur ses activités et capacité à rendre compte"
+type = "rank"
+required = true
+
+[[Categories.Q]]
+en = "Understanding of economic and business challenges of the company. Following internal procedures (quality, health & security)"
+fr = "Prise en compte des enjeux métiers et économiques - Respect des procédures (qualité, sécurité, santé, sécurité, ...)"
+type = "rank"
+required = true
+
+
+[[Categories]]
+en = "Respect of corporate culture and environmental values"
+fr = "Respect des valeurs sociétales, sociales et environnementales"
+
+[[Categories.Q]]
+en = "Assimilation of values, codes and company culture"
+fr = "Appropriation  des valeurs, codes, et de la culture de l’équipe et de l’organisation"
+type = "rank"
+required = true
+
+[[Categories.Q]]
+en = "Attitude, attendance and punctuality"
+fr = "Attitude / assiduité / ponctualité"
+type = "rank"
+required = true
+
+
+[[Categories]]
+fr = "Évaluation globale"
+en = "Overall assessment"
+
+
+[[Categories.Q]]
+en = "Among students of the same level of studies that you have previously supervised, how would you rate this student ?"
+fr = "Parmi les stagiaires du même niveau d’études que vous avez eu l’occasion d’accueillir, comment classez-vous cet élève ?"
+type = "rank"
+required=true
+
+[[Categories.Q]]
+en = "What advice if any would you give him/her ?"
+fr = "Quels conseils donneriez-vous à ce futur ingénieur ?"
+type = "comment"
+required = true
+
+[[Categories.Q]]
+en = "Additional observations:"
+fr = "Observations supplémentaires éventuelles :"
+type = "comment"
+required = true
+
+[[Categories.Q]]
+en = "If you had an engineer position to fill, would you employ him/her ?"
+fr = "Si vous aviez un emploi d’ingénieur à pourvoir, l’engageriez vous ?"
+type = "yesno"
+required = true
+
+[[Categories.Q]]
+en = "Grade /20:"
+fr = "Note /20:"
+type = "number"
+required = true
+isMark = true
+
+[[Categories.Q]]
+en = "Notation guide: <ul> <li> &lt; 10: the work done is below the expectations for a junior master degree / engineer. </li> <li> 10 to 12: the trainee did the bare minimum </li> <li> 13 to 14: the trainee did a correct job for a young master / engineer </li> <li> 15 to 16: Real good trainee.His work mattered significantly for the hosting company </li> <li> 17 to 18: It will be hard to find a valuable substitute for the trainee </li> <li> &gt; 18: The trainee succeeded as being a primordial team member. It will not be possible to replace him without a clear loss in terms of knowledge / skills. </li> </ul>"
+fr = "Guide pour la notation: <ul> <li> &lt;10: le travail réalisé ne correspond pas à ce qui est attendu de la part d'un jeune master / ingénieur.</li> <li> 10 à 12: le travail réalisé correspond au strict minimum </li> <li> 13 à 14: le stagiaire a réalisé un travail correct pour un jeune master / ingénieur </li> <li> 15 à 16: très bon stagiaire. Son travail a beaucoup compté pour l'entreprise </li> <li> 17 à 18: Il va être difficile de trouver un aussi bon remplaçant </li> <li> &gt; 18: Le stagiaire était un membre primordial de l 'équipe. Il ne sera pas possible de le remplacer sans une perte claire de connaissances / capacités</li> </ul>"
+type="html"

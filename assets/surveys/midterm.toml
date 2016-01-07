@@ -1,0 +1,138 @@
+en = "Midterm evaluation" 
+fr = "Évaluation intermédiaire"
+
+[[Categories]]
+en = "Ponctuality"
+fr = "Ponctualité"
+
+[[Categories.Q]]
+en = "Is the trainee punctual at work ?"
+fr = "Est-il ponctuel ?"
+type = "yesno"
+required = true
+
+[[Categories.Q]]
+en = "Comments:"
+fr = "Commentaires:"
+type = "comment"
+
+[[Categories]]
+en = "Integration inside the company"
+fr = "Intégration dans l'entreprise"
+
+[[Categories.Q]]
+en = "Does the trainee seek to communicate with the others ?"
+fr = "Cherche-t-il à communiquer avec les autres ?"
+type = "yesno"
+required = true
+
+[[Categories.Q]]
+en = "Is the trainee well integrated within your team ?"
+fr = "D’après vous, est-il déjà bien intégré parmi les membres de votre service ?"
+type = "yesno"
+required = true
+
+[[Categories.Q]]
+en = "Comments:"
+fr = "Commentaires:"
+type = "comment"
+
+[[Categories]]
+fr = "Travail"
+en = "Work"
+
+[[Categories.Q]]
+en = "Is the trainee interested by his work ?"
+fr = "Est-il intéressé par son travail ?"
+required = true
+type= "yesno"
+
+[[Categories.Q]]
+en = "Was he concerned with the work methods of the company ?"
+fr = "S’est-il préoccupé des méthodes de travail de l’entreprise ? "
+type = "yesno"
+required = true
+
+[[Categories.Q]]
+en = "Is the quantity of work provided satisfactory?"
+fr = "La quantité de travail fournie est elle satisfaisante ?"
+type = "yesno"
+required = true
+
+[[Categories.Q]]
+en = "Does the trainee respect the deadlines ?"
+fr = "Respecte-t-il les délais ?"
+type = "yesno"
+required = true
+
+[[Categories.Q]]
+en = "Comments:"
+fr = "Commentaires:"
+type = "comment"
+
+[[Categories]]
+en = "Technical skills"
+fr = "Compétence techniques"
+
+[[Categories.Q]]
+fr = "Possède-t-il les compétences techniques nécessaires pour son travail ?"
+en = "Does the trainee have the technical skills necessary for his work ?"				
+type = "yesno"
+required = true
+
+[[Categories.Q]]
+fr = "Si non, précisez ses lacunes :"
+en = "If not, specify his shortcomings :"
+type = "comment"
+
+[[Categories.Q]]
+fr = "A-t-il eu besoin d’apprendre une nouvelle technique ou un nouveau logiciel ?"
+en = "Did the trainee need to learn a novel method or a new software ?"
+type = "yesno"
+required = true
+
+[[Categories.Q]]
+fr = "Si oui, a-t-il montré sa capacité à apprendre ?"
+en = "If so, does he demonstrate his ability to learn ?"
+type = "yesno"
+
+[[Categories.Q]]
+fr = "Cherche-t-il à améliorer ses compétences dans certains domaines ?"
+en = "Does he seek to improve his competences in certain fields ?"
+type = "yesno"
+required = true
+
+[[Categories.Q]]
+fr = "Est-il autonome ?"
+en = "Is he autonomous ?"
+type = "yesno"
+required = true
+
+[[Categories.Q]]
+fr = "Cherche-t-il à aider les autres ?"
+en = "Does he seek to help the others ?"
+type = "yesno"
+required = true
+
+[[Categories]]
+fr = "Évaluation globale"
+en = "Overall assessment"
+
+[[Categories.Q]]
+fr = "Êtes-vous globalement satisfait du début de ce stage ?"
+en = "Are you satisfied with the beginning of this training course ?"
+type = "yesno"
+required = true
+isMark = true
+
+[[Categories.Q]]
+fr = "Quels sont d’après vous les points forts de ce stagiaire (un par ligne) :"
+en = "Which are the strong points of this trainee according to you (one per line) :"
+type = "comment"
+required = true
+
+[[Categories.Q]]
+fr = "Quels sont d’après vous les points faibles de ce stagiaire (un par ligne) :"
+en = "Which are the weak points of this trainee according to you (one per line) :"
+type = "comment"
+required = true

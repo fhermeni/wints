@@ -1,0 +1,73 @@
+<h3><span class="count">{{len Internships}}</span> tutored student(s)</h3>
+
+<div class="btn-group">
+  <button type="button" class="btn btn-default dropdown-toggle btn-sm" data-toggle="dropdown" aria-expanded="false"><i class="glyphicon glyphicon-envelope"></i> mail selection <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" role="menu">
+    <li><a onclick="conventionMailing('tbody','stu')">students</a></li>
+    <li><a onclick="conventionMailing('tbody','stu','sup')">students (cc supervisors)</a></li>        
+    <li><a onclick="conventionMailing('tbody','sup','stu')">supervisors (cc students)</a></li>        
+  </ul>
+</div>
+
+<div class="btn-group">
+  <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><i class="glyphicon glyphicon-list"></i> fullnames from selection <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" role="menu">
+    <li><a onclick="showRawFullname('tbody','stu')">Students</a></li>    
+    <li><a onclick="showRawFullname('tbody','sup')">Supervisors</a></li>    
+  </ul>
+</div>
+</h3>
+
+<!--
+<p>
+This is the students you are following as an academic tutor. Your role is to:
+<ul>
+<li>Maintain contacts with the students and the supervisors. Use the checkboxes to select internships and the top buttons for mailing purposes.</li>
+<li>Click on a report cell to access a report and grade it (see the <a href="/static/consignes-rapports.pdf"> expectations</a>). If needed, you can also revise the deadline (e.g. if the student is late) or its visibility.</li>
+<li>Send to the supervisors the survey links. Click on a student name to get them.</li>
+</ul>
+
+<p>More informations about the internship is available by clicking on the student name.</p>
+<br/>
+<div class="legend">
+<span class="title">Reports color legend: </span>
+<ul class="legend">
+<li><span class="color bg-warning"></span>Deadline passed, no report</li>
+<li><span class="color bg-info"></span>Waiting for being reviewed</li>
+<li><span class="color bg-success"></span>Grade &gt; 10</li>
+<li><span class="color bg-danger"></span>Grade &lt; 10</li>
+</ul>
+</div>
+-->
+<table class="table table-hover tablesorter" id="table-tutoring" data-partial="tutored-student">
+    <thead>
+    <tr>
+        <th class="sorter-false" rowspan="2">
+        <input type='checkbox' data-toggle='checkbox' class='globalSelect' data-context="table-tutoring"/>
+        </th>
+        <th rowspan="2">Student</th>
+        <th rowspan="2">Promotion</th>
+        <th rowspan="2">Major</th>
+        <th rowspan="2" class="sorter-false">Supervisor</th>
+        <th rowspan="2" class="sorter-false">Company</th>
+        <th class="sorter-false text-center" colspan="{{len Org.Reports}}">Reports</th>
+        <th class="sorter-false text-center" colspan="{{len Org.Surveys}}">Surveys</th>        
+        <th class="text-center" rowspan="2">Alumni</th>
+    </tr>
+    <tr>        
+        {{#each Org.Reports}}        
+        <th class="text-center"><small>{{this.Kind}}</small></th>
+        {{/each}}        
+        {{#each Org.Surveys}}        
+        <th class="text-center"><small>{{this.Kind}}</small></th>
+        {{/each}}                
+    </tr>    
+    </thead>
+    <tbody>
+        {{#each Internships}}    
+        {{> tutored-student this}}
+    {{/each}}
+    </tbody>
+</table>

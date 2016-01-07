@@ -1,0 +1,22 @@
+    <h3><span class="count">{{len this}}</span> convention(s)</h3>
+
+<table class="table table-hover tablesorter" id="table-conventions" data-sortlist="[[1,0]]">
+<thead>
+    <tr>
+        <th class="sorter-false"></th>
+        <th>Student</th>
+        <th>Promotion/Major</th>
+        <th>Period</th>        
+        <th>Tutor</th>
+        <th>Gratification</th>
+        <th>Creation</th>   
+        <th>Validated</th>
+        <th>Skip</th>             
+    </tr>
+</thead>
+<tbody>
+{{#each this}}
+    {{> conventions-convention this}}
+{{/each}}
+</tbody>
+</table>

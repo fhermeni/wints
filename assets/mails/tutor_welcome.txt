@@ -1,0 +1,10 @@
+Subject:[Wints] Account created
+
+Wints is the web application used to follow internships.
+This webapp allows you to follow the students you are tutoring, access their reports and grade them
+
+Login: {{.Data.Login}}
+To generate a password: {{.WWW}}/password?token={{.Data.Token}}
+
+Regards,
+{{.Fullname}}

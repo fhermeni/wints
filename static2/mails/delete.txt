@@ -1,6 +1,0 @@
-Subject:[Wints] Account deleted
-
-Your account has been deleted. If this is a mistake, contact me.
-
-Regards
-{{.Fullname}}

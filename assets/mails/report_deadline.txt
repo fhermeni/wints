@@ -1,0 +1,4 @@
+Subject:[Wints] New deadline for report {{.Data.Kind}}: {{.Data.Date}} (france timezone)
+
+Regards,
+{{.Fullname}}

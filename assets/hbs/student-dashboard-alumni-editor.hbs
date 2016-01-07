@@ -1,0 +1,72 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-body">
+        <button type="button" class="close" aria-hidden="true" onclick="hideModal()">×</button>
+            <div class="form-horizontal">
+                <fieldset>
+                <legend>Alumni editor</legend>
+                <div class="form-group">
+                    <label for="lbl-fn" class="col-sm-3 control-label">Email</label>
+                        <div class="col-sm-9">
+                            <input type="email" class="form-control" id="lbl-email" value="{{Email}}"/>
+                        </div>
+                </div>
+                 
+                <div class="form-group">
+                    <label for="lbl-kind" class="col-sm-3 control-label">Kind</label>
+                        <div class="col-sm-9">
+                            <select class="form-control" id="position" onchange="syncAlumniEditor(this)">
+                                <option value="looking" {{#ifEq Position "looking"}}selected{{/ifEq}}>Looking for a job</option>
+                                <option value="sabbatical" {{#ifEq Position "sabbatical"}}selected{{/ifEq}}>Sabattical leave</option>
+                                <option value="company" {{#ifEq Position "company"}}selected{{/ifEq}}>Working in a company</option>
+                                <option value="entrepreneurship" {{#ifEq Position "entrepreneurship"}}selected{{/ifEq}}>Entrepreneurship</option>
+                                <option value="study" {{#ifEq Position "study"}}selected{{/ifEq}}>Pursuit of higher education</option>
+                            </select>                            
+                        </div>
+                </div>
+
+                <div class="form-group hidden" id="contract">
+                    <label class="col-sm-3 control-label">Contract</label>
+                    <div class="col-sm-9">
+                        <label class="checkbox-inline">
+                            <input type="radio" name="permanent" value='false' disabled> Fixed (CDD)
+                        </label>                        
+                        <label class="checkbox-inline">
+                            <input type="radio" name='permanent' value='true' disabled> Permanent (CDI)
+                        </label>                        
+                    </div>
+                </div>   
+
+                <div class="form-group hidden" id="company">
+                    <label class="col-sm-3 control-label">Company</label>
+                    <div class="col-sm-9">
+                        <label class="checkbox-inline">
+                            <input type="radio" name='sameCompany' value='true' disabled> internship company
+                        </label>                        
+                        <label class="checkbox-inline">
+                            <input type="radio" name='sameCompany' value='false' disabled> other
+                        </label>                        
+                    </div>
+                </div> 
+
+                <div class="form-group hidden" id="country">
+                    <label class="col-sm-3 control-label">Country</label>
+                    <div class="col-sm-9">
+                        <label class="checkbox-inline">
+                            <input type="radio" name='france' value='true' disabled> France
+                        </label>                        
+                        <label class="checkbox-inline">
+                            <input type="radio" name='france' value='false' disabled> Foreign country
+                        </label>                        
+                    </div>
+                </div>                            
+                </div>
+                </fieldset>
+            <div class="text-right form-group">
+            <button type="button" class="btn btn-default" onclick="hideModal()">Cancel</button>
+            <button type="button" class="btn btn-primary" onclick="sendAlumni()">Update</button>
+            </div>                
+            </div>
+        </div>
+    </div>
+</div>   

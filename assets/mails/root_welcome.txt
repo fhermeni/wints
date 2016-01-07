@@ -1,0 +1,8 @@
+Subject:[Wints] Root account created
+
+A root account has been created for you.
+Login: {{.Data.Login}}
+To generate a password: {{.WWW}}/password?token={{.Data.Token}}
+
+Regards,
+{{.Fullname}}

@@ -1,0 +1,18 @@
+<tr>
+    <td><input type='checkbox' data-email='{{Student.User.Person.Email}}'/></td>
+    <td class="fn">    	
+    	{{Student.User.Person.Lastname}}, {{Student.User.Person.Firstname}}
+    </td>
+    <td>{{Student.Promotion}}/{{Student.Major}}</td>
+    <td>{{dateFmt Begin "DD/MM/YY"}} - {{dateFmt End "DD/MM/YY"}}</td>    
+    <td class="fn {{#unless Tutor.Person.Role}}text-danger{{/unless}}">{{Tutor.Person.Lastname}}, {{Tutor.Person.Firstname}}</td>
+    <td>{{Gratification}} €</td>    
+    <td>{{dateFmt Creation "DD/MM/YY HH:mm:ss"}}    
+    <td data-text="{{#if Placed}}0{{else}}1{{/if}}">
+    	<i class="glyphicon glyphicon-star{{#unless Placed}}-empty{{/unless}}"></i>
+    </td>
+
+    <td data-text="{{#if Skip}}0{{else}}1{{/if}}">
+    <i onclick="updateConventionSkipable('{{Student.User.Person.Email}}',{{#if Skip}}true{{else}}false{{/if}})" class="glyphicon glyphicon-eye-{{#if Skip}}close{{else}}open{{/if}}"></i>
+    </td>    
+</tr>

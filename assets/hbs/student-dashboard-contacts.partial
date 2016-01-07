@@ -1,0 +1,13 @@
+	<h3 class="page-header">Contacts
+	<button onclick="showSupervisorEditor()" class="btn btn-xs btn-default pull-right"><i class="glyphicon glyphicon-pencil"></i> edit</button>
+	</h3>	
+	<p class="text-justify">Ensure the contact informations are correct.
+	This is of a primary importance to allow us to communicate with your supervisor.
+	</p>
+	<dl class="dl-horizontal">
+		<dt>Supervisor</dt>
+		<dd id="supervisor-contact">
+		{{> person Convention.Supervisor}}</dd>
+		<dt>Academic tutor</dt>
+		<dd>{{> person Convention.Tutor.Person}}</dd>	
+	</dl>

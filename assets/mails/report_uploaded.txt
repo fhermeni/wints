@@ -1,0 +1,9 @@
+Subject:[Wints] New version of report '{{.Data.Kind}}' uploaded
+
+Dear {{.Data.Student.Fullname}},
+
+This mail confirms your report has been uploaded.
+Once the deadline expired, it will be reviewed by your tutor.
+
+Regards,
+{{.Fullname}}

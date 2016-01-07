@@ -1,0 +1,22 @@
+<tr>
+    <td>
+    <input class="shiftSelectable" type='checkbox'
+data-stu='{{Convention.Student.User.Person.Email}}' data-stu-fn='{{fullname Convention.Student.User.Person true}}'
+data-sup='{{Convention.Supervisor.Email}}' data-sup-fn='{{fullname Convention.Supervisor true}}'/>  
+    </td>
+    <td>
+    <a class='click fn' onclick="showInternship('{{Convention.Student.User.Person.Email}}')">
+    {{fullname Convention.Student.User.Person}}            
+    </td>
+    <td>{{Convention.Student.Promotion}}</td>
+    <td>{{Convention.Student.Major}}</td>
+    <td><a href="mailto:{{Convention.Supervisor.Email}}">{{fullname Convention.Supervisor}}</a></td>
+    <td><a href="{{Convention.Company.WWW}}">{{Convention.Company.Name}}</a></td>
+    {{#each Reports}}
+    {{report this ../Convention.Student.User.Person.Email}}
+    {{/each}}            
+    
+    {{#each Surveys}}
+    {{survey this ../Convention.Student.User.Person.Email}}
+    {{/each}}            
+</tr>

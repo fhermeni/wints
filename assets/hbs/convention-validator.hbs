@@ -1,0 +1,32 @@
+<div class="modal-dialog">
+<div class="modal-content"> 
+    <div class="modal-body">
+        <button type="button" class="close" aria-hidden="true" onclick="hideModal()">×</button>
+<fieldset>
+	<legend class="fn" data-email="{{S.User.Person.Email}}">					
+		{{fullname S.User.Person}} - {{S.Promotion}}/{{S.Major}}
+	</legend>	
+	<div class="alert alert-dismissible alert-danger hidden text-center">
+               <button type="button" class="close" data-dismiss="alert">×</button>
+               <p></p>
+	</div>
+
+	<div class="form-horizontal">	
+	<div class="form-group">
+		<label class="col-lg-3 control-label">Available conventions</label>
+		<div class="col-lg-9">
+		<select class="fn form-control" id="convention-selecter" onchange="showConvention(this)">
+			{{#each Conventions}}
+				<option value="{{Student.User.Person.Email}}">{{fullname Student.User.Person}} ({{Student.Promotion}})</option>
+			{{/each}}
+		</select>
+		</div>
+	</div>		
+	</div>
+	<div id="convention-detail">
+		{{>convention-editor this}}
+	</div>
+</fieldset>
+</div>
+</div>
+</div>

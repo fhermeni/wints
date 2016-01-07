@@ -1,0 +1,58 @@
+{{#if this}}
+<h3>{{len this}} Session(s)
+<button type="button" class="btn btn-sm" onclick="serviceMailing()">
+<i class="glyphicon glyphicon-envelope"></i> mail selection
+</button>
+</h3>
+    <p>This is the sessions you are participating as a jury member. The role of the jury is to:
+    </p>
+    <ul>
+    <li>Grade every student</li>
+    <li>Ask about their next position (it might be out-dated)</li>
+    </ul>
+{{#each this}}
+<table class="table table-hover table-condensed">
+    <thead>
+    <tr>
+        <td colspan="3">
+            <i class="glyphicon  glyphicon-calendar"></i> {{dateFmt Date "D MMM YYYY HH:mm"}};
+            <i class="glyphicon glyphicon-map-marker"></i> {{Room}}
+        </td>
+        <td colspan="4" class="text-right">
+            <strong>Juries: </strong>     {{#each Juries}}
+    <input type='checkbox' class='icheckbox_flat' data-email='{{Email}}'/> <span class="fn">{{fullname this}}</span>{{#unless @last}}, {{/unless}}
+    {{/each}}
+        </td>
+    </tr>
+    <tr>
+        <th></th>
+        <th>Time</th>
+        <th>Student</th>        
+        <th>Promotion</th>                
+        <th>Grade</th>
+        <th class="col-sm-4">Next position</th>
+    </tr>
+    </thead>
+    <tbody> 
+        {{#each Defenses}}   
+        <tr>
+            <td>
+            <input type='checkbox' class='icheckbox_flat' data-email='{{Student.Email}}'/>  
+            </td>
+            <td>{{offset ../Date Offset}}</td>
+            <td class='fn'>{{shortFullname Student}}
+            {{#if Private}}<i class="glyphicon glyphicon-eye-close text-danger" title="confidential defense"></i>{{/if}}
+            {{#if Remote}}<i class="glyphicon glyphicon-facetime-video" title="visio conference"></i>{{/if}}
+            </td>            
+            <td>{{Promotion}}/{{Major}}</td>                            
+            <td><a title="click to edit" href="#" data-value="{{defenseGrade3 Grade}}" data-type="text" class="grade" data-email="{{Student.Email}}">{{defenseGrade3 Grade}}</a></td>
+            <td><a title="click to edit" href="#" data-value="{{NextPosition}}" data-type="select" class="position editable editable-click" data-email="{{Student.Email}}">{{nextPosition NextPosition}}</a></td>
+        </tr>    
+        {{/each}}
+    </tbody>
+</table>
+{{#unless @last}}<div class="page-header"></div>{{/unless}}
+{{/each}}
+{{else}}
+    <h5 class="text-center">No defenses to attend to</h5>
+{{/if}}
