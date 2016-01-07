@@ -10,7 +10,7 @@ A web application to manage final internships at Polytech.
 
 ## Installation
 
-go get github.com/klauspost/compress/gzip
+go get github.com/pierrre/gotestcover
 
 In your `$GOPATH`:
 

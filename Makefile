@@ -6,6 +6,7 @@ GOFLAGS ?= $(GOFLAGS:)
 all: install test
 
 build:
+	@godep go build
 	@go build $(GOFLAGS) ./...
 
 install:
