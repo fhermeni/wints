@@ -159,11 +159,21 @@ func (s *Store) Internships() (schema.Internships, error) {
 	if err != nil {
 		return res, err
 	}
+	defs, err := s.defenses()
+	if err != nil {
+		return res, err
+	}
+
 	for _, c := range conventions {
 		i, err := s.toInternship(c)
 		if err != nil {
 			return res, err
 		}
+		d, ok := defs[c.Student.User.Person.Email]
+		if !ok {
+			return res, err
+		}
+		i.Defense = d
 		res = append(res, i)
 	}
 	return res, err
@@ -198,11 +208,7 @@ func (s *Store) toInternship(c schema.Convention) (schema.Internship, error) {
 	if err != nil {
 		return schema.Internship{}, err
 	}
-	d, err := s.Defense(stu)
-	if err != nil {
-		return schema.Internship{}, err
-	}
-	return schema.Internship{Convention: c, Reports: r, Surveys: surveys, Defense: d}, err
+	return schema.Internship{Convention: c, Reports: r, Surveys: surveys}, err
 }
 
 func scanConvention(rows *sql.Rows) (schema.Convention, error) {

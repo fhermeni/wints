@@ -79,8 +79,6 @@ func BenchmarkInternships(t *testing.B) {
 		stu := newStudent(nil)
 		tut := newTutor(nil)
 		newInternship(nil, stu, tut)
-		//_, _, err := store.NewInternship(x.Convention)
-		//assert.Nil(t, err)
 	}
 	t.ResetTimer()
 	for i := 0; i < t.N; i++ {

@@ -38,12 +38,12 @@ func (s *Store) Install() error {
 }
 
 func (s *Store) stmt(q string) *stmtErr {
+	s.lock.Lock()
+	defer s.lock.Unlock()
 	st, ok := s.stmts[q]
 	if !ok {
 		x, err := s.db.Prepare(q)
 		st = &stmtErr{err: err, st: x}
-		s.lock.Lock()
-		defer s.lock.Unlock()
 		s.stmts[q] = st
 	}
 	return st

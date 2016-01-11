@@ -42,7 +42,6 @@ func (s *Store) Reports(email string) ([]schema.ReportHeader, error) {
 		}
 	}
 	return res, err
-
 }
 
 func scanReport(rows *sql.Rows) (schema.ReportHeader, error) {

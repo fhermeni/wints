@@ -10,6 +10,7 @@ var (
 	updateDefensePrivacy  = "update defenses set private=$1 where student=$2"
 	updateDefenseLocality = "update defenses set local=$1 where student=$2"
 	selectDefense         = "select date, room, grade, private, local from defenses where student=$1"
+	selectDefenses        = "select student, date, room, grade, private, local from defenses"
 	updateDefenseGrade    = "update defenses set grade=$2 where student=$1"
 )
 
@@ -46,6 +47,33 @@ func (s *Store) Defense(student string) (schema.Defense, error) {
 		return d, err
 	}
 	return d, nil
+}
+
+func (s *Store) defenses() (map[string]schema.Defense, error) {
+	defs := make(map[string]schema.Defense)
+	st := s.stmt(selectDefenses)
+	rows, err := st.Query()
+	if err != nil {
+		return defs, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		d := schema.Defense{}
+		var s string
+		err = rows.Scan(
+			&s,
+			&d.Time,
+			&d.Room,
+			&d.Grade,
+			&d.Private,
+			&d.Local,
+		)
+		if err != nil {
+			return defs, err
+		}
+		defs[s] = d
+	}
+	return defs, nil
 }
 
 //DefenseSessions get all the defense sessions

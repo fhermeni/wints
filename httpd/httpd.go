@@ -44,6 +44,7 @@ func NewHTTPd(not *notifier.Notifier, store *sqlstore.Store, conventions feeder.
 
 func (ed *HTTPd) page(path string) func(http.ResponseWriter, *http.Request) {
 	return Mon(ed.not, func(w http.ResponseWriter, r *http.Request) {
+
 		http.ServeFile(w, r, ed.cfg.Assets+path)
 	})
 }
