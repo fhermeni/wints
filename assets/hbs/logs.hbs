@@ -1,6 +1,6 @@
 <h1>Logs</h1>
 <div class="form-horizontal">
-<div class="form-group">    
+<div class="form-group" >    
         <div class="col-sm-8">
             <select class="form-control" id="logs" onchange="showLog()">
                 {{#each this}}
@@ -11,4 +11,14 @@
 </div
 </div>
 
+<div class="row">
+<div class="col-lg-11">
 <pre id="log">Select a log</pre>
+</div>
+<div class="col-lg-1">
+<div class="pull-right affix text-left">    
+    <div><a class="btn btn-info" href="#top"><i class="alert-info glyphicon glyphicon-chevron-up"></i></a></div>
+    <div><a class="btn btn-info" href="#bottom"><i class="alert-info glyphicon glyphicon-chevron-down"></i></a></div>
+</div>
+</div>
+</div>
