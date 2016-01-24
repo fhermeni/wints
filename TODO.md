@@ -1,5 +1,9 @@
 # TODO
 
+- cron
+	- survey request
+	- report deadlines
+	- tutor weekly status
 - server-side caching of the store
 	- store interface
 	- cache implement interface
@@ -8,10 +12,6 @@
 	- bench
 	- dependency management
 - asset minification, concatenation, and embedding
-- cron
-	- survey request
-	- report deadlines
-	- tutor weekly status
 - log access from the dashboard
 - defense management
 - test security ?

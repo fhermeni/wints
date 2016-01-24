@@ -8,12 +8,12 @@ import (
 
 //The different level of Roles
 const (
-	STUDENT_LEVEL int = iota
-	TUTOR_LEVEL
-	MAJOR_LEVEL
-	HEAD_LEVEL
-	ADMIN_LEVEL
-	ROOT_LEVEL
+	StudentLevel int = iota
+	TutorLevel
+	MajorLevel
+	HeadLevel
+	AdminLevel
+	RootLevel
 
 	STUDENT Role = "student"
 	TUTOR   Role = "tutor"
@@ -28,17 +28,17 @@ type Role string
 //Level returns the authentication level associated to a given role
 func (p Role) Level() int {
 	if p == "student" {
-		return STUDENT_LEVEL
+		return StudentLevel
 	} else if p == "tutor" {
-		return TUTOR_LEVEL
+		return TutorLevel
 	} else if strings.Index(string(p), "major") == 0 {
-		return MAJOR_LEVEL
+		return MajorLevel
 	} else if p == "head" {
-		return HEAD_LEVEL
+		return HeadLevel
 	} else if p == "admin" {
-		return ADMIN_LEVEL
+		return AdminLevel
 	} else if p == "root" {
-		return ROOT_LEVEL
+		return RootLevel
 	}
 	return -1
 }
@@ -48,10 +48,13 @@ func (p Role) SubRole() string {
 	from := strings.LastIndex(string(p), "-") + 1
 	return string(p)[from:len(p)]
 }
+
+//Value returns String()
 func (p Role) Value() (driver.Value, error) {
 	return p.String(), nil
 }
 
+//String() versions of the role
 func (p Role) String() string {
 	return string(p)
 }

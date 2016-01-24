@@ -63,6 +63,11 @@ func (h *HTTPConventionReader) Reader(year int, promotion string) (io.Reader, er
 	return charset.NewReader(h.Encoding, res.Body)
 }
 
-var ErrAuthorization = errors.New("Permission denied")
-var ErrTimeout = errors.New("Timeout")
-var ErrNotFound = errors.New("No convention file")
+var (
+	//ErrAuthorization declares a permission issue
+	ErrAuthorization = errors.New("Permission denied")
+	//ErrTimeout indicates a timeout
+	ErrTimeout = errors.New("Timeout")
+	//ErrNotFound states there is no convention file
+	ErrNotFound = errors.New("No convention file")
+)

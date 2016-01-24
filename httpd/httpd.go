@@ -64,11 +64,12 @@ func (ed *HTTPd) home(w http.ResponseWriter, r *http.Request) {
 }
 
 //Listen starts listening
-func (d *HTTPd) Listen() error {
+func (ed *HTTPd) Listen() error {
 	//return http.ListenAndServe(d.cfg.Listen, d.cfg.Certificate, d.cfg.PrivateKey, nil)
-	return http.ListenAndServe(d.cfg.Listen, nil) //, d.cfg.Certificate, d.cfg.PrivateKey, nil)
+	return http.ListenAndServe(ed.cfg.Listen, nil) //, d.cfg.Certificate, d.cfg.PrivateKey, nil)
 }
 
 var (
+	//ErrMalformedJSON reports a JSON message that cannot be mapped to a struct
 	ErrMalformedJSON = errors.New("Malformed json message")
 )

@@ -1,4 +1,4 @@
-//Package rest provides all the endpoints
+//Package httpd provides all the endpoints
 package httpd
 
 import (
@@ -394,7 +394,7 @@ func resetSurvey(ex Exchange) error {
 }
 
 func requestSurvey(ex Exchange) error {
-	if ex.s.Me().Role.Level() < schema.ADMIN_LEVEL {
+	if ex.s.Me().Role.Level() < schema.AdminLevel {
 		return session.ErrPermission
 	}
 	stu := ex.V("s")

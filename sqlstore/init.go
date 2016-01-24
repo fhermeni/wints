@@ -106,6 +106,8 @@ create table surveys(
     constraint fk_surveys_student FOREIGN KEY(student) REFERENCES students(email) on delete cascade on update cascade
 );
 
+create index surveys_deadline on surveys(deadline asc);
+
 create table defenseSessions(
     date timestamp without time zone,
     room text,    

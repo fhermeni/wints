@@ -7,6 +7,7 @@ import (
 	"github.com/fhermeni/wints/schema"
 )
 
+//Person returns a random person
 func Person() schema.Person {
 	p := schema.Person{
 		Firstname: string(randomBytes(12)),
@@ -17,6 +18,7 @@ func Person() schema.Person {
 	return p
 }
 
+//Student returns a random student
 func Student(major, promotion string) schema.Student {
 	return schema.Student{
 		User: schema.User{
@@ -29,6 +31,7 @@ func Student(major, promotion string) schema.Student {
 	}
 }
 
+//Tutor returns a random tutor
 func Tutor() schema.User {
 	return schema.User{
 		Person: Person(),
@@ -36,6 +39,7 @@ func Tutor() schema.User {
 	}
 }
 
+//Internship returns an internship for a random student and supervisor
 func Internship(tutor schema.User) schema.Internship {
 	creation := time.Now()
 	c := schema.Convention{
@@ -95,6 +99,7 @@ func convention(student schema.Student, tutor schema.User) schema.Convention {
 	}
 }
 
+//ReportHeader returns a report
 func ReportHeader(k string, deadline time.Time, others ...time.Time) schema.ReportHeader {
 	hdr := schema.ReportHeader{
 		Kind:     k,
@@ -114,6 +119,7 @@ type FakeInternshipser struct {
 	Ints schema.Internships
 }
 
+//Internships returns all the intenrships in FakeInternshipser
 func (f *FakeInternshipser) Internships() (schema.Internships, error) {
 	return f.Ints, nil
 }

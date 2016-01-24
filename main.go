@@ -6,7 +6,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/BurntSushi/toml"
+	"github.com/fhermeni/wints/Godeps/_workspace/src/github.com/BurntSushi/toml"
+	_ "github.com/fhermeni/wints/Godeps/_workspace/src/github.com/lib/pq"
 	"github.com/fhermeni/wints/config"
 	"github.com/fhermeni/wints/feeder"
 	"github.com/fhermeni/wints/httpd"
@@ -15,7 +16,6 @@ import (
 	"github.com/fhermeni/wints/notifier"
 	"github.com/fhermeni/wints/schema"
 	"github.com/fhermeni/wints/sqlstore"
-	_ "github.com/lib/pq"
 )
 
 var cfg config.Config

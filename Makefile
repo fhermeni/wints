@@ -7,7 +7,7 @@ all: install test
 
 build:
 	@echo "==== go build ===="		
-	@go build $(GOFLAGS) ./...
+	@godep go build $(GOFLAGS) ./...
 
 install:
 	@go get $(GOFLAGS) ./...
@@ -22,11 +22,11 @@ lint:
 
 test: install vet lint	
 	@echo "==== go test ===="
-	@go test $(GOFLAGS) ./...	
+	@godep go test $(GOFLAGS) ./...	
 
 test-integration: install
 	@echo "==== integration test ===="
-	@go test -v -tags "integration" ./...
+	@godep go test -v -tags "integration" ./...
 
 errcheck:	
 	@echo "==== errcheck ===="
@@ -41,10 +41,10 @@ cov: install
 
 bench: install
 	@echo "==== bench ===="
-	@go test -tags "integration" -run=NONE -bench=. $(GOFLAGS) ./...
+	@godep go test -tags "integration" -run=NONE -bench=. $(GOFLAGS) ./...
 
 clean:
-	@go clean $(GOFLAGS) -i ./...
+	@godep go clean $(GOFLAGS) -i ./...
 
 doc:
 	@echo "==== go doc is running. Can be moved to background ===="	
@@ -61,8 +61,8 @@ setup:
 	@go get -u github.com/kisielk/errcheck
 
 run-dev: 
-	@echo "==== dev-run ===="
-	@go run wints/wints.go --fake-mailer
+	@echo "==== run-dev ===="
+	@godep go run main.go --fake-mailer
 
 assets:
-	go run assets/assets_generate.go		
+	@godep go run assets/assets_generate.go		

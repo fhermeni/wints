@@ -1,0 +1,61 @@
+{
+	"ImportPath": "github.com/fhermeni/wints",
+	"GoVersion": "go1.5",
+	"Deps": [
+		{
+			"ImportPath": "code.google.com/p/go-charset/charset",
+			"Comment": "null-32",
+			"Rev": "'ebbeafdc430eb6c7e44e9a730a38eaff4c56ba3a'"
+		},
+		{
+			"ImportPath": "code.google.com/p/go-charset/data",
+			"Comment": "null-32",
+			"Rev": "'ebbeafdc430eb6c7e44e9a730a38eaff4c56ba3a'"
+		},
+		{
+			"ImportPath": "code.google.com/p/go.crypto/bcrypt",
+			"Comment": "null-191",
+			"Rev": "'7aa593ce8ceaf0199504fff27455bbb60eedabc7'"
+		},
+		{
+			"ImportPath": "code.google.com/p/go.crypto/blowfish",
+			"Comment": "null-191",
+			"Rev": "'7aa593ce8ceaf0199504fff27455bbb60eedabc7'"
+		},
+		{
+			"ImportPath": "github.com/BurntSushi/toml",
+			"Comment": "v0.1.0-21-g056c9bc",
+			"Rev": "056c9bc7be7190eaa7715723883caffa5f8fa3e4"
+		},
+		{
+			"ImportPath": "github.com/dimfeld/httppath",
+			"Rev": "c8e499c3ef3c3e272ed8bdcc1ccf39f73c88debc"
+		},
+		{
+			"ImportPath": "github.com/dimfeld/httptreemux",
+			"Comment": "1.2.1",
+			"Rev": "89abad64706614f5e043bed9bbb7c9c3518d1faa"
+		},
+		{
+			"ImportPath": "github.com/klauspost/compress/flate",
+			"Rev": "2dd54ae854d6f6f64cc1171fb1df2a633eba4356"
+		},
+		{
+			"ImportPath": "github.com/klauspost/compress/gzip",
+			"Rev": "2dd54ae854d6f6f64cc1171fb1df2a633eba4356"
+		},
+		{
+			"ImportPath": "github.com/klauspost/cpuid",
+			"Rev": "349c675778172472f5e8f3a3e0fe187e302e5a10"
+		},
+		{
+			"ImportPath": "github.com/klauspost/crc32",
+			"Rev": "a3b15ae34567abb20a22992b989cd76f48d09c47"
+		},
+		{
+			"ImportPath": "github.com/lib/pq",
+			"Comment": "go1.0-cutoff-59-gb269bd0",
+			"Rev": "b269bd035a727d6c1081f76e7a239a1b00674c40"
+		}
+	]
+}

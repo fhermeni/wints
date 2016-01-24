@@ -71,7 +71,7 @@ func ReportsScanner(cfg config.Internships, s schema.Internshipser, reporter Rem
 
 //Scan the reminders to report for a given set of reports
 func missingReports(reports []schema.ReportHeader, reviews map[string]time.Duration) []ReportReminder {
-	reminders := make([]ReportReminder, 0)
+	var reminders []ReportReminder
 	now := time.Now()
 	for _, r := range reports {
 		if r.Delivery == nil && r.Deadline.Before(now) {

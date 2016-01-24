@@ -13,6 +13,7 @@ var (
 	selectSurveyFromToken  = "select student, kind, invitation, lastInvitation, deadline, delivery, cnt, token from surveys where token=$1"
 	selectSurvey           = "select student, kind, invitation, lastInvitation, deadline, delivery, cnt, token from surveys where student=$1 and kind=$2"
 	selectSurveys          = "select student, kind, invitation, lastInvitation, deadline, delivery, cnt, token from surveys where student=$1 order by deadline asc"
+	selectAllSurveys       = "select student, kind, invitation, lastInvitation, deadline, delivery, cnt, token from surveys order by deadline asc"
 	updateSurveyContent    = "update surveys set cnt=$1, delivery=$2 where token=$3"
 	resetSurveyContent     = "update surveys set cnt=null, delivery=null where student=$1 and kind=$2"
 	updateSurveyInvitation = "update surveys set lastInvitation=$3 where student=$1 and kind=$2"
@@ -62,6 +63,29 @@ func scanSurvey(rows *sql.Rows) (string, schema.SurveyHeader, error) {
 	return student, survey, err
 }
 
+func (s *Store) allSurveys() (map[string][]schema.SurveyHeader, error) {
+	res := make(map[string][]schema.SurveyHeader)
+	st := s.stmt(selectAllSurveys)
+	rows, err := st.Query()
+	if err != nil {
+		return res, nil
+	}
+	defer rows.Close()
+	for rows.Next() {
+		stu, s, err := scanSurvey(rows)
+		if err != nil {
+			return res, err
+		}
+		surveys, ok := res[stu]
+		if !ok {
+			surveys = make([]schema.SurveyHeader, 0, 0)
+		}
+		surveys = append(surveys, s)
+		res[stu] = surveys
+	}
+	return res, nil
+}
+
 //Surveys returns all the survey related to a student
 func (s *Store) Surveys(student string) ([]schema.SurveyHeader, error) {
 	res := make([]schema.SurveyHeader, 0, 0)
@@ -96,6 +120,7 @@ func (s *Store) Survey(student, kind string) (schema.SurveyHeader, error) {
 	return srv, err
 }
 
+//SetSurveyInvitation stores the invitation date for a survey to fullfil
 func (s *Store) SetSurveyInvitation(student, kind string) (time.Time, error) {
 	t := time.Now()
 	return t, s.singleUpdate(updateSurveyInvitation, schema.ErrUnknownSurvey, student, kind, t)

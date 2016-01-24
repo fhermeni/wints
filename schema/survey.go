@@ -19,6 +19,7 @@ type SurveyHeader struct {
 	Cnt map[string]string
 }
 
+//Survey agglomerates Cateogies with a title in French or English
 type Survey struct {
 	En string
 	Fr string
@@ -26,12 +27,14 @@ type Survey struct {
 	Categories []Category
 }
 
+//Category contains questions with a title in french or english
 type Category struct {
 	En string
 	Fr string
 	Q  []Question
 }
 
+//Question has a title in french or english
 type Question struct {
 	En       string
 	Fr       string
