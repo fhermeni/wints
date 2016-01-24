@@ -11,9 +11,7 @@ import (
 
 	"github.com/fhermeni/wints/journal"
 
-	"code.google.com/p/go-charset/charset"
-	//no need anything special here. Just for the data
-	_ "code.google.com/p/go-charset/data"
+	"golang.org/x/text/encoding/charmap"
 )
 
 //HTTPConventionReader reads conventions that are made available from the Http server
@@ -32,7 +30,6 @@ func NewHTTPConventionReader(url, login, password string, j journal.Journal) *HT
 		url:      url,
 		login:    login,
 		password: password,
-		Encoding: "windows-1252",
 		j:        j,
 	}
 }
@@ -61,10 +58,15 @@ func (h *HTTPConventionReader) Reader(year int, promotion string) (io.Reader, er
 	if res.StatusCode != 200 {
 		return nil, ErrAuthorization
 	}
-	return charset.NewReader(h.Encoding, res.Body)
+	if h.Encoding == "windows-1252" {
+		return charmap.Windows1252.NewDecoder().Reader(res.Body), nil
+	}
+	return nil, ErrUnsupportedEncoding
 }
 
 var (
+	//ErrUnsupportedEncoding signals an encoding that cannot be converted
+	ErrUnsupportedEncoding = errors.New("Unsupported encoding")
 	//ErrAuthorization declares a permission issue
 	ErrAuthorization = errors.New("Permission denied")
 	//ErrTimeout indicates a timeout

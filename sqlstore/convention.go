@@ -135,7 +135,7 @@ func (s *Store) Convention(student string) (schema.Convention, error) {
 
 //Conventions lists all the registered conventions
 func (s *Store) Conventions() ([]schema.Convention, error) {
-	conventions := make([]schema.Convention, 0, 0)
+	conventions := make([]schema.Convention, 0)
 	st := s.stmt(selectConventions)
 	rows, err := st.Query()
 	if err != nil {
@@ -175,15 +175,14 @@ func (s *Store) Internships() (schema.Internships, error) {
 			return res, err
 		}
 		d, ok := defs[stu]
-		if !ok {
-			return res, err
+		if ok {
+			i.Defense = d
 		}
 		s, ok := surveys[stu]
 		if !ok {
 			return res, err
 		}
 		i.Surveys = s
-		i.Defense = d
 		res = append(res, i)
 	}
 	return res, err
@@ -288,7 +287,6 @@ func scanConvention(rows *sql.Rows) (schema.Convention, error) {
 		c.Student.Alumni.Permanent = nullableBool(nextPermanent, false)
 		c.Student.Alumni.SameCompany = nullableBool(nextSameCompany, false)
 		c.Student.Alumni.Contact = nullableString(nextContact)
-
 	}
 	return c, err
 }

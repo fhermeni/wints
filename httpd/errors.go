@@ -15,7 +15,7 @@ func status(not *notifier.Notifier, w http.ResponseWriter, r *http.Request, e er
 	case os.ErrNotExist, schema.ErrUnknownConvention, schema.ErrUnknownStudent, schema.ErrUnknownSurvey, schema.ErrUnknownUser, schema.ErrUnknownReport, schema.ErrUnknownInternship, schema.ErrNoPendingRequests:
 		http.Error(w, e.Error(), http.StatusNotFound)
 		return
-	case schema.ErrReportExists, schema.ErrUserExists, schema.ErrInternshipExists, schema.ErrUserTutoring:
+	case schema.ErrReportExists, schema.ErrUserExists, schema.ErrInternshipExists, schema.ErrUserTutoring, schema.ErrConventionExists:
 		http.Error(w, e.Error(), http.StatusConflict)
 		return
 	case schema.ErrCredentials, schema.ErrInvalidToken, schema.ErrSessionExpired:

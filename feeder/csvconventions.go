@@ -60,7 +60,7 @@ func NewCsvConventions(r ConventionReader, promotions []string, j journal.Journa
 		Reader:     r,
 		j:          j,
 		promotions: promotions,
-		Year:       time.Now().Year()}
+		Year:       time.Now().Year() - 1}
 }
 
 func cleanPerson(fn, ln, email, tel string) schema.Person {

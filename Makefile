@@ -55,6 +55,7 @@ setup:
 	@go get -u github.com/tools/godep 
 	@go get -u github.com/pierrre/gotestcover
 	@go get -u github.com/kisielk/errcheck
+	@go get -u golang.org/x/text/encoding/charmap
 
 deploy: test
 	@echo "=== deploy ==="
