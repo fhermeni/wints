@@ -23,7 +23,8 @@ type HTTPd struct {
 func NewHTTPd(not *notifier.Notifier, store *sqlstore.Store, conventions feeder.Conventions, cfg config.HTTPd, org config.Internships) HTTPd {
 
 	//The assets
-	http.Handle("/assets/", http.StripPrefix("/"+cfg.Assets, http.FileServer(assets)))
+	fs := http.FileServer(http.Dir("assets"))
+	http.Handle("/assets/", http.StripPrefix("/"+cfg.Assets, fs))
 	//The rest endpoints
 	rest := NewEndPoints(not, store, conventions, cfg.Rest, org)
 	http.HandleFunc(cfg.Rest.Prefix, Mon(not, rest.router.ServeHTTP))

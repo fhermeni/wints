@@ -78,6 +78,8 @@ func NewEndPoints(not *notifier.Notifier, store *sqlstore.Store, convs feeder.Co
 	ed.get("/conventions/", conventions)
 	ed.get("/conventions/:s", convention)
 
+	ed.get("/logs/:k", streamLog)
+	ed.get("/logs/", logs)
 	ed.router.POST(ed.prefix+"/signin", ed.anon(ed.signin))
 	ed.router.POST(ed.prefix+"/resetPassword", ed.anon(ed.resetPassword))
 	ed.router.POST(ed.prefix+"/newPassword", ed.anon(ed.newPassword))

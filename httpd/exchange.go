@@ -3,6 +3,7 @@ package httpd
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -82,6 +83,29 @@ func (ex *Exchange) inJSON(j interface{}) error {
 	}
 	dec := json.NewDecoder(ex.r.Body)
 	ex.err = dec.Decode(&j)
+	return ex.err
+}
+
+func (ex *Exchange) out(mime string, in io.ReadCloser, e error) error {
+	if e != nil {
+		return e
+	}
+	defer in.Close()
+	ex.w.Header().Set("Content-type", mime)
+
+	ex.w.Header().Add("Vary", "Accept-Encoding")
+	ex.w.Header().Set("Content-Encoding", "gzip")
+	// Get a Writer from the Pool
+	gz := zippers.Get().(*gzip.Writer)
+
+	// When done, put the Writer back in to the Pool
+	defer zippers.Put(gz)
+
+	// We use Reset to set the writer we want to use.
+	gz.Reset(ex.w)
+	defer gz.Close()
+
+	_, ex.err = io.Copy(gz, in)
 	return ex.err
 }
 

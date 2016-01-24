@@ -1,0 +1,14 @@
+<h1>Logs</h1>
+<div class="form-horizontal">
+<div class="form-group">    
+        <div class="col-sm-8">
+            <select class="form-control" id="logs" onchange="showLog()">
+                {{#each this}}
+                    <option name="{{this}}">{{this}}</option> 
+                {{/each}}
+            </select> 
+        </div>
+</div
+</div>
+
+<pre id="log">Select a log</pre>

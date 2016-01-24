@@ -9,9 +9,9 @@
 	- cache implement interface
 - Makefile to control the build workflow		
 	- deploy
-	- bench
-	- dependency management
+	- bench	
 - asset minification, concatenation, and embedding
-- log access from the dashboard
+	- gulp to minimify and concatenate
+	- whatever for embedding
 - defense management
 - test security ?

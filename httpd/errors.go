@@ -2,6 +2,7 @@ package httpd
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/fhermeni/wints/feeder"
 	"github.com/fhermeni/wints/notifier"
@@ -11,7 +12,7 @@ import (
 
 func status(not *notifier.Notifier, w http.ResponseWriter, r *http.Request, e error) {
 	switch e {
-	case schema.ErrUnknownConvention, schema.ErrUnknownStudent, schema.ErrUnknownSurvey, schema.ErrUnknownUser, schema.ErrUnknownReport, schema.ErrUnknownInternship, schema.ErrNoPendingRequests:
+	case os.ErrNotExist, schema.ErrUnknownConvention, schema.ErrUnknownStudent, schema.ErrUnknownSurvey, schema.ErrUnknownUser, schema.ErrUnknownReport, schema.ErrUnknownInternship, schema.ErrNoPendingRequests:
 		http.Error(w, e.Error(), http.StatusNotFound)
 		return
 	case schema.ErrReportExists, schema.ErrUserExists, schema.ErrInternshipExists, schema.ErrUserTutoring:

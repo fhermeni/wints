@@ -284,6 +284,13 @@ function postReportDeadline(stu, kind, date) {
 	return post("/reports/" + stu + "/" + kind + "/deadline", date);
 }
 
+function getLog(kind) {
+	return get("/logs/" + kind)
+}
+function logs() {
+	return get("/logs/")
+}
+
 /*function setReportContent(email, kind, d, progressFunc, ok, no) {
 	return $.ajax({
 		method: "POST",

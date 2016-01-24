@@ -2,9 +2,12 @@ package journal
 
 import (
 	"fmt"
+	"io"
+	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -14,11 +17,17 @@ import (
 var (
 	//TimeFmt indicates the output format for timestamps
 	TimeFmt = "02/01/06 15:04:05"
+	//FileTimeFmt specifies the date format for the log files
+	FileTimeFmt = "06-01-02"
 	//AccessLog is the filename where the rest call are stored
-	AccessLog = "access.log"
+	AccessLog = "access"
 	//EventLog is the file containing wints events
-	EventLog = "event.log"
+	EventLog = "event"
 )
+
+func fileName(key string, t time.Time) string {
+	return fmt.Sprintf("%s-%s.log", key, t.Format(FileTimeFmt))
+}
 
 //File is a structure to store a journal into a file.
 //The file is never zeroed.
@@ -39,15 +48,17 @@ func FileBacked(p string) (*File, error) {
 
 //UserLog stores the event emitted by a logged user into the file.
 func (f *File) UserLog(u schema.User, msg string, err error) {
+	now := time.Now()
 	go func() {
-		f.log(EventLog, "[%s] %s (%s) - %s: %s\n", time.Now().Format(TimeFmt), u.Person.Email, u.Role, msg, status(err))
+		f.log(fileName(EventLog, now), "[%s] %s (%s) - %s: %s\n", now.Format(TimeFmt), u.Person.Email, u.Role, msg, status(err))
 	}()
 }
 
 //Log a message with a possible error
 func (f *File) Log(em, msg string, err error) {
+	now := time.Now()
 	go func() {
-		f.log(EventLog, "[%s] %s - %s: %s\n", time.Now().Format(TimeFmt), em, msg, status(err))
+		f.log(fileName(EventLog, now), "[%s] %s - %s: %s\n", now.Format(TimeFmt), em, msg, status(err))
 	}()
 }
 
@@ -74,14 +85,33 @@ func (f *File) log(fn, format string, args ...interface{}) {
 
 //Wipe signals the application has been restarted
 func (f *File) Wipe() {
+	now := time.Now()
 	go func() {
-		f.log(EventLog, "[%s] *** WIPE ***\n", time.Now().Format(TimeFmt))
+		f.log(fileName(EventLog, now), "[%s] *** WIPE ***\n", now.Format(TimeFmt))
 	}()
 }
 
 //Access logs an access to a file through HTTP
 func (f *File) Access(method, url string, statusCode, latency int) {
+	now := time.Now()
 	go func() {
-		f.log(AccessLog, "[%s] \"%s %s\" %d %d\n", time.Now().Format(TimeFmt), method, url, statusCode, latency)
+		f.log(fileName(AccessLog, now), "[%s] \"%s %s\" %d %d\n", now.Format(TimeFmt), method, url, statusCode, latency)
 	}()
+}
+
+func (f *File) StreamLog(kind string) (io.ReadCloser, error) {
+	var path = filepath.Join(f.path, kind) + ".log"
+	return os.OpenFile(path, os.O_RDONLY, 0660)
+}
+
+func (f *File) Logs() ([]string, error) {
+	files, err := ioutil.ReadDir(f.path)
+	if err != nil {
+		return []string{}, err
+	}
+	names := make([]string, len(files))
+	for i, f := range files {
+		names[i] = strings.TrimSuffix(f.Name(), ".log")
+	}
+	return names, err
 }

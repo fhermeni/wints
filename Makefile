@@ -20,7 +20,7 @@ lint:
 	@echo "==== go lint ===="
 	@golint ./**/*.go
 
-test: install vet lint	
+test: build vet lint	
 	@echo "==== go test ===="
 	@godep go test $(GOFLAGS) ./...	
 
@@ -54,15 +54,12 @@ setup:
 	@go get -u golang.org/x/tools/cmd/cover
 	@go get -u github.com/tools/godep 
 	@go get -u github.com/pierrre/gotestcover
-	@go get -u github.com/shurcooL/vfsgen
-	@go get -u github.com/shurcooL/vfsgen/cmd/vfsgendev
-	@go get -u github.com/jteeuwen/go-bindata/...
-	@go get -u github.com/elazarl/go-bindata-assetfs/...
 	@go get -u github.com/kisielk/errcheck
 
-run-dev: 
+deploy: test
+	@echo "=== deploy ==="
+	@git push wints
+
+run-dev:
 	@echo "==== run-dev ===="
 	@godep go run main.go --fake-mailer
-
-assets:
-	@godep go run assets/assets_generate.go		
