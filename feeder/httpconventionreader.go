@@ -12,6 +12,7 @@ import (
 	"github.com/fhermeni/wints/journal"
 
 	"code.google.com/p/go-charset/charset"
+	//no need anything special here. Just for the data
 	_ "code.google.com/p/go-charset/data"
 )
 

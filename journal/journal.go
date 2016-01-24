@@ -23,7 +23,9 @@ type Journal interface {
 	//Access notify an access to a Rest endPoint. The latency is in milliseconds
 	Access(method, url string, statusCode, latency int)
 
+	//StreamLog stream a log content
 	StreamLog(kind string) (io.ReadCloser, error)
 
+	//Logs returns all the available log files
 	Logs() ([]string, error)
 }

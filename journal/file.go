@@ -99,11 +99,13 @@ func (f *File) Access(method, url string, statusCode, latency int) {
 	}()
 }
 
+//StreamLog stream the required log file
 func (f *File) StreamLog(kind string) (io.ReadCloser, error) {
 	var path = filepath.Join(f.path, kind) + ".log"
 	return os.OpenFile(path, os.O_RDONLY, 0660)
 }
 
+//Logs returns all the files in the log folder
 func (f *File) Logs() ([]string, error) {
 	files, err := ioutil.ReadDir(f.path)
 	if err != nil {

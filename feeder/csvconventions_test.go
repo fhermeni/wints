@@ -556,6 +556,8 @@ func (m *MockJournal) UserLog(u schema.User, msg string, err error)       {}
 func (m *MockJournal) Log(em, msg string, err error)                      {}
 func (m *MockJournal) Wipe()                                              {}
 func (m *MockJournal) Access(method, url string, statusCode, latency int) {}
+func (m *MockJournal) Logs() ([]string, error)                            { return []string{}, nil }
+func (m *MockJournal) StreamLog(k string) (io.ReadCloser, error)          { return nil, nil }
 
 func (b BufferReader) Reader(year int, promotion string) (io.Reader, error) {
 	return strings.NewReader(b.input), nil
