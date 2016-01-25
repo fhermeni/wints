@@ -82,8 +82,8 @@ function loadSurvey(ok) {
 		});
 	} else {		
 		var email = $.urlParam("student");		
-		internship(email).done(function(i) {
-			stu = i.Convention.Student.User.Person;
+		internship(email).done(function(i) {			
+			stu = i.Convention.Student.User.Person;			
 			tut = i.Convention.Tutor.Person;
 			survey = i.Surveys.filter(function(s) {
 				return s.Kind == kind;

@@ -92,6 +92,7 @@ create table reports(
     constraint pk_reports_student PRIMARY KEY(student, kind),
     constraint fk_reports_student FOREIGN KEY(student) REFERENCES students(email) on delete cascade on update cascade
 );
+create index reports_deadline on reports(deadline asc);
 
 create table surveys(
     student text,

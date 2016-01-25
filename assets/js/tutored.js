@@ -4,8 +4,11 @@ function showTutored() {
 }
 
 function loadTutored(interns) {
+	managed = interns.filter(function (i) {
+		return !i.Convention.Student.Skip;
+	});
 	//Filter people I am not following (due to the major/+ rights)
-	var ii = interns.filter(function(i) {
+	var ii = managed.filter(function(i) {
 		return i.Convention.Tutor.Person.Email == myself.Person.Email;
 	});
 	$("#cnt").render("tutored", {

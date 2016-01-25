@@ -179,10 +179,9 @@ func (s *Store) Internships() (schema.Internships, error) {
 			i.Defense = d
 		}
 		s, ok := surveys[stu]
-		if !ok {
-			return res, err
+		if ok {
+			i.Surveys = s
 		}
-		i.Surveys = s
 		res = append(res, i)
 	}
 	return res, err
@@ -213,11 +212,11 @@ func (s *Store) toInternship(c schema.Convention) (schema.Internship, error) {
 	if err != nil {
 		return schema.Internship{}, err
 	}
-	/*surveys, err := s.Surveys(stu)
+	surveys, err := s.Surveys(stu)
 	if err != nil {
 		return schema.Internship{}, err
-	}*/
-	return schema.Internship{Convention: c, Reports: r /*, Surveys: surveys*/}, err
+	}
+	return schema.Internship{Convention: c, Reports: r, Surveys: surveys}, err
 }
 
 func scanConvention(rows *sql.Rows) (schema.Convention, error) {

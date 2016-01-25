@@ -10,8 +10,9 @@ import (
 )
 
 var (
-	selectReport      = "select kind, deadline, delivery, reviewed, grade, comment, private, toGrade from reports where student=$1 and kind=$2"
-	selectReports     = "select kind, deadline, delivery, reviewed, grade, comment, private, toGrade from reports where student=$1 order by deadline asc"
+	selectReport      = "select student, kind, deadline, delivery, reviewed, grade, comment, private, toGrade from reports where student=$1 and kind=$2"
+	selectReports     = "select student, kind, deadline, delivery, reviewed, grade, comment, private, toGrade from reports where student=$1 order by deadline asc"
+	selectAllReports  = "select student, kind, deadline, delivery, reviewed, grade, comment, private, toGrade from reports order by deadline asc"
 	selectReportCnt   = "select cnt from reports where student=$1 and kind=$2"
 	setReportCnt      = "update reports set cnt=$3, delivery=$4 where student=$1 and kind=$2"
 	setGrade          = "update reports set grade=$3, comment=$4,reviewed=$5 where student=$1 and kind=$2"
@@ -30,7 +31,7 @@ func (s *Store) Reports(email string) ([]schema.ReportHeader, error) {
 	defer rows.Next()
 	for rows.Next() {
 		var hdr schema.ReportHeader
-		if hdr, err = scanReport(rows); err != nil {
+		if _, hdr, err = scanReport(rows); err != nil {
 			return res, err
 		}
 		//place at the right offset
@@ -44,12 +45,37 @@ func (s *Store) Reports(email string) ([]schema.ReportHeader, error) {
 	return res, err
 }
 
-func scanReport(rows *sql.Rows) (schema.ReportHeader, error) {
+func (s *Store) allReports() (map[string][]schema.ReportHeader, error) {
+	res := make(map[string][]schema.ReportHeader)
+	st := s.stmt(selectAllReports)
+	rows, err := st.Query()
+	if err != nil {
+		return res, nil
+	}
+	defer rows.Close()
+	for rows.Next() {
+		stu, s, err := scanReport(rows)
+		if err != nil {
+			return res, err
+		}
+		reports, ok := res[stu]
+		if !ok {
+			reports = make([]schema.ReportHeader, 0, 0)
+		}
+		reports = append(reports, s)
+		res[stu] = reports
+	}
+	return res, nil
+}
+
+func scanReport(rows *sql.Rows) (string, schema.ReportHeader, error) {
 	hdr := schema.ReportHeader{Grade: -1}
 	var comment sql.NullString
 	var delivery, reviewed pq.NullTime
 	var grade sql.NullInt64
+	var student string
 	err := rows.Scan(
+		&student,
 		&hdr.Kind,
 		&hdr.Deadline,
 		&delivery,
@@ -59,7 +85,7 @@ func scanReport(rows *sql.Rows) (schema.ReportHeader, error) {
 		&hdr.Private,
 		&hdr.ToGrade)
 	if err != nil {
-		return hdr, mapCstrToError(err)
+		return "", hdr, mapCstrToError(err)
 	}
 	if comment.Valid {
 		hdr.Comment = comment.String
@@ -70,7 +96,7 @@ func scanReport(rows *sql.Rows) (schema.ReportHeader, error) {
 	if grade.Valid {
 		hdr.Grade = int(grade.Int64)
 	}
-	return hdr, mapCstrToError(err)
+	return student, hdr, mapCstrToError(err)
 }
 
 //Report returns the given report
@@ -86,7 +112,8 @@ func (s *Store) Report(k, email string) (schema.ReportHeader, error) {
 	if !rows.Next() {
 		return hdr, schema.ErrUnknownReport
 	}
-	return scanReport(rows)
+	_, r, e := scanReport(rows)
+	return r, e
 }
 
 //ReportContent returns the content of a given report

@@ -13,7 +13,7 @@ func (ed *HTTPd) survey(w http.ResponseWriter, r *http.Request) {
 	//Cache ?
 	kind := r.URL.Query().Get("kind")
 	s := schema.Survey{}
-	if _, err := toml.DecodeFile("static/surveys/"+kind+".toml", &s); err != nil {
+	if _, err := toml.DecodeFile("assets/surveys/"+kind+".toml", &s); err != nil {
 		ed.not.Log.Log("root", "Unable to read the survey questions", err)
 		http.Error(w, "", http.StatusInternalServerError)
 		return
@@ -24,7 +24,7 @@ func (ed *HTTPd) survey(w http.ResponseWriter, r *http.Request) {
 			"html": func(value interface{}) template.HTML {
 				return template.HTML(fmt.Sprint(value))
 			},
-		}).ParseFiles("static/surveys/survey.html")
+		}).ParseFiles("assets/surveys/survey.html")
 
 	if err != nil {
 		ed.not.Log.Log("root", "Unable to read the survey template", err)

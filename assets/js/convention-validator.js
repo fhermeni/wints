@@ -33,8 +33,12 @@ function loadConventionValidator(students, internships, convs, us) {
 	allStudents = students[0];
 	allTeachers = [];
 	allConventions = [];
+	var managed = 0;
 	allStudents.forEach(function(s, idx, arr) {
 		allStudents[idx].Warn = !s.Skip;
+		if (!s.Skip) {
+			managed++;
+		}
 	});
 
 	allStudents.sort(studentSort);
@@ -49,7 +53,7 @@ function loadConventionValidator(students, internships, convs, us) {
 		allTeachers = us.filter(function(u) { 
 			return level(u.Role) != STUDENT_LEVEL;
 		});		
-	}
+	}	
 	allTeachers.sort(userSort);	
 	internships.forEach(function(i) {
 		allStudents.forEach(function(s, idx, arr) {
@@ -58,11 +62,12 @@ function loadConventionValidator(students, internships, convs, us) {
 				allStudents[idx].I = i;
 				allStudents[idx].Warn = !i && !allStudents[idx].Skip;
 			}
-
 		});
 	});
+
 	$("#cnt").render("placement-header", {
 		Students: allStudents,
+		Managed: managed,
 		Ints: internships.length,	
 		FeederWarning: feederWarning
 	}, ui);
@@ -158,6 +163,8 @@ function updateStudentSkipable(stu, btn) {
 					var cnt = Handlebars.partials['placement-student'](s);
 					row.replaceWith(cnt);
 					$('.tablesorter').trigger("update").trigger("updateCache");
+					var v = parseInt($('#managed_cnt').html());
+					$('#managed_cnt').html(s.Skip ? v - 1 : v + 1);					
 				}).fail(function(xhr) {
 					s.Warn = !s.Skip
 					allStudents[idx] = s;

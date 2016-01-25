@@ -4,8 +4,11 @@ function showWatchlist() {
 }
 
 function loadWatchlist(interns) {
+	managed = interns.filter(function (i) {
+		return !i.Convention.Student.Skip;
+	});
 	$("#cnt").render("watchlist", {
-		Internships: interns,
+		Internships: managed,
 		Org: config
 	}, function() {
 		ui();

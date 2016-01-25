@@ -8,7 +8,7 @@
      {{else}}
         {{User.Person.Lastname}}, {{User.Person.Firstname}}
      {{/if}}
-    </td>      
+    </td>    
     <td class="text-center" {{#if Warn}}data-text="-1"{{else}}data-text="0"{{/if}}>
         {{#if Skip}}
             <i class="glyphicon glyphicon-remove" onclick="updateStudentSkipable('{{User.Person.Email}}', this)"></i>          

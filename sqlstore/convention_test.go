@@ -82,7 +82,10 @@ func BenchmarkInternships(t *testing.B) {
 	}
 	t.ResetTimer()
 	for i := 0; i < t.N; i++ {
-		_, err := store.Internships()
+		ints, err := store.Internships()
 		assert.Nil(t, err)
+		for _, int := range ints {
+			assert.Equal(t, 1, len(int.Surveys))
+		}
 	}
 }
