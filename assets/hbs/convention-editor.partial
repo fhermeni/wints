@@ -45,10 +45,11 @@
         </div>
 </div>	
 
-<div class="text-right">
+<div class="text-right form-group">
         <button type="button" class="btn btn-default" aria-hidden="true" onclick="hideModal()">
         Close
-        </button><button type="button" class="btn btn-success" data-placement="top" data-toggle="confirmation" data-on-confirm="prepareValidation()">
+        </button>
+        <button type="button" class="btn btn-success" data-placement="top" data-toggle="confirmation" data-on-confirm="prepareValidation()">
         Validate
         </button>
 </div>			

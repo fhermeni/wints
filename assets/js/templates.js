@@ -225,7 +225,7 @@ Handlebars.registerHelper('ifAfter', function(d1, d2, opts) {
 });
 
 Handlebars.registerHelper('ifRole', function(d, opts) {
-	if (myself.Role >= d)
+	if (level(myself.Role) >= d)
 		return opts.fn(this);
 	else
 		return opts.inverse(this);
@@ -299,15 +299,15 @@ Handlebars.registerHelper('survey', function(s, stu) {
 			value = -1000 + delay;
 			grade = "<i class='glyphicon glyphicon-time'></i> " + delay + " d.";		
 	} else if (moment(s.Invitation).isBefore(new Date)) {
-			bg = "bg-info";			
+			bg = "bg-warning";			
 			delay = Math.floor(moment.duration(moment().diff(moment(s.Invitation))).asDays());
 			value = -100 + delay;
 			grade = "<i class='glyphicon glyphicon-time'></i> " + delay + " d.";		
-	}	
+	} 
 	
 	var buf = '<td class="' + bg + ' text-center" data-text="' + value + '">';	
 	buf += grade;
-	buf += '</a></td>';
+	buf += '</td>';
 	return new Handlebars.SafeString(buf); 
 });
 
