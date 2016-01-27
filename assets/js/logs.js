@@ -7,14 +7,11 @@ function showLogs() {
   				$("html, body").animate({ scrollTop: 0 }, 500);
   				return false;
 			});
-			$("a[href='#bottom']").click(function() {
-  				$("html, body").animate({ scrollTop: $(document).height()-$(window).height()}, 500);
+			$("a[href='#bottom']").click(function() {				
+				showLog();
   				return false;
 			});
 	
-			$('.pull-down').each(function() {
-    			$(this).css('margin-top', $(this).parent().height()-$(this).height())
-			});
 			events = list.filter(function (i) {
 				return i.indexOf("event") == 0;
 			});
@@ -36,5 +33,6 @@ function showLog(f) {
 	}	
 	getLog(f).success(function (l) {
 		$("#log").html(l);
-	})
+		$("html, body").animate({ scrollTop: $(document).height()-$(window).height()}, 500);		
+	});
 }
