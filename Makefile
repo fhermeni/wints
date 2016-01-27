@@ -5,6 +5,7 @@ GOFLAGS ?= $(GOFLAGS:)
 
 all: install test
 
+
 build:
 	@echo "==== go build ===="		
 	@godep go build $(GOFLAGS) ./...
