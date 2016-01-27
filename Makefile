@@ -10,7 +10,7 @@ build:
 	@godep go build $(GOFLAGS) ./...
 
 install:
-	@go get $(GOFLAGS) ./...
+	@godep go install $(GOFLAGS) .
 
 vet:
 	@echo "==== go vet ===="
