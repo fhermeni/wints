@@ -66,7 +66,7 @@ func (ed *HTTPd) home(w http.ResponseWriter, r *http.Request) {
 
 //Listen starts listening
 func (ed *HTTPd) Listen() error {
-	return http.ListenAndServe(ed.cfg.Listen, ed.cfg.Certificate, ed.cfg.PrivateKey, nil)
+	return http.ListenAndServeTLS(ed.cfg.Listen, ed.cfg.Certificate, ed.cfg.PrivateKey, nil)
 	//return http.ListenAndServe(ed.cfg.Listen, nil) //, d.cfg.Certificate, d.cfg.PrivateKey, nil)
 }
 
