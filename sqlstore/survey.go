@@ -88,7 +88,7 @@ func (s *Store) allSurveys() (map[string][]schema.SurveyHeader, error) {
 
 //Surveys returns all the survey related to a student
 func (s *Store) Surveys(student string) ([]schema.SurveyHeader, error) {
-	res := make([]schema.SurveyHeader, 0, 0)
+	var res []schema.SurveyHeader
 	st := s.stmt(selectSurveys)
 	rows, err := st.Query(student)
 	if err != nil {

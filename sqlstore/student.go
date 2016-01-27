@@ -81,7 +81,7 @@ func scanStudent(rows *sql.Rows) (schema.Student, error) {
 func (s *Store) Students() (schema.Students, error) {
 	rows, err := s.db.Query(allStudents)
 
-	students := make([]schema.Student, 0, 0)
+	var students []schema.Student
 	if err != nil {
 		return students, err
 	}

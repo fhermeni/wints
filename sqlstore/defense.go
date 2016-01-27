@@ -78,6 +78,6 @@ func (s *Store) defenses() (map[string]schema.Defense, error) {
 
 //DefenseSessions get all the defense sessions
 func (s *Store) DefenseSessions() ([]schema.DefenseSession, error) {
-	ss := make([]schema.DefenseSession, 0, 0)
+	var ss []schema.DefenseSession
 	return ss, nil
 }

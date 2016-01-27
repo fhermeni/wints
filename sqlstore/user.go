@@ -81,7 +81,7 @@ func (s *Store) User(email string) (schema.User, error) {
 
 //Users list all the registered users
 func (s *Store) Users() ([]schema.User, error) {
-	users := make([]schema.User, 0, 0)
+	var users []schema.User
 	st := s.stmt(allUsers)
 	rows, err := st.Query()
 	if err != nil {

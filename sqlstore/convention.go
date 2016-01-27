@@ -135,7 +135,7 @@ func (s *Store) Convention(student string) (schema.Convention, error) {
 
 //Conventions lists all the registered conventions
 func (s *Store) Conventions() ([]schema.Convention, error) {
-	conventions := make([]schema.Convention, 0)
+	var conventions []schema.Convention
 	st := s.stmt(selectConventions)
 	rows, err := st.Query()
 	if err != nil {
@@ -154,7 +154,7 @@ func (s *Store) Conventions() ([]schema.Convention, error) {
 
 //Internships returns all the internships. Not necessarily validated
 func (s *Store) Internships() (schema.Internships, error) {
-	res := make([]schema.Internship, 0, 0)
+	var res []schema.Internship
 	conventions, err := s.Conventions()
 	if err != nil {
 		return res, err

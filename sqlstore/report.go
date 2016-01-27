@@ -60,7 +60,7 @@ func (s *Store) allReports() (map[string][]schema.ReportHeader, error) {
 		}
 		reports, ok := res[stu]
 		if !ok {
-			reports = make([]schema.ReportHeader, 0, 0)
+			reports = make([]schema.ReportHeader, 0)
 		}
 		reports = append(reports, s)
 		res[stu] = reports
