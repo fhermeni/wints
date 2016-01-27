@@ -6,7 +6,7 @@ package httptreemux
 
 import (
 	"fmt"
-	"github.com/fhermeni/wints/Godeps/_workspace/src/github.com/dimfeld/httppath"
+	"github.com/dimfeld/httppath"
 	"net/http"
 )
 

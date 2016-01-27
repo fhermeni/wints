@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/fhermeni/wints/Godeps/_workspace/src/github.com/BurntSushi/toml"
+	"github.com/BurntSushi/toml"
 	"github.com/fhermeni/wints/config"
 	"github.com/fhermeni/wints/feeder"
 	"github.com/fhermeni/wints/httpd"

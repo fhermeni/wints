@@ -3,16 +3,6 @@
 	"GoVersion": "go1.5",
 	"Deps": [
 		{
-			"ImportPath": "code.google.com/p/go-charset/charset",
-			"Comment": "null-32",
-			"Rev": "'ebbeafdc430eb6c7e44e9a730a38eaff4c56ba3a'"
-		},
-		{
-			"ImportPath": "code.google.com/p/go-charset/data",
-			"Comment": "null-32",
-			"Rev": "'ebbeafdc430eb6c7e44e9a730a38eaff4c56ba3a'"
-		},
-		{
 			"ImportPath": "code.google.com/p/go.crypto/bcrypt",
 			"Comment": "null-191",
 			"Rev": "'7aa593ce8ceaf0199504fff27455bbb60eedabc7'"
@@ -56,6 +46,14 @@
 			"ImportPath": "github.com/lib/pq",
 			"Comment": "go1.0-cutoff-59-gb269bd0",
 			"Rev": "b269bd035a727d6c1081f76e7a239a1b00674c40"
+		},
+		{
+			"ImportPath": "golang.org/x/text/encoding",
+			"Rev": "cf4986612c83df6c55578ba198316d1684a9a287"
+		},
+		{
+			"ImportPath": "golang.org/x/text/transform",
+			"Rev": "cf4986612c83df6c55578ba198316d1684a9a287"
 		}
 	]
 }

@@ -13,8 +13,8 @@ import (
 	"io"
 	"time"
 
-	"github.com/fhermeni/wints/Godeps/_workspace/src/github.com/klauspost/compress/flate"
-	"github.com/fhermeni/wints/Godeps/_workspace/src/github.com/klauspost/crc32"
+	"github.com/klauspost/compress/flate"
+	"github.com/klauspost/crc32"
 )
 
 const (

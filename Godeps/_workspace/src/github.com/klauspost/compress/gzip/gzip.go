@@ -10,8 +10,8 @@ import (
 	"hash"
 	"io"
 
-	"github.com/fhermeni/wints/Godeps/_workspace/src/github.com/klauspost/compress/flate"
-	"github.com/fhermeni/wints/Godeps/_workspace/src/github.com/klauspost/crc32"
+	"github.com/klauspost/compress/flate"
+	"github.com/klauspost/crc32"
 )
 
 // These constants are copied from the flate package, so that code that imports
