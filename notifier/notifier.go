@@ -192,7 +192,7 @@ func (n *Notifier) PasswordChanged(em string, err error) error {
 
 //ProfileEdited logs the change
 func (n *Notifier) ProfileEdited(from schema.User, p schema.Person, err error) {
-	n.Log.UserLog(from, "profile updated for "+p.Email+" ("+p.Fullname()+")", err)
+	n.Log.UserLog(from, "new profile for "+p.Email+" ("+p.Fullname()+")", err)
 }
 
 //InviteTeacher calls invite()
@@ -207,7 +207,7 @@ func (n *Notifier) InviteRoot(from schema.User, p schema.Person, token string, e
 
 //NewStudent logs the student addition
 func (n *Notifier) NewStudent(from schema.User, st schema.Student, err error) {
-	n.Log.UserLog(from, "new student "+st.User.Fullname()+"("+st.User.Person.Email+") "+st.Major+"/"+st.Promotion, err)
+	n.Log.UserLog(from, "new student "+st.User.Fullname()+" ("+st.User.Person.Email+") "+st.Major+"/"+st.Promotion, err)
 }
 
 //SkipStudent logs the change

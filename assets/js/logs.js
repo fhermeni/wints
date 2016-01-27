@@ -27,11 +27,16 @@ function showLogs() {
 	});
 }
 
+var re = /\[\d+\/\d+\/\d+ /;
+
 function showLog(f) {
 	if (!f) {
 		f = $("#logs").val();
 	}	
-	getLog(f).success(function (l) {
+	getLog(f).success(function (l) {			
+		l = l.split('\n').map(function (x) {
+			return x.replace(re,'[');
+		}).join("\n");	
 		$("#log").html(l);
 		$("html, body").animate({ scrollTop: $(document).height()-$(window).height()}, 500);		
 	});
