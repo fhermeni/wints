@@ -25,3 +25,5 @@ _testmain.go
 *.test
 wints.conf
 cover.out
+*.key
+*.pem
