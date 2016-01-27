@@ -88,7 +88,10 @@ function usersUI() {
 	ui();
 }
 
-function loadUsers(uss, ints) {
+function loadUsers(uss, ints) {	
+	if (!ints[0]) {
+		ints[0] = [];
+	}
 	var got = {};
 	ints[0].forEach(function(i) {
 		got[i.Convention.Student.User.Person.Email] = true;

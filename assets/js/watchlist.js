@@ -4,6 +4,9 @@ function showWatchlist() {
 }
 
 function loadWatchlist(interns) {
+	if (!interns) {
+		interns = [];
+	}
 	managed = interns.filter(function (i) {
 		return !i.Convention.Student.Skip;
 	});

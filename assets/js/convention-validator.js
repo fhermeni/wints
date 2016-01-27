@@ -31,6 +31,9 @@ function convSort(a, b) {
 
 function loadConventionValidator(students, internships, convs, us) {
 	allStudents = students[0];
+	if (!allStudents) {
+		allStudents = [];
+	}	
 	allTeachers = [];
 	allConventions = [];
 	var managed = 0;
@@ -43,13 +46,22 @@ function loadConventionValidator(students, internships, convs, us) {
 
 	allStudents.sort(studentSort);
 	internships = internships[0];
+	if (!internships) {
+		internships = []
+	}
 	if (convs) {
 		allConventions = convs[0];
+		if (!allConventions) {
+			allConventions = [];
+		}
 		allConventions.sort(convSort);
 	}
 
 	if (us) {
 		us = us[0];		
+		if (!us) {
+			us = [];
+		}
 		allTeachers = us.filter(function(u) { 
 			return level(u.Role) != STUDENT_LEVEL;
 		});		

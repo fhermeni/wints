@@ -45,7 +45,7 @@ type Internships []Internship
 
 //Filter returns the internships that pass the given filter
 func (ss Internships) Filter(filter func(Internship) bool) Internships {
-	res := make(Internships, 0)
+	var res Internships
 	for _, i := range ss {
 		if filter(i) {
 			res = append(res, i)

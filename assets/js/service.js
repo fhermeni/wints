@@ -1,6 +1,9 @@
 function showService() {
 	showWait();
 	internships().done(function(ints) {
+		if (!ints) {
+			ints = [];
+		}
 		var service = {};
 		ints.forEach(function(i) {
 			var em = i.Convention.Tutor.Person.Email;
