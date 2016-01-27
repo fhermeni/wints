@@ -23,7 +23,8 @@ _testmain.go
 
 *.exe
 *.test
+
+#private stuff
 wints.conf
-cover.out
 *.key
 *.pem
