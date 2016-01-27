@@ -11,6 +11,7 @@ build:
 	@godep go build $(GOFLAGS) ./...
 
 install:
+	@echo "==== install ===="
 	@godep go install $(GOFLAGS) .
 
 vet:
