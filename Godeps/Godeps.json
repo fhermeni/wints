@@ -18,6 +18,10 @@
 			"Rev": "056c9bc7be7190eaa7715723883caffa5f8fa3e4"
 		},
 		{
+			"ImportPath": "github.com/daaku/go.httpgzip",
+			"Rev": "3f59977b58c61991f5ed3670bbd141937d808b06"
+		},
+		{
 			"ImportPath": "github.com/dimfeld/httppath",
 			"Rev": "c8e499c3ef3c3e272ed8bdcc1ccf39f73c88debc"
 		},

@@ -100,15 +100,6 @@ function ui() {
 		$("#cnt").find('.shiftSelectable').shiftSelectable();
 	});
 
-	$("#cnt").find(".editable-role").each(function(i, e) {
-		$(e).editable({
-			source: editableRoles(),
-			url: function(p) {
-				return postUserRole($(e).data("user"), parseInt(p.value))
-			}
-		});
-	});
-
 	$(".date").datetimepicker({
 		format: "DD MMM YYYY"
 	});

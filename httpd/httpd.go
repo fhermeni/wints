@@ -9,6 +9,8 @@ import (
 	"github.com/fhermeni/wints/feeder"
 	"github.com/fhermeni/wints/notifier"
 	"github.com/fhermeni/wints/sqlstore"
+
+	"github.com/daaku/go.httpgzip"
 )
 
 //HTTPd just wrap a HTTP daemon that will serve both the static assets
@@ -24,7 +26,7 @@ func NewHTTPd(not *notifier.Notifier, store *sqlstore.Store, conventions feeder.
 
 	//The assets
 	fs := http.FileServer(http.Dir("assets"))
-	http.Handle("/assets/", http.StripPrefix("/"+cfg.Assets, fs))
+	http.Handle("/assets/", http.StripPrefix("/"+cfg.Assets, httpgzip.NewHandler(fs)))
 	//The rest endpoints
 	rest := NewEndPoints(not, store, conventions, cfg.Rest, org)
 	http.HandleFunc(cfg.Rest.Prefix, Mon(not, rest.router.ServeHTTP))
