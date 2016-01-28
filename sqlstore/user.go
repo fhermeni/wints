@@ -33,6 +33,10 @@ var (
 //addUser add the given user.
 //Every strings are turned into their lower case version
 func (s *Store) addUser(tx *TxErr, u schema.User) {
+	if !strings.Contains(u.Person.Email, "@") {
+		tx.err = schema.ErrInvalidEmail
+		return
+	}
 	tx.Exec(insertUser,
 		u.Person.Firstname,
 		u.Person.Lastname,
