@@ -21,7 +21,7 @@
     {{else}}  
         {{#if I}}
         <td><small><a href="{{I.Convention.Company.WWW}}">{{I.Convention.Company.Name}}</a></small></td>
-        <td>{{dateFmt I.Convention.Begin "DD/MM/YY"}} - {{dateFmt I.Convention.End "DD/MM/YY"}}</td>
+        <td data-text="{{dateFmt I.Convention.Begin "X"}}">{{dateFmt I.Convention.Begin "DD/MM/YY"}} - {{dateFmt I.Convention.End "DD/MM/YY"}}</td>
         <td class="fn">{{I.Convention.Tutor.Person.Lastname}}, {{I.Convention.Tutor.Person.Firstname}}</td>
         <td class="text-right">{{I.Convention.Gratification}}</td>
         {{else}}
