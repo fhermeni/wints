@@ -105,6 +105,7 @@ func cleanInt(str string) int {
 }
 func (f *CsvConventions) scan(prom string) ([]schema.Convention, error) {
 	conventions := make([]schema.Convention, 0, 0)
+	lasts := make(map[string]schema.Convention)
 	r, err := f.Reader.Reader(f.Year, prom)
 	if err != nil {
 		return conventions, err
@@ -143,7 +144,6 @@ func (f *CsvConventions) scan(prom string) ([]schema.Convention, error) {
 			return conventions, err
 		}
 		//The to-valid users
-
 		c := schema.Convention{
 			Creation: ts,
 			Student: schema.Student{
@@ -167,9 +167,13 @@ func (f *CsvConventions) scan(prom string) ([]schema.Convention, error) {
 				Role:   schema.TUTOR,
 			},
 		}
+		//conventions = append(conventions, c)
+		lasts[c.Student.User.Person.Email] = c
+	}
+	for _, c := range lasts {
 		conventions = append(conventions, c)
 	}
-	return conventions, err
+	return conventions, nil
 }
 
 //Import imports all the conventions by requesting in parallel the conventions for each registered promotions

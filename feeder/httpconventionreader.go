@@ -37,7 +37,7 @@ func NewHTTPConventionReader(url, login, password string, j journal.Journal) *HT
 //Reader read all the conventions for a given year and promotion
 func (h *HTTPConventionReader) Reader(year int, promotion string) (io.Reader, error) {
 	client := &http.Client{}
-	client.Timeout = time.Duration(5) * time.Second
+	client.Timeout = time.Duration(10) * time.Second
 	query := fmt.Sprintf("%s?action=down&filiere=%s&annee=%d", h.url, url.QueryEscape(promotion), year)
 	req, err := http.NewRequest("GET", query, nil)
 	if err != nil {

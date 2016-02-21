@@ -23,6 +23,12 @@ create table users(
     constraint pk_email PRIMARY KEY(email)
 );
 
+create table aliases(
+    email text,
+    real text,
+    constraint pk_aliases_email PRIMARY KEY(email),
+    constraint fk_aliases_real FOREIGN KEY(real) REFERENCES users(email) on delete cascade on update cascade
+);
 create table sessions(
     email text,
     token text,

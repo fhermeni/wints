@@ -93,13 +93,19 @@ function loadUsers(uss, ints) {
 		ints[0] = [];
 	}
 	var got = {};
+	var blocked = {};
+	//Cannot delete a student having a convention or someone involved in tutoring
+	//cannot reset a student wo a convention (password not send a first time)
 	ints[0].forEach(function(i) {
 		got[i.Convention.Student.User.Person.Email] = true;
+		blocked[i.Convention.Student.User.Person.Email] = true;
+		blocked[i.Convention.Tutor.Person.Email] = true;
 	});
 	var allUsers = uss[0];
-	allUsers.forEach(function(u, idx) {
-		allUsers[idx].Resetable = (u.Role != 1 || got[u.Person.Email]);
-	});
+	allUsers.forEach(function(u, idx) {		
+		allUsers[idx].Resetable = (level(u.Role) != STUDENT_LEVEL || got[u.Person.Email]);
+		allUsers[idx].Blocked = blocked[u.Person.Email];
+	});	
 	$("#cnt").render("users-header", allUsers, usersUI);
 }
 
@@ -216,6 +222,8 @@ function failStudentImport(student, xhr) {
 		});
 	} else if (xhr.status == 409) {
 		stats.Ignored.push(student)
+	} else {
+		notifyError(xhr);
 	}
 	updateImportStatus()
 }

@@ -3,6 +3,7 @@ package sqlstore
 import (
 	"database/sql"
 	"errors"
+	"log"
 	"strings"
 	"time"
 
@@ -28,6 +29,8 @@ var (
 	emailFromRenewableToken      = "select email from password_renewal where token=$1"
 	replaceTutorInConventions    = "update conventions set tutor=$2 where tutor=$1"
 	replaceJuryInDefenses        = "update defenseJuries set jury=$2 where jury=$1"
+	selectAlias                  = "select real from aliases where email=$1"
+	insertAlias                  = "insert into aliases(email,real) values($1,$2)"
 )
 
 //addUser add the given user.
@@ -37,6 +40,17 @@ func (s *Store) addUser(tx *TxErr, u schema.User) {
 		tx.err = schema.ErrInvalidEmail
 		return
 	}
+	//Check if aliased name (this email corresponds to another real email)
+	var em string
+	err := tx.QueryRow(selectAlias, u.Person.Email).Scan(&em)
+	if err == nil {
+		//There is already a user. The proposed email was just an alias
+		tx.err = schema.ErrUserExists
+	} else {
+		if err != sql.ErrNoRows {
+			tx.err = err
+		}
+	}
 	tx.Exec(insertUser,
 		u.Person.Firstname,
 		u.Person.Lastname,
@@ -45,6 +59,8 @@ func (s *Store) addUser(tx *TxErr, u schema.User) {
 		u.Role.String(),
 		randomBytes(32),
 	)
+	tx.Exec(insertAlias, u.Person.Email, u.Person.Email)
+	log.Println(tx.err)
 }
 
 //Visit writes the current time for the given user
@@ -165,12 +181,23 @@ func (s *Store) NewUser(p schema.Person, role schema.Role) ([]byte, error) {
 
 //RmUser removes a user from the database
 func (s *Store) RmUser(email string) error {
+	_, err := s.Internship(email)
+	if err == nil {
+		return schema.ErrInternshipExists
+	}
 	return s.singleUpdate(deleteUser, schema.ErrUnknownUser, email)
 }
 
 //SetEmail change a user email to another
 func (s *Store) SetEmail(old, now string) error {
-	return s.singleUpdate(updateEmail, schema.ErrUnknownUser, old, now)
+	//Create an alias to remember the email
+	tx := newTxErr(s.db)
+	tx.Exec(insertAlias, old, now)
+	nb := tx.Update(updateEmail, old, now)
+	if nb != 1 {
+		tx.err = schema.ErrUnknownUser
+	}
+	return tx.Done()
 }
 
 //ReplaceUserWith the account referred by src by the account referred by dst
