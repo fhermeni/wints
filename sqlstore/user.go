@@ -192,11 +192,12 @@ func (s *Store) RmUser(email string) error {
 func (s *Store) SetEmail(old, now string) error {
 	//Create an alias to remember the email
 	tx := newTxErr(s.db)
-	tx.Exec(insertAlias, old, now)
 	nb := tx.Update(updateEmail, old, now)
 	if nb != 1 {
 		tx.err = schema.ErrUnknownUser
 	}
+	//Alias after the user because it does not exists otherwise
+	tx.Exec(insertAlias, old, now)
 	return tx.Done()
 }
 
