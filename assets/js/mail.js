@@ -21,7 +21,7 @@ function sendMail(to, cc) {
 function userMailing(ctx) {
 	var to = [];
 	$(ctx).find("input:checked").each(function(i, c) {
-		var em = $(c).data("email")
+		var em = $(c).data("email")		
 		to.push(em);
 	});
 	sendMail(to, [])

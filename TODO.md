@@ -11,8 +11,8 @@
 - Makefile to control the build workflow		
 	- deploy
 	- bench	
-- asset minification, concatenation, and embedding
-	- gulp to minimify and concatenate
-	- whatever for embedding
+	- asset minification, concatenation, and embedding
+		- gulp to minimify and concatenate
+		- whatever for embedding
 - defense management
 - test security ?

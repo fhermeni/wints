@@ -1,13 +1,12 @@
 $.fn.shiftSelectable = function() {
 	var lastChecked,
 		$boxes = this;
-
+	$boxes.off('click');		
 	$boxes.click(function(evt) {
 		if (!lastChecked) {
 			lastChecked = this;
 			return;
 		}
-
 		if (evt.shiftKey) {
 			var start = $boxes.index(this),
 				end = $boxes.index(lastChecked);
