@@ -64,7 +64,7 @@ moment.locale('fr', {
 
 Handlebars.logger.level = 0;
 $.handlebars({
-	templatePath: '/assets/hbs/',
+	templatePath: '/assets/hbs',
 	templateExtension: 'hbs',
 	partialPath: '/assets/hbs',
 	partials: ['person', 'users-user', 'placement-student', 'convention-student', 'convention-editor', 'student-dashboard-report', 'student-dashboard-company', 'student-dashboard-contacts', 'student-dashboard-alumni', 'tutored-student', 'watchlist-student']
