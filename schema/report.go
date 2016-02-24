@@ -16,6 +16,12 @@ type ReportHeader struct {
 	ToGrade bool
 }
 
+//StudentReports aggregate the reports of a given student
+type StudentReports struct {
+	Student Student
+	Reports []ReportHeader
+}
+
 //Graded indicates if a report has been graded
 func (m *ReportHeader) Graded() bool {
 	return m.Reviewed != nil

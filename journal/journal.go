@@ -7,15 +7,19 @@ import (
 	"github.com/fhermeni/wints/schema"
 )
 
+//Logger is a basic interface to log messages
+type Logger interface {
+	//Log stores an event emitted by a non-logged user
+	Log(em, msg string, err error)
+}
+
 //Journal is the interface that allows to store an event into the journal
 type Journal interface {
+	Logger
 
 	//UserLog stores an event emitted by a logged user. The event is described in a message
 	//while err denotes the event status
 	UserLog(u schema.User, msg string, err error)
-
-	//Log stores an event emitted by a non-logged user
-	Log(em, msg string, err error)
 
 	//Wipe indicates the database has been reseted
 	Wipe()

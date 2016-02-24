@@ -1,0 +1,16 @@
+Subject:[Wints] Weekly reminder
+
+Some of the students you are tutoring missed some deadlines. You may also have
+some reports that are waiting for a review.
+
+If the deadline for a report is not appropriate, you must revise it properly
+on wints to prevent any un-justified late penalty.
+
+{{range $s := .Data -}}
+# {{ $s.Student.Fullname -}}
+{{range  $s.Status}}
+  - {{. -}}
+{{ end }}
+{{ end }}
+Regards,
+{{.Fullname}}

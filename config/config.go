@@ -10,12 +10,6 @@ var (
 	DateLayout = "02/01/2006"
 )
 
-//Spy defines a job that is executed regularly
-type Spy struct {
-	Kind string
-	Cron string
-}
-
 //Feeder configures the feeder than scan conventions
 type Feeder struct {
 	Login      string
@@ -98,9 +92,14 @@ type Survey struct {
 	Kind       string
 }
 
+//Crons list the waiting periods for some period tasks
+type Crons struct {
+	//NewsLetters is the waiting time between two news letters
+	NewsLetters string
+}
+
 //Config aggregates all the subcomponents configuration parameters
 type Config struct {
-	Spy         Spy
 	Feeder      Feeder
 	Db          Db
 	Mailer      mail.Config
@@ -108,5 +107,5 @@ type Config struct {
 	Majors      []string
 	Journal     Journal
 	Internships Internships
-	Spies       []Spy
+	Crons       Crons
 }

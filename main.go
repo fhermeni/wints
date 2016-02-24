@@ -10,12 +10,14 @@ import (
 	"github.com/fhermeni/wints/config"
 	"github.com/fhermeni/wints/feeder"
 	"github.com/fhermeni/wints/httpd"
+	"github.com/fhermeni/wints/jobs"
 	"github.com/fhermeni/wints/journal"
 	"github.com/fhermeni/wints/mail"
 	"github.com/fhermeni/wints/notifier"
 	"github.com/fhermeni/wints/schema"
 	"github.com/fhermeni/wints/sqlstore"
 	_ "github.com/lib/pq"
+	"github.com/robfig/cron"
 )
 
 var cfg config.Config
@@ -81,27 +83,11 @@ func newFeeder(not *notifier.Notifier) feeder.Conventions {
 	return f
 }
 
-/*func runSpies() {
-
-	if len(cfg.Spies) == 0 {
-		log.Println("No spies to schedule")
-	}
-	cr := cron.New()
-	for _, s := range cfg.Spies {
-		switch strings.ToLower(s.Kind) {
-		case "tutor":
-			reviews := make(map[string]time.Duration)
-			for _, r := range cfg.Internships.Reports {
-				reviews[r.Kind] = r.Review.Duration
-			}
-			cr.AddFunc(s.Cron, spy.ReminderReporter)
-		default:
-			log.Fatalln("Unsupported spy '" + s.Kind + "'")
-		}
-		log.Println("Spy '" + s.Kind + "' scheduled")
-	}
-	cr.Start()
-}*/
+func runSpies() {
+	c := cron.New()
+	c.AddFunc(cfg.Crons.NewsLetters, func() { jobs.MissingReports(store, not, not.Log) })
+	c.Start()
+}
 
 func install() {
 	if !confirm("This will erase any data. Confirm ") {
@@ -123,7 +109,7 @@ func main() {
 	}
 
 	mailer = newMailer(*fakeMailer)
-	not = notifier.New(mailer, newJournal())
+	not = notifier.New(mailer, newJournal(), cfg)
 	not.Log.Wipe()
 	store = newStore()
 	if *installStore {
@@ -139,7 +125,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	//runSpies()
+	runSpies()
 	conventions := newFeeder(not)
 	not.Println("Listening on "+cfg.HTTPd.WWW, nil)
 	httpd := httpd.NewHTTPd(not, store, conventions, cfg.HTTPd, cfg.Internships)

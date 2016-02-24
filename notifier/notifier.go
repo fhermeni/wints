@@ -14,13 +14,18 @@ import (
 
 //Notifier just embed notification mechanisms
 type Notifier struct {
-	mailer mail.Mailer
-	Log    journal.Journal
+	mailer         mail.Mailer
+	Log            journal.Journal
+	reviewDuration map[string]time.Duration
 }
 
 //New creates a new notifier
-func New(m mail.Mailer, l journal.Journal) *Notifier {
-	return &Notifier{mailer: m, Log: l}
+func New(m mail.Mailer, l journal.Journal, cfg config.Config) *Notifier {
+	reports := make(map[string]time.Duration)
+	for _, r := range cfg.Internships.Reports {
+		reports[r.Kind] = r.Review.Duration
+	}
+	return &Notifier{mailer: m, Log: l, reviewDuration: reports}
 }
 
 //Println logs a message with an error if needed
@@ -247,4 +252,34 @@ func (n *Notifier) SurveyRequest(sup schema.Person, tutor schema.User, student s
 		return n.mailer.Send(sup, "survey_request.txt", dta, tutor.Person)
 	}
 	return err
+}
+
+type studentStatus struct {
+	Student schema.User
+	Status  []string
+}
+
+//TutorNewsLetter send to a tutor a mail about the missing reports or reviews
+func (n *Notifier) TutorNewsLetter(tut schema.User, lates []schema.StudentReports) {
+	now := time.Now()
+	var statuses []studentStatus
+
+	for _, stu := range lates {
+		s := studentStatus{Student: stu.Student.User, Status: make([]string, 0)}
+		for _, r := range stu.Reports {
+			//missing deadlines
+			if r.Delivery == nil {
+				s.Status = append(s.Status, r.Kind+" deadline passed; was "+r.Deadline.Format(config.DateLayout))
+			}
+			//missing reviews
+			if r.Deadline.Before(now) && r.Reviewed == nil {
+				deadline := r.Deadline.Add(n.reviewDuration[r.Kind])
+				s.Status = append(s.Status, r.Kind+" waiting for review (deadline: "+deadline.Format(config.DateLayout)+")")
+			}
+		}
+		statuses = append(statuses, s)
+	}
+	buf := fmt.Sprintf("send the weekly report to '%s' with %d warning(s)\n", tut.Fullname(), len(statuses))
+	err := n.mailer.Send(tut.Person, "tutor_newsletter.txt", statuses)
+	n.Log.Log("cron", buf, err)
 }

@@ -1,4 +1,4 @@
-package spy
+package jobs
 
 import (
 	"time"
