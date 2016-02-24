@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/fhermeni/wints",
-	"GoVersion": "go1.5",
+	"GoVersion": "go1.6",
 	"Deps": [
 		{
 			"ImportPath": "code.google.com/p/go.crypto/bcrypt",
@@ -52,7 +52,29 @@
 			"Rev": "b269bd035a727d6c1081f76e7a239a1b00674c40"
 		},
 		{
+			"ImportPath": "github.com/lib/pq/oid",
+			"Comment": "go1.0-cutoff-59-gb269bd0",
+			"Rev": "b269bd035a727d6c1081f76e7a239a1b00674c40"
+		},
+		{
+			"ImportPath": "github.com/robfig/cron",
+			"Comment": "v1-2-g67823cd",
+			"Rev": "67823cd24dece1b04cced3a0a0b3ca2bc84d875e"
+		},
+		{
 			"ImportPath": "golang.org/x/text/encoding",
+			"Rev": "cf4986612c83df6c55578ba198316d1684a9a287"
+		},
+		{
+			"ImportPath": "golang.org/x/text/encoding/charmap",
+			"Rev": "cf4986612c83df6c55578ba198316d1684a9a287"
+		},
+		{
+			"ImportPath": "golang.org/x/text/encoding/internal",
+			"Rev": "cf4986612c83df6c55578ba198316d1684a9a287"
+		},
+		{
+			"ImportPath": "golang.org/x/text/encoding/internal/identifier",
 			"Rev": "cf4986612c83df6c55578ba198316d1684a9a287"
 		},
 		{

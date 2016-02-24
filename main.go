@@ -16,7 +16,6 @@ import (
 	"github.com/fhermeni/wints/notifier"
 	"github.com/fhermeni/wints/schema"
 	"github.com/fhermeni/wints/sqlstore"
-	_ "github.com/lib/pq"
 	"github.com/robfig/cron"
 )
 
