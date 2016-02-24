@@ -9,7 +9,6 @@
 	- store interface
 	- cache implement interface
 - Makefile to control the build workflow		
-	- deploy
 	- bench	
 	- asset minification, concatenation, and embedding
 		- gulp to minimify and concatenate

@@ -321,6 +321,13 @@ Handlebars.registerHelper('report', function(r, em, cb) {
 		value = -100 + delay;
 		cnt = "<i class='glyphicon glyphicon-time'></i> " + delay + " d.";
 	}
+
+	if (!r.Delivery && moment(r.Deadline).isBefore(new Date())) {
+		bg = "danger";
+		var delay = deadlineDelay(r);		
+		value = -50 + delay;
+		cnt = "<i class='glyphicon glyphicon-time'></i> " + delay + " d.";
+	}
 	if (r.Reviewed) {
 			grade = netGrade(r);
 			cnt = Handlebars.helpers['grade'](r).string;

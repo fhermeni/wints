@@ -47,6 +47,11 @@ function showReportModal(i, kind) {
 function reviewDelay(r) {
 	return Math.floor(moment.duration(moment(r.Delivery).diff(moment(r.Deadline))).asDays());
 }
+
+function deadlineDelay(r) {
+	return Math.floor(moment.duration(moment().diff(moment(r.Deadline))).asDays());
+}
+
 function netGrade(r) {
 	var duration = moment.duration(moment(r.Delivery).diff(moment(r.Deadline)));
 	var days = Math.floor(duration.asDays());
