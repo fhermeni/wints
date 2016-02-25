@@ -217,10 +217,12 @@ Handlebars.registerHelper('ifLate', function(d, opts) {
 		return opts.inverse(this);
 });
 
-Handlebars.registerHelper('ifAfter', function(d1, d2, opts) {
-	if (!d1 || moment(d1).isAfter(d2))
+Handlebars.registerHelper('ifAfter', function(d1, d2, opts) {	
+	if ((!d1 && moment().isAfter(d2)) || moment(d1).isAfter(d2)) {		
+		console.log(d1)
+		console.log(d2)
 		return opts.fn(this);
-	else
+	} else
 		return opts.inverse(this);
 });
 
