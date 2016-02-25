@@ -23,6 +23,7 @@ var cfg config.Config
 var not *notifier.Notifier
 var store *sqlstore.Store
 var mailer mail.Mailer
+var j journal.Journal
 
 func confirm(msg string) bool {
 	os.Stdout.WriteString(msg + " (y/n) ?")
@@ -51,7 +52,7 @@ func newConventionReader(cfg config.Feeder, not *notifier.Notifier) feeder.Conve
 
 func newMailer(fake bool) mail.Mailer {
 	if fake {
-		return &mail.Fake{WWW: cfg.HTTPd.WWW, Config: cfg.Mailer}
+		return &mail.Fake{WWW: cfg.HTTPd.WWW, Config: cfg.Mailer, Logger: j}
 	}
 	m, err := mail.NewSMTP(cfg.Mailer, cfg.HTTPd.WWW)
 	if err != nil {
@@ -60,12 +61,12 @@ func newMailer(fake bool) mail.Mailer {
 	return m
 }
 
-func newJournal() journal.Journal {
-	j, err := journal.FileBacked(cfg.Journal.Path)
+func newJournal() {
+	var err error
+	j, err = journal.FileBacked(cfg.Journal.Path)
 	if err != nil {
 		log.Fatalln("Unable to create logs: " + err.Error())
 	}
-	return j
 }
 
 func newStore() *sqlstore.Store {
@@ -106,9 +107,9 @@ func main() {
 	if _, err := toml.DecodeFile(*conf, &cfg); err != nil {
 		log.Fatalln(err.Error())
 	}
-
+	newJournal()
 	mailer = newMailer(*fakeMailer)
-	not = notifier.New(mailer, newJournal(), cfg)
+	not = notifier.New(mailer, j, cfg)
 	not.Log.Wipe()
 	store = newStore()
 	if *installStore {
