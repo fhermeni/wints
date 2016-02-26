@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/fhermeni/wints/feeder"
+	"github.com/fhermeni/wints/logger"
 	"github.com/fhermeni/wints/notifier"
 	"github.com/fhermeni/wints/schema"
 	"github.com/fhermeni/wints/session"
@@ -37,6 +38,6 @@ func status(not *notifier.Notifier, w http.ResponseWriter, r *http.Request, e er
 		return
 	default:
 		http.Error(w, "Internal server error. A possible bug to report", http.StatusInternalServerError)
-		not.Log.Log("wintsd", "unsupported error ", e)
+		logger.Log("event", "httpd", "unsupported error ", e)
 	}
 }

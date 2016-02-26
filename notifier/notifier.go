@@ -2,12 +2,11 @@ package notifier
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"time"
 
 	"github.com/fhermeni/wints/config"
-	"github.com/fhermeni/wints/journal"
+	"github.com/fhermeni/wints/logger"
 	"github.com/fhermeni/wints/mail"
 	"github.com/fhermeni/wints/schema"
 )
@@ -15,33 +14,26 @@ import (
 //Notifier just embed notification mechanisms
 type Notifier struct {
 	mailer         mail.Mailer
-	Log            journal.Journal
 	reviewDuration map[string]time.Duration
 }
 
 //New creates a new notifier
-func New(m mail.Mailer, l journal.Journal, cfg config.Config) *Notifier {
+func New(m mail.Mailer, cfg config.Config) *Notifier {
 	reports := make(map[string]time.Duration)
 	for _, r := range cfg.Internships.Reports {
 		reports[r.Kind] = r.Review.Duration
 	}
-	return &Notifier{mailer: m, Log: l, reviewDuration: reports}
+	return &Notifier{mailer: m, reviewDuration: reports}
 }
 
-//Println logs a message with an error if needed
-func (n *Notifier) Println(s string, err error) {
-	n.Log.Log("wintsd", s, err)
-	if err == nil {
-		log.Println(s + ": OK")
-	} else {
-		log.Println(s + ": " + err.Error())
-	}
+func userLog(u schema.User, msg string, err error) {
+	logger.Log("event", u.Person.Email, msg, err)
 }
 
 //ReportPrivacyUpdated logs a privacy status change for a given report
 func (n *Notifier) ReportPrivacyUpdated(from schema.User, stu, kind string, priv bool, err error) error {
 	buf := fmt.Sprintf("set privacy status for '%s' report of '%s' to '%t'", kind, stu, priv)
-	n.Log.UserLog(from, buf, err)
+	userLog(from, buf, err)
 	return err
 }
 
@@ -49,25 +41,15 @@ func (n *Notifier) ReportPrivacyUpdated(from schema.User, stu, kind string, priv
 func (n *Notifier) ReportDeadlineUpdated(from schema.User, stu, kind string, d time.Time, err error) error {
 	s := d.Format(config.DateTimeLayout)
 	buf := fmt.Sprintf("set deadline for '%s' report of '%s' to '%s'", kind, stu, s)
-	n.Log.UserLog(from, buf, err)
+	userLog(from, buf, err)
 	return err
-}
-
-//Fatalln logs a fatal error and quit
-func (n *Notifier) Fatalln(s string, err error) {
-	n.Log.Log("wintsd", s, err)
-	if err == nil {
-		log.Println(s + ": OK")
-	} else {
-		log.Fatalln(s + ": " + err.Error())
-	}
 }
 
 //AccountReseted logs an account reset and send the mail to the targeted user
 func (n *Notifier) AccountReseted(em string, token []byte, err error) error {
 	//mail with token
 	//log
-	n.Log.Log("wintsd", "start password reset for "+em, err)
+	logger.Log("event", "wintsd", "start password reset for "+em, err)
 	if err != nil {
 		return err
 	}
@@ -76,7 +58,7 @@ func (n *Notifier) AccountReseted(em string, token []byte, err error) error {
 
 //ReportUploaded logs the upload and notify the student with the tutor in cc.
 func (n *Notifier) ReportUploaded(student schema.User, tutor schema.User, kind string, err error) error {
-	n.Log.UserLog(student, "Report "+kind+" uploaded", err)
+	userLog(student, "Report "+kind+" uploaded", err)
 	data := struct {
 		Kind    string
 		Student schema.Person
@@ -93,7 +75,7 @@ func (n *Notifier) ReportReviewed(from, student, tutor schema.User, kind string,
 		Kind  string
 		Tutor schema.User
 	}{Kind: kind, Tutor: tutor}
-	n.Log.UserLog(from, "report '"+kind+"' reviewed for '"+student.Person.Email+"'", err)
+	userLog(from, "report '"+kind+"' reviewed for '"+student.Person.Email+"'", err)
 	if err != nil {
 		return err
 	}
@@ -102,17 +84,17 @@ func (n *Notifier) ReportReviewed(from, student, tutor schema.User, kind string,
 
 //Login logs the login
 func (n *Notifier) Login(s schema.Session, err error) {
-	n.Log.Log(s.Email, "login", err)
+	logger.Log("event", s.Email, "login", err)
 }
 
 //Logout logs the logout
 func (n *Notifier) Logout(s schema.User, err error) {
-	n.Log.UserLog(s, "logout", err)
+	userLog(s, "logout", err)
 }
 
 //PrivilegeUpdated logs the action and notify the target
 func (n *Notifier) PrivilegeUpdated(from schema.User, em string, p schema.Role, err error) error {
-	n.Log.UserLog(from, "'"+string(p)+"' privileges for "+em, err)
+	userLog(from, "'"+string(p)+"' privileges for "+em, err)
 	if err != nil {
 		return err
 	}
@@ -125,37 +107,37 @@ func (n *Notifier) SurveyUploaded(student, tutor schema.User, supervisor schema.
 		Student schema.Person
 		Kind    string
 	}{Student: student.Person, Kind: kind}
-	n.Log.UserLog(schema.User{Person: supervisor}, "'"+kind+"' survey uploaded for student '"+student.Person.Email+"'", err)
+	userLog(schema.User{Person: supervisor}, "'"+kind+"' survey uploaded for student '"+student.Person.Email+"'", err)
 	return n.mailer.Send(tutor.Person, "survey_uploaded.txt", data)
 }
 
 //SurveyReseted logs the action
 func (n *Notifier) SurveyReseted(from schema.User, student, kind string, err error) error {
-	n.Log.UserLog(from, "'"+kind+"' survey content reseted for '"+student+"'", err)
+	userLog(from, "'"+kind+"' survey content reseted for '"+student+"'", err)
 	return err
 }
 
 //CompanyUpdated logs the change
 func (n *Notifier) CompanyUpdated(from schema.User, c schema.Company, err error) {
 	buf := fmt.Sprintf("company data updated '%+v'", c)
-	n.Log.UserLog(from, buf, err)
+	userLog(from, buf, err)
 }
 
 //AlumniUpdated logs the change
 func (n *Notifier) AlumniUpdated(from schema.User, a schema.Alumni, err error) {
 	buf := fmt.Sprintf("alumni data updated '%+v'", a)
-	n.Log.UserLog(from, buf, err)
+	userLog(from, buf, err)
 }
 
 //SupervisorUpdated logs the change
 func (n *Notifier) SupervisorUpdated(from schema.User, sup schema.Person, err error) {
 	buf := fmt.Sprintf("supervisor data updated '%+v'", sup)
-	n.Log.UserLog(from, buf, err)
+	userLog(from, buf, err)
 }
 
 //RmAccount logs the target and notify it by mail
 func (n *Notifier) RmAccount(from schema.User, em string, err error) error {
-	n.Log.UserLog(from, "delete account '"+em+"'", err)
+	userLog(from, "delete account '"+em+"'", err)
 	if err == nil {
 		return n.mailer.Send(schema.Person{Email: em}, "delete.txt", nil, from.Person)
 	}
@@ -167,13 +149,13 @@ func (n *Notifier) InviteStudent(from schema.User, i schema.Internship, token st
 	err = n.invite(from, i.Convention.Student.User.Person, token, "student_welcome.txt", err)
 	if err == nil {
 		err = n.mailer.Send(i.Convention.Tutor.Person, "tutor.txt", i.Convention.Student)
-		n.Log.UserLog(from, "Notify tutor ", err)
+		userLog(from, "Notify tutor ", err)
 	}
 	return err
 }
 
 func (n *Notifier) invite(from schema.User, p schema.Person, token string, tpl string, err error) error {
-	n.Log.UserLog(from, p.Email+" invited", err)
+	userLog(from, p.Email+" invited", err)
 	if err != nil {
 		return err
 	}
@@ -182,13 +164,13 @@ func (n *Notifier) invite(from schema.User, p schema.Person, token string, tpl s
 		Token string
 	}{Login: p.Email, Token: string(token)}
 	err = n.mailer.Send(p, tpl, data)
-	n.Log.UserLog(from, "invitation sent", err)
+	userLog(from, "invitation sent", err)
 	return err
 }
 
 //PasswordChanged logs the event and notify the target
 func (n *Notifier) PasswordChanged(em string, err error) error {
-	n.Log.Log(em, "password changed", err)
+	logger.Log("event", em, "password changed", err)
 	if err != nil {
 		return err
 	}
@@ -197,7 +179,7 @@ func (n *Notifier) PasswordChanged(em string, err error) error {
 
 //ProfileEdited logs the change
 func (n *Notifier) ProfileEdited(from schema.User, p schema.Person, err error) {
-	n.Log.UserLog(from, "new profile for "+p.Email+" ("+p.Fullname()+")", err)
+	userLog(from, "new profile for "+p.Email+" ("+p.Fullname()+")", err)
 }
 
 //InviteTeacher calls invite()
@@ -212,17 +194,17 @@ func (n *Notifier) InviteRoot(from schema.User, p schema.Person, token string, e
 
 //NewStudent logs the student addition
 func (n *Notifier) NewStudent(from schema.User, st schema.Student, err error) {
-	n.Log.UserLog(from, "new student "+st.User.Fullname()+" ("+st.User.Person.Email+") "+st.Major+"/"+st.Promotion, err)
+	userLog(from, "new student "+st.User.Fullname()+" ("+st.User.Person.Email+") "+st.Major+"/"+st.Promotion, err)
 }
 
 //SkipStudent logs the change
 func (n *Notifier) SkipStudent(from schema.User, em string, skip bool, err error) {
-	n.Log.UserLog(from, "set student "+em+" skip status to "+strconv.FormatBool(skip), err)
+	userLog(from, "set student "+em+" skip status to "+strconv.FormatBool(skip), err)
 }
 
 //NewTutor logs the change and mail the old, the new tutor and the emitter
 func (n *Notifier) NewTutor(from schema.User, stu string, old, now schema.User, err error) error {
-	n.Log.UserLog(from, stu+" was tutored by "+old.Person.Email+", now "+now.Person.Email, err)
+	userLog(from, stu+" was tutored by "+old.Person.Email+", now "+now.Person.Email, err)
 	if err != nil {
 		return err
 	}
@@ -236,7 +218,7 @@ func (n *Notifier) NewTutor(from schema.User, stu string, old, now schema.User, 
 
 //SurveyRequest sends the survey request to the supervisor
 func (n *Notifier) SurveyRequest(sup schema.Person, tutor schema.User, student schema.Student, survey schema.SurveyHeader, err error) error {
-	n.Log.Log("cron", "send invitation for survey '"+student.User.Person.Email+"/"+survey.Kind+"' to '"+sup.Email+"'", err)
+	logger.Log("event", "cron", "send invitation for survey '"+student.User.Person.Email+"/"+survey.Kind+"' to '"+sup.Email+"'", err)
 	frMonths := []string{"", "Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Decembre"}
 	if err == nil {
 		dta := struct {
@@ -281,5 +263,5 @@ func (n *Notifier) TutorNewsLetter(tut schema.User, lates []schema.StudentReport
 	}
 	buf := fmt.Sprintf("send the weekly report to '%s' with %d warning(s)\n", tut.Fullname(), len(statuses))
 	err := n.mailer.Send(tut.Person, "tutor_newsletter.txt", statuses)
-	n.Log.Log("cron", buf, err)
+	logger.Log("event", "cron", buf, err)
 }

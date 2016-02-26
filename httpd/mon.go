@@ -1,10 +1,11 @@
 package httpd
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 
-	"github.com/fhermeni/wints/notifier"
+	"github.com/fhermeni/wints/logger"
 )
 
 //MonResponseWriter embeds a responsewriter to save the status code
@@ -44,12 +45,14 @@ func (w *MonResponseWriter) WriteHeader(statusCode int) {
 }
 
 //Mon monitores the requests
-func Mon(not *notifier.Notifier, h http.HandlerFunc) http.HandlerFunc {
+func Mon(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		myRw := NewMonResponseWriter(w)
 		start := time.Now()
 		defer func() {
-			not.Log.Access(r.Method, r.URL.String(), myRw.Status(), int(time.Since(start).Nanoseconds()/1000000))
+			ms := int(time.Since(start).Nanoseconds() / 1000000)
+			msg := fmt.Sprintf("\"%s\" %d %d", r.URL.String(), myRw.Status(), ms)
+			logger.Log("access", r.Method, msg, nil)
 		}()
 		h(myRw, r)
 	}

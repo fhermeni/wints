@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/BurntSushi/toml"
+	"github.com/fhermeni/wints/logger"
 	"github.com/fhermeni/wints/schema"
 )
 
@@ -14,7 +15,7 @@ func (ed *HTTPd) survey(w http.ResponseWriter, r *http.Request) {
 	kind := r.URL.Query().Get("kind")
 	s := schema.Survey{}
 	if _, err := toml.DecodeFile("assets/surveys/"+kind+".toml", &s); err != nil {
-		ed.not.Log.Log("root", "Unable to read the survey questions", err)
+		logger.Log("event", "survey", "Unable to read the questions for '"+kind+"'", err)
 		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
@@ -27,13 +28,13 @@ func (ed *HTTPd) survey(w http.ResponseWriter, r *http.Request) {
 		}).ParseFiles("assets/surveys/survey.html")
 
 	if err != nil {
-		ed.not.Log.Log("root", "Unable to read the survey template", err)
+		logger.Log("event", "survey", "Unable to read the template for '"+kind+"'", err)
 		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-type", "text/html; charset=utf-8")
 	if err := tpl.Execute(w, s); err != nil {
-		ed.not.Log.Log("root", "Unable to run the template", err)
+		logger.Log("event", "survey", "Unable to run the template for '"+kind+"'", err)
 		http.Error(w, "", http.StatusInternalServerError)
 		return
 	}

@@ -5,13 +5,13 @@ import (
 	"errors"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"sync"
 
 	"github.com/klauspost/compress/gzip"
 
 	"github.com/fhermeni/wints/config"
+	"github.com/fhermeni/wints/logger"
 	"github.com/fhermeni/wints/notifier"
 	"github.com/fhermeni/wints/session"
 )
@@ -115,10 +115,9 @@ func (ex *Exchange) outFile(mime, filename string, cnt []byte, e error) error {
 	}
 	ex.w.Header().Set("Content-type", mime)
 	ex.w.Header().Set("Content-disposition", "attachment; filename="+filename)
-	x, err := ex.w.Write(cnt)
-	log.Println(x)
+	_, err := ex.w.Write(cnt)
 	if err != nil {
-		ex.not.Log.UserLog(ex.s.Me(), "Unable to send the report", err)
+		logger.Log("event", ex.s.Me().Person.Email, "Unable to send the report", err)
 		http.Error(ex.w, "", http.StatusInternalServerError)
 	}
 	return err

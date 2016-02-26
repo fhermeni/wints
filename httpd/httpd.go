@@ -18,7 +18,6 @@ import (
 type HTTPd struct {
 	cfg   config.HTTPd
 	store *sqlstore.Store
-	not   *notifier.Notifier
 }
 
 //NewHTTPd makes a new HTTP daemon
@@ -29,12 +28,11 @@ func NewHTTPd(not *notifier.Notifier, store *sqlstore.Store, conventions feeder.
 	http.Handle("/assets/", http.StripPrefix("/"+cfg.Assets, httpgzip.NewHandler(fs)))
 	//The rest endpoints
 	rest := NewEndPoints(not, store, conventions, cfg.Rest, org)
-	http.HandleFunc(cfg.Rest.Prefix, Mon(not, rest.router.ServeHTTP))
+	http.HandleFunc(cfg.Rest.Prefix, Mon(rest.router.ServeHTTP))
 
 	httpd := HTTPd{
 		cfg:   cfg,
 		store: store,
-		not:   not,
 	}
 	//the pages
 	for _, p := range []string{"home", "login", "password"} {
@@ -46,7 +44,7 @@ func NewHTTPd(not *notifier.Notifier, store *sqlstore.Store, conventions feeder.
 }
 
 func (ed *HTTPd) page(path string) func(http.ResponseWriter, *http.Request) {
-	return Mon(ed.not, func(w http.ResponseWriter, r *http.Request) {
+	return Mon(func(w http.ResponseWriter, r *http.Request) {
 
 		http.ServeFile(w, r, ed.cfg.Assets+path)
 	})

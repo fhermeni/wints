@@ -9,8 +9,6 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/fhermeni/wints/journal"
-
 	"golang.org/x/text/encoding/charmap"
 )
 
@@ -20,17 +18,15 @@ type HTTPConventionReader struct {
 	login    string
 	password string
 	Encoding string
-	j        journal.Journal
 }
 
 //NewHTTPConventionReader creates a new reader.
 //Default encoding is "windows-1252"
-func NewHTTPConventionReader(url, login, password string, j journal.Journal) *HTTPConventionReader {
+func NewHTTPConventionReader(url, login, password string) *HTTPConventionReader {
 	return &HTTPConventionReader{
 		url:      url,
 		login:    login,
 		password: password,
-		j:        j,
 	}
 }
 

@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/fhermeni/wints/journal"
+	"github.com/fhermeni/wints/logger"
 	"github.com/fhermeni/wints/schema"
 )
 
@@ -47,7 +47,6 @@ var (
 
 //CsvConventions parses conventions from CSV files
 type CsvConventions struct {
-	j          journal.Journal
 	Reader     ConventionReader
 	Year       int
 	promotions []string
@@ -55,10 +54,9 @@ type CsvConventions struct {
 
 //NewCsvConventions creates an importer from a given reader
 //By default, the parsed year is the current year
-func NewCsvConventions(r ConventionReader, promotions []string, j journal.Journal) *CsvConventions {
+func NewCsvConventions(r ConventionReader, promotions []string) *CsvConventions {
 	return &CsvConventions{
 		Reader:     r,
-		j:          j,
 		promotions: promotions,
 		Year:       time.Now().Year()}
 }
@@ -88,7 +86,7 @@ func clean(str string) string {
 }
 
 func (f *CsvConventions) log(msg string, err error) {
-	f.j.Log("feeder", msg, err)
+	logger.Log("event", "feeder", msg, err)
 }
 
 func cleanInt(str string) int {
@@ -186,7 +184,7 @@ func (f *CsvConventions) Import() ([]schema.Convention, error) {
 		wg.Add(1)
 		go func(i int, p string) {
 			convs, err := f.scan(p)
-			f.j.Log("feeder", "Scanning conventions of promotion '"+p+"'", err)
+			logger.Log("event", "feeder", "Scanning conventions of promotion '"+p+"'", err)
 			if err == ErrAuthorization {
 				error = err
 			}

@@ -3,15 +3,15 @@ package jobs
 import (
 	"time"
 
-	"github.com/fhermeni/wints/journal"
+	"github.com/fhermeni/wints/logger"
 	"github.com/fhermeni/wints/notifier"
 	"github.com/fhermeni/wints/schema"
 )
 
 //MissingReports scan the internships for reports or reviews that are missing
-func MissingReports(provider schema.Internshipser, not notifier.NewsLetter, logger journal.Logger) {
+func MissingReports(provider schema.Internshipser, not notifier.NewsLetter) {
 	ints, err := provider.Internships()
-	logger.Log("cron", "Scanning the internships for the tutor news letters", err)
+	logger.Log("event", "cron", "Scanning the internships for the tutor news letters", err)
 	byTutor := make(map[string][]schema.StudentReports)
 	tutors := make(map[string]schema.User)
 	for _, i := range ints {

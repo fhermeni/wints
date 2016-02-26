@@ -8,11 +8,11 @@ all: install test
 
 build:
 	@echo "==== go build ===="		
-	@godep go build $(GOFLAGS) ./...
+	@go build $(GOFLAGS) ./...
 
 install:
 	@echo "==== install ===="
-	@godep go install $(GOFLAGS) .
+	@go install $(GOFLAGS) .
 
 vet:
 	@echo "==== go vet ===="
@@ -24,11 +24,11 @@ lint:
 
 test: build vet lint	
 	@echo "==== go test ===="
-	@godep go test $(GOFLAGS) ./...	
+	@go test $(GOFLAGS) ./...	
 
 test-integration: install
 	@echo "==== integration test ===="
-	@godep go test -v -tags "integration" ./...
+	@go test -v -tags "integration" ./...
 
 errcheck:	
 	@echo "==== errcheck ===="
@@ -43,7 +43,7 @@ cov: install
 
 bench: install
 	@echo "==== bench ===="
-	@godep go test -tags "integration" -run=NONE -bench=. $(GOFLAGS) ./...
+	@go test -tags "integration" -run=NONE -bench=. $(GOFLAGS) ./...
 
 clean:
 	@godep go clean $(GOFLAGS) -i ./...
@@ -65,4 +65,4 @@ deploy: test
 
 run-dev:
 	@echo "==== run-dev ===="
-	@godep go run main.go --fake-mailer
+	@go run main.go --fake-mailer
