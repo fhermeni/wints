@@ -11,30 +11,70 @@ import (
 	"time"
 )
 
+type defaultLogger struct {
+	path  string
+	mutex sync.Mutex
+}
+
+//MultiLogger specifies an interface to log multiple sources than can be streamed
+type MultiLogger interface {
+	SetRoot(p string) error
+	Read(kind string) (io.ReadCloser, error)
+	Logs() ([]string, error)
+	Log(kind, tag, msg string, err error)
+}
+
 var (
 	//FileTimeFmt specifies the date format for the log files
 	FileTimeFmt = "06-01-02"
-	path        string
-	mutex       sync.Mutex
+	//Default is the default logger
+	Default *defaultLogger
 )
 
-//Init initiate the logger that will store the files in the given path
-func Init(p string) error {
+func init() {
+	Default = &defaultLogger{
+		path:  "./",
+		mutex: sync.Mutex{},
+	}
+}
+
+//SetRoot set the folder where the log files will be stored
+func (m *defaultLogger) SetRoot(p string) error {
 	err := os.MkdirAll(p, 0770)
 	if err != nil && !os.IsExist(err) {
 		return err
 	}
-	path = p
+	m.path = p
 	return nil
+
+}
+
+//Read stream the required log file
+func (m *defaultLogger) Read(kind string) (io.ReadCloser, error) {
+	var path = filepath.Join(m.path, kind)
+	return os.OpenFile(path, os.O_RDONLY, 0660)
+}
+
+//Logs returns all the files in the log folder
+func (m *defaultLogger) Logs() ([]string, error) {
+	files, err := ioutil.ReadDir(m.path)
+	if err != nil {
+		return []string{}, err
+	}
+	names := make([]string, len(files))
+	for i, f := range files {
+		names[i] = f.Name()
+	}
+	return names, err
 }
 
 //Log in the 'kind' file a tagged message
-func Log(kind, tag, msg string, err error) {
-	mutex.Lock()
-	defer mutex.Unlock()
+func (m *defaultLogger) Log(kind, tag, msg string, err error) {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
 	now := time.Now()
 
-	path := filepath.Join(path, kind+"-"+now.Format(FileTimeFmt))
+	path := filepath.Join(m.path, kind+"-"+now.Format(FileTimeFmt))
 
 	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
 	if err != nil {
@@ -50,21 +90,22 @@ func Log(kind, tag, msg string, err error) {
 	out.Printf("%s - %s %s\n", tag, msg, status)
 }
 
-//Logs returns all the files in the log folder
-func Logs() ([]string, error) {
-	files, err := ioutil.ReadDir(path)
-	if err != nil {
-		return []string{}, err
-	}
-	names := make([]string, len(files))
-	for i, f := range files {
-		names[i] = f.Name()
-	}
-	return names, err
+//SetRoot set the folder where the log files will be stored
+func SetRoot(p string) error {
+	return Default.SetRoot(p)
 }
 
-//StreamLog stream the required log file
-func StreamLog(kind string) (io.ReadCloser, error) {
-	var path = filepath.Join(path, kind)
-	return os.OpenFile(path, os.O_RDONLY, 0660)
+//Log in the 'kind' file a tagged message
+func Log(kind, tag, msg string, err error) {
+	Default.Log(kind, tag, msg, err)
+}
+
+//Logs returns all the files in the log folder
+func Logs() ([]string, error) {
+	return Default.Logs()
+}
+
+//Read stream the required log file
+func Read(kind string) (io.ReadCloser, error) {
+	return Default.Read(kind)
 }

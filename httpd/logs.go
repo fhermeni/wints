@@ -11,7 +11,7 @@ func streamLog(ex Exchange) error {
 	if ex.s.Me().Role.Level() < schema.AdminLevel {
 		return session.ErrPermission
 	}
-	in, err := logger.StreamLog(kind)
+	in, err := logger.Read(kind)
 	return ex.out("text/plain", in, err)
 }
 

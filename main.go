@@ -111,7 +111,7 @@ func main() {
 		log.Fatalf("reading configuration '%s': %s\n", *conf, err.Error())
 	}
 
-	err = logger.Init(cfg.Journal.Path)
+	err = logger.SetRoot(cfg.Journal.Path)
 	fatal("Initiating the logger", err)
 
 	mailer = newMailer(*fakeMailer)
