@@ -14,5 +14,7 @@ By default, the deadlines for the reports are:
 - Midterm report: 2 months from the beginning
 - Final report: September, the 1st
 
+There is a 1 point penalty per day late.
+
 Regards,
 {{.Fullname}}
