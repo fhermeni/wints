@@ -317,7 +317,7 @@ Handlebars.registerHelper('report', function(r, em, cb) {
 	var bg = "";
 	var value, grade;
 	var cnt = '-';
-	if (r.Delivery && !r.Reviewed) {
+	if (r.Delivery && moment(r.Deadline).isBefore(moment()) && !r.Reviewed) {
 		bg = "info";
 		var delay = reviewDelay(r);		
 		value = -100 + delay;
