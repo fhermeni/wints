@@ -55,6 +55,7 @@ type Internships struct {
 	Reports     []Report
 	Surveys     []Survey
 	LatePenalty int
+	Version     string
 }
 
 func contains(s []string, v string) bool {

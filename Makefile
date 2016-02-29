@@ -11,8 +11,8 @@ build:
 	@go build $(GOFLAGS) ./...
 
 install:
-	@echo "==== install ===="
-	@go install $(GOFLAGS) .
+	@echo "==== install ===="	
+	@go install -ldflags "-X main.Version=`git rev-parse HEAD`" $(GOFLAGS) .
 
 vet:
 	@echo "==== go vet ===="
@@ -65,4 +65,4 @@ deploy: test
 
 run-dev:
 	@echo "==== run-dev ===="
-	@go run main.go --fake-mailer
+	@go run -ldflags "-X main.Version=`git rev-parse HEAD`" main.go --fake-mailer

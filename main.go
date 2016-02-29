@@ -19,6 +19,8 @@ import (
 	"github.com/robfig/cron"
 )
 
+var Version = "SNAPSHOT"
+
 var cfg config.Config
 var not *notifier.Notifier
 var store *sqlstore.Store
@@ -113,7 +115,8 @@ func main() {
 
 	err = logger.SetRoot(cfg.Journal.Path)
 	fatal("Initiating the logger", err)
-
+	fatal("Running Version '"+Version+"'", nil)
+	cfg.Internships.Version = Version
 	mailer = newMailer(*fakeMailer)
 	not = notifier.New(mailer, cfg)
 

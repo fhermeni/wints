@@ -28,6 +28,7 @@ $(document).ready(function() {
 	getConfig().done(function(c) {
 		config = c;
 		user(getCookie("login")).done(loadSuccess).fail(logFail);
+		$(".release").html(config.Version)
 	})
 });
 
