@@ -69,7 +69,7 @@ func (m *defaultLogger) Logs() ([]string, error) {
 }
 
 //Log in the 'kind' file a tagged message
-func (m *defaultLogger) Log(kind, tag, msg string, err error) {
+func (m *defaultLogger) Log(kind, tag, msg string, e error) {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 	now := time.Now()
@@ -83,8 +83,8 @@ func (m *defaultLogger) Log(kind, tag, msg string, err error) {
 	defer f.Close()
 
 	status := ""
-	if err != nil {
-		status = ": " + err.Error()
+	if e != nil {
+		status = ": " + e.Error()
 	}
 	out := log.New(f, "", log.LstdFlags)
 	out.Printf("%s - %s %s\n", tag, msg, status)

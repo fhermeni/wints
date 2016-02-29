@@ -3,6 +3,7 @@ package sqlstore
 import (
 	"database/sql"
 	"errors"
+	"log"
 	"strings"
 	"time"
 
@@ -43,6 +44,7 @@ func (s *Store) addUser(tx *TxErr, u schema.User) {
 	var em string
 	err := tx.QueryRow(selectAlias, u.Person.Email).Scan(&em)
 	if err == nil {
+		log.Println("No " + em + " in the alias")
 		//There is already a user. The proposed email was just an alias
 		tx.err = schema.ErrUserExists
 	} else {
@@ -191,8 +193,10 @@ func (s *Store) SetEmail(old, now string) error {
 	//Create an alias to remember the email
 	tx := newTxErr(s.db)
 	nb := tx.Update(updateEmail, old, now)
-	if nb != 1 {
-		tx.err = schema.ErrUnknownUser
+	log.Println(nb)
+	if nb == -1 {
+		log.Println(old + " " + now)
+		log.Println(tx.err)
 	}
 	//Alias after the user because it does not exists otherwise
 	tx.Exec(insertAlias, old, now)

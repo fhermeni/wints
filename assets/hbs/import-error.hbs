@@ -2,7 +2,7 @@
 <div class="modal-content"> 
     <div class="modal-body">
         <button type="button" class="close" aria-hidden="true" onclick="hideModal()">×</button>
-        <legend>{{len Errors}} error(s)</legend>   
+        <legend>Over {{Nb}}: {{len Errors}} failure(s); {{len Ignored}} ignored</legend>   
         <table class="table table-hover">
         <thead>
             <tr>
@@ -11,6 +11,15 @@
         </thead>
         {{#each Errors}}
             <tr>
+                <td>{{fullname Student.User.Person}}</td>
+                <td>{{Student.User.Person.Email}}</td>
+                <td>{{Student.Promotion}}</td>
+                <td>{{Student.Major}}</td>
+                <td>{{Reason}}</td>
+            </tr>
+        {{/each}}
+        {{#each Ignored}}
+            <tr class="warning">
                 <td>{{fullname Student.User.Person}}</td>
                 <td>{{Student.User.Person.Email}}</td>
                 <td>{{Student.Promotion}}</td>

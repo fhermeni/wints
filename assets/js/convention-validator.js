@@ -272,6 +272,7 @@ function prepareValidation() {
 	p = c.Student.User.Person;
 	var newEmail = p.Email;
 	p.Email = newEmail;
+	console.log(knownEmail + " "  +newEmail)
 	postUserEmail(knownEmail, newEmail).done(function() {
 		sendProfile(p).done(function() {
 			commitValidation(c, tut);

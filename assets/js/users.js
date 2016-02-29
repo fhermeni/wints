@@ -197,34 +197,39 @@ function parseCSV(e) {
 			Promotion: among(fields[3].toLowerCase(), config.Promotions),
 			Major: among(fields[4].toLowerCase(), config.Majors)
 		};
-		var req = postStudent(p).done(doneStudentImport).fail(function(xhr) {
+		var req = postStudent(p).done(doneStudentImport).fail(function(xhr) {			
 			failStudentImport(p, xhr)
 		});
 	});
 	$("#csv-import").val("");
 }
 
-function updateImportStatus() {
-	if (stats.Errors.length != 0) {
+function updateImportStatus() {	
+	if (stats.Errors.length + stats.Ignored.length != 0) {
 		$("#import-status").removeClass("hidden")
 	}
 }
 
 function showImportError() {
+	console.log(stats);
 	$("#modal").render("import-error", stats, showModal)
 }
 
 function failStudentImport(student, xhr) {
+	console.log(xhr);
 	if (xhr.status == 400) {
 		stats.Errors.push({
 			Student: student,
 			Reason: xhr.responseText
 		});
 	} else if (xhr.status == 409) {
-		stats.Ignored.push(student)
+		stats.Ignored.push({
+			Student: student,
+			Reason: xhr.responseText
+		});		
 	} else {
 		notifyError(xhr);
-	}
+	}	
 	updateImportStatus()
 }
 
