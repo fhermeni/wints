@@ -3,7 +3,6 @@ package sqlstore
 import (
 	"database/sql"
 	"errors"
-	"log"
 	"strings"
 	"time"
 
@@ -60,7 +59,6 @@ func (s *Store) addUser(tx *TxErr, u schema.User) {
 		randomBytes(32),
 	)
 	tx.Exec(insertAlias, u.Person.Email, u.Person.Email)
-	log.Println(tx.err)
 }
 
 //Visit writes the current time for the given user

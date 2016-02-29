@@ -1,9 +1,6 @@
 package sqlstore
 
-import (
-	"database/sql"
-	"log"
-)
+import "database/sql"
 
 //TxErr is a structure to manage transactions more confortablely.
 //It maintains the ongoing error to state if the transaction must be committed or rollbacked
@@ -22,7 +19,6 @@ func newTxErr(db *sql.DB) TxErr {
 //It is committed if err == nil. Rollbacked otherwise.
 func (r *TxErr) Done() error {
 	if r.err != nil {
-		log.Println(r.err.Error())
 		if r.tx == nil {
 			//In case there was an issue while opening the transaction
 			return r.err
