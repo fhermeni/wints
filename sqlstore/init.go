@@ -1,7 +1,8 @@
 package sqlstore
 
 const (
-	create = `drop table if exists users cascade;
+	create = `drop table if exists aliases cascade;
+drop table if exists users cascade;        
 drop table if exists sessions cascade;
 drop table if exists password_renewal cascade;
 drop table if exists students cascade;
