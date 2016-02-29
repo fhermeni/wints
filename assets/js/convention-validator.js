@@ -54,7 +54,17 @@ function loadConventionValidator(students, internships, convs, us) {
 		if (!allConventions) {
 			allConventions = [];
 		}
-		allConventions.sort(convSort);
+		allConventions.sort(convSort);	
+
+		//Remove the conventions that are already validated
+		var checked = [];
+		internships.forEach(function (i) {
+			checked.push(i.Convention.Student.User.Person.Email);
+		})
+		console.log(checked.length + " internships");
+		allConventions = allConventions.filter(function (c) {					
+			return !(checked.indexOf(c.Student.User.Person.Email) >= 0);
+		});		
 	}
 
 	if (us) {
@@ -90,6 +100,8 @@ function conventionValidator(em) {
 		notifyError("Only an admin can validate a convention");
 		return
 	}
+
+
 	data = {
 		Conventions: allConventions,
 		C: allConventions[0],
