@@ -12,7 +12,7 @@ build:
 
 install:
 	@echo "==== install ===="	
-	@go install -ldflags "-X main.Version=`git rev-parse HEAD`" $(GOFLAGS) .
+	@go install -ldflags "-X main.Version=${VERSION}" $(GOFLAGS) .
 
 vet:
 	@echo "==== go vet ===="
