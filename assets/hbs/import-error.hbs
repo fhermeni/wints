@@ -6,15 +6,14 @@
         <table class="table table-hover">
         <thead>
             <tr>
-                <th>Student</th><th>Email</th><th>Promotion</th><th>Major</th><th>Status</th>
+                <th>Student</th><th>Email</th><th>Promotion</th><th>Status</th>
             </tr>
         </thead>
         {{#each Errors}}
             <tr>
                 <td>{{fullname Student.User.Person}}</td>
                 <td>{{Student.User.Person.Email}}</td>
-                <td>{{Student.Promotion}}</td>
-                <td>{{Student.Major}}</td>
+                <td>{{Student.Promotion}} / {{Student.Major}}</td>                
                 <td>{{Reason}}</td>
             </tr>
         {{/each}}
@@ -22,8 +21,7 @@
             <tr class="warning">
                 <td>{{fullname Student.User.Person}}</td>
                 <td>{{Student.User.Person.Email}}</td>
-                <td>{{Student.Promotion}}</td>
-                <td>{{Student.Major}}</td>
+                <td>{{Student.Promotion}} / {{Student.Major}}</td>                                
                 <td>{{Reason}}</td>
             </tr>
         {{/each}}

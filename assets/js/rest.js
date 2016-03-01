@@ -81,11 +81,12 @@ var ROOT_API = "/api/v2";
 
 //Profile management
 
-function post(URL, data) {
+function post(URL, data, sync) {
 	return $.ajax({
 		method: "POST",
 		data: JSON.stringify(data),
 		url: ROOT_API + URL,
+		async: sync ? false: true,
 	});
 }
 
@@ -188,8 +189,8 @@ function pendingConventions() {
 	return get("/conventions/");
 }
 
-function postStudent(p) {
-	return post("/students/", p);
+function postStudent(p, sync) {
+	return post("/students/", p, sync);
 }
 
 function postStudentSkippable(stu, skip) {
@@ -290,23 +291,6 @@ function getLog(kind) {
 function logs() {
 	return get("/logs/")
 }
-
-/*function setReportContent(email, kind, d, progressFunc, ok, no) {
-	return $.ajax({
-		method: "POST",
-		url: ROOT_API + "/internships/" + email + "/reports/" + kind + "/content",
-		data: d,
-		processData: false,
-		contentType: false,
-		xhr: function() { // custom xhr
-			myXhr = $.ajaxSettings.xhr();
-			if (myXhr.upload) { // check if upload property exists
-				myXhr.upload.addEventListener('progress', progressFunc, false); // for handling the progress of the upload
-			}
-			return myXhr;
-		}
-	}).done(noCb(ok)).fail(restError(no));
-}*/
 
 function postReport(email, kind, dta, progress) {
 	return $.ajax({

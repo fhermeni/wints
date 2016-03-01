@@ -59,7 +59,7 @@ setup:
 	@go get -u github.com/kisielk/errcheck
 	@go get -u golang.org/x/text/encoding/charmap
 
-deploy: test
+deploy: intall test
 	@echo "=== deploy ==="
 	@git push wints
 

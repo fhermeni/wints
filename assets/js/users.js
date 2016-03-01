@@ -197,7 +197,7 @@ function parseCSV(e) {
 			Promotion: among(fields[3].toLowerCase(), config.Promotions),
 			Major: among(fields[4].toLowerCase(), config.Majors)
 		};
-		var req = postStudent(p).done(doneStudentImport).fail(function(xhr) {			
+		var req = postStudent(p).done(doneStudentImport, true).fail(function(xhr) {			
 			failStudentImport(p, xhr)
 		});
 	});
