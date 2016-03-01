@@ -1,9 +1,6 @@
 package sqlstore
 
-import (
-	"database/sql"
-	"log"
-)
+import "database/sql"
 
 //TxErr is a structure to manage transactions more confortablely.
 //It maintains the ongoing error to state if the transaction must be committed or rollbacked
@@ -61,7 +58,6 @@ func (r *TxErr) Update(query string, args ...interface{}) int64 {
 		return -1
 	}
 	res, err := r.tx.Exec(query, args...)
-	log.Println(err)
 	if err != nil {
 		r.err = mapCstrToError(err)
 		return -1
