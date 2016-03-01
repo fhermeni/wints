@@ -11,7 +11,10 @@ import (
 //MissingReports scan the internships for reports or reviews that are missing
 func MissingReports(provider schema.Internshipser, not notifier.NewsLetter) {
 	ints, err := provider.Internships()
-	logger.Log("event", "cron", "Scanning the internships for the tutor news letters", err)
+	logger.Log("event", "cron", "Scanning the internships for the tutor newsletters", err)
+	if err != nil {
+		return
+	}
 	byTutor := make(map[string][]schema.StudentReports)
 	tutors := make(map[string]schema.User)
 	for _, i := range ints {

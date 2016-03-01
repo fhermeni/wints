@@ -3,8 +3,6 @@
 - sequence student import
 - do not remove student having a convention	
 - resilience to multi import with e-mail rewriting
-- cron
-	- survey request	
 - server-side caching of the store
 	- store interface
 	- cache implement interface
