@@ -164,7 +164,7 @@ func (s *Store) NewPassword(token, newP []byte) (string, error) {
 //NewUser add a user
 //Basically, calls addUser
 func (s *Store) NewUser(p schema.Person, role schema.Role) ([]byte, error) {
-	if !validEmail(now) {
+	if !validEmail(p.Email) {
 		return []byte{}, schema.ErrInvalidEmail
 	}
 	token := randomBytes(32)

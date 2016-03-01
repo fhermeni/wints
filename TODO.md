@@ -8,10 +8,16 @@
 - server-side caching of the store
 	- store interface
 	- cache implement interface
+- defense management
+- test security ?
+
+
+
+#Year +1 todo
+- generate link for the major head & the tutor to ack the convention
+- gin middleware ?
 - Makefile to control the build workflow		
 	- bench	
 	- asset minification, concatenation, and embedding
 		- gulp to minimify and concatenate
 		- whatever for embedding
-- defense management
-- test security ?
