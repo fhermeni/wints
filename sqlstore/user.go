@@ -164,7 +164,7 @@ func (s *Store) NewPassword(token, newP []byte) (string, error) {
 //NewUser add a user
 //Basically, calls addUser
 func (s *Store) NewUser(p schema.Person, role schema.Role) ([]byte, error) {
-	if !strings.Contains(p.Email, "@") {
+	if !validEmail(now) {
 		return []byte{}, schema.ErrInvalidEmail
 	}
 	token := randomBytes(32)
@@ -188,6 +188,9 @@ func (s *Store) RmUser(email string) error {
 
 //SetEmail change a user email to another
 func (s *Store) SetEmail(old, now string) error {
+	if !validEmail(now) {
+		return schema.ErrInvalidEmail
+	}
 	//Create an alias to remember the email
 	tx := newTxErr(s.db)
 	tx.Update(updateEmail, old, now)
@@ -203,4 +206,16 @@ func (s *Store) ReplaceUserWith(src, dst string) error {
 	tx.Update(replaceJuryInDefenses, src, dst)
 	tx.Update(deleteUser, src)
 	return tx.Done()
+}
+
+func validEmail(em string) bool {
+	if !strings.Contains(em, "@") {
+		return false
+	}
+	for _, c := range []string{";", ",", " "} {
+		if strings.Contains(em, c) {
+			return false
+		}
+	}
+	return true
 }

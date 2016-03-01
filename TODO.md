@@ -1,4 +1,6 @@
 # TODO
+- check malformed emails
+- sequence student import
 - do not remove student having a convention	
 - resilience to multi import with e-mail rewriting
 - cron
