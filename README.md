@@ -7,6 +7,7 @@ A web application to manage final internships at Polytech.
 - A postgreSQL database
 - [Golang](https://golang.org/)
 - [GoDep](https://github.com/tools/godep) to handle the dependencies
+- [node.js](nodejs.org) to build the frontend
 
 ## Installation
 
@@ -31,3 +32,23 @@ In your `$GOPATH`:
 ## Benchmarks, tests
 
 go test -x -v -tags=integration -bench BenchmarkInternships -cpuprofile=cpu.prof
+
+
+## Developement
+```
+assets
+  |- dist
+  |	   |- css/wints.min.css
+  |	   |- js/wints.min.js
+  |	   |- html/*.html
+  | - src
+  		|- js
+  		|- css
+  		| -hbs
+  		\- html
+```
+
+- concat and minify css
+- concat and minify javascript
+- minify html
+- precompile handlebars
