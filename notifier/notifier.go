@@ -218,21 +218,21 @@ func (n *Notifier) NewTutor(from schema.User, stu string, old, now schema.User, 
 
 //SurveyRequest sends the survey request to the supervisor
 func (n *Notifier) SurveyRequest(sup schema.Person, tutor schema.User, student schema.Student, survey schema.SurveyHeader, err error) error {
-	logger.Log("event", "cron", "send invitation for survey '"+student.User.Person.Email+"/"+survey.Kind+"' to '"+sup.Email+"'", err)
 	frMonths := []string{"", "Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Decembre"}
-	if err == nil {
-		dta := struct {
-			Student schema.User
-			Survey  schema.SurveyHeader
-			FrDate  string
-			EnDate  string
-		}{Student: student.User,
-			Survey: survey,
-			FrDate: fmt.Sprintf("%d %s %d", survey.Deadline.Day(), frMonths[survey.Deadline.Month()], survey.Deadline.Year()),
-			EnDate: survey.Deadline.Format("Mon, 02 Jan 2006"),
-		}
-		return n.mailer.Send(sup, "survey_request.txt", dta, tutor.Person)
+	dta := struct {
+		Student schema.User
+		Survey  schema.SurveyHeader
+		FrDate  string
+		EnDate  string
+	}{Student: student.User,
+		Survey: survey,
+		FrDate: fmt.Sprintf("%d %s %d", survey.Deadline.Day(), frMonths[survey.Deadline.Month()], survey.Deadline.Year()),
+		EnDate: survey.Deadline.Format("Mon, 02 Jan 2006"),
 	}
+	if err == nil {
+		err = n.mailer.Send(sup, "survey_request.txt", dta, tutor.Person)
+	}
+	logger.Log("event", "cron", "send invitation for survey '"+student.User.Person.Email+"/"+survey.Kind+"' to '"+sup.Email+"'", err)
 	return err
 }
 

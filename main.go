@@ -90,6 +90,7 @@ func newFeeder(not *notifier.Notifier) feeder.Conventions {
 func runSpies() {
 	c := cron.New()
 	c.AddFunc(cfg.Crons.NewsLetters, func() { jobs.MissingReports(store, not) })
+	c.AddFunc(cfg.Crons.NewsLetters, func() { jobs.MissingSurveys(store, not) })
 	c.Start()
 }
 
