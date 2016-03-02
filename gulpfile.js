@@ -1,151 +1,60 @@
-/*
- * Copyright (c) 2015 Martin Donath
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- */
+var gulp = require('gulp');
+var handlebars = require('gulp-handlebars');
+var wrap = require('gulp-wrap');
+var declare = require('gulp-declare');
+var concat = require('gulp-concat');
+var uglify = require('gulp-uglify');
+var rename = require('gulp-rename');
+var cleanCSS = require('gulp-clean-css');
+var htmlmin = require('gulp-htmlmin');
+var livereload = require('gulp-livereload');
 
-/* ----------------------------------------------------------------------------
- * Imports
- * ------------------------------------------------------------------------- */
-
-var gulp       = require('gulp');
-var addsrc     = require('gulp-add-src');
-var args       = require('yargs').argv;
-var autoprefix = require('autoprefixer-core');
-var clean      = require('del');
-var collect    = require('gulp-rev-collector');
-var concat     = require('gulp-concat');
-var ignore     = require('gulp-ignore');
-var mincss     = require('gulp-minify-css');
-var minhtml    = require('gulp-htmlmin');
-var modernizr  = require('gulp-modernizr');
-var mqpacker   = require('css-mqpacker');
-var notifier   = require('node-notifier');
-var gulpif     = require('gulp-if');
-var pixrem     = require('pixrem');
-var plumber    = require('gulp-plumber');
-var ren    = require('gulp-rename');
-var postcss    = require('gulp-postcss');
-var reload     = require('gulp-livereload');
-var rev        = require('gulp-rev');
-var sass       = require('gulp-sass');
-var sourcemaps = require('gulp-sourcemaps');
-var sync       = require('gulp-sync')(gulp).sync;
-var child      = require('child_process');
-var uglify     = require('gulp-uglify');
-var util       = require('gulp-util');
-var vinyl      = require('vinyl-paths');
-
-/* ----------------------------------------------------------------------------
- * Locals
- * ------------------------------------------------------------------------- */
-
-/* Application server */
-var server = null;
-
-/* ----------------------------------------------------------------------------
- * Overrides
- * ------------------------------------------------------------------------- */
-
-/*
- * Override gulp.src() for nicer error handling.
- */
-var src = gulp.src;
-gulp.src = function() {
-  return src.apply(gulp, arguments)
-    .pipe(plumber(function(error) {
-      util.log(util.colors.red(
-        'Error (' + error.plugin + '): ' + error.message
-      ));
-      notifier.notify({
-        title: 'Error (' + error.plugin + ')',
-        message: error.message.split('\n')[0]
-      });
-      this.emit('end');
-    })
-  );
-};
-
-/* ----------------------------------------------------------------------------
- * Assets pipeline
- * ------------------------------------------------------------------------- */
-
-var gulp = require('gulp'),
-    gp_concat = require('gulp-concat'),
-    gp_rename = require('gulp-rename'),
-    gp_uglify = require('gulp-uglify');
-
-/*
-* Javascript concatenation and minimization
-*/
-gulp.task('assets:javascripts', function(){
-    return gulp.src(['assets/js/*.js','assets/js/vendor/*.js'])
-        .pipe(gp_concat('wints.js'))
-        .pipe(gulp.dest('dist'))
-        .pipe(gp_rename('wints.min.js'))
-        .pipe(gp_uglify())
-        .pipe(gulp.dest('dist'));
+gulp.task('html', function() {
+  return gulp.src('assets/*.html')
+    .pipe(htmlmin({collapseWhitespace: true}))
+    .pipe(gulp.dest('dist/html/'))
+    .pipe(livereload());
 });
 
-/*
-* stylesheets concatenation and minimization
-*/
-gulp.task('assets:stylesheets', function(){
-    return gulp.src(['assets/css/*.css','assets/css/vendor/*.css'])
-        .pipe(gp_concat('wints.css'))
-        .pipe(gulp.dest('dist'))
-        .pipe(gp_rename('wints.min.css'))
-        .pipe(gp_uglify())
-        .pipe(gulp.dest('dist'));
-});
-/*
- * Build assets.
- */
-gulp.task('assets:build', [
-  'assets:stylesheets',
-  'assets:js',
-  'assets:modernizr',
-  'assets:views'
-]);
+gulp.task('fonts', function() {
+  return gulp.src('assets/css/fonts/**/*')
+  .pipe(gulp.dest('dist/css/fonts'))
+  .pipe(livereload());
+})
 
-/*
- * Watch assets for changes and rebuild on the fly.
- */
-gulp.task('assets:watch', function() {
-
-  /* Rebuild stylesheets on-the-fly */
-  gulp.watch([
-    'assets/css/**/*.css'
-  ], ['assets:stylesheets']);
-
-  /* Rebuild javascripts on-the-fly */
-  gulp.watch([
-    'assets/js/**/*.js',
-    'bower.json'
-  ], ['assets:javascripts']);
+gulp.task('handlebars', function(){
+  gulp.src(['assets/hbs/*.hbs','assets/hbs/*.partial'])
+    .pipe(handlebars())
+    .pipe(wrap('Handlebars.template(<%= contents %>)'))
+    .pipe(declare({
+      namespace: 'wints.templates',
+      noRedeclare: true, // Avoid duplicate declarations 
+    }))
+    .pipe(concat('templates.js'))
+    .pipe(gulp.dest('/assets/js/'))
+    .pipe(livereload());
 });
 
-/* ----------------------------------------------------------------------------
- * Application server
- * ------------------------------------------------------------------------- */
+gulp.task('js', function(){
+    return gulp.src(['assets/js/**/*.js', '!assets/js/**/*.min.js'])
+        .pipe(uglify())
+        .pipe(concat('wints.min.js'))                      
+        .pipe(gulp.dest('dist/js'))
+        .pipe(livereload());        
+});
 
-/*
- * Build assets by default.
- */
-gulp.task('default', ['js-fef'], function(){});
+gulp.task('css', function() {
+  return gulp.src(['assets/css/**/*.css', '!assets/js/**/*.min.css'])
+    .pipe(cleanCSS())
+    .pipe(concat('wints.min.css'))                      
+    .pipe(gulp.dest('dist/css'))
+    .pipe(livereload());
+});
+
+gulp.task('watch', function(){
+  livereload.listen();
+  gulp.watch(['assets/js/**/*.js', '!assets/js/**/*.min.js'], ['js']);   
+  gulp.watch(['assets/css/**/*.css', '!assets/css/**/*.min.css'], ['css']); 
+  gulp.watch('assets/*.html', ['html']); 
+  gulp.watch('assets/css/fonts/**/*', ['fonts']); 
+})
