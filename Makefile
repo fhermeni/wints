@@ -53,7 +53,15 @@ doc:
 	@godoc -http=:6060
 
 setup:
-	@npm install --save-dev gulp-wrap gulp-declare gulp-concat gulp-uglify gulp-rename gulp-clean-css gulp-htmlmin gulp-handlebars
+	@npm install --save-dev gulp-wrap\
+							gulp-declare\
+							gulp-concat\
+							gulp-uglify\
+							gulp-rename\
+							gulp-clean-css\
+							gulp-htmlmin\
+							gulp-handlebars\
+							gulp-util
 	@go get -u golang.org/x/tools/cmd/cover
 	@go get -u github.com/tools/godep 
 	@go get -u github.com/pierrre/gotestcover

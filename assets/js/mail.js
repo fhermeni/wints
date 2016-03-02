@@ -12,6 +12,7 @@ function conventionMailing(ctx, t, w) {
 	sendMail(to, cc);
 }
 
+
 function sendMail(to, cc) {
 	if (to.length > 0) {
 		window.location.href = "mailto:" + to.join(",") + (cc.length > 0 ? "?cc=" + cc.join(",") : "");
