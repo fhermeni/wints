@@ -30,11 +30,3 @@ function failSetPassword(xhr) {
 	cleanError("#passwd1", "#passwd2");
 	$(".alert-danger").html(xhr.responseText).removeClass("hidden");
 }
-$(document).ready(function() {
-	var t = $.urlParam("token");
-	if (!t) {
-		$(".alert-danger").html("<strong>There is no token in the request</strong>. Initiate a reset request <a href='login'>here</a>.").removeClass("hidden");
-		$(".btn").attr("disabled", "disabled");
-	}
-	$('[data-toggle="popover"]').popover()
-});

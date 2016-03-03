@@ -157,7 +157,6 @@ function showConvention(cnt) {
 	var dta = {
 		Teachers: allTeachers
 	};
-	debugger;
 	allConventions.forEach(function(c) {
 		if (c.Student.User.Person.Email == em) {
 			dta.C = c;

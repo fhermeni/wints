@@ -105,7 +105,10 @@ func (ed *EndPoints) del(path string, handler EndPoint) {
 }
 
 func (ed *EndPoints) openSession(w http.ResponseWriter, r *http.Request) (session.Session, error) {
-	token, _ := r.Cookie("token")
+	token, err := r.Cookie("token")
+	if err != nil {
+		token = &http.Cookie{}
+	}
 	s, err := ed.store.Session([]byte(token.Value))
 	if err != nil {
 		return session.Session{}, err

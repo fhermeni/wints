@@ -57,23 +57,3 @@ function passwordLostOk(xhr) {
 function passwordLostFail(xhr) {
 	reportError("#lostEmail", xhr.responseText)
 }
-
-$(document).ready(function() {
-	var em = $.urlParam("email")
-	if (em) {
-		$("#loginEmail").val(em);
-	}
-	$('[data-toggle="popover"]').popover()
-
-	$(function() {
-		$("input").keypress(function(e) {
-			if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
-				$('#login').click();
-				return false;
-			} else {
-				return true;
-			}
-		});
-	});
-
-});

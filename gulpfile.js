@@ -45,13 +45,16 @@ gulp.task('handlebars', function(){
 gulp.task('js', function(){      
     return gulp.src(['assets/js/**/*.js', '!assets/js/wints.min.js'])
     .pipe(order([
-    "**/j*.min.js",
-    "/**/bootstrap.min.js",    
-    "**/m*.min.js",
-    "**/*.min.js",
-    "assets/js/users.js"    
+    "**/vendor/jquery-1*",  
+    "**/vendor/moment.min.js",    
+    "**/vendor/handlebars.min.js",    
+    "**/vendor/jquery.*",  
+    "**/vendor/bootstrap.min.js",        
+    "**/vendor/bootstrap-*.js",    
+    "**/vendor/*.js",    
+    "assets/js/*.js"    
   ]))        
-    .pipe(print())
+    //.pipe(print())
         .pipe(config.production ? uglify() : util.noop())        
         .pipe(concat('wints.min.js'))                      
         .pipe(gulp.dest('assets/js/'))        
@@ -59,11 +62,15 @@ gulp.task('js', function(){
 });
 
 gulp.task('css', function() {
-  return gulp.src(['assets/css/**/*.css', '!assets/js/**/*.min.css', '!assets/js/**/wints.css'])
+  return gulp.src(['assets/css/**/*.css', '!assets/css/**/wints.css'])
     .pipe(config.production ? cleanCSS() : util.noop())
     .pipe(concat('wints.css'))                      
     .pipe(gulp.dest('assets/css/'))            
     .pipe(livereload());
+});
+
+gulp.task('assets', function () {
+  return gulp.start(['js','css','html']);
 });
 
 gulp.task('watch', function(){

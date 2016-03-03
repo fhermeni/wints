@@ -28,4 +28,3 @@ _testmain.go
 wints.conf
 *.key
 *.pem
-dist

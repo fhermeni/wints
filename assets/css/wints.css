@@ -1,12 +1,13 @@
-body {
+.404 {
 	background: #37BC9B;
 }
 
-.vertical-center {
+.404 .vertical-center {
 	margin-top: 200px;
 }
 .has-error input {
 	color: #d9534f;
+	border: none;
 	font-weight: bold;
 }
 
@@ -124,39 +125,6 @@ body {
 
 #sessionExpired:target {
    display: block;
-}
-body {
-	width: 95%;
-	margin: 0 auto;
-	font-size: 12pt;
-}
-
-h4 {
-	margin-bottom: 0.2em;
-}
-
-.offset,.cnt {
-	display: inline-block;
-	vertical-align: text-top;
-}
-
-.offset,.header {
-	font-weight: bold;
-}
-
-.descr {
-	width: 800px;
-	text-align: justify;
-}
-
-.fn {
-	color: rgb(67, 74, 84);
-}
-
-@media print {
-	.alert {
-	display: none !important;
-}
 }
 .box {
 	width: 1em;

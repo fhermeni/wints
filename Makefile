@@ -67,6 +67,7 @@ setup:
 	@go get -u github.com/pierrre/gotestcover
 	@go get -u github.com/kisielk/errcheck
 	@go get -u golang.org/x/text/encoding/charmap
+	@go get -u github.com/maruel/panicparse/cmd/pp
 
 deploy: intall test
 	@echo "=== deploy ==="

@@ -1,5 +1,6 @@
 .has-error input {
 	color: #d9534f;
+	border: none;
 	font-weight: bold;
 }
 
