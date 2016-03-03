@@ -69,7 +69,13 @@ setup:
 	@go get -u golang.org/x/text/encoding/charmap
 	@go get -u github.com/maruel/panicparse/cmd/pp
 
-deploy: intall test
+assets:
+	@gulp assets --production
+	
+deploy: install
+	@gulp assets --production
+	@git add assets
+	@git commit -m "production level assets"	
 	@echo "=== deploy ==="
 	@git push wints
 
