@@ -14,9 +14,5 @@
 
 #Year +1 todo
 - generate link for the major head & the tutor to ack the convention
-- gin middleware ?
-- Makefile to control the build workflow		
-	- bench	
-	- asset minification, concatenation, and embedding
-		- gulp to minimify and concatenate
-		- whatever for embedding
+- gin middleware ?	
+		
