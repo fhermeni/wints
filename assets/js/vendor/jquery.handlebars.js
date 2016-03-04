@@ -72,24 +72,30 @@
 	};
 
 	$.handlebarsPreload = function(templateName) {
-		var url = resolveTemplatePath(templateName);
+		var url = templateName;//resolveTemplatePath(templateName);
 		if (!cache.hasOwnProperty(url)) {
 			var $this = this;
 			$.get(url, function(template) {
-				cache[url] = Handlebars.compile(template);
+				cache[url] =  wints.templates[url];//Handlebars.compile(template);
 			});
+			//debugger;
+			//cache[url] = wints.templates[url];
 		}
 	};
 
 	$.fn.render = function(templateName, data, callback) {
-		var url = resolveTemplatePath(templateName);
+		var url = templateName;//resolveTemplatePath(templateName);
 		if (cache.hasOwnProperty(url)) {
 			this.html(cache[url](data)).trigger('render.handlebars', [templateName, data]);
 			if (callback) callback();
 		} else {
-			var $this = this;
+			var $this = this;			
+			cache[url] = wints.templates[url];
+			//debugger;
 			$.get(url, function(template) {
-				cache[url] = Handlebars.compile(template);
+				cache[url] = wints.templates[url];/*Handlebars.compile(template);*/
+				console.log(url);
+				console.log(cache[url]);
 				$this.html(cache[url](data)).trigger('render.handlebars', [templateName, data]);
 				if (callback) callback();
 			}, 'text');

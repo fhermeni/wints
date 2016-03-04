@@ -1,5 +1,6 @@
 var gulp = require('gulp');
-var handlebars = require('gulp-handlebars');
+//var handlebars = require('gulp-handlebars');
+var handlebars = require('gulp-handlebars-all');
 var wrap = require('gulp-wrap');
 var declare = require('gulp-declare');
 var concat = require('gulp-concat');
@@ -11,7 +12,7 @@ var livereload = require('gulp-livereload');
 var util = require('gulp-util');
 var order = require("gulp-order");
 var print = require("gulp-print");
-
+var $ = require('gulp-load-plugins')();
 var config = {
     production: !!util.env.production
 };
@@ -23,21 +24,44 @@ gulp.task('html', function() {
     .pipe(livereload());
 });
 
-//gulp.task('fonts', function() {
-//  return gulp.src('assets/css/fonts/**/*')
-//  .pipe(gulp.dest('dist/css/fonts'))
-//  .pipe(livereload());
-//})
-
-gulp.task('handlebars', function(){
-  gulp.src(['assets/hbs/*.hbs','assets/hbs/*.partial'])
+/*gulp.task('handlebars', function(){
+  gulp.src(['assets/hbs/*.hbs'])
     .pipe(handlebars())
     .pipe(wrap('Handlebars.template(<%= contents %>)'))
     .pipe(declare({
       namespace: 'wints.templates',
       noRedeclare: true, // Avoid duplicate declarations 
+    }))    
+    .pipe(concat('hbs.js'))
+    .pipe(gulp.dest('assets/js/'))
+    .pipe(livereload());
+
+  gulp.src(['assets/hbs/*.partial'])
+    .pipe(handlebars())
+    .pipe(wrap('Handlebars.registerPartial(<%= processPartialName(file.relative) %>, Handlebars.template(<%= contents %>));', {}, {
+      imports: {
+        processPartialName: function(fileName) {
+          // Strip the extension and the underscore 
+          // Escape the output with JSON.stringify 
+          return JSON.stringify(path.basename(fileName, '.js').substr(1));
+        }
+      }
     }))
-    .pipe(concat('templates.js'))
+    .pipe(concat('partials.js'))
+    .pipe(gulp.dest('assets/js/'));
+});*/
+
+gulp.task('handlebars', function(){
+  gulp.src('assets/hbs/*.hbs')
+    .pipe(handlebars('js'), {
+      partials: ['assets/hbs/*.partial'],
+    })
+    .pipe($.declare({
+      namespace: 'wints.templates',
+      noRedeclare: true, // Avoid duplicate declarations 
+
+    }))    
+    .pipe(concat('hbs.js'))
     .pipe(gulp.dest('assets/js/'))
     .pipe(livereload());
 });
