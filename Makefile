@@ -52,27 +52,6 @@ doc:
 	@echo "==== go doc is running. Can be moved to background ===="	
 	@godoc -http=:6060
 
-setup:
-	# @npm install --save-dev gulp-handlebars\
-							gulp-wrap\
-							gulp-declare\
-							gulp-concat\
-							gulp-uglify\
-							gulp-rename\
-							gulp-clean-css\
-							gulp-htmlmin\
-							gulp-livereload\
-							gulp-order\
-							gulp-util\					
-							merge-stream\														
-							
-	@go get -u golang.org/x/tools/cmd/cover
-	@go get -u github.com/tools/godep 
-	@go get -u github.com/pierrre/gotestcover
-	@go get -u github.com/kisielk/errcheck
-	@go get -u golang.org/x/text/encoding/charmap
-	@go get -u github.com/maruel/panicparse/cmd/pp
-
 assets:
 	@echo "=== production level assets ==="
 	@gulp assets --production
@@ -82,7 +61,3 @@ deploy: install assets
 	@git commit -m "production level assets"	
 	@echo "=== deploy ==="
 	@git push wints
-
-run-dev:
-	@echo "==== run-dev ===="
-	@go run -ldflags "-X main.Version=`git rev-parse HEAD`" main.go --fake-mailer
