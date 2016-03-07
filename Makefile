@@ -46,11 +46,7 @@ bench: install
 	@go test -tags "integration" -run=NONE -bench=. $(GOFLAGS) ./...
 
 clean:
-	@godep go clean $(GOFLAGS) -i ./...
-
-doc:
-	@echo "==== go doc is running. Can be moved to background ===="	
-	@godoc -http=:6060
+	@go clean $(GOFLAGS) -i ./...
 
 assets:
 	@echo "=== production level assets ==="

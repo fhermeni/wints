@@ -8,6 +8,8 @@ fi
 
 case ${ARG} in
 run)
+	echo "==== godoc listening at :6060 ===="	
+	godoc -http=:6060&
 	gulp watch&
 	go run -ldflags "-X main.Version=SNAPSHOT" main.go --fake-mailer
 	wait
