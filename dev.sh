@@ -10,12 +10,13 @@ case ${ARG} in
 run)
 	echo "==== godoc listening at :6060 ===="	
 	godoc -http=:6060&
-	gulp watch&
+	gulp assets watch&
 	go run -ldflags "-X main.Version=SNAPSHOT" main.go --fake-mailer
 	wait
 	;;
 install)
-	npm install --save-dev gulp-handlebars\
+	npm install --save-dev  handlebars\
+							gulp-handlebars\
 							gulp-wrap\
 							gulp-declare\
 							gulp-concat\
