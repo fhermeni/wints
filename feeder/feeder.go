@@ -5,13 +5,20 @@ package feeder
 
 import (
 	"io"
+	"strconv"
 
 	"github.com/fhermeni/wints/schema"
 )
 
+type Errors []error
+
+func (e *Errors) Error() string {
+	return strconv.Itoa(len([]error(e))) + " error(s)"
+}
+
 //Conventions allows to import conventions
 type Conventions interface {
-	Import() ([]schema.Convention, error)
+	Import() ([]schema.Convention, *Errors)
 }
 
 //ConventionReader interfaces the source where to read conventions

@@ -108,25 +108,31 @@ func parseTime(fmt, buf string, student schema.Student) (time.Time, error) {
 	}
 	return ts, err
 }
-func (f *CsvConventions) scan(prom string) ([]schema.Convention, error) {
+func (f *CsvConventions) scan(prom string) ([]schema.Convention, *Errors) {
 	conventions := make([]schema.Convention, 0, 0)
 	lasts := make(map[string]schema.Convention)
 	r, err := f.Reader.Reader(f.Year, prom)
+
 	if err != nil {
-		return conventions, err
+		var errs Errors
+		errs = append(errs, err)
+		return conventions, &errs
 	}
 	in := csv.NewReader(r)
 	in.Comma = ';'
 	//Get rid of the header
 	in.Read()
 
+	var errs Errors
 	for {
 		record, err := in.Read()
 		// end-of-file is fitted into err
 		if err == io.EOF {
 			break
 		} else if err != nil {
-			return conventions, err
+			var errs Errors
+			errs = append(errs, err)
+			return conventions, &errs
 		}
 		student := cleanPerson(record[stuFn], record[stuLn], record[stuEmail], record[stuTel])
 		supervisor := cleanPerson(record[supervisorFn], record[supervisorLn], record[supervisorEmail], record[supervisorTel])
@@ -146,21 +152,20 @@ func (f *CsvConventions) scan(prom string) ([]schema.Convention, error) {
 			Skip:      false,
 			Male:      male,
 		}
-		//ts, err := time.Parse("2006-01-02 15:04", clean(record[timestamp]))
 		ts, err := parseTime("2006-01-02 15:04", record[timestamp], stu)
 		if err != nil {
+			errs = append(errs, err)
 			continue
-			//return conventions, err
 		}
 		startTime, err := parseTime("02/01/2006", record[begin], stu)
 		if err != nil {
+			errs = append(errs, err)
 			continue
-			//return conventions, err
 		}
 		endTime, err := parseTime("02/01/2006", record[end], stu)
 		if err != nil {
+			errs = append(errs, err)
 			continue
-			//return conventions, err
 		}
 		//The to-valid users
 		c := schema.Convention{
@@ -178,29 +183,26 @@ func (f *CsvConventions) scan(prom string) ([]schema.Convention, error) {
 				Role:   schema.TUTOR,
 			},
 		}
-		//conventions = append(conventions, c)
 		lasts[c.Student.User.Person.Email] = c
 	}
 	for _, c := range lasts {
 		conventions = append(conventions, c)
 	}
-	return conventions, nil
+	return conventions, &errs
 }
 
 //Import imports all the conventions by requesting in parallel the conventions for each registered promotions
-func (f *CsvConventions) Import() ([]schema.Convention, error) {
+func (f *CsvConventions) Import() ([]schema.Convention, *Errors) {
 	lock := &sync.Mutex{}
-	var error error
 	all := make([]schema.Convention, 0, 0)
 	var wg sync.WaitGroup
+	var errs Errors
 	for i, prom := range f.promotions {
 		wg.Add(1)
 		go func(i int, p string) {
 			convs, err := f.scan(p)
 			logger.Log("event", "feeder", "Scanning conventions of promotion '"+p+"'", err)
-			if err == ErrAuthorization {
-				error = err
-			}
+			errs = append(errs, err)
 			lock.Lock()
 			defer lock.Unlock()
 			all = append(all, convs...)
@@ -208,5 +210,5 @@ func (f *CsvConventions) Import() ([]schema.Convention, error) {
 		}(i, prom)
 	}
 	wg.Wait()
-	return all, error
+	return all, &errs
 }
