@@ -85,7 +85,7 @@ func clean(str string) string {
 	return strings.ToLower(strings.TrimSpace(str))
 }
 
-func (f *CsvConventions) log(msg string, err error) {
+func log(msg string, err error) {
 	logger.Log("event", "feeder", msg, err)
 }
 
@@ -100,6 +100,13 @@ func cleanInt(str string) int {
 		return -1
 	}
 	return i
+}
+func parseTime(fmt, buf string, student schema.Student) (time.Time, error) {
+	ts, err := time.Parse(fmt, clean(buf))
+	if err != nil {
+		log("Unable to parse time for '"+student.User.Fullname()+"'", err)
+	}
+	return ts, err
 }
 func (f *CsvConventions) scan(prom string) ([]schema.Convention, error) {
 	conventions := make([]schema.Convention, 0, 0)
@@ -129,30 +136,36 @@ func (f *CsvConventions) scan(prom string) ([]schema.Convention, error) {
 		inLab := clean(record[lab]) != "non"
 		male := clean(record[gender]) == "m."
 		gratif := cleanInt(record[gratification])
-		ts, err := time.Parse("2006-01-02 15:04", clean(record[timestamp]))
-		if err != nil {
-			return conventions, err
+
+		stu := schema.Student{
+			User: schema.User{
+				Person: student,
+				Role:   schema.STUDENT,
+			},
+			Promotion: prom,
+			Skip:      false,
+			Male:      male,
 		}
-		startTime, err := time.Parse("02/01/2006", clean(record[begin]))
+		//ts, err := time.Parse("2006-01-02 15:04", clean(record[timestamp]))
+		ts, err := parseTime("2006-01-02 15:04", record[timestamp], stu)
 		if err != nil {
-			return conventions, err
+			continue
+			//return conventions, err
 		}
-		endTime, err := time.Parse("02/01/2006", clean(record[end]))
+		startTime, err := parseTime("02/01/2006", record[begin], stu)
 		if err != nil {
-			return conventions, err
+			continue
+			//return conventions, err
+		}
+		endTime, err := parseTime("02/01/2006", record[end], stu)
+		if err != nil {
+			continue
+			//return conventions, err
 		}
 		//The to-valid users
 		c := schema.Convention{
-			Creation: ts,
-			Student: schema.Student{
-				User: schema.User{
-					Person: student,
-					Role:   schema.STUDENT,
-				},
-				Promotion: prom,
-				Skip:      false,
-				Male:      male,
-			},
+			Creation:       ts,
+			Student:        stu,
 			Gratification:  gratif,
 			Lab:            inLab,
 			ForeignCountry: foreign,

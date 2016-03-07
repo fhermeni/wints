@@ -21,7 +21,7 @@ function login() {
 	if (empty("#loginEmail", "#loginPassword")) {
 		return;
 	}
-	signin($("#loginEmail").val(), $("#loginPassword").val())
+	signin($("#loginEmail").val().trim(), $("#loginPassword").val())
 		.done(loginSuccess).fail(loginFail)
 
 }
