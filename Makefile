@@ -53,17 +53,19 @@ doc:
 	@godoc -http=:6060
 
 setup:
-	@npm install --save-dev gulp-wrap\
+	# @npm install --save-dev gulp-handlebars\
+							gulp-wrap\
 							gulp-declare\
 							gulp-concat\
 							gulp-uglify\
 							gulp-rename\
 							gulp-clean-css\
 							gulp-htmlmin\
-							gulp-handlebars\
-							gulp-util\
-							gulp-insert\
-							merge-stream
+							gulp-livereload\
+							gulp-order\
+							gulp-util\					
+							merge-stream\														
+							
 	@go get -u golang.org/x/tools/cmd/cover
 	@go get -u github.com/tools/godep 
 	@go get -u github.com/pierrre/gotestcover
@@ -72,10 +74,10 @@ setup:
 	@go get -u github.com/maruel/panicparse/cmd/pp
 
 assets:
+	@echo "=== production level assets ==="
 	@gulp assets --production
 	
-deploy: install
-	@gulp assets --production
+deploy: install assets
 	@git add assets
 	@git commit -m "production level assets"	
 	@echo "=== deploy ==="

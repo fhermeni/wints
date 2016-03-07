@@ -10,7 +10,6 @@ var htmlmin = require('gulp-htmlmin');
 var livereload = require('gulp-livereload');
 var util = require('gulp-util');
 var order = require("gulp-order");
-var print = require("gulp-print");
 var merge = require('merge-stream');
 var path = require('path');
 var config = {
