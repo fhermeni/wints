@@ -30,8 +30,7 @@
 	}
 
 	function registerPartial(path, name) {
-		$.get(resolvePartialPath(path), function(partial) {
-			//console.log(Handlebars.compile(partial))
+		$.get(resolvePartialPath(path), function(partial) {			
 			Handlebars.registerPartial(name, Handlebars.compile(partial));
 		}, 'text');
 	}
@@ -75,11 +74,9 @@
 		var url = templateName;//resolveTemplatePath(templateName);
 		if (!cache.hasOwnProperty(url)) {
 			var $this = this;
-			$.get(url, function(template) {
+//			$.get(url, function(template) {
 				cache[url] =  wints.templates[url];//Handlebars.compile(template);
-			});
-			//debugger;
-			//cache[url] = wints.templates[url];
+//			});
 		}
 	};
 
@@ -92,13 +89,11 @@
 			var $this = this;			
 			cache[url] = wints.templates[url];
 			//debugger;
-			$.get(url, function(template) {
+			//$.get(url, function(template) {
 				cache[url] = wints.templates[url];/*Handlebars.compile(template);*/
-				console.log(url);
-				console.log(cache[url]);
 				$this.html(cache[url](data)).trigger('render.handlebars', [templateName, data]);
 				if (callback) callback();
-			}, 'text');
+			//}, 'text');
 		}
 		return this;
 	};
