@@ -48,6 +48,7 @@
     "gulp-util": "^3.0.7",
     "gulp-wrap": "^0.11.0",
     "handlebars": "^4.0.5",
+    "merge-stream": "^1.0.0",
     "node-notifier": "^4.5.0",
     "pixrem": "^3.0.0",
     "vinyl-paths": "^2.1.0",

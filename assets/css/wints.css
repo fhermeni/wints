@@ -77,7 +77,7 @@
 .editable-container.left>.arrow:after {
 	background-color: inherit;	
 }
-.container {
+.container.login {
 	margin-top: 7em;
 }
 

@@ -1,6 +1,5 @@
 var gulp = require('gulp');
-//var handlebars = require('gulp-handlebars');
-var handlebars = require('gulp-handlebars-all');
+var handlebars = require('gulp-handlebars');
 var wrap = require('gulp-wrap');
 var declare = require('gulp-declare');
 var concat = require('gulp-concat');
@@ -12,7 +11,8 @@ var livereload = require('gulp-livereload');
 var util = require('gulp-util');
 var order = require("gulp-order");
 var print = require("gulp-print");
-var $ = require('gulp-load-plugins')();
+var merge = require('merge-stream');
+var path = require('path');
 var config = {
     production: !!util.env.production
 };
@@ -24,46 +24,36 @@ gulp.task('html', function() {
     .pipe(livereload());
 });
 
-/*gulp.task('handlebars', function(){
-  gulp.src(['assets/hbs/*.hbs'])
-    .pipe(handlebars())
-    .pipe(wrap('Handlebars.template(<%= contents %>)'))
-    .pipe(declare({
-      namespace: 'wints.templates',
-      noRedeclare: true, // Avoid duplicate declarations 
-    }))    
-    .pipe(concat('hbs.js'))
-    .pipe(gulp.dest('assets/js/'))
-    .pipe(livereload());
 
-  gulp.src(['assets/hbs/*.partial'])
-    .pipe(handlebars())
+gulp.task('templates', function() {
+    return gulp.src('assets/hbs/*.partial')
+    .pipe(handlebars({
+      handlebars: require('handlebars')
+    }))          
     .pipe(wrap('Handlebars.registerPartial(<%= processPartialName(file.relative) %>, Handlebars.template(<%= contents %>));', {}, {
       imports: {
         processPartialName: function(fileName) {
-          // Strip the extension and the underscore 
-          // Escape the output with JSON.stringify 
-          return JSON.stringify(path.basename(fileName, '.js').substr(1));
+          return JSON.stringify(path.basename(fileName, '.js'));
         }
       }
     }))
-    .pipe(concat('partials.js'))
-    .pipe(gulp.dest('assets/js/'));
-});*/
-
-gulp.task('handlebars', function(){
-  gulp.src('assets/hbs/*.hbs')
-    .pipe(handlebars('js'), {
-      partials: ['assets/hbs/*.partial'],
-    })
-    .pipe($.declare({
-      namespace: 'wints.templates',
-      noRedeclare: true, // Avoid duplicate declarations 
-
-    }))    
-    .pipe(concat('hbs.js'))
+    .pipe(concat('hbs_partial.js'))    
     .pipe(gulp.dest('assets/js/'))
-    .pipe(livereload());
+    ;
+});
+
+gulp.task('partials', function() {
+    return gulp.src('assets/hbs/*.hbs')
+    .pipe(handlebars({
+      handlebars: require('handlebars')
+    }))    
+    .pipe(wrap('Handlebars.template(<%= contents %>)'))
+    .pipe(declare({
+      namespace: 'wints.templates',
+      noRedeclare: true
+    }))
+    .pipe(concat('hbs.js'))    
+    .pipe(gulp.dest('assets/js/'));
 });
 
 gulp.task('js', function(){      
@@ -77,8 +67,7 @@ gulp.task('js', function(){
     "**/vendor/bootstrap-*.js",    
     "**/vendor/*.js",    
     "assets/js/*.js"    
-  ]))        
-    //.pipe(print())
+  ]))            
         .pipe(config.production ? uglify() : util.noop())        
         .pipe(concat('wints.min.js'))                      
         .pipe(gulp.dest('assets/js/'))        
@@ -94,13 +83,13 @@ gulp.task('css', function() {
 });
 
 gulp.task('assets', function () {
-  return gulp.start(['js','css','html']);
+  return gulp.start(['css','html','partials','templates','js']);
 });
 
 gulp.task('watch', function(){
   livereload.listen();
-  gulp.watch(['assets/js/**/*.js', '!assets/js/**/*.min.js', '!assets/js/wints.js'], ['js']);   
+  gulp.watch(['assets/js/**/*.js', '!assets/js/**/*.min.js', '!assets/js/wints.js', '!assets/js/!hbs*.js'], ['js']);   
   gulp.watch(['assets/css/**/*.css', '!assets/css/**/*.min.css', '!assets/css/wints.css'], ['css']); 
   gulp.watch('assets/html/*.html', ['html']);
-  //gulp.watch('assets/css/fonts/**/*', ['fonts']); 
+  gulp.watch('assets/hbs/*', ['partials','templates']); 
 })
