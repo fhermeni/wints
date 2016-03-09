@@ -120,6 +120,7 @@ func (ed *EndPoints) openSession(w http.ResponseWriter, r *http.Request) (sessio
 	if err != nil {
 		return session.Session{}, err
 	}
+	ed.store.Visit(user.Person.Email)
 	return session.NewSession(user, ed.store, ed.conventions), err
 }
 

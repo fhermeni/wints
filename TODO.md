@@ -1,4 +1,5 @@
 # TODO
+- wipe conventions once imported
 - check malformed emails
 - sequence student import
 - do not remove student having a convention	
