@@ -453,7 +453,9 @@ Handlebars.registerPartial("users-user", Handlebars.template({"1":function(conta
     + alias2((helpers.roleLevel || (depth0 && depth0.roleLevel) || alias4).call(alias3,(depth0 != null ? depth0.Role : depth0),{"name":"roleLevel","hash":{},"data":data}))
     + "\">\n"
     + ((stack1 = (helpers.ifEq || (depth0 && depth0.ifEq) || alias4).call(alias3,(depth0 != null ? depth0.Role : depth0),"student",{"name":"ifEq","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(3, data, 0),"data":data})) != null ? stack1 : "")
-    + "    </td>\n    <td>"
+    + "    </td>\n    <td data-text='"
+    + alias2((helpers.dateFmt || (depth0 && depth0.dateFmt) || alias4).call(alias3,(depth0 != null ? depth0.LastVisit : depth0),"X",{"name":"dateFmt","hash":{},"data":data}))
+    + "'>"
     + alias2((helpers.dateFmt || (depth0 && depth0.dateFmt) || alias4).call(alias3,(depth0 != null ? depth0.LastVisit : depth0),"DD/MM/YY HH:mm",{"name":"dateFmt","hash":{},"data":data}))
     + "</td>\n    <td>\n        <button type=\"button\" tabindex=\"0\" data-trigger=\"focus\" role=\"button\" data-user=\""
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.Person : depth0)) != null ? stack1.Email : stack1), depth0))
