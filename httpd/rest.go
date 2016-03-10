@@ -366,17 +366,14 @@ func setReportPrivacy(ex Exchange) error {
 
 func conventions(ex Exchange) error {
 	cc, err := ex.s.Conventions()
-	if serr, ok := err.(*feeder.Errors); ok {
-		var all = struct {
-			Conventions []schema.Convention
-			Errors      *feeder.Errors
-		}{
-			Conventions: cc,
-			Errors:      serr,
-		}
-		return ex.outJSON(all, serr)
+	var all = struct {
+		Conventions []schema.Convention
+		Errors      *feeder.ImportError
+	}{
+		Conventions: cc,
+		Errors:      err,
 	}
-	return ex.outJSON(cc, err)
+	return ex.outJSON(all, err.Fatal)
 }
 
 func convention(ex Exchange) error {

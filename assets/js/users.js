@@ -210,13 +210,11 @@ function updateImportStatus() {
 	}
 }
 
-function showImportError() {
-	console.log(stats);
+function showImportError() {	
 	$("#modal").render("import-error", stats, showModal)
 }
 
 function failStudentImport(student, xhr) {
-	console.log(xhr);
 	if (xhr.status == 400) {
 		stats.Errors.push({
 			Student: student,

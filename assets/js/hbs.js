@@ -295,19 +295,23 @@ this["wints"]["templates"]["password-reset"] = Handlebars.template({"compiler":[
     return "<div class=\"modal-dialog\">\n<div class=\"modal-content\"> \n    <div class=\"modal-body\">\n        <button type=\"button\" class=\"close\" aria-hidden=\"true\" onclick=\"hideModal()\">×</button>\n        <div class=\"form-horizontal\">\n            <fieldset>     \n            <legend>Password update</legend>   \n                <div class=\"form-group\">\n                    <label for=\"password-current\" class=\"col-lg-2 control-label\">Current</label>\n                    <div class=\"col-lg-10\">\n                        <input data-placement=\"right\" data-container=\"body\" data-toggle=\"popover\" type=\"password\" class=\"form-control\" id=\"password-current\">\n                    </div>\n                </div>\n                <p>Please enter your new password. It must be at least 8 characters long.</p>\n                <div class=\"form-group\">\n                    <label for=\"password-new\" class=\"col-lg-2 control-label\">New</label>\n                    <div class=\"col-lg-10\">\n                        <input data-placement=\"right\" data-container=\"body\" data-toggle=\"popover\" type=\"password\" class=\"form-control\" id=\"password-new\">\n                    </div>\n                </div>\n                <div class=\"form-group\">\n                    <label for=\"password-confirm\" class=\"col-lg-2 control-label\">Confirm</label>\n                    <div class=\"col-lg-10\">\n                        <input data-placement=\"right\" data-container=\"body\" data-toggle=\"popover\" type=\"password\" class=\"form-control\" id=\"password-confirm\">\n                    </div>\n                </div>\n            </fieldset>\n        </div>\n        <div class=\"text-right form-group\">\n            <button type=\"button\" class=\"btn btn-default\" onclick=\"hideModal()\">Cancel</button>\n            <button type=\"button\" class=\"btn btn-primary\" onclick=\"updatePassword()\">Update</button            \n        </div>\n    </div>    \n</div>    \n</div>\n        ";
 },"useData":true});
 this["wints"]["templates"]["placement-header"] = Handlebars.template({"1":function(container,depth0,helpers,partials,data) {
-    var helper;
+    var stack1;
 
-  return "<div id=\"feeder-issue\" class=\"alert alert-warning text-center\">\n    <p>"
-    + container.escapeExpression(((helper = (helper = helpers.FeederWarning || (depth0 != null ? depth0.FeederWarning : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"FeederWarning","hash":{},"data":data}) : helper)))
-    + "</p>\n</div>\n";
-},"3":function(container,depth0,helpers,partials,data) {
+  return "<div id=\"feeder-issue\" class=\"alert alert-warning\">\n <button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>\n    <h5>Warning:</h5>\n    <ul>\n"
+    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},((stack1 = (depth0 != null ? depth0.Errors : depth0)) != null ? stack1.Warnings : stack1),{"name":"each","hash":{},"fn":container.program(2, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "    </ul>        \n</div>\n";
+},"2":function(container,depth0,helpers,partials,data) {
+    return "        <li>"
+    + container.escapeExpression(container.lambda(depth0, depth0))
+    + "</li>\n";
+},"4":function(container,depth0,helpers,partials,data) {
     var stack1;
 
   return ((stack1 = container.invokePartial(partials["placement-student"],depth0,{"name":"placement-student","data":data,"indent":"    ","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3=container.escapeExpression, alias4="function";
 
-  return ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.FeederWarning : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+  return ((stack1 = helpers["if"].call(alias1,((stack1 = (depth0 != null ? depth0.Errors : depth0)) != null ? stack1.Warnings : stack1),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "\n<h3>"
     + alias3((helpers.len || (depth0 && depth0.len) || alias2).call(alias1,(depth0 != null ? depth0.Students : depth0),{"name":"len","hash":{},"data":data}))
     + " Student(s) - <small><span id=\"placed_cnt\">"
@@ -315,7 +319,7 @@ this["wints"]["templates"]["placement-header"] = Handlebars.template({"1":functi
     + "</span> / <span id=\"managed_cnt\">"
     + alias3(((helper = (helper = helpers.Managed || (depth0 != null ? depth0.Managed : depth0)) != null ? helper : alias2),(typeof helper === alias4 ? helper.call(alias1,{"name":"Managed","hash":{},"data":data}) : helper)))
     + "</span> placed</small></h3>\n\n<button type=\"button\" class=\"btn btn-default btn-sm\" onclick=\"userMailing('#table-placement')\">\n    <i class=\"glyphicon glyphicon-envelope\"></i> mail selection\n</button>\n\n<button type=\"button\" onclick=\"showRawFullname('tbody','stu')\" data-toggle='modal' class=\"btn btn-default btn-sm\">\n    <i class=\"glyphicon glyphicon-list\"></i> fullname from selection\n</button>    \n\n<table class=\"table table-hover tablesorter\" id=\"table-placement\" data-sortlist=\"[[1,0]]\">\n<thead>\n    <tr>\n        <th class=\"sorter-false\"><input type='checkbox' class=\"globalSelect\" data-context=\"table-placement\"/></th>\n        <th>Lastname, Firstname</th>\n        <th>Managed</th>        \n        <th>Promotion</th>        \n        <th>Major</th>\n        <th class=\"col-md-2\">Company</th>\n        <th>Period</th>\n        <th>Tutor</th>\n        <th>Gratif.</th>       \n    </tr>\n</thead>\n<tbody>\n"
-    + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.Students : depth0),{"name":"each","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.Students : depth0),{"name":"each","hash":{},"fn":container.program(4, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "</tbody>\n</table>";
 },"usePartial":true,"useData":true});
 this["wints"]["templates"]["profile-editor"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {

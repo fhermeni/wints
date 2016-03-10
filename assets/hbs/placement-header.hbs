@@ -1,6 +1,12 @@
-{{#if FeederWarning}}
-<div id="feeder-issue" class="alert alert-warning text-center">
-    <p>{{FeederWarning}}</p>
+{{#if Errors.Warnings}}
+<div id="feeder-issue" class="alert alert-warning">
+ <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <h5>Warning:</h5>
+    <ul>
+    {{#each Errors.Warnings}}
+        <li>{{.}}</li>
+    {{/each}}
+    </ul>        
 </div>
 {{/if}}
 

@@ -1,13 +1,18 @@
 package session
 
-import "github.com/fhermeni/wints/schema"
+import (
+	"github.com/fhermeni/wints/feeder"
+	"github.com/fhermeni/wints/schema"
+)
 
 //Conventions lists the conventions if the emitter is an admin at minimum
-func (s *Session) Conventions() ([]schema.Convention, error) {
+func (s *Session) Conventions() ([]schema.Convention, *feeder.ImportError) {
 	if s.Role().Level() >= schema.AdminLevel {
 		return s.conventions.Import()
 	}
-	return []schema.Convention{}, ErrPermission
+	ierr := feeder.NewImportError()
+	ierr.Fatal = ErrPermission
+	return []schema.Convention{}, ierr
 }
 
 //Convention returns the convention of a given student if the emitter is the student or at least an admin

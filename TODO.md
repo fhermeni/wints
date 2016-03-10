@@ -1,6 +1,4 @@
 # TODO
-- report partial imports:
-	struct of student -> error
 - wipe conventions once imported
 - check malformed emails
 - sequence student import

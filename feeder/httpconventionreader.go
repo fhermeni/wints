@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"net"
 	"net/http"
 	"net/url"
 	"time"
@@ -42,22 +41,15 @@ func (h *HTTPConventionReader) Reader(year int, promotion string) (io.Reader, er
 	req.SetBasicAuth(h.login, h.password)
 	res, err := client.Do(req)
 	if err != nil {
-		if e, ok := err.(*url.Error); ok {
-			if err, ok := e.Err.(net.Error); ok && err.Timeout() {
-				return nil, ErrTimeout
-			}
-		} else if e, ok := err.(net.Error); ok && e.Timeout() {
-			return nil, ErrTimeout
-		}
 		return nil, err
 	}
 	if res.StatusCode != 200 {
-		return nil, ErrAuthorization
+		return nil, errors.New("Unexpected response status: " + res.Status)
 	}
 	if h.Encoding == "windows-1252" {
 		return charmap.Windows1252.NewDecoder().Reader(res.Body), nil
 	}
-	return nil, ErrUnsupportedEncoding
+	return nil, errors.New("Unsupported encoding: " + h.Encoding)
 }
 
 var (

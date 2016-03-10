@@ -8,7 +8,7 @@ function showConventionValidator() {
 			if (xhr.responseText.indexOf("feeder")) {
 				//conventions() failed, so, an error message and we retry without this call
 				//we don't notify error because it is done by the default fail				
-				feederWarning = xhr.responseText
+				//feederWarning = xhr.responseText
 				$.when(students(), internships()).done(loadConventionValidator).fail(notifyError)
 			}
 		})
@@ -30,6 +30,9 @@ function convSort(a, b) {
 }
 
 function loadConventionValidator(students, internships, convs, us) {
+	errors = {
+		Warnings : []
+	}
 	allStudents = students[0];
 	if (!allStudents) {
 		allStudents = [];
@@ -50,7 +53,8 @@ function loadConventionValidator(students, internships, convs, us) {
 		internships = []
 	}
 	if (convs) {
-		allConventions = convs[0];
+		allConventions = convs[0].Conventions;
+		errors = convs[0].Errors
 		if (!allConventions) {
 			allConventions = [];
 		}
@@ -91,7 +95,7 @@ function loadConventionValidator(students, internships, convs, us) {
 		Students: allStudents,
 		Managed: managed,
 		Ints: internships.length,	
-		FeederWarning: feederWarning
+		Errors: errors,
 	}, ui);
 }
 
