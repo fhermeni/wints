@@ -46,23 +46,14 @@ bench: install
 	@go test -tags "integration" -run=NONE -bench=. $(GOFLAGS) ./...
 
 clean:
-	@godep go clean $(GOFLAGS) -i ./...
+	@go clean $(GOFLAGS) -i ./...
 
-doc:
-	@echo "==== go doc is running. Can be moved to background ===="	
-	@godoc -http=:6060
-
-setup:
-	@go get -u golang.org/x/tools/cmd/cover
-	@go get -u github.com/tools/godep 
-	@go get -u github.com/pierrre/gotestcover
-	@go get -u github.com/kisielk/errcheck
-	@go get -u golang.org/x/text/encoding/charmap
-
-deploy: intall test
+assets:
+	@echo "=== production level assets ==="
+	@gulp assets --production
+	
+deploy: install assets
+	@git add assets
+	@git commit -m "production level assets"	
 	@echo "=== deploy ==="
 	@git push wints
-
-run-dev:
-	@echo "==== run-dev ===="
-	@go run -ldflags "-X main.Version=`git rev-parse HEAD`" main.go --fake-mailer

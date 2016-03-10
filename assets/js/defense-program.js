@@ -1,4 +1,4 @@
-$(document).ready(function() {
+/*$(document).ready(function() {
 	defenseProgram(function(sessions) {
 		for (var i = 0; i < sessions.length; i++) {
 			sessions[i].Date = new Date(sessions[i].Date)
@@ -7,4 +7,4 @@ $(document).ready(function() {
 		var root = $("#cnt");
 		root.html(html);
 	})
-});
+});*/

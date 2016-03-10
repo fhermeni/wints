@@ -1,8 +1,4 @@
 var lang;
-$(document).ready(function() {
-	setLang(".fr",".en");
-	loadSurvey();
-});
 
 function setLang(to, from) {
 	lang = to;
@@ -65,7 +61,7 @@ function commitPost(s) {
 	readOnly();
 }
 
-function readOnly() {
+function readOnly() {	
 	$("#submit").addClass("hidden");
 	$("textarea").attr('readonly','readonly');
 	$("input[type=number]").attr('readonly','readonly');
@@ -77,7 +73,7 @@ function loadSurvey(ok) {
 	var token = $.urlParam("token");
 	if (token) {		
 		surveyFromToken(token).done(function (s) {
-			$("#submit").removeClass("hidden");
+			$("#submit").removeClass("hidden");					
 			fill(s.Student, s.Tutor, s.Survey);			
 		});
 	} else {		
@@ -87,7 +83,7 @@ function loadSurvey(ok) {
 			tut = i.Convention.Tutor.Person;
 			survey = i.Surveys.filter(function(s) {
 				return s.Kind == kind;
-			})[0]
+			})[0]			
 			fill(stu, tut, survey);
 		});		
 	}

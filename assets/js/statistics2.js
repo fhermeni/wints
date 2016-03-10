@@ -13,7 +13,7 @@ var delayKind = "Midterm"
 var delayType = "Delivery"
 
 $(document).ready(function() {
-
+/*
 	//IE8 stuff
 	if (typeof Array.prototype.forEach != 'function') {
 		Array.prototype.forEach = function(callback) {
@@ -71,7 +71,7 @@ $(document).ready(function() {
 				});
 			}
 		})
-	})
+	})*/
 });
 
 String.prototype.endsWith = function(suffix) {

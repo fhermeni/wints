@@ -12,26 +12,6 @@ String.prototype.capitalize = function() {
 	return this.charAt(0).toUpperCase() + this.substring(1)
 }
 
-$(document).ready(function() {
-	waitingBlock = $("#cnt").clone().html();
-
-
-	$( document ).ajaxError(function(e, xhr) {		
-  		if (xhr.responseText.indexOf("expired") >0) {
-  			window.location = "/#sessionExpired";
-  		}
-	});
-	$.tablesorter.defaults.widgets = ["uitheme"]
-	$.tablesorter.defaults.theme = 'bootstrap';
-	$.tablesorter.defaults.headerTemplate = '{content} {icon}';
-
-	getConfig().done(function(c) {
-		config = c;
-		user(getCookie("login")).done(loadSuccess).fail(logFail);
-		$(".release").html(config.Version)
-	})
-});
-
 function showWait() {
 	$("#cnt").html(waitingBlock);
 }

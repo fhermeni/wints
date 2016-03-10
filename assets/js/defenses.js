@@ -1,3 +1,4 @@
+/*
 var active = undefined;
 var teachers = []
 var students = []
@@ -435,15 +436,6 @@ function save() {
 						s.Defenses.push(d)
 					}
 				})
-				/*session.Students.forEach(function(stu) {
-					if (stu) {
-						d = allDefenses[stu]
-						d["Student"] = {
-							Email: stu
-						}
-						s.Defenses.push(d)
-					}
-				})*/
 			ss.push(s)
 		})
 		//console.log(ss)
@@ -479,4 +471,4 @@ function load(defs) {
 		});
 		delete s.Defenses
 	});
-}
+}*/
