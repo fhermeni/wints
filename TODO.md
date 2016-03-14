@@ -1,8 +1,7 @@
 # TODO
 - wipe conventions once imported
-- check malformed emails
-- sequence student import
 - do not remove student having a convention	
+- check malformed emails
 - resilience to multi import with e-mail rewriting
 - server-side caching of the store
 	- store interface

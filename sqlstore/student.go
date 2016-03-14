@@ -9,16 +9,14 @@ import (
 )
 
 var (
-	allStudents     = "select male, firstname, lastname, users.email, tel, role, lastVisit, promotion, major, nextPosition, nextFrance,nextPermanent,nextSameCompany, nextContact, skip from students inner join users on (students.email=users.email)"
-	selectStudent   = "select male, firstname, lastname, users.email, tel, role, lastVisit, promotion, major, nextPosition, nextFrance,nextPermanent,nextSameCompany, nextContact, skip from students inner join users on (students.email=users.email) where students.email=$1"
-	insertStudent   = "insert into students(email, male, major, promotion, skip) values ($1,$2,$3,$4,$5)"
-	skipStudent     = "update students set skip=$2 where email=$1"
-	setPromotion    = "update students set promotion=$2 where email=$1"
-	setMajor        = "update students set major=$2 where email=$1"
-	updateMale      = "update students set male=$2 where email=$1"
-	setNextPosition = "update students set nextPosition=$1 where email=$2"
-	setNextContact  = "update students set nextContact=$1 where email=$2"
-	updateAlumni    = "update students set nextPosition=$1, nextFrance=$2, nextPermanent=$3, nextSameCompany=$4, nextContact=$5 where email=$6"
+	allStudents   = "select male, firstname, lastname, users.email, tel, role, lastVisit, promotion, major, nextPosition, nextFrance,nextPermanent,nextSameCompany, nextContact, skip from students inner join users on (students.email=users.email)"
+	selectStudent = "select male, firstname, lastname, users.email, tel, role, lastVisit, promotion, major, nextPosition, nextFrance,nextPermanent,nextSameCompany, nextContact, skip from students inner join users on (students.email=users.email) where students.email=$1"
+	insertStudent = "insert into students(email, male, major, promotion, skip) values ($1,$2,$3,$4,$5)"
+	skipStudent   = "update students set skip=$2 where email=$1"
+	setPromotion  = "update students set promotion=$2 where email=$1"
+	setMajor      = "update students set major=$2 where email=$1"
+	updateMale    = "update students set male=$2 where email=$1"
+	updateAlumni  = "update students set nextPosition=$1, nextFrance=$2, nextPermanent=$3, nextSameCompany=$4, nextContact=$5 where email=$6"
 )
 
 //Student returns a given student

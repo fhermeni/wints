@@ -195,14 +195,6 @@ func setUserPerson(ex Exchange) error {
 	return err
 }
 
-func replaceUser(ex Exchange) error {
-	var em string
-	if err := ex.inJSON(&em); err != nil {
-		return err
-	}
-	return ex.s.ReplaceUserWith(ex.V("u"), em)
-}
-
 func setEmail(ex Exchange) error {
 	var em string
 	if err := ex.inJSON(&em); err != nil {

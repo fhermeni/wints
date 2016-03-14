@@ -8,13 +8,11 @@ import (
 )
 
 var (
-	updateConventionSkip = "update conventions set skip=$1 where student=$2"
-	updateSupervisor     = "update conventions set supervisorFn=$1, supervisorLn=$2, supervisorTel=$3, supervisorEmail=$4 where student=$5"
-	updateTutor          = "update conventions set tutor=$1 where student=$2"
-	updateCompany        = "update conventions set companyWWW=$1, companyName=$2, title=$3 where student=$4"
-	insertConvention     = "insert into conventions(student, startTime, endTime, tutor, companyName, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, creation, foreignCountry, lab, gratification) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)"
-	updateConvention     = "update conventions set startTime=$2, endTime=$3, tutor=$4, companyName=$5, companyWWW=$6, supervisorFn=$7, supervisorLn=$8, supervisorEmail=$9, supervisorTel=$10, title=$11, creation=$12, foreignCountry=$13, lab=$14, gratification=$15, where student=$1 and creation < $12"
-	selectConventions    = "select stup.firstname, stup.lastname, stup.tel, stup.email, stup.lastVisit, " +
+	updateSupervisor  = "update conventions set supervisorFn=$1, supervisorLn=$2, supervisorTel=$3, supervisorEmail=$4 where student=$5"
+	updateTutor       = "update conventions set tutor=$1 where student=$2"
+	updateCompany     = "update conventions set companyWWW=$1, companyName=$2, title=$3 where student=$4"
+	insertConvention  = "insert into conventions(student, startTime, endTime, tutor, companyName, companyWWW, supervisorFn, supervisorLn, supervisorEmail, supervisorTel, title, creation, foreignCountry, lab, gratification) values($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)"
+	selectConventions = "select stup.firstname, stup.lastname, stup.tel, stup.email, stup.lastVisit, " +
 		"students.male, students.promotion, students.major, students.nextPosition, students.nextFrance, students.nextPermanent, students.nextSameCompany, students.nextContact, students.skip," +
 		"tutp.firstname, tutp.lastname, tutp.tel, tutp.email, tutp.lastVisit, tutp.role, " +
 		"startTime, endTime, companyName, companyWWW, title, creation, foreignCountry, lab, gratification, " +
@@ -33,9 +31,8 @@ var (
 		" inner join users as stup on (stup.email = conventions.student)  " +
 		" inner join users as tutp on (tutp.email = conventions.tutor)  " +
 		" where stup.email=$1"
-	insertReport       = "insert into reports(student, kind, deadline, private, toGrade) values($1,$2,$3,$4,$5)"
-	insertSurvey       = "insert into surveys(student, kind, token, invitation, lastInvitation, deadline) values($1,$2,$3,$4,$5,$6)"
-	validateConvention = "update conventions set valid=$2 where student=$1"
+	insertReport = "insert into reports(student, kind, deadline, private, toGrade) values($1,$2,$3,$4,$5)"
+	insertSurvey = "insert into surveys(student, kind, token, invitation, lastInvitation, deadline) values($1,$2,$3,$4,$5,$6)"
 )
 
 //SetSupervisor updates the student supervisor
@@ -134,7 +131,7 @@ func (s *Store) Convention(student string) (schema.Convention, error) {
 }
 
 //Conventions lists all the registered conventions
-func (s *Store) Conventions() ([]schema.Convention, error) {
+func (s *Store) conventions() ([]schema.Convention, error) {
 	var conventions []schema.Convention
 	st := s.stmt(selectConventions)
 	rows, err := st.Query()
@@ -154,25 +151,28 @@ func (s *Store) Conventions() ([]schema.Convention, error) {
 
 //Internships returns all the internships. Not necessarily validated
 func (s *Store) Internships() (schema.Internships, error) {
-	var res []schema.Internship
-	conventions, err := s.Conventions()
+	var res = s.cached()
+	if res != nil {
+		return *res, nil
+	}
+	conventions, err := s.conventions()
 	if err != nil {
-		return res, err
+		return *res, err
 	}
 	defs, err := s.defenses()
 	if err != nil {
-		return res, err
+		return *res, err
 	}
 
 	surveys, err := s.allSurveys()
 	if err != nil {
-		return res, err
+		return *res, err
 	}
 	for _, c := range conventions {
 		stu := c.Student.User.Person.Email
 		i, err := s.toInternship(c)
 		if err != nil {
-			return res, err
+			return *res, err
 		}
 		d, ok := defs[stu]
 		if ok {
@@ -182,9 +182,9 @@ func (s *Store) Internships() (schema.Internships, error) {
 		if ok {
 			i.Surveys = s
 		}
-		res = append(res, i)
+		*res = append(*res, i)
 	}
-	return res, err
+	return *res, err
 }
 
 //Internship returns the internship for a given student

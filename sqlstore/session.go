@@ -8,10 +8,9 @@ import (
 )
 
 var (
-	selectSession          = "select email, token, expire from sessions where token=$1"
-	deleteSession          = "delete from sessions where email=$1"
-	newSession             = "insert into sessions(email, token, expire) values ($1,$2,$3)"
-	deleteSessionFromToken = "delete from sessions where token=$1"
+	selectSession = "select email, token, expire from sessions where token=$1"
+	deleteSession = "delete from sessions where email=$1"
+	newSession    = "insert into sessions(email, token, expire) values ($1,$2,$3)"
 )
 
 //Session get the token related session

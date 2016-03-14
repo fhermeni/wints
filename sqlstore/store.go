@@ -14,19 +14,23 @@ import (
 
 //Store allows to communicate with a database
 type Store struct {
-	db     *sql.DB
-	stmts  map[string]*stmtErr
-	config config.Internships
-	lock   *sync.Mutex
+	db        *sql.DB
+	stmts     map[string]*stmtErr
+	config    config.Internships
+	lock      sync.Mutex
+	cacheLock sync.Mutex
+	cache     *schema.Internships
 }
 
 //NewStore initiate the storage servive
 func NewStore(d *sql.DB, config config.Internships) (*Store, error) {
 	s := Store{
-		db:     d,
-		stmts:  make(map[string]*stmtErr),
-		config: config,
-		lock:   &sync.Mutex{},
+		db:        d,
+		stmts:     make(map[string]*stmtErr),
+		config:    config,
+		lock:      sync.Mutex{},
+		cacheLock: sync.Mutex{},
+		cache:     nil,
 	}
 	return &s, nil
 }
@@ -84,12 +88,12 @@ func nullableTime(t pq.NullTime) *time.Time {
 	return nil
 }
 
-func nullableInt(t sql.NullInt64, def int) int {
+/*func nullableInt(t sql.NullInt64, def int) int {
 	if t.Valid {
 		return int(t.Int64)
 	}
 	return def
-}
+}*/
 
 func nullableString(t sql.NullString) string {
 	if t.Valid {
@@ -134,3 +138,22 @@ func mapCstrToError(err error) error {
 	}
 	return err
 }
+
+//flush the internship cache
+/*func (s *Store) flush() {
+	s.cacheLock.Lock()
+	defer s.cacheLock.Unlock()
+	s.cache = nil
+}*/
+
+func (s *Store) cached() *schema.Internships {
+	s.cacheLock.Lock()
+	defer s.cacheLock.Unlock()
+	return s.cache
+}
+
+/*func (s *Store) encache(i schema.Internships) {
+	s.cacheLock.Lock()
+	defer s.cacheLock.Unlock()
+	s.cache = &i
+}*/
