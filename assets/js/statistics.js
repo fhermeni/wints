@@ -38,36 +38,6 @@ function loadStatistics() {
 		country();
 		sector();
 	});
-		/*majors(function(m) {
-			for (var i = 0; i < stats.length; i++) {
-				if (stats[i].Gratification > 10000) {
-					stats[i].Gratification /= 100;
-				}
-				stats[i].Begin = new Date(stats[i].Begin)
-				stats[i].End = new Date(stats[i].End)
-			}
-		*/
-			
-			//basics()
-			
-			/*sector()			
-			
-			durations()			
-			declared()
-			grades('Midterm')
-			grades('Final')
-			surveys("midterm")
-			showAlumni();*/
-
-			/*var token = getCookie("session")
-			if (token) {
-				user(token, function(u) {
-					if (u.Role != 0) {
-						delays("DoW", "Delivery")
-					}
-				});
-			}*/
-		//})	
 }
 
 String.prototype.endsWith = function(suffix) {
@@ -178,7 +148,7 @@ function nbDays(from, to) {
 	return moment(to).dayOfYear() - moment(from).dayOfYear();
 }
 
-function declared() {
+/*function declared() {
 	var at = [];
 	var ms = [];
 	var i = 0;
@@ -242,7 +212,7 @@ function declared() {
 		scaleSteps: 6,
 		scaleStepWidth: 20
 	});
-}
+}*/
 
 function ddply(arr) {
 	var res = [arr[0]];
@@ -256,7 +226,7 @@ function ddply(arr) {
 	return res
 }
 
-function durations() {
+/*function durations() {
 	var begin = new Date()
 	begin.setMonth(1)
 	begin.setDate(1)
@@ -296,7 +266,7 @@ function durations() {
 		scaleSteps: 6,
 		scaleStepWidth: 20
 	});
-}
+}*/
 
 
 
