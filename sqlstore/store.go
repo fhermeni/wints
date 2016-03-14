@@ -17,8 +17,8 @@ type Store struct {
 	db        *sql.DB
 	stmts     map[string]*stmtErr
 	config    config.Internships
-	lock      sync.Mutex
-	cacheLock sync.Mutex
+	lock      *sync.Mutex
+	cacheLock *sync.Mutex
 	cache     *schema.Internships
 }
 
@@ -28,8 +28,8 @@ func NewStore(d *sql.DB, config config.Internships) (*Store, error) {
 		db:        d,
 		stmts:     make(map[string]*stmtErr),
 		config:    config,
-		lock:      sync.Mutex{},
-		cacheLock: sync.Mutex{},
+		lock:      &sync.Mutex{},
+		cacheLock: &sync.Mutex{},
 		cache:     nil,
 	}
 	return &s, nil
@@ -42,8 +42,6 @@ func (s *Store) Install() error {
 }
 
 func (s *Store) stmt(q string) *stmtErr {
-	s.lock.Lock()
-	defer s.lock.Unlock()
 	st, ok := s.stmts[q]
 	if !ok {
 		x, err := s.db.Prepare(q)

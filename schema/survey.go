@@ -19,6 +19,11 @@ type SurveyHeader struct {
 	Cnt map[string]string
 }
 
+//Anonymise removes the token
+func (s *SurveyHeader) Anonymise() {
+	s.Token = ""
+}
+
 //Survey agglomerates Cateogies with a title in French or English
 type Survey struct {
 	En string

@@ -151,28 +151,25 @@ func (s *Store) conventions() ([]schema.Convention, error) {
 
 //Internships returns all the internships. Not necessarily validated
 func (s *Store) Internships() (schema.Internships, error) {
-	var res = s.cached()
-	if res != nil {
-		return *res, nil
-	}
 	conventions, err := s.conventions()
 	if err != nil {
-		return *res, err
+		return schema.Internships{}, err
 	}
 	defs, err := s.defenses()
 	if err != nil {
-		return *res, err
+		return schema.Internships{}, err
 	}
 
 	surveys, err := s.allSurveys()
 	if err != nil {
-		return *res, err
+		return schema.Internships{}, err
 	}
+	ints := make([]schema.Internship, 0, 0)
 	for _, c := range conventions {
 		stu := c.Student.User.Person.Email
 		i, err := s.toInternship(c)
 		if err != nil {
-			return *res, err
+			return schema.Internships{}, err
 		}
 		d, ok := defs[stu]
 		if ok {
@@ -182,9 +179,9 @@ func (s *Store) Internships() (schema.Internships, error) {
 		if ok {
 			i.Surveys = s
 		}
-		*res = append(*res, i)
+		ints = append(ints, i)
 	}
-	return *res, err
+	return ints, err
 }
 
 //Internship returns the internship for a given student

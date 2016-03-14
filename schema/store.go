@@ -4,3 +4,7 @@ package schema
 type Internshipser interface {
 	Internships() (Internships, error)
 }
+
+type Anonymiser interface {
+	Anonymise()
+}

@@ -121,6 +121,14 @@ func (u User) Fullname() string {
 	return u.Person.Fullname()
 }
 
+//Anonymise the person by removing any personal information
+func (p *Person) Anonymise() {
+	p.Firstname = ""
+	p.Lastname = ""
+	p.Email = ""
+	p.Tel = ""
+}
+
 //Students aliases slices of student to exhibit filtering methods
 type Students []Student
 

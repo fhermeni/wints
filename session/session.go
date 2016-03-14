@@ -21,8 +21,10 @@ type Session struct {
 	my          schema.User
 	store       *sqlstore.Store
 	conventions feeder.Conventions
-	//log    journal.Journal
-	//mailer mail.Mailer
+}
+
+func AnonSession(store *sqlstore.Store) Session {
+	return Session{store: store}
 }
 
 //NewSession creates a new session

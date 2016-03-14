@@ -59,7 +59,7 @@ func NewEndPoints(not *notifier.Notifier, store *sqlstore.Store, convs feeder.Co
 	ed.get("/students/", students)
 	ed.post("/students/", newStudent)
 
-	ed.get("/internships/", internships)
+	ed.router.GET(ed.prefix+"/internships/", ed.anon(internships))
 	ed.get("/internships/:s/", internship)
 	ed.post("/internships/:s/company", setCompany)
 	ed.post("/internships/:s/supervisor", setSupervisor)
@@ -126,10 +126,16 @@ func (ed *EndPoints) openSession(w http.ResponseWriter, r *http.Request) (sessio
 
 func (ed *EndPoints) anon(fn EndPoint) httptreemux.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request, ps map[string]string) {
+		//We create a session if possible. Otherwise we move to an anonymous session
+		s, err := ed.openSession(w, r)
+		if err != nil {
+			s = session.AnonSession(ed.store)
+		}
 		ex := Exchange{
 			w:   w,
 			r:   r,
 			ps:  ps,
+			s:   s,
 			cfg: ed.cfg,
 			not: ed.notifier,
 		}

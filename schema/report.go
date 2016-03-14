@@ -31,3 +31,9 @@ func (m *ReportHeader) Graded() bool {
 func (m *ReportHeader) In() bool {
 	return m.Delivery != nil
 }
+
+//Anonymise the report grade and comment
+func (m *ReportHeader) Anonymise() {
+	m.Grade = -10
+	m.Comment = ""
+}

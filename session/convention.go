@@ -66,7 +66,9 @@ func (s *Session) Internships() (schema.Internships, error) {
 	} else if s.Role().Level() == schema.TutorLevel {
 		return is.Filter(schema.Tutoring(s.my.Person.Email)), err
 	}
-	return schema.Internships{}, ErrPermission
+	//Return the anonymised version
+	is.Anonymise()
+	return is, nil
 
 }
 

@@ -12,6 +12,11 @@ type Company struct {
 	Title string
 }
 
+//Anonymise removes the internship subject title
+func (c *Company) Anonymise() {
+	c.Title = ""
+}
+
 //Convention declares a student convention
 type Convention struct {
 	Creation   time.Time
@@ -29,6 +34,14 @@ type Convention struct {
 	Gratification  int
 }
 
+//Anonymise the company, the person
+func (c *Convention) Anonymise() {
+	c.Company.Anonymise()
+	c.Student.User.Person.Anonymise()
+	c.Tutor.Person.Anonymise()
+	c.Supervisor.Anonymise()
+}
+
 //Internship is the core type to specify required data related to an internship
 type Internship struct {
 	Convention Convention
@@ -38,6 +51,20 @@ type Internship struct {
 	Surveys []SurveyHeader
 	//Defense
 	Defense Defense
+}
+
+//Anonymise the convention, the reports and the surveys
+func (i *Internship) Anonymise() {
+	i.Convention.Anonymise()
+	for idx, hdr := range i.Reports {
+		hdr.Anonymise()
+		i.Reports[idx] = hdr
+	}
+
+	for idx, hdr := range i.Surveys {
+		hdr.Anonymise()
+		i.Surveys[idx] = hdr
+	}
 }
 
 //Internships aliases slices of internship to exhibit filtering methods
@@ -52,6 +79,14 @@ func (ss Internships) Filter(filter func(Internship) bool) Internships {
 		}
 	}
 	return res
+}
+
+//Anonymise every internships
+func (ss Internships) Anonymise() {
+	for idx, i := range ss {
+		i.Anonymise()
+		ss[idx] = i
+	}
 }
 
 //Tutoring is a filter that keep only the internships tutored by the given user
