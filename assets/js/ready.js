@@ -3,6 +3,11 @@ $(document).ready(function() {
 	$('[data-toggle="popover"]').popover();
 
 
+	getConfig().done(function(c) {
+		config = c;
+		$(".release").html(config.Version)		
+	});
+
 	//Login part
 	if (window.location.pathname == "/login") {
 		var em = $.urlParam("email")
@@ -32,14 +37,10 @@ $(document).ready(function() {
 		$.tablesorter.defaults.theme = 'bootstrap';
 		$.tablesorter.defaults.headerTemplate = '{content} {icon}';
 
-		getConfig().done(function(c) {
-			config = c;
-			cookie = getCookie("login")		
-			if (cookie) { 			
-				user(cookie).done(loadSuccess).fail(logFail);
-				$(".release").html(config.Version)
-			}
-		})
+		cookie = getCookie("login")		
+		if (cookie) { 			
+			user(cookie).done(loadSuccess).fail(logFail);
+		}
 	} else if (window.location.pathname == "/survey") {
 		setLang(".fr",".en");
 		loadSurvey();
@@ -49,6 +50,8 @@ $(document).ready(function() {
 			$(".alert-danger").html("<strong>There is no token in the request</strong>. Initiate a reset request <a href='login'>here</a>.").removeClass("hidden");
 			$(".btn").attr("disabled", "disabled");
 		}	
+	} else if (window.location.pathname == "/statistics") {
+		loadStatistics();
 	}
 
 });
