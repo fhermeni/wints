@@ -28,7 +28,7 @@ var (
 	//ErrUserTutoring declares the user cannot be removed as it is tutoring students
 	ErrUserTutoring = errors.New("The user is tutoring students")
 	//ErrCredentials declares invalid credentials
-	ErrCredentials = errors.New("Incorrect credentials")
+	ErrCredentials = errors.New("Incorrect password")
 	//ErrPasswordTooShort declares the stated password is too short
 	ErrPasswordTooShort = errors.New("Password too short (8 chars. min)")
 	//ErrNoPendingRequests declares there is no password renewal request

@@ -488,6 +488,17 @@ func (ed *EndPoints) signin(ex Exchange) error {
 	s, err := ed.store.NewSession(cred.Login, []byte(cred.Password), ed.cfg.SessionLifeTime.Duration)
 	ed.notifier.Login(s, err)
 	if err != nil {
+		if err == schema.ErrCredentials {
+			u, e := ed.store.User(cred.Login)
+			if e != nil {
+				//We maintain the original error
+				return err
+			}
+			if u.LastVisit == nil {
+				//Never visited, so account might be not activated
+				return ErrNotActivatedAccount
+			}
+		}
 		return err
 	}
 
@@ -531,6 +542,9 @@ func (ed *EndPoints) newPassword(ex Exchange) error {
 	}
 	email, err := ed.store.NewPassword([]byte(req.Token), []byte(req.Password))
 	ex.not.PasswordChanged(email, err)
+	if err == nil {
+		ed.store.Visit(email)
+	}
 	return ex.outJSON(email, err)
 }
 

@@ -67,10 +67,10 @@ func (ed *HTTPd) home(w http.ResponseWriter, r *http.Request) {
 //Listen starts listening
 func (ed *HTTPd) Listen() error {
 	return http.ListenAndServeTLS(ed.cfg.Listen, ed.cfg.Certificate, ed.cfg.PrivateKey, nil)
-	//return http.ListenAndServe(ed.cfg.Listen, nil) //, d.cfg.Certificate, d.cfg.PrivateKey, nil)
 }
 
 var (
 	//ErrMalformedJSON reports a JSON message that cannot be mapped to a struct
-	ErrMalformedJSON = errors.New("Malformed json message")
+	ErrMalformedJSON       = errors.New("Malformed json message")
+	ErrNotActivatedAccount = errors.New("You did not activate the account. Check for the invitation mail in this email mailbox")
 )

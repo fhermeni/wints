@@ -19,7 +19,7 @@ func status(not *notifier.Notifier, w http.ResponseWriter, r *http.Request, e er
 	case schema.ErrReportExists, schema.ErrUserExists, schema.ErrInternshipExists, schema.ErrUserTutoring, schema.ErrConventionExists:
 		http.Error(w, e.Error(), http.StatusConflict)
 		return
-	case schema.ErrCredentials, schema.ErrInvalidToken, schema.ErrSessionExpired:
+	case schema.ErrCredentials, schema.ErrInvalidToken, schema.ErrSessionExpired, ErrNotActivatedAccount:
 		http.Error(w, e.Error(), http.StatusUnauthorized)
 		return
 	case feeder.ErrAuthorization:
