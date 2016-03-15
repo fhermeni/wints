@@ -148,72 +148,6 @@ function nbDays(from, to) {
 	return moment(to).dayOfYear() - moment(from).dayOfYear();
 }
 
-/*function declared() {
-	var at = [];
-	var ms = [];
-	var i = 0;
-	stats.forEach(function(s) {
-		d = new Date(s.Creation);
-		if (d.getUTCDate() > 15) {
-			d.setUTCDate(15)
-		} else {
-			d.setUTCDate(1);
-		}
-		var m = d.getMonth();
-		ms.push((d.getYear() - 100) + "-" + d.getUTCMonth() + "-" + d.getUTCDate());
-	});
-	ms.sort();
-	var toShift = ms[0].endsWith("-15")
-	if (toShift) {
-		var x = ms[0].substring(0, ms[0].length - 3) + "-1"
-		ms.unshift(x)
-	}
-	var labels = [];
-	var count = [];
-	var i = 0;
-	ms.forEach(function(m) {
-		if (labels.length == 0) {
-			labels.push(m);
-			count[i++] = 1;
-		} else {
-			if (labels[i - 1] == m) {
-				count[i - 1]++;
-			} else {
-				labels[i] = m;
-				count[i] = count[i - 1] + 1;
-				i++;
-			}
-		}
-	});
-	//Padding if the first convention is established by the end of the month
-	if (toShift) {
-		count.unshift(0)
-	}
-
-	//percentage
-	for (i = 0; i < count.length; i++) {
-		count[i] = Math.round(count[i] / stats.length * 100)
-	}
-	var xx = [];
-	labels.forEach(function(l) {
-		var buf = l.split("-");
-		xx.push(months[buf[1]] + " " + buf[0]);
-	});
-
-	var atLab = $("#conventions").get(0).getContext("2d");
-	var data = {
-		labels: ddply(xx),
-		datasets: [line(count)]
-	}
-	var atc = new Chart(atLab).Line(data, {
-		pointDotRadius: 2,
-		tooltipTemplate: "<%= value %>",
-		scaleOverride: true,
-		scaleSteps: 6,
-		scaleStepWidth: 20
-	});
-}*/
-
 function ddply(arr) {
 	var res = [arr[0]];
 	for (var i = 1; i < arr.length; i++) {
@@ -225,50 +159,6 @@ function ddply(arr) {
 	}
 	return res
 }
-
-/*function durations() {
-	var begin = new Date()
-	begin.setMonth(1)
-	begin.setDate(1)
-	var end = new Date()
-	end.setMonth(10);
-	end.setDate(31);
-
-	var labels = [];
-	var cur = new Date(begin.getTime());
-	var ins = [];
-	while (cur.getTime() < end.getTime()) {
-		labels.push(months[cur.getMonth()])
-		cur.setMonth(cur.getMonth() + 1);
-		ins.push(0)
-	};
-	var now = begin;
-	stats.forEach(function(s) {
-		var i = 0;
-		var cur = new Date(begin.getTime());
-		while (cur.getTime() < end.getTime()) {
-			if (s.Begin.getTime() <= cur.getTime() && s.End.getTime() >= cur.getTime()) {
-				ins[i]++;
-			}
-			cur.setMonth(cur.getMonth() + 1);
-			i++;
-		};
-	});
-	var atLab = $("#periods").get(0).getContext("2d");
-	var data = {
-		labels: ddply(labels),
-		datasets: [line(ins)]
-	}
-	var atc = new Chart(atLab).Line(data, {
-		pointDotRadius: 2,
-		tooltipTemplate: "<%= value %>",
-		scaleOverride: true,
-		scaleSteps: 6,
-		scaleStepWidth: 20
-	});
-}*/
-
-
 
 function gratifications(filter) {
 	$("li.gratification").removeClass("active")
@@ -283,30 +173,21 @@ function gratifications(filter) {
 	ints.forEach(function(s) {
 		g = s.Convention.Gratification;
 		all += g;
-		var idx = -1;		
-		if (filter == "promotion") {
-			idx = config.Promotions.indexOf(s.Convention.Student.Promotion);
-		} else if (filter == "sector") {			
-			idx  = s.Convention.Lab ? 0 : 1;
-		} else if (filter == "country") {
-			idx  = s.Convention.ForeignCountry ? 0 : 1;
-		} else if (filter == "major") {
-			idx = config.Majors.indexOf(s.Convention.Student.Major);
-		}			
+		var idx = index(s, filter);		
 		if (!qty[idx]) {
 			qty[idx] = [];
 		}			
 		qty[idx].push(g);
-	});	
+	});		
+	for (var i = 0; i < qty.length; i++) {
+		qty[i] = Math.round(avg(qty[i]));
+	}	
 	if (!filter) {
-		$("#how-much").html(Math.round(all / ints.length) + "€");
+		$("#how-much").html(Math.round(qty[0]) + "€");
 	} else {
 		if (filter == "country" || filter == "sector") {
-			$("#how-much").html("<h1>" + Math.round(avg(qty[0])) + "€ / " + Math.round(avg(qty[1])) + "€</h1>");
-		} else {
-			for (var i = 0; i < qty.length; i++) {
-				qty[i] = Math.round(avg(qty[i]));
-			}
+			$("#how-much").html("<h1>" + Math.round(qty[0]) + "€ / " + Math.round(qty[1]) + "€</h1>");
+		} else {			
 			c = $("<canvas>");
 			data = dataset(filter == "promotion" ? config.Promotions : config.Majors, "gratifications", qty);	
 			c = $("#how-much").html(c).find("canvas");			
@@ -451,6 +332,7 @@ function employers(ints) {
 
 
 function country(filter) {	
+	//Toggles coordination
 	$("li.country").removeClass("active")
 	if (!filter) {
 		$("li.country.all").addClass("active")
@@ -462,12 +344,7 @@ function country(filter) {
 	var total = [];
 	
 	ints.forEach(function(s) {
-		var idx = 0;		
-		if (filter == "promotion") {
-			idx = config.Promotions.indexOf(s.Convention.Student.Promotion);
-		} else if (filter == "major") {
-			idx = config.Majors.indexOf(s.Convention.Student.Major);
-		}		
+		var idx = index(s, filter);		
 		if (!qty[idx]) {
 			qty[idx] = 0;
 			total[idx] = 0;
@@ -480,15 +357,12 @@ function country(filter) {
 
 	
 	for (var i = 0; i < qty.length; i++) {
-		qty[i] = Math.round(qty[i] / total[i] * 100);
-		if (!qty[i]) {
-			qty[i] = 0;
-		}
+		qty[i] = pct(qty[i],total[i]);
 	}
 	
 	if (!filter) {
 		$("#country").html("<h1>" + qty[0] + "%</h1>");
-	} else {
+	} else {		
 		c = $("<canvas>");
 		data = dataset(filter == "promotion" ? config.Promotions : config.Majors, "foreign country", qty);	
 		c = $("#country").html(c).find("canvas");			
@@ -563,12 +437,7 @@ function sector(filter) {
 	var total = [];
 	
 	ints.forEach(function(s) {
-		var idx = 0;		
-		if (filter == "promotion") {
-			idx = config.Promotions.indexOf(s.Convention.Student.Promotion);
-		} else if (filter == "major") {
-			idx = config.Majors.indexOf(s.Convention.Student.Major);
-		}		
+		var idx = index(s, filter);		
 		if (!qty[idx]) {
 			qty[idx] = 0;
 			total[idx] = 0;
@@ -578,13 +447,9 @@ function sector(filter) {
 		}		
 		total[idx]++;
 	});	
-
 	
 	for (var i = 0; i < qty.length; i++) {
-		qty[i] = Math.round(qty[i] / total[i] * 100);
-		if (!qty[i]) {
-			qty[i] = 0;
-		}
+		qty[i] = pct(qty[i],total[i]);
 	}
 	
 	if (!filter) {
@@ -598,17 +463,46 @@ function sector(filter) {
 	}
 }
 
+
+/*
+* Helpers
+*/
+
+/**
+* returns an identifier for the category depending on the filter.
+* 0 when there is no filter
+*/
+function index(i, filter) {
+		if (filter == "promotion") {
+			return config.Promotions.indexOf(i.Convention.Student.Promotion);
+		} else if (filter == "sector") {			
+			return i.Convention.Lab ? 0 : 1;
+		} else if (filter == "country") {
+			return i.Convention.ForeignCountry ? 0 : 1;
+		} else if (filter == "major") {
+			return config.Majors.indexOf(i.Convention.Student.Major);
+		}			
+		return 0	
+}
+
 function avg(values) {
 	var sum = 0
 	var nb = 0
 	if (!values || values.length == 0) {
-		return nb
+		return undefined;
 	}
 	values.forEach(function(v) {
 		sum += v;
 		nb++;
 	})
 	return sum / nb;
+}
+
+function pct(a, b) {
+	if (a === undefined) {
+		return a;
+	}
+	return Math.round(a / b * 100);
 }
 
 function zeroes(nb) {
@@ -620,6 +514,13 @@ function zeroes(nb) {
 }
 
 function dataset(labels, title, d) {
+	var i = d.length;	
+	while (i--) {
+		if (isNaN(d[i])) {			
+			d.splice(i, 1);			
+			labels.splice(i, 1);			
+		}
+	}
 	return { labels: labels,
 			datasets: [{
 					label: title,
