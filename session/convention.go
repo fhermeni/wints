@@ -74,7 +74,7 @@ func (s *Session) Internships() (schema.Internships, error) {
 
 //Internship returns the internship of the emitter or if the emitter is at least a major leader
 func (s *Session) Internship(stu string) (schema.Internship, error) {
-	if s.Myself(stu) || s.Role().Level() >= schema.MajorLevel {
+	if s.Myself(stu) || s.Watching(stu) {
 		return s.store.Internship(stu)
 	}
 	return schema.Internship{}, ErrPermission

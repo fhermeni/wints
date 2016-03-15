@@ -67,7 +67,7 @@ func (s *Session) Tutoring(student string) bool {
 //Watching checks if the student is in the major I am the leader of, an head or not or
 //the student tutor
 func (s *Session) Watching(student string) bool {
-	//wathing
+	//watching
 	if s.my.Role.Level() >= schema.HeadLevel {
 		return true
 	}
