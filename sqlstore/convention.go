@@ -86,7 +86,7 @@ func (s *Store) NewInternship(c schema.Convention) (schema.Internship, []byte, e
 
 	i.Surveys = make([]schema.SurveyHeader, len(s.config.Surveys))
 	for idx, survey := range s.config.Surveys {
-		token := randomBytes(16)
+		token = randomBytes(16)
 		inv := survey.Invitation.Value(c.Begin).Truncate(time.Minute).UTC()
 		dead := inv.Add(survey.Deadline.Duration).Truncate(time.Minute).UTC()
 		tx.Exec(insertSurvey, c.Student.User.Person.Email, survey.Kind, token, inv, inv, dead)
@@ -167,8 +167,8 @@ func (s *Store) Internships() (schema.Internships, error) {
 	ints := make([]schema.Internship, 0, 0)
 	for _, c := range conventions {
 		stu := c.Student.User.Person.Email
-		i, err := s.toInternship(c)
-		if err != nil {
+		i, e := s.toInternship(c)
+		if e != nil {
 			return schema.Internships{}, err
 		}
 		d, ok := defs[stu]

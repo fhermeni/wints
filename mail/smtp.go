@@ -96,14 +96,20 @@ func (m *SMTP) sendMail(to string, cc []string, msg []byte) error {
 	if err != nil {
 		return err
 	}
+
+	write := func(buf []byte) {
+		if err != nil {
+			return
+		}
+		_, err = w.Write(buf)
+	}
+
 	for _, em := range cc {
-		w.Write([]byte("Cc: "))
-		w.Write([]byte(em))
-		w.Write([]byte("\n"))
+		write([]byte("Cc: "))
+		write([]byte(em))
+		write([]byte("\n"))
 	}
-	if _, err = w.Write(msg); err != nil {
-		return err
-	}
+	write(msg)
 	if err = w.Close(); err != nil {
 		return err
 	}

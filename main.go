@@ -19,6 +19,7 @@ import (
 	"github.com/robfig/cron"
 )
 
+//Version is the running version. Should be set at link time
 var Version = "SNAPSHOT"
 
 var cfg config.Config
@@ -28,7 +29,7 @@ var mailer mail.Mailer
 
 func confirm(msg string) bool {
 	os.Stdout.WriteString(msg + " (y/n) ?")
-	var b []byte = make([]byte, 1)
+	b := make([]byte, 1)
 	os.Stdin.Read(b)
 	ret := string(b) == "y"
 	return ret
@@ -49,17 +50,11 @@ func inviteRoot(em string) {
 	p := schema.Person{Firstname: "root", Lastname: "root", Email: em, Tel: "n/a"}
 	token, err := store.NewUser(p, schema.ROOT)
 	fatal("Create root account", err)
-	if err := not.InviteRoot(schema.User{Person: p}, p, string(token), err); err != nil {
+	if e := not.InviteRoot(schema.User{Person: p}, p, string(token), err); e != nil {
 		//Here, we delete the account as the root account was not aware of the creation
 		store.RmUser(p.Email)
-		fatal("Invite root", err)
+		fatal("Invite root", e)
 	}
-}
-
-func newConventionReader(cfg config.Feeder, not *notifier.Notifier) feeder.ConventionReader {
-	reader := feeder.NewHTTPConventionReader(cfg.URL, cfg.Login, cfg.Password)
-	reader.Encoding = cfg.Encoding
-	return reader
 }
 
 func newMailer(fake bool) mail.Mailer {
@@ -76,8 +71,8 @@ func newMailer(fake bool) mail.Mailer {
 func newStore() *sqlstore.Store {
 	DB, err := sql.Open("postgres", cfg.Db.ConnectionString)
 	fatal("Database connexion", err)
-	store, _ := sqlstore.NewStore(DB, cfg.Internships)
-	return store
+	st, _ := sqlstore.NewStore(DB, cfg.Internships)
+	return st
 }
 
 func newFeeder(not *notifier.Notifier) feeder.Conventions {
@@ -89,8 +84,12 @@ func newFeeder(not *notifier.Notifier) feeder.Conventions {
 
 func runSpies() {
 	c := cron.New()
-	c.AddFunc(cfg.Crons.NewsLetters, func() { jobs.MissingReports(store, not) })
-	c.AddFunc(cfg.Crons.NewsLetters, func() { jobs.MissingSurveys(store, not) })
+	if err := c.AddFunc(cfg.Crons.NewsLetters, func() { jobs.MissingReports(store, not) }); err != nil {
+		fatal("Unable to cron the missing report scanner", err)
+	}
+	if err := c.AddFunc(cfg.Crons.NewsLetters, func() { jobs.MissingSurveys(store, not) }); err != nil {
+		fatal("Unable to cron the missing survey scanner", err)
+	}
 	c.Start()
 }
 

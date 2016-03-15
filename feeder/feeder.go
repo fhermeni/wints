@@ -10,11 +10,13 @@ import (
 	"github.com/fhermeni/wints/schema"
 )
 
+//ImportError to report a critical error and multiple warnings
 type ImportError struct {
 	Warnings []string
 	Fatal    error
 }
 
+//NewImportError creates a new error
 func NewImportError() *ImportError {
 	return &ImportError{
 		Fatal:    nil,
@@ -22,6 +24,7 @@ func NewImportError() *ImportError {
 	}
 }
 
+//Error reports the critical errors and the possible warnings.
 func (e *ImportError) Error() string {
 	buf := fmt.Sprintf("%d warning(s)", len(e.Warnings))
 	if len(e.Warnings) > 0 {
@@ -36,6 +39,7 @@ func (e *ImportError) Error() string {
 	return buf
 }
 
+//NewWarning signal a new warning to report
 func (e *ImportError) NewWarning(err ...string) {
 	e.Warnings = append(e.Warnings, err...)
 }

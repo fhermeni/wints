@@ -23,6 +23,7 @@ type Session struct {
 	conventions feeder.Conventions
 }
 
+//AnonSession creates a session that is not attached to a particular user
 func AnonSession(store *sqlstore.Store) Session {
 	return Session{store: store}
 }

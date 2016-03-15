@@ -77,17 +77,16 @@ func scanStudent(rows *sql.Rows) (schema.Student, error) {
 
 //Students list all the registered students
 func (s *Store) Students() (schema.Students, error) {
-	rows, err := s.db.Query(allStudents)
-
 	var students []schema.Student
+	rows, err := s.db.Query(allStudents)
 	if err != nil {
 		return students, err
 	}
 	defer rows.Close()
 	for rows.Next() {
-		s, err := scanStudent(rows)
-		if err != nil {
-			return students, err
+		s, e := scanStudent(rows)
+		if e != nil {
+			return students, e
 		}
 		students = append(students, s)
 	}

@@ -85,10 +85,6 @@ func clean(str string) string {
 	return strings.ToLower(strings.TrimSpace(str))
 }
 
-func log(msg string, err error) {
-	logger.Log("event", "feeder", msg, err)
-}
-
 func cleanInt(str string) int {
 	s := strings.Replace(str, " ", "", -1)
 	m := Integer.FindSubmatch([]byte(s))
@@ -106,7 +102,7 @@ func parseTime(fmt, buf string, student schema.Student) (time.Time, error) {
 }
 func (f *CsvConventions) scan(prom string) ([]schema.Convention, *ImportError) {
 	ierr := NewImportError()
-	conventions := make([]schema.Convention, 0)
+	var conventions []schema.Convention
 	lasts := make(map[string]schema.Convention)
 	r, err := f.Reader.Reader(f.Year, prom)
 	if err != nil {
@@ -187,7 +183,7 @@ func (f *CsvConventions) scan(prom string) ([]schema.Convention, *ImportError) {
 //Import imports all the conventions by requesting in parallel the conventions for each registered promotions
 func (f *CsvConventions) Import() ([]schema.Convention, *ImportError) {
 	lock := &sync.Mutex{}
-	all := make([]schema.Convention, 0)
+	var all []schema.Convention
 	var wg sync.WaitGroup
 	ierr := NewImportError()
 	for i, prom := range f.promotions {

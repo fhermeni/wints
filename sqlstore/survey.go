@@ -52,8 +52,8 @@ func scanSurvey(rows *sql.Rows) (string, schema.SurveyHeader, error) {
 		return student, survey, err
 	}
 	if buf.Valid {
-		if err := json.Unmarshal([]byte(buf.String), &survey.Cnt); err != nil {
-			return student, survey, err
+		if e := json.Unmarshal([]byte(buf.String), &survey.Cnt); e != nil {
+			return student, survey, e
 		}
 	}
 	survey.Deadline = survey.Deadline.Truncate(time.Minute).UTC()
@@ -96,9 +96,9 @@ func (s *Store) Surveys(student string) ([]schema.SurveyHeader, error) {
 	}
 	defer rows.Close()
 	for rows.Next() {
-		_, s, err := scanSurvey(rows)
-		if err != nil {
-			return res, err
+		_, s, e := scanSurvey(rows)
+		if e != nil {
+			return res, e
 		}
 		res = append(res, s)
 	}

@@ -71,6 +71,7 @@ func (ed *HTTPd) Listen() error {
 
 var (
 	//ErrMalformedJSON reports a JSON message that cannot be mapped to a struct
-	ErrMalformedJSON       = errors.New("Malformed json message")
+	ErrMalformedJSON = errors.New("Malformed json message")
+	//ErrNotActivatedAccount refines a schema.ErrCredential when the user never logged before.
 	ErrNotActivatedAccount = errors.New("You did not activate the account. Check for the invitation mail in this email mailbox")
 )

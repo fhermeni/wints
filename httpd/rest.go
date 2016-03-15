@@ -9,7 +9,6 @@ import (
 	"github.com/dimfeld/httptreemux"
 	"github.com/fhermeni/wints/config"
 	"github.com/fhermeni/wints/feeder"
-	"github.com/fhermeni/wints/mail"
 	"github.com/fhermeni/wints/notifier"
 	"github.com/fhermeni/wints/schema"
 	"github.com/fhermeni/wints/session"
@@ -24,7 +23,6 @@ type EndPoints struct {
 	conventions  feeder.Conventions
 	cfg          config.Rest
 	organization config.Internships
-	mailer       mail.Mailer
 	notifier     *notifier.Notifier
 }
 
@@ -195,8 +193,8 @@ func setUserPerson(ex Exchange) error {
 	err := ex.s.SetUserPerson(p)
 	ex.not.ProfileEdited(ex.s.Me(), p, err)
 	if err == nil {
-		u, err := ex.s.User(ex.V("u"))
-		return ex.outJSON(u, err)
+		u, e := ex.s.User(ex.V("u"))
+		return ex.outJSON(u, e)
 	}
 	return err
 }
@@ -218,8 +216,8 @@ func setUserRole(ex Exchange) error {
 	err := ex.s.SetUserRole(ex.V("u"), r)
 	ex.not.PrivilegeUpdated(ex.s.Me(), ex.V("u"), r, err)
 	if err == nil {
-		u, err := ex.s.User(ex.V("u"))
-		return ex.outJSON(u, err)
+		u, e := ex.s.User(ex.V("u"))
+		return ex.outJSON(u, e)
 	}
 	return err
 }
@@ -506,7 +504,7 @@ func (ed *EndPoints) signin(ex Exchange) error {
 	}
 	login := &http.Cookie{
 		Name:  "login",
-		Value: string(s.Email),
+		Value: s.Email,
 		Path:  "/",
 	}
 	http.SetCookie(ex.w, token)
