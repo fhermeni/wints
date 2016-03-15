@@ -486,22 +486,19 @@ func (ed *EndPoints) signin(ex Exchange) error {
 		return err
 	}
 	s, err := ed.store.NewSession(cred.Login, []byte(cred.Password), ed.cfg.SessionLifeTime.Duration)
-	ed.notifier.Login(s, err)
 	if err != nil {
 		if err == schema.ErrCredentials {
 			u, e := ed.store.User(cred.Login)
-			if e != nil {
-				//We maintain the original error
-				return err
-			}
-			if u.LastVisit == nil {
+			if e == nil && u.LastVisit == nil {
 				//Never visited, so account might be not activated
-				return ErrNotActivatedAccount
+				err = ErrNotActivatedAccount
 			}
 		}
+	}
+	ed.notifier.Login(s, err)
+	if err != nil {
 		return err
 	}
-
 	token := &http.Cookie{
 		Name:  "token",
 		Value: string(s.Token),

@@ -1,24 +1,5 @@
-.box {
-	width: 1em;
-	height: 1em;
-	display: inline-block;
-	border: solid 1px #fff;
-}
-
-body {
-	background-color: #FFCE54;
-}
-
-.thumbnail {
-	background-color: #F6BB42;
-}
-
-.pagination {
-	margin-bottom: 0px;
-	margin-top: 0px;
-}
-.page-header {
-	border-bottom: 1px solid #434A33;	
+.thumbnail > .pagination {
+    margin: 0 0;
 }
 
 .thumbnail h3 {
@@ -29,6 +10,23 @@ body {
 	margin-top: 0em;
 	margin-bottom: 0.5em;
 }
+
+/*.box {
+	width: 1em;
+	height: 1em;
+	display: inline-block;
+	border: solid 1px #fff;
+}
+
+.pagination {
+	margin-bottom: 0px;
+	margin-top: 0px;
+}
+.page-header {
+	border-bottom: 1px solid #434A33;	
+}
+
+
 
 canvas {
 	padding: 0em 1em;
@@ -44,4 +42,4 @@ h1.survey {
 }
 h4 {
 	margin-top: 0em;
-}
+}*/

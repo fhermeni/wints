@@ -1,7 +1,10 @@
+.has-error label {
+	font-weight: bold;
+}
+
 .has-error input {
 	color: #d9534f;
-	border: none;
-	font-weight: bold;
+	border: none;	
 }
 
 .popover {
@@ -9,24 +12,24 @@
 	box-shadow: none;
 	font-weight: inherit;
 }
-.popover-content  {
+.popover-error .popover-content  {
 	background-color: #d9534f;
 	color: #fff;
 }
 
-.popover.right>.arrow:after {
+.popover-error.right>.arrow:after {
 	border-left-color: #d9534f;
 }
 
-.popover.top>.arrow:after {
+.popover-error.top>.arrow:after {
 	border-bottom-color: #d9534f;
 }
 
-.popover.bottom>.arrow:after {
+.popover-error.bottom>.arrow:after {
 	border-top-color: #d9534f;
 }
 
-.popover.left>.arrow:after {
+.popover-error.left>.arrow:after {
 	border-right-color: #d9534f;
 }
 

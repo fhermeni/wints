@@ -12,6 +12,7 @@ var util = require('gulp-util');
 var order = require("gulp-order");
 var merge = require('merge-stream');
 var path = require('path');
+var print = require('gulp-print');
 var config = {
     production: !!util.env.production
 };
@@ -75,6 +76,10 @@ gulp.task('js', function(){
 
 gulp.task('css', function() {
   return gulp.src(['assets/css/**/*.css', '!assets/css/**/wints.css'])
+  .pipe(order([
+    "**/vendor/*.css",  
+    "assets/css/*.css"    
+  ]))    
     .pipe(config.production ? cleanCSS() : util.noop())
     .pipe(concat('wints.css'))                      
     .pipe(gulp.dest('assets/css/'))            
