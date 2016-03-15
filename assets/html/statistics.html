@@ -14,50 +14,41 @@
 </div>
 <div class="container">
 <h1>Internships in a nutshell</h1>
-<!--<div class='col-md-6 col-md-offset-3'>
-    <div class="alert alert-warning">
-        <h4>Warning</h4>
-        <p>"There are three types of lies -- lies, damn lies, and statistics."</p>
-        <p class="text-right">-- Benjamin Disraeli</p>
-    </div>
-</div>-->
 <div class="row">
     <div class="col-sm-4">        
-        <div class="thumbnail text-center">
-        <h3>% in a foreign country</h3>
+        <div class="thumbnail text-center">          
         <ul class="pagination pagination-sm">            
             <li class="country all active"><a onclick="country()">all</a></li>    
             <li class="country promotion"><a onclick="country('promotion')">promotions</a></li>    
             <li class="country major"><a onclick="country('major')">majors</a></li>
-        </ul>      
-            
-            <div id="country"><canvas></canvas></div>                                                     
+        </ul>            
+        <h3>% in a foreign country</h3>
+            <div id="country"><canvas></canvas></div>
         </div>
     </div>
 
     <div class="col-sm-4">
         <div class="thumbnail text-center">
-        <h3>% in industry</h3>          
         <ul class="pagination pagination-sm">            
             <li class="sector all active"><a onclick="sector()">all</a></li>    
             <li class="sector promotion"><a onclick="sector('promotion')">promotions</a></li>    
             <li class="sector major"><a onclick="sector('major')">majors</a></li>            
-        </ul>                        
+        </ul>                                
+        <h3>% in industry</h3>          
             <div id="sector"><canvas></canvas></div>                                    
         </div>
     </div>
 
     <div class="col-sm-4">
         <div class="thumbnail text-center">
-            <h3>Gratification</h3>
             <ul class="pagination pagination-sm">
             <li class="gratification all active"><a onclick="gratifications()">all</a></li>                
             <li class="gratification promotion"><a onclick="gratifications('promotion')">promotions</a></li>
             <li class="gratification major"><a onclick="gratifications('major')">majors</a></li>
             <li class="gratification sector"><a onclick="gratifications('sector')">lab / company</a></li>
             <li class="gratification country"><a onclick="gratifications('country')">fr / other</a></li>
-            
-            </ul>            
+            </ul>                    
+            <h3>Gratification</h3>
             <h2 id="how-much"></h2>            
         </div>
     </div>

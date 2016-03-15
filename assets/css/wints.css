@@ -222,6 +222,10 @@ table {
     margin-top: 2em;
     margin-bottom: 2em;
 }
+
+.thumbnail > .pagination {
+    margin: 0 0;
+}
 .has-error {
 	color: #f04124;
 }
