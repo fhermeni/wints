@@ -347,25 +347,27 @@ Handlebars.registerPartial("student-dashboard-report", Handlebars.template({"1":
     + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.Comment : depth0),{"name":"unless","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + ">\n		<i class=\"glyphicon glyphicon-comment\"></i>\n	</button>\n</td>\n</tr>";
 },"useData":true}));
-Handlebars.registerPartial("tutored-student", Handlebars.template({"1":function(container,depth0,helpers,partials,data,blockParams,depths) {
+Handlebars.registerPartial("tutored-student", Handlebars.template({"1":function(container,depth0,helpers,partials,data) {
+    return "            <span class=\"pull-right\">\n            <i class=\"glyphicon glyphicon-warning-sign text-warning\" title=\"never logged in\"></i>\n";
+},"3":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
   return "            "
     + container.escapeExpression((helpers.report || (depth0 && depth0.report) || helpers.helperMissing).call(depth0 != null ? depth0 : {},depth0,((stack1 = ((stack1 = ((stack1 = ((stack1 = (depths[1] != null ? depths[1].Convention : depths[1])) != null ? stack1.Student : stack1)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1),{"name":"report","hash":{},"data":data}))
     + "\n";
-},"3":function(container,depth0,helpers,partials,data,blockParams,depths) {
+},"5":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
   return "            "
     + container.escapeExpression((helpers.survey || (depth0 && depth0.survey) || helpers.helperMissing).call(depth0 != null ? depth0 : {},depth0,((stack1 = ((stack1 = ((stack1 = ((stack1 = (depths[1] != null ? depths[1].Convention : depths[1])) != null ? stack1.Student : stack1)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1),{"name":"survey","hash":{},"data":data}))
     + "\n";
-},"5":function(container,depth0,helpers,partials,data) {
+},"7":function(container,depth0,helpers,partials,data) {
     var stack1;
 
   return "            <td class=\"text-center\" data-text=\"1\">\n                <a href=\"#\" onclick=\"showAlumni('"
     + container.escapeExpression(container.lambda(((stack1 = ((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1), depth0))
     + "')\">\n                    <i class=\"glyphicon glyphicon-star-empty\"></i>\n                </a>\n            </td>\n";
-},"7":function(container,depth0,helpers,partials,data) {
+},"9":function(container,depth0,helpers,partials,data) {
     return "            <td class=\"text-center\" data-text=\"0\"></td>           \n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, alias1=container.lambda, alias2=container.escapeExpression, alias3=depth0 != null ? depth0 : {}, alias4=helpers.helperMissing;
@@ -384,7 +386,9 @@ Handlebars.registerPartial("tutored-student", Handlebars.template({"1":function(
     + alias2(alias1(((stack1 = ((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1), depth0))
     + "')\">\n            "
     + alias2((helpers.fullname || (depth0 && depth0.fullname) || alias4).call(alias3,((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1),{"name":"fullname","hash":{},"data":data}))
-    + "            \n            </td>\n            <td>"
+    + "            \n            </a>\n"
+    + ((stack1 = helpers.unless.call(alias3,((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.User : stack1)) != null ? stack1.LastVisit : stack1),{"name":"unless","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "            </span>\n            </td>\n            <td>"
     + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.Promotion : stack1), depth0))
     + "</td>\n            <td>"
     + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.Major : stack1), depth0))
@@ -397,11 +401,11 @@ Handlebars.registerPartial("tutored-student", Handlebars.template({"1":function(
     + "\">"
     + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Company : stack1)) != null ? stack1.Name : stack1), depth0))
     + "</a></td>\n"
-    + ((stack1 = helpers.each.call(alias3,(depth0 != null ? depth0.Reports : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers.each.call(alias3,(depth0 != null ? depth0.Reports : depth0),{"name":"each","hash":{},"fn":container.program(3, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "            \n"
-    + ((stack1 = helpers.each.call(alias3,(depth0 != null ? depth0.Surveys : depth0),{"name":"each","hash":{},"fn":container.program(3, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers.each.call(alias3,(depth0 != null ? depth0.Surveys : depth0),{"name":"each","hash":{},"fn":container.program(5, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "\n"
-    + ((stack1 = helpers["if"].call(alias3,((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.Alumni : stack1),{"name":"if","hash":{},"fn":container.program(5, data, 0, blockParams, depths),"inverse":container.program(7, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers["if"].call(alias3,((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.Alumni : stack1),{"name":"if","hash":{},"fn":container.program(7, data, 0, blockParams, depths),"inverse":container.program(9, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
     + "        </tr>";
 },"useData":true,"useDepths":true}));
 Handlebars.registerPartial("users-user", Handlebars.template({"1":function(container,depth0,helpers,partials,data) {
@@ -467,19 +471,21 @@ Handlebars.registerPartial("users-user", Handlebars.template({"1":function(conta
     + ((stack1 = helpers["if"].call(alias3,(depth0 != null ? depth0.Blocked : depth0),{"name":"if","hash":{},"fn":container.program(7, data, 0),"inverse":container.program(9, data, 0),"data":data})) != null ? stack1 : "")
     + ">\n            <i class=\"glyphicon glyphicon-remove\"></i>\n        </button>       \n    </td>\n</tr>";
 },"useData":true}));
-Handlebars.registerPartial("watchlist-student", Handlebars.template({"1":function(container,depth0,helpers,partials,data,blockParams,depths) {
+Handlebars.registerPartial("watchlist-student", Handlebars.template({"1":function(container,depth0,helpers,partials,data) {
+    return "        <span class=\"pull-right\">\n        <i class=\"glyphicon glyphicon-warning-sign text-warning\" title=\"never logged in\"></i>\n";
+},"3":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
   return "    "
     + container.escapeExpression((helpers.report || (depth0 && depth0.report) || helpers.helperMissing).call(depth0 != null ? depth0 : {},depth0,((stack1 = ((stack1 = ((stack1 = ((stack1 = (depths[1] != null ? depths[1].Convention : depths[1])) != null ? stack1.Student : stack1)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1),{"name":"report","hash":{},"data":data}))
     + "\n";
-},"3":function(container,depth0,helpers,partials,data,blockParams,depths) {
+},"5":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1;
 
   return "    "
     + container.escapeExpression((helpers.survey || (depth0 && depth0.survey) || helpers.helperMissing).call(depth0 != null ? depth0 : {},depth0,((stack1 = ((stack1 = ((stack1 = ((stack1 = (depths[1] != null ? depths[1].Convention : depths[1])) != null ? stack1.Student : stack1)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1),{"name":"survey","hash":{},"data":data}))
     + "\n";
-},"5":function(container,depth0,helpers,partials,data) {
+},"7":function(container,depth0,helpers,partials,data) {
     var stack1, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3=container.escapeExpression;
 
   return "    <td class=\"text-center "
@@ -491,15 +497,15 @@ Handlebars.registerPartial("watchlist-student", Handlebars.template({"1":functio
     + "\" class=\"grade\">"
     + alias3((helpers.defenseGrade || (depth0 && depth0.defenseGrade) || alias2).call(alias1,(depth0 != null ? depth0.Defense : depth0),{"name":"defenseGrade","hash":{},"data":data}))
     + "</a></td>\n";
-},"7":function(container,depth0,helpers,partials,data) {
-    return "    <td class=\"text-center\"><i>n/a</i></td>\n";
 },"9":function(container,depth0,helpers,partials,data) {
+    return "    <td class=\"text-center\"><i>n/a</i></td>\n";
+},"11":function(container,depth0,helpers,partials,data) {
     var stack1;
 
   return "    <td class=\"text-center\" data-text=\"1\">\n        <a href=\"#\" onclick=\"showAlumni('"
     + container.escapeExpression(container.lambda(((stack1 = ((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1), depth0))
     + "')\">\n            <i class=\"glyphicon glyphicon-star-empty\"></i>\n        </a>\n    </td>\n";
-},"11":function(container,depth0,helpers,partials,data) {
+},"13":function(container,depth0,helpers,partials,data) {
     return "    <td class=\"text-center\" data-text=\"0\"></td>           \n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, alias1=container.lambda, alias2=container.escapeExpression, alias3=depth0 != null ? depth0 : {}, alias4=helpers.helperMissing;
@@ -522,7 +528,9 @@ Handlebars.registerPartial("watchlist-student", Handlebars.template({"1":functio
     + alias2(alias1(((stack1 = ((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1), depth0))
     + "')\">\n    "
     + alias2((helpers.fullname || (depth0 && depth0.fullname) || alias4).call(alias3,((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1),{"name":"fullname","hash":{},"data":data}))
-    + "            \n    </td>\n    <td>"
+    + "\n    </a>\n\n"
+    + ((stack1 = helpers.unless.call(alias3,((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.User : stack1)) != null ? stack1.LastVisit : stack1),{"name":"unless","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "    </td>\n    <td>"
     + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.Promotion : stack1), depth0))
     + "</td>\n    <td>"
     + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.Major : stack1), depth0))
@@ -535,12 +543,12 @@ Handlebars.registerPartial("watchlist-student", Handlebars.template({"1":functio
     + "'>"
     + alias2((helpers.fullname || (depth0 && depth0.fullname) || alias4).call(alias3,((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Tutor : stack1)) != null ? stack1.Person : stack1),{"name":"fullname","hash":{},"data":data}))
     + "</td>            \n"
-    + ((stack1 = helpers.each.call(alias3,(depth0 != null ? depth0.Reports : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers.each.call(alias3,(depth0 != null ? depth0.Reports : depth0),{"name":"each","hash":{},"fn":container.program(3, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "    \n"
-    + ((stack1 = helpers.each.call(alias3,(depth0 != null ? depth0.Surveys : depth0),{"name":"each","hash":{},"fn":container.program(3, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers.each.call(alias3,(depth0 != null ? depth0.Surveys : depth0),{"name":"each","hash":{},"fn":container.program(5, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "\n"
-    + ((stack1 = helpers["if"].call(alias3,((stack1 = (depth0 != null ? depth0.Defense : depth0)) != null ? stack1.Defenses : stack1),{"name":"if","hash":{},"fn":container.program(5, data, 0, blockParams, depths),"inverse":container.program(7, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers["if"].call(alias3,((stack1 = (depth0 != null ? depth0.Defense : depth0)) != null ? stack1.Defenses : stack1),{"name":"if","hash":{},"fn":container.program(7, data, 0, blockParams, depths),"inverse":container.program(9, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
     + "                \n"
-    + ((stack1 = helpers["if"].call(alias3,((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.Alumni : stack1),{"name":"if","hash":{},"fn":container.program(9, data, 0, blockParams, depths),"inverse":container.program(11, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
+    + ((stack1 = helpers["if"].call(alias3,((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.Alumni : stack1),{"name":"if","hash":{},"fn":container.program(11, data, 0, blockParams, depths),"inverse":container.program(13, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
     + "</tr>    ";
 },"useData":true,"useDepths":true}));
