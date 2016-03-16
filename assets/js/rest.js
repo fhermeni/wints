@@ -26,6 +26,27 @@ function empty() {
 	return count != 0;
 }
 
+function invalidEmail() {
+	var count = 0;
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+	for (var i = 0; i < arguments.length; i++) {
+		var em = $(arguments[i]).val();
+		if (em.indexOf(" ") >= 0) {
+			reportError(arguments[i], "invalid email. Check for space characters");
+			count++;
+		}
+		else if (!re.test(em)) {
+			reportError(arguments[i], "invalid email");
+			count++;
+		} else {
+			$(arguments[i]).closest(".form-group").removeClass("has-error");
+			$(arguments[i]).popover("hide");
+		}		
+
+	}	
+    return count != 0;
+}
+
 function reportError(id, message) {
 	var popover = $(id).data('bs.popover');
 	if (popover) {

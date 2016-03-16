@@ -43,9 +43,13 @@ function updateCompany() {
 	postCompany(myself.Person.Email, cpy).done(refreshCompany).fail(notifyError);
 }
 
-function sendSupervisor() {
+function sendSupervisor() {	
 	if (empty("sup-fn") || empty("sup-ln") || empty("sup-tel") || empty("sup-email")) {
-		return
+		return;
+	}
+
+	if (invalidEmail("sup-email")) {
+		return;
 	}
 	var sup = {
 		Firstname: $("#sup-fn").val(),

@@ -18,10 +18,14 @@ function flipForm(from, to) {
 
 function login() {
 	cleanError("#loginEmail", "#loginPassword");
+	if (invalidEmail("#loginEmail")) {
+		return;
+	}
 	if (empty("#loginEmail", "#loginPassword")) {
 		return;
 	}
-	signin($("#loginEmail").val().trim(), $("#loginPassword").val())
+	console.log("here");
+	signin($("#loginEmail").val(), $("#loginPassword").val())
 		.done(loginSuccess).fail(loginFail)
 
 }
@@ -41,7 +45,7 @@ function loginFail(xhr) {
 
 
 function passwordLost() {
-	if (empty("#lostEmail")) {
+	if (invalidEmail("#lostEmail")) {
 		return
 	}
 	resetPassword($("#lostEmail").val().trim())
