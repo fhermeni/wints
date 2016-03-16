@@ -44,7 +44,7 @@ function passwordLost() {
 	if (empty("#lostEmail")) {
 		return
 	}
-	resetPassword($("#lostEmail").val())
+	resetPassword($("#lostEmail").val().trim())
 		.fail(passwordLostFail).done(passwordLostOk);
 }
 
