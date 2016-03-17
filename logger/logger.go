@@ -74,7 +74,7 @@ func (m *defaultLogger) Log(kind, tag, msg string, e error) {
 	defer m.mutex.Unlock()
 	now := time.Now()
 
-	path := filepath.Join(m.path, kind+"-"+now.Format(FileTimeFmt))
+	path := filepath.Join(m.path, now.Format(FileTimeFmt)+"-"+kind)
 
 	f, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
 	if err != nil {

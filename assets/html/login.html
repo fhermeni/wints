@@ -48,8 +48,14 @@
                 <div id="reset-diag" class="well well-sm" style="display: none">
                 <div class="alert alert-dismissible alert-success hidden">
                 <button type="button" class="close" data-dismiss="alert">×</button>
-                An email about the reset procedure has been sent.
-                Click on the link in the mail body.
+                <p>
+                An email with the reset procedure will arrive shortly.
+                It contains the link to generate the new password.
+                </p>
+                <p>
+                Don't spam the reset button. Each time, a new request starts and
+                desactivates the old ones.                 
+                </p>
                 </div>
                     <div class="form-horizontal">
                         <fieldset>                                    
@@ -60,7 +66,7 @@
                                 </div>
                             </div>
                             <div class="text-right">
-                                <button type="button" class="btn btn-primary" onclick="passwordLost()">Reset</button>
+                                <button type="button" id="reset-button" class="btn btn-primary" onclick="passwordLost()">Reset</button>
                                 <button type="button" class="btn btn-default" onclick="flipForm('reset-diag','login-diag')">Cancel</button>
                             </div>
                         </fieldset>

@@ -1,7 +1,6 @@
 # TODO
 - wipe conventions once imported
 - do not remove student having a convention	
-- check malformed emails
 - resilience to multi import with e-mail rewriting
 - server-side caching of the store
 	- store interface
@@ -14,5 +13,6 @@ PENDING statistics
 
 #Year +1 todo
 - generate link for the major head & the tutor to ack the convention
-- gin middleware ?	
-		
+- gin middleware ?	/ simplify a bit if possible
+- use the email provided by Claudine for the student in place of the one in convention
+
