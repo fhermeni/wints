@@ -58,7 +58,7 @@ func NewEndPoints(not *notifier.Notifier, store *sqlstore.Store, convs feeder.Co
 	ed.post("/students/", newStudent)
 
 	ed.router.GET(ed.prefix+"/internships/", ed.anon(internships))
-	ed.get("/internships/:s/", internship)
+	ed.get("/internships/:s", internship)
 	ed.post("/internships/:s/company", setCompany)
 	ed.post("/internships/:s/supervisor", setSupervisor)
 	ed.post("/internships/:s/tutor", setTutor)
@@ -172,7 +172,7 @@ func newUser(ex Exchange) error {
 		return err
 	}
 	token, err := ex.s.NewUser(u.Person, u.Role)
-	err = ex.not.InviteTeacher(ex.s.Me(), u.Person, string(token), err)
+	err = ex.not.InviteTeacher(ex.s.Me(), u, string(token), err)
 	return ex.outJSON(u, err)
 }
 func delUser(ex Exchange) error {

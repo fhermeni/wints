@@ -77,10 +77,17 @@ Handlebars.registerHelper('len', function(a) {
 	return Object.keys(a).length;
 });
 
-Handlebars.registerHelper('dateFmt', function(d, fmt) {
+Handlebars.registerHelper('dateFmt', function(d, fmt, none, foo) {
+	console.log(arguments)
 	if (!d) {
-		return "-";
+		//None test for background compatibility
+		console.log(none);			
+		if (typeof none === "string") {
+			return none;
+		}
+		return "-";		
 	}
+	console.log("got it");
 	return moment(d).format(fmt);
 });
 

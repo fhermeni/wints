@@ -130,6 +130,8 @@ func (s *Store) SetUserRole(email string, priv schema.Role) error {
 func (s *Store) ResetPassword(email string) ([]byte, error) {
 	token := randomBytes(32)
 
+	//If exists & not outdate, resend the token
+	//otherwise new token
 	tx := newTxErr(s.db)
 	tx.Exec(deletePasswordRenewalRequest, email)
 	//In case a request already exists

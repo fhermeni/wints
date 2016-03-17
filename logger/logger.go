@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sort"
 	"sync"
 	"time"
 )
@@ -55,12 +56,25 @@ func (m *defaultLogger) Read(kind string) (io.ReadCloser, error) {
 	return os.OpenFile(path, os.O_RDONLY, 0660)
 }
 
+type byDate []os.FileInfo
+
+func (f byDate) Len() int {
+	return len(f)
+}
+func (f byDate) Less(i, j int) bool {
+	return f[i].ModTime().Unix() < f[j].ModTime().Unix()
+}
+func (f byDate) Swap(i, j int) {
+	f[i], f[j] = f[j], f[i]
+}
+
 //Logs returns all the files in the log folder
 func (m *defaultLogger) Logs() ([]string, error) {
 	files, err := ioutil.ReadDir(m.path)
 	if err != nil {
 		return []string{}, err
 	}
+	sort.Sort(byDate(files))
 	names := make([]string, len(files))
 	for i, f := range files {
 		names[i] = f.Name()

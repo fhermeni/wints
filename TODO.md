@@ -1,4 +1,5 @@
 # TODO
+- warning gratification
 - wipe conventions once imported
 - do not remove student having a convention	
 - resilience to multi import with e-mail rewriting
@@ -7,6 +8,7 @@
 	- cache implement interface
 - defense management
 - test security ?
+- don't change the reset token if not needed
 PENDING statistics
 	
 
@@ -15,4 +17,5 @@ PENDING statistics
 - generate link for the major head & the tutor to ack the convention
 - gin middleware ?	/ simplify a bit if possible
 - use the email provided by Claudine for the student in place of the one in convention
-
+- head par formation
+- cumul head formation & major leader

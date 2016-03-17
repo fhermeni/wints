@@ -124,6 +124,7 @@ function successNewUser(p) {
 	var row = Handlebars.partials["users-user"](p);
 	var config = $('#table-users')[0].config
 	$.tablesorter.addRows(config, row, true, hideModal);
+	defaultSuccess({}, "OK");
 	usersUI()
 }
 

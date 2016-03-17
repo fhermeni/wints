@@ -146,7 +146,7 @@ func (n *Notifier) RmAccount(from schema.User, em string, err error) error {
 
 //InviteStudent invite() and mail the tutor in case of success
 func (n *Notifier) InviteStudent(from schema.User, i schema.Internship, token string, err error) error {
-	err = n.invite(from, i.Convention.Student.User.Person, token, "student_welcome.txt", err)
+	err = n.invite(from, i.Convention.Student.User, token, "student_welcome.txt", err)
 	if err == nil {
 		err = n.mailer.Send(i.Convention.Tutor.Person, "tutor.txt", i.Convention.Student)
 		userLog(from, "Notify tutor ", err)
@@ -154,16 +154,16 @@ func (n *Notifier) InviteStudent(from schema.User, i schema.Internship, token st
 	return err
 }
 
-func (n *Notifier) invite(from schema.User, p schema.Person, token string, tpl string, err error) error {
-	userLog(from, p.Email+" invited", err)
+func (n *Notifier) invite(from schema.User, u schema.User, token string, tpl string, err error) error {
+	userLog(from, u.Person.Email+" invited as "+u.Role.String(), err)
 	if err != nil {
 		return err
 	}
 	data := struct {
 		Login string
 		Token string
-	}{Login: p.Email, Token: string(token)}
-	err = n.mailer.Send(p, tpl, data)
+	}{Login: u.Person.Email, Token: string(token)}
+	err = n.mailer.Send(u.Person, tpl, data)
 	userLog(from, "invitation sent", err)
 	return err
 }
@@ -183,13 +183,13 @@ func (n *Notifier) ProfileEdited(from schema.User, p schema.Person, err error) {
 }
 
 //InviteTeacher calls invite()
-func (n *Notifier) InviteTeacher(from schema.User, p schema.Person, token string, err error) error {
-	return n.invite(from, p, token, "tutor_welcome.txt", err)
+func (n *Notifier) InviteTeacher(from schema.User, u schema.User, token string, err error) error {
+	return n.invite(from, u, token, "tutor_welcome.txt", err)
 }
 
 //InviteRoot calls invite
-func (n *Notifier) InviteRoot(from schema.User, p schema.Person, token string, err error) error {
-	return n.invite(from, p, token, "root_welcome.txt", err)
+func (n *Notifier) InviteRoot(from schema.User, u schema.User, token string, err error) error {
+	return n.invite(from, u, token, "root_welcome.txt", err)
 }
 
 //NewStudent logs the student addition

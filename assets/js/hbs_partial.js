@@ -18,9 +18,9 @@ Handlebars.registerPartial("convention-editor", Handlebars.template({"1":functio
     + "</a>\n                </p>\n        </div>\n</div>	\n<div class=\"form-group\">\n	<label class=\"col-lg-3 control-label\">Title</label>\n        <div class=\"col-lg-9\">\n        	<p class=\"form-control-static\">"
     + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.C : depth0)) != null ? stack1.Company : stack1)) != null ? stack1.Title : stack1), depth0))
     + "</p>\n        </div>\n</div>				\n<div class=\"form-group\">\n	<label class=\"col-lg-3 control-label\">Period</label>\n        <div class=\"col-lg-9\">\n        	<p class=\"form-control-static\">\n        	"
-    + alias2((helpers.dateFmt || (depth0 && depth0.dateFmt) || alias4).call(alias3,((stack1 = (depth0 != null ? depth0.C : depth0)) != null ? stack1.Begin : stack1),"D MMM YYYY",{"name":"dateFmt","hash":{},"data":data}))
+    + alias2((helpers.dateFmt || (depth0 && depth0.dateFmt) || alias4).call(alias3,((stack1 = (depth0 != null ? depth0.C : depth0)) != null ? stack1.Begin : stack1),"D MMM YYYY","-",{"name":"dateFmt","hash":{},"data":data}))
     + "\n        	to \n        	"
-    + alias2((helpers.dateFmt || (depth0 && depth0.dateFmt) || alias4).call(alias3,((stack1 = (depth0 != null ? depth0.C : depth0)) != null ? stack1.End : stack1),"D MMM YYYY",{"name":"dateFmt","hash":{},"data":data}))
+    + alias2((helpers.dateFmt || (depth0 && depth0.dateFmt) || alias4).call(alias3,((stack1 = (depth0 != null ? depth0.C : depth0)) != null ? stack1.End : stack1),"D MMM YYYY","-",{"name":"dateFmt","hash":{},"data":data}))
     + "\n        	</p>\n        </div>\n</div>\n<div class=\"form-group\">\n	<label class=\"col-lg-3 control-label\">Gratification</label>\n        <div class=\"col-lg-9\">\n        	<p class=\"form-control-static\">"
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.C : depth0)) != null ? stack1.Gratification : stack1), depth0))
     + " €</p>\n        </div>\n</div>				\n\n\n<div class=\"form-group\" id=\"tutor-group\">\n	<label class=\"col-lg-3 control-label\">Academic tutor</label>\n        <div class=\"col-lg-6\">\n        	<p class=\"form-control-static\">\n                        <span class='fn'>"
@@ -458,7 +458,7 @@ Handlebars.registerPartial("users-user", Handlebars.template({"1":function(conta
     + "\">\n"
     + ((stack1 = (helpers.ifEq || (depth0 && depth0.ifEq) || alias4).call(alias3,(depth0 != null ? depth0.Role : depth0),"student",{"name":"ifEq","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(3, data, 0),"data":data})) != null ? stack1 : "")
     + "    </td>\n    <td data-text='"
-    + alias2((helpers.dateFmt || (depth0 && depth0.dateFmt) || alias4).call(alias3,(depth0 != null ? depth0.LastVisit : depth0),"X",{"name":"dateFmt","hash":{},"data":data}))
+    + alias2((helpers.dateFmt || (depth0 && depth0.dateFmt) || alias4).call(alias3,(depth0 != null ? depth0.LastVisit : depth0),"X","0",{"name":"dateFmt","hash":{},"data":data}))
     + "'>"
     + alias2((helpers.dateFmt || (depth0 && depth0.dateFmt) || alias4).call(alias3,(depth0 != null ? depth0.LastVisit : depth0),"DD/MM/YY HH:mm",{"name":"dateFmt","hash":{},"data":data}))
     + "</td>\n    <td>\n        <button type=\"button\" tabindex=\"0\" data-trigger=\"focus\" role=\"button\" data-user=\""

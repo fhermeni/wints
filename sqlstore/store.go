@@ -86,13 +86,6 @@ func nullableTime(t pq.NullTime) *time.Time {
 	return nil
 }
 
-/*func nullableInt(t sql.NullInt64, def int) int {
-	if t.Valid {
-		return int(t.Int64)
-	}
-	return def
-}*/
-
 func nullableString(t sql.NullString) string {
 	if t.Valid {
 		return t.String

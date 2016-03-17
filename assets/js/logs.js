@@ -13,14 +13,9 @@ function showLogs() {
 			});
 	
 			events = list.filter(function (i) {
-				return i.indexOf("event") == 0;
-			});
-			toShow = events[0];
-			events.forEach(function (v,i) {
-				if (v > toShow) {					
-					toShow = v;
-				} 
-			});
+				return i.indexOf("event") >= 0;
+			});			
+			toShow = events[events.length-1];			
 			$("#logs").val(toShow);
 			showLog(toShow);
 		})

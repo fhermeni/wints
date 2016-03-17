@@ -47,12 +47,20 @@ func fatal(msg string, err error) {
 }
 
 func inviteRoot(em string) {
-	p := schema.Person{Firstname: "root", Lastname: "root", Email: em, Tel: "n/a"}
-	token, err := store.NewUser(p, schema.ROOT)
+	u := schema.User{
+		Person: schema.Person{
+			Firstname: "root",
+			Lastname:  "root",
+			Email:     em,
+			Tel:       "n/a",
+		},
+		Role: schema.ROOT,
+	}
+	token, err := store.NewUser(u.Person, schema.ROOT)
 	fatal("Create root account", err)
-	if e := not.InviteRoot(schema.User{Person: p}, p, string(token), err); e != nil {
+	if e := not.InviteRoot(u, u, string(token), err); e != nil {
 		//Here, we delete the account as the root account was not aware of the creation
-		store.RmUser(p.Email)
+		store.RmUser(u.Person.Email)
 		fatal("Invite root", e)
 	}
 }

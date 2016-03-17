@@ -9,7 +9,7 @@
     	<a onclick="showRoleEditor('{{Person.Email}}')">{{Role}}</a>
     	{{/ifEq}}    	    
     </td>
-    <td data-text='{{dateFmt LastVisit "X"}}'>{{dateFmt LastVisit "DD/MM/YY HH:mm"}}</td>
+    <td data-text='{{dateFmt LastVisit "X" "0"}}'>{{dateFmt LastVisit "DD/MM/YY HH:mm"}}</td>
     <td>
         <button type="button" tabindex="0" data-trigger="focus" role="button" data-user="{{Person.Email}}" class="pull-left btn btn-info btn-xs" {{#if Resetable}}data-toggle="confirmation" data-on-confirm="startPasswordReset('{{Person.Email}}')" {{else}}disabled{{/if}}>
             <i class="glyphicon glyphicon-refresh" title="re-invite ?"></i>
