@@ -64,8 +64,7 @@ function loadConventionValidator(students, internships, convs, us) {
 		var checked = [];
 		internships.forEach(function (i) {
 			checked.push(i.Convention.Student.User.Person.Email);
-		})
-		console.log(checked.length + " internships");
+		})		
 		allConventions = allConventions.filter(function (c) {					
 			return !(checked.indexOf(c.Student.User.Person.Email) >= 0);
 		});		
@@ -193,6 +192,7 @@ function updateStudentSkipable(stu, btn) {
 					var v = parseInt($('#managed_cnt').html());
 					$('#managed_cnt').html(s.Skip ? v - 1 : v + 1);					
 				}).fail(function(xhr) {
+					console.log("here");
 					s.Warn = !s.Skip
 					allStudents[idx] = s;
 					var cnt = Handlebars.partials['placement-student'](s);
@@ -286,8 +286,7 @@ function prepareValidation() {
 	var knownEmail = $("#modal").find("legend").data("email");
 	p = c.Student.User.Person;
 	var newEmail = p.Email;
-	p.Email = newEmail;
-	console.log(knownEmail + " "  +newEmail)
+	p.Email = newEmail;	
 	postUserEmail(knownEmail, newEmail).done(function() {
 		sendProfile(p).done(function() {
 			commitValidation(c, tut);
