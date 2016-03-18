@@ -180,7 +180,7 @@ function updateStudentSkipable(stu, btn) {
 				s.Skip = !s.Skip;
 				var row = $("#table-placement").find("tr[data-email='" + stu + "']");
 				s.I = undefined;
-				//catch the convention if it has
+				
 				internship(stu).done(function(i) {
 					s = i.Convention.Student;
 					s.I = i;
@@ -192,7 +192,6 @@ function updateStudentSkipable(stu, btn) {
 					var v = parseInt($('#managed_cnt').html());
 					$('#managed_cnt').html(s.Skip ? v - 1 : v + 1);					
 				}).fail(function(xhr) {
-					console.log("here");
 					s.Warn = !s.Skip
 					allStudents[idx] = s;
 					var cnt = Handlebars.partials['placement-student'](s);
