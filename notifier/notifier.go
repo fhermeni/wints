@@ -245,23 +245,26 @@ type studentStatus struct {
 func (n *Notifier) TutorNewsLetter(tut schema.User, lates []schema.StudentReports) {
 	now := time.Now()
 	var statuses []studentStatus
-
+	reports := 0
+	reviews := 0
 	for _, stu := range lates {
 		s := studentStatus{Student: stu.Student.User, Status: make([]string, 0)}
 		for _, r := range stu.Reports {
 			//missing deadlines
 			if r.Delivery == nil {
 				s.Status = append(s.Status, r.Kind+" deadline passed; was "+r.Deadline.Format(config.DateLayout))
+				reports++
 			}
 			//missing reviews
 			if r.Deadline.Before(now) && r.Reviewed == nil {
 				deadline := r.Deadline.Add(n.reviewDuration[r.Kind])
 				s.Status = append(s.Status, r.Kind+" waiting for review (deadline: "+deadline.Format(config.DateLayout)+")")
+				reviews++
 			}
 		}
 		statuses = append(statuses, s)
 	}
-	buf := fmt.Sprintf("send the weekly report to '%s' with %d warning(s)\n", tut.Fullname(), len(statuses))
+	buf := fmt.Sprintf("send the weekly report to '%s' with %d warning(s): %d late reports, %d pending reviews", tut.Fullname(), len(statuses), reports, reviews)
 	err := n.mailer.Send(tut.Person, "tutor_newsletter.txt", statuses)
 	logger.Log("event", "cron", buf, err)
 }
