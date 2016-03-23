@@ -1,5 +1,5 @@
 For each student:
- datetime, location private/public, remote/local
+ datetime, room, private/public, remote/local
 
 For each jury member:
  datetime, location
