@@ -44,8 +44,9 @@ function showReportModal(i, kind) {
 	});
 }
 
+//Returns the number of days the report is waiting for a review
 function reviewDelay(r) {
-	return Math.floor(moment.duration(moment(r.Delivery).diff(moment(r.Deadline))).asDays());
+	return Math.floor(moment.duration(moment(r.Delivery).diff(moment())).asDays());
 }
 
 function deadlineDelay(r) {

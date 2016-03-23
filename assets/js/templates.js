@@ -325,6 +325,9 @@ Handlebars.registerHelper('report', function(r, em, cb) {
 		bg = "info";
 		var delay = reviewDelay(r);		
 		value = -100 + delay;
+		if (delay == 0) {
+			delay = "< 1";
+		}
 		cnt = "<i class='glyphicon glyphicon-time'></i> " + delay + " d.";
 	}
 
@@ -332,6 +335,9 @@ Handlebars.registerHelper('report', function(r, em, cb) {
 		bg = "danger";
 		var delay = deadlineDelay(r);		
 		value = -50 + delay;
+		if (delay == 0) {
+			delay = "< 1";
+		}
 		cnt = "<i class='glyphicon glyphicon-time'></i> " + delay + " d.";
 	}
 	if (r.Reviewed) {
