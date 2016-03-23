@@ -7,6 +7,7 @@ import (
 	"net/smtp"
 	"os"
 
+	"github.com/fhermeni/wints/logger"
 	"github.com/fhermeni/wints/schema"
 )
 
@@ -67,7 +68,13 @@ func (m *SMTP) Send(to schema.Person, tpl string, data interface{}, cc ...schema
 	if err != nil {
 		return err
 	}
-	return m.sendMail(to.Email, emails(cc...), body)
+	if err == nil {
+		err = m.sendMail(to.Email, emails(cc...), body)
+	}
+	buf := fmt.Sprintf("sending '%s' to %s (cc %s)", tpl, to.Email, emails(cc...))
+	logger.Log("event", "mailer", buf, err)
+	return err
+
 }
 
 func (m *SMTP) sendMail(to string, cc []string, msg []byte) error {
