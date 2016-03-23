@@ -26,7 +26,7 @@ function login() {
 	}
 	console.log("here");
 	signin($("#loginEmail").val().trim().toLowerCase(), $("#loginPassword").val())
-		.done(loginSuccess).fail(loginFail)
+		.done(loginSuccess).fail(loginFail);
 
 }
 
@@ -37,29 +37,29 @@ function loginSuccess(session) {
 
 function loginFail(xhr) {
 	if (xhr.status == 404) {
-		reportError("#loginEmail", xhr.responseText)
+		reportError("#loginEmail", xhr.responseText);
 	} else if (xhr.status == 401) {
-		reportError("#loginPassword", xhr.responseText)
+		reportError("#loginPassword", xhr.responseText);
 	}
 }
 
 
 function passwordLost() {
 	if (invalidEmail("#lostEmail")) {
-		return
+		return;
 	}
 	$("#reset-button").attr("disabled","disabled");
 	resetPassword($("#lostEmail").val().trim().toLowerCase())
 		.fail(passwordLostFail).done(passwordLostOk);
 }
 
-function passwordLostOk(xhr) {
+function passwordLostOk() {
 	$(".alert-success").removeClass("hidden");
 	$(".btn").attr("disabled", "disabled");
-	cleanError("#lostEmail")
+	cleanError("#lostEmail");
 }
 
 function passwordLostFail(xhr) {
 	$("#reset-button").removeAttr("disabled");
-	reportError("#lostEmail", xhr.responseText)
+	reportError("#lostEmail", xhr.responseText);
 }

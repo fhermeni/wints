@@ -2,7 +2,7 @@ function equals(f1, f2) {
 	var v1 = $(f1).val();
 	var v2 = $(f2).val();
 	if (v1 != v2) {
-		reportError(f2, "Passwords do not match")
+		reportError(f2, "Passwords do not match");
 		return false;
 	}
 	return true;
@@ -11,14 +11,14 @@ function equals(f1, f2) {
 function setPassword() {
 	$(".alert-danger").addClass("hidden");
 	if (empty("#passwd1", "#passwd2")) {
-		return
+		return;
 	}
 	if (!equals("#passwd1", "#passwd2")) {
-		return
+		return;
 	}
 	newPassword($.urlParam("token"), $("#passwd1").val())
 		.fail(failSetPassword)
-		.done(doneSetPassword)
+		.done(doneSetPassword);
 }
 
 function doneSetPassword(em) {

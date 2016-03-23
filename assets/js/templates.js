@@ -93,8 +93,8 @@ var positions = {
 	"sabbatical" : "Sabattical leave",
 	"company" : "Working in a company",
 	"entrepreneurship" : "Entrepreneurship",
-	"study" : "Pursuit of higher education"	
-}
+	"study" : "Pursuit of higher education"
+};
 
 Handlebars.registerHelper('alumniPosition', function(r) {
 	return positions[r];
@@ -114,7 +114,7 @@ Handlebars.registerHelper('optionRoles', function(r) {
 				var full = role + "-" + m;
 				var selected = full == r ? "selected" : "";
 				res += ("<option value='" + full + "' " + selected + ">" + full + "</option>");
-			})
+			});
 		} else {
 			var selected = role == r ? "selected" : "";
 			res += "<option value='" + role + "' " + selected + ">" + role + "</option>";
@@ -185,7 +185,7 @@ function editablePromotions() {
 			"value": p,
 			"text": p
 		});
-	})
+	});
 	return res;
 }
 
@@ -196,7 +196,7 @@ function editableMajors() {
 			"value": p,
 			"text": p
 		});
-	})
+	});
 	return res;
 }
 
@@ -223,8 +223,6 @@ Handlebars.registerHelper('ifLate', function(d, opts) {
 
 Handlebars.registerHelper('ifAfter', function(d1, d2, opts) {	
 	if ((!d1 && moment().isAfter(d2)) || moment(d1).isAfter(d2)) {		
-		console.log(d1)
-		console.log(d2)
 		return opts.fn(this);
 	} else
 		return opts.inverse(this);
@@ -267,7 +265,7 @@ Handlebars.registerHelper('grade', function(r) {
 			buf = "<span title='Tutor: " + r.Grade + "; Late penalty: -" + (config.LatePenalty * days) + "'>" + netGrade(r) + "</span>";
 		}
 	}
-	return new Handlebars.SafeString(buf)	
+	return new Handlebars.SafeString(buf);
 });
 
 
@@ -299,12 +297,12 @@ Handlebars.registerHelper('survey', function(s, stu) {
 	}
 	
 	var delay;
-	if (moment(s.Deadline).isBefore(new Date)) {			
+	if (moment(s.Deadline).isBefore(new Date())) {			
 			bg = "bg-danger";
 			delay = Math.floor(moment.duration(moment().diff(moment(s.Deadline))).asDays());
 			value = -1000 + delay;
 			grade = "<i class='glyphicon glyphicon-time'></i> " + delay + " d.";		
-	} else if (moment(s.Invitation).isBefore(new Date)) {
+	} else if (moment(s.Invitation).isBefore(new Date())) {
 			bg = "bg-warning";			
 			delay = Math.floor(moment.duration(moment().diff(moment(s.Invitation))).asDays());
 			value = -100 + delay;
@@ -319,13 +317,13 @@ Handlebars.registerHelper('survey', function(s, stu) {
 
 Handlebars.registerHelper('report', function(r, em, cb) {
 	var bg = "";
-	var value, grade;
+	var value = "-999999", grade;
 	var cnt = '-';
 	if (r.Delivery && moment(r.Deadline).isBefore(moment()) && !r.Reviewed) {
 		bg = "info";
 		var delay = reviewDelay(r);		
 		value = -100 + delay;
-		if (delay == 0) {
+		if (delay === 0) {
 			delay = "< 1";
 		}
 		cnt = "<i class='glyphicon glyphicon-time'></i> " + delay + " d.";
@@ -335,7 +333,7 @@ Handlebars.registerHelper('report', function(r, em, cb) {
 		bg = "danger";
 		var delay = deadlineDelay(r);		
 		value = -50 + delay;
-		if (delay == 0) {
+		if (delay === 0) {
 			delay = "< 1";
 		}
 		cnt = "<i class='glyphicon glyphicon-time'></i> " + delay + " d.";
@@ -355,6 +353,6 @@ Handlebars.registerHelper('report', function(r, em, cb) {
 
 	var buf = '<td data-text=' + value + ' onclick="showReport(\'' + em + '\', \'' + r.Kind + '\')" class="click ' + bg + ' text-center">';
 	
-	var buf = buf + cnt + '</td>';
+	buf = buf + cnt + '</td>';
 	return new Handlebars.SafeString(buf);
 });

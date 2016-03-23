@@ -1,3 +1,6 @@
+# Backend
+
+defense_session(#id, room, date)
 For each student:
  datetime, room, private/public, remote/local
 
@@ -14,3 +17,4 @@ unique(#(date, am|pm), room)
 
  #juries
  teacher, location, 
+

@@ -9,8 +9,8 @@ var ROOT_LEVEL = 5;
 
 
 String.prototype.capitalize = function() {
-	return this.charAt(0).toUpperCase() + this.substring(1)
-}
+	return this.charAt(0).toUpperCase() + this.substring(1);
+};
 
 function showWait() {
 	$("#cnt").html(waitingBlock);
@@ -40,7 +40,7 @@ function level(role) {
 		return STUDENT_LEVEL;
 	} else if (role == "tutor") {
 		return TUTOR_LEVEL;
-	} else if (role.indexOf("major") == 0) {
+	} else if (role.indexOf("major") === 0) {
 		return MAJOR_LEVEL;
 	} else if (role == "head") {
 		return HEAD_LEVEL;
@@ -54,11 +54,11 @@ function level(role) {
 
 function showModal(next) {
 	$("#modal").modal("show");
-	$('#modal').find('[data-toggle="popover"]').popover()
+	$('#modal').find('[data-toggle="popover"]').popover();
 	$('#modal').unbind('shown.bs.modal');
 	if (next) {
-		$('#modal').on('shown.bs.modal', function(e) {
-			next()
+		$('#modal').on('shown.bs.modal', function() {
+			next();
 		});
 	}
 	$("#modal").find(".date").datetimepicker();

@@ -18,7 +18,7 @@ function showLogs() {
 			toShow = events[events.length-1];			
 			$("#logs").val(toShow);
 			showLog(toShow);
-		})
+		});
 	});
 }
 

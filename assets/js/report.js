@@ -19,7 +19,7 @@ function updateReportDeadline(em, kind) {
 	var now = $('#report-deadline').data("DateTimePicker").date();
 	postReportDeadline(em, kind, now.toJSON()).done(function(data, status, xhr) {
 		updateInternshipRow(em);
-		defaultSuccess({}, status, xhr)
+		defaultSuccess({}, status, xhr);
 	}).fail(function(xhr) {
 		input.val($("#report-deadline").data("old-date"));
 		notifyError(xhr);
@@ -33,14 +33,12 @@ function showReportModal(i, kind) {
 			r = rr;
 			return false;
 		}
-	})		
+	});
 	r.Email = i.Convention.Student.User.Person.Email;
 	r.Tutor = i.Convention.Tutor.Person.Email;
 	$("#modal").render("report-modal", r, function() {
-		$("#report-deadline").datetimepicker()/*.on("dp.change", function(e) {
-			updateReportDeadline(r.Email, r.Kind, e);
-		});*/
-		showModal()
+		$("#report-deadline").datetimepicker();
+		showModal();
 	});
 }
 
@@ -68,7 +66,7 @@ function review(student, kind, toGrade) {
 	var g = $("#grade").val();	
 	postReview(student, kind, comment, parseInt(g)).done(function(dta, status, xhr) {
 		updateInternshipRow(student);
-		defaultSuccess({}, status, xhr)
+		defaultSuccess({}, status, xhr);
 		hideModal();
 	});
 }

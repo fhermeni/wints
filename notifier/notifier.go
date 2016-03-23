@@ -49,7 +49,7 @@ func (n *Notifier) ReportDeadlineUpdated(from schema.User, stu, kind string, d t
 func (n *Notifier) AccountReseted(em string, token []byte, err error) error {
 	//mail with token
 	//log
-	logger.Log("event", "wintsd", "start password reset for "+em, err)
+	logger.Log("event", "daemon", "start password reset for "+em, err)
 	if err != nil {
 		return err
 	}

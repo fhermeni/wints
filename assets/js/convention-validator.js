@@ -1,6 +1,6 @@
 var allStudents, allConventions, allTeachers;
 
-var feederWarning = false
+var feederWarning = false;
 function showConventionValidator() {
 	showWait();
 	if (level(myself.Role) >= ADMIN_LEVEL) {
@@ -9,11 +9,11 @@ function showConventionValidator() {
 				//conventions() failed, so, an error message and we retry without this call
 				//we don't notify error because it is done by the default fail				
 				//feederWarning = xhr.responseText
-				$.when(students(), internships()).done(loadConventionValidator).fail(notifyError)
+				$.when(students(), internships()).done(loadConventionValidator).fail(notifyError);
 			}
-		})
+		});
 	} else {
-		$.when(students(), internships()).done(loadConventionValidator).fail(notifyError)
+		$.when(students(), internships()).done(loadConventionValidator).fail(notifyError);
 	}
 }
 
@@ -32,7 +32,7 @@ function convSort(a, b) {
 function loadConventionValidator(students, internships, convs, us) {
 	errors = {
 		Warnings : []
-	}
+	};
 	allStudents = students[0];
 	if (!allStudents) {
 		allStudents = [];
@@ -40,7 +40,7 @@ function loadConventionValidator(students, internships, convs, us) {
 	allTeachers = [];
 	allConventions = [];
 	var managed = 0;
-	allStudents.forEach(function(s, idx, arr) {
+	allStudents.forEach(function(s, idx) {
 		allStudents[idx].Warn = !s.Skip;
 		if (!s.Skip) {
 			managed++;
@@ -50,11 +50,11 @@ function loadConventionValidator(students, internships, convs, us) {
 	allStudents.sort(studentSort);
 	internships = internships[0];
 	if (!internships) {
-		internships = []
+		internships = [];
 	}
 	if (convs) {
 		allConventions = convs[0].Conventions;
-		errors = convs[0].Errors
+		errors = convs[0].Errors;
 		if (!allConventions) {
 			allConventions = [];
 		}
@@ -64,7 +64,7 @@ function loadConventionValidator(students, internships, convs, us) {
 		var checked = [];
 		internships.forEach(function (i) {
 			checked.push(i.Convention.Student.User.Person.Email);
-		})		
+		});
 		allConventions = allConventions.filter(function (c) {					
 			return !(checked.indexOf(c.Student.User.Person.Email) >= 0);
 		});		
