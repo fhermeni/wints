@@ -25,7 +25,7 @@ function login() {
 		return;
 	}
 	console.log("here");
-	signin($("#loginEmail").val(), $("#loginPassword").val())
+	signin($("#loginEmail").val().trim().toLowerCase(), $("#loginPassword").val())
 		.done(loginSuccess).fail(loginFail)
 
 }
@@ -49,7 +49,7 @@ function passwordLost() {
 		return
 	}
 	$("#reset-button").attr("disabled","disabled");
-	resetPassword($("#lostEmail").val().trim())
+	resetPassword($("#lostEmail").val().trim().toLowerCase())
 		.fail(passwordLostFail).done(passwordLostOk);
 }
 
