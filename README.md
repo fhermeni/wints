@@ -27,7 +27,7 @@ In your `$GOPATH`:
 - `wintsd --test` to check if everything is ok
 
 ## Running
-- `wintsd` launches the daemon. For test purposes, it is preferable to launch it with the `--fakeMailer` option to prevent to send mails (they will be printed on stdout instead)
+- `wints` launches the daemon. For test purposes, it is preferable to launch it with the `--fakeMailer` option to prevent to send mails (they will be logged into logs/mailer... instead)
 
 ## Benchmarks, tests
 
@@ -35,20 +35,5 @@ go test -x -v -tags=integration -bench BenchmarkInternships -cpuprofile=cpu.prof
 
 
 ## Developement
-```
-assets
-  |- dist
-  |	   |- css/wints.min.css
-  |	   |- js/wints.min.js
-  |	   |- html/*.html
-  | - src
-  		|- js
-  		|- css
-  		| -hbs
-  		\- html
-```
 
-- concat and minify css
-- concat and minify javascript
-- minify html
-- precompile handlebars
+to run in development mode: `./dev.sh`

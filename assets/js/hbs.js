@@ -526,20 +526,28 @@ this["wints"]["templates"]["student-dashboard-supervisor-editor"] = Handlebars.t
 this["wints"]["templates"]["student-dashboard"] = Handlebars.template({"1":function(container,depth0,helpers,partials,data) {
     var stack1;
 
-  return ((stack1 = container.invokePartial(partials["student-dashboard-report"],depth0,{"name":"student-dashboard-report","data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
-},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+  return "There is a "
+    + container.escapeExpression(container.lambda(((stack1 = (depth0 != null ? depth0.Config : depth0)) != null ? stack1.LatePenalty : stack1), depth0))
+    + " point penalty per day late.\n";
+},"3":function(container,depth0,helpers,partials,data) {
     var stack1;
 
+  return ((stack1 = container.invokePartial(partials["student-dashboard-report"],depth0,{"name":"student-dashboard-report","data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
+},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    var stack1, alias1=depth0 != null ? depth0 : {};
+
   return "<div class=\"row\">\n<div class=\"col-md-6\" id=\"dashboard-company\">	\n"
-    + ((stack1 = container.invokePartial(partials["student-dashboard-company"],depth0,{"name":"student-dashboard-company","data":data,"indent":"\t","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
+    + ((stack1 = container.invokePartial(partials["student-dashboard-company"],(depth0 != null ? depth0.Internship : depth0),{"name":"student-dashboard-company","data":data,"indent":"\t","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
     + "</div>\n\n<div class=\"col-md-6\" id=\"student-dashboard-contacts\">	\n"
-    + ((stack1 = container.invokePartial(partials["student-dashboard-contacts"],depth0,{"name":"student-dashboard-contacts","data":data,"indent":"\t","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
+    + ((stack1 = container.invokePartial(partials["student-dashboard-contacts"],(depth0 != null ? depth0.Internship : depth0),{"name":"student-dashboard-contacts","data":data,"indent":"\t","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
     + "</div>\n</div>\n\n<div class=\"row\">\n<div class=\"col-md-6\">	\n<h3 class=\"page-header\">Reports</h3>\n<p class=\"text-justify\">\nPDF files, 10 MB max.\nSee <a href=\"/assets/consignes-rapports.pdf\">the expectations</a>.\nThe upload may take time. Once completed, download the report to check for errors.\n</p>\n<p class=\"text-justify\">\nYour <a href=\"mailto:"
-    + container.escapeExpression(container.lambda(((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Tutor : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1), depth0))
-    + "\">academic supervisor</a> can reconsider the deadlines upon strong justifications.\nYou can re-upload until the deadline.\nOnce late, you will have <b>one</b> upload opportunity.\nThere will be a 1 point penalty per day late.\n</p>\n<table class=\"table table-hover table-condensed\">\n<thead>\n<tr>\n	<td>Kind</td><td>Deadline</td><td>Delivery date</td><td>Grade</td><td></td>\n</tr>\n</thead>\n<tbody>\n"
-    + ((stack1 = helpers.each.call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.Reports : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + container.escapeExpression(container.lambda(((stack1 = ((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.Internship : depth0)) != null ? stack1.Convention : stack1)) != null ? stack1.Tutor : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1), depth0))
+    + "\">academic supervisor</a> can reconsider the deadlines upon strong justifications.\nYou can re-upload until the deadline.\nOnce late, you will have <b>one</b> upload opportunity.\n"
+    + ((stack1 = helpers["if"].call(alias1,((stack1 = (depth0 != null ? depth0.Config : depth0)) != null ? stack1.LatePenalty : stack1),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "</p>\n<table class=\"table table-hover table-condensed\">\n<thead>\n<tr>\n	<td>Kind</td><td>Deadline</td><td>Delivery date</td><td>Grade</td><td></td>\n</tr>\n</thead>\n<tbody>\n"
+    + ((stack1 = helpers.each.call(alias1,((stack1 = (depth0 != null ? depth0.Internship : depth0)) != null ? stack1.Reports : stack1),{"name":"each","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "</tbody>\n</table>\n</div>\n<div class=\"col-md-6\" id=\"dashboard-alumni\">\n"
-    + ((stack1 = container.invokePartial(partials["student-dashboard-alumni"],((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.Alumni : stack1),{"name":"student-dashboard-alumni","data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
+    + ((stack1 = container.invokePartial(partials["student-dashboard-alumni"],((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.Internship : depth0)) != null ? stack1.Convention : stack1)) != null ? stack1.Student : stack1)) != null ? stack1.Alumni : stack1),{"name":"student-dashboard-alumni","data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
     + "</div>\n</div>\n";
 },"usePartial":true,"useData":true});
 this["wints"]["templates"]["tutored"] = Handlebars.template({"1":function(container,depth0,helpers,partials,data) {

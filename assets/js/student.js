@@ -7,13 +7,17 @@ function showStudent() {
 
 function showStudentDashboard(m) {
 	mine = m;
+	var data = {
+		Config: config,
+		Internship: m
+	};
 	Object.keys(mine.Reports).forEach(function(kind) {
 		var passed = moment(mine.Reports[kind].Deadline).isBefore(moment());
 		var r = mine.Reports[kind];		
 		mine.Reports[kind].Open = isReportUpdloadeable(r);		
 		mine.Reports[kind].Email = myself.Person.Email;
 	});
-	$("#cnt").render("student-dashboard", m, function() {
+	$("#cnt").render("student-dashboard", data, function() {
 		syncAlumniEditor($("#position"))
 		ui()
 	});

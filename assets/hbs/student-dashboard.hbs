@@ -1,10 +1,10 @@
 <div class="row">
 <div class="col-md-6" id="dashboard-company">	
-	{{> student-dashboard-company this}}		
+	{{> student-dashboard-company Internship}}		
 </div>
 
 <div class="col-md-6" id="student-dashboard-contacts">	
-	{{> student-dashboard-contacts this}}
+	{{> student-dashboard-contacts Internship}}
 </div>
 </div>
 
@@ -17,10 +17,12 @@ See <a href="/assets/consignes-rapports.pdf">the expectations</a>.
 The upload may take time. Once completed, download the report to check for errors.
 </p>
 <p class="text-justify">
-Your <a href="mailto:{{Convention.Tutor.Person.Email}}">academic supervisor</a> can reconsider the deadlines upon strong justifications.
+Your <a href="mailto:{{Internship.Convention.Tutor.Person.Email}}">academic supervisor</a> can reconsider the deadlines upon strong justifications.
 You can re-upload until the deadline.
 Once late, you will have <b>one</b> upload opportunity.
-There will be a 1 point penalty per day late.
+{{#if Config.LatePenalty}}
+There is a {{Config.LatePenalty}} point penalty per day late.
+{{/if}}
 </p>
 <table class="table table-hover table-condensed">
 <thead>
@@ -29,13 +31,13 @@ There will be a 1 point penalty per day late.
 </tr>
 </thead>
 <tbody>
-{{#each Reports}}
+{{#each Internship.Reports}}
 {{> student-dashboard-report this}}
 {{/each}}
 </tbody>
 </table>
 </div>
 <div class="col-md-6" id="dashboard-alumni">
-{{> student-dashboard-alumni Convention.Student.Alumni}}
+{{> student-dashboard-alumni Internship.Convention.Student.Alumni}}
 </div>
 </div>
