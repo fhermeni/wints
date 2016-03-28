@@ -48,8 +48,10 @@ func lateReports(reports []schema.ReportHeader) []schema.ReportHeader {
 	var res []schema.ReportHeader
 	now := time.Now()
 	for _, r := range reports {
-		if (r.Delivery == nil && r.Deadline.Before(now) && r.Reviewed == nil) ||
-			(r.Delivery != nil && r.Reviewed == nil) {
+		if r.Deadline.Before(now) && r.Reviewed == nil {
+			//The deadline passed and it is not reviewed
+			//So if not uploaded -> missing report
+			//if uploaded -> missing review
 			res = append(res, r)
 		}
 	}

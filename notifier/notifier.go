@@ -264,6 +264,10 @@ func (n *Notifier) TutorNewsLetter(tut schema.User, lates []schema.StudentReport
 		}
 		statuses = append(statuses, s)
 	}
+	//Safety belt
+	if reviews == 0 && reports == 0 {
+		return
+	}
 	buf := fmt.Sprintf("send the weekly report to '%s' with %d warning(s): %d late reports, %d pending reviews", tut.Fullname(), len(statuses), reports, reviews)
 	err := n.mailer.Send(tut.Person, "tutor_newsletter.txt", statuses)
 	logger.Log("event", "cron", buf, err)
