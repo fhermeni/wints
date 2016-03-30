@@ -24,7 +24,7 @@ var (
 	//ErrUserExists declares the user already exists
 	ErrUserExists = errors.New("User already exists")
 	//ErrUnknownUser declares the user is unknown
-	ErrUnknownUser = errors.New("User not found")
+	ErrUnknownUser = errors.New("The email does not match a registered user")
 	//ErrUserTutoring declares the user cannot be removed as it is tutoring students
 	ErrUserTutoring = errors.New("The user is tutoring students")
 	//ErrCredentials declares invalid credentials
