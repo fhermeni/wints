@@ -9,6 +9,7 @@ import (
 	"github.com/dimfeld/httptreemux"
 	"github.com/fhermeni/wints/config"
 	"github.com/fhermeni/wints/feeder"
+	"github.com/fhermeni/wints/logger"
 	"github.com/fhermeni/wints/notifier"
 	"github.com/fhermeni/wints/schema"
 	"github.com/fhermeni/wints/session"
@@ -112,6 +113,7 @@ func (ed *EndPoints) openSession(w http.ResponseWriter, r *http.Request) (sessio
 		return session.Session{}, err
 	}
 	if s.Expire.Before(time.Now()) {
+		logger.Log("event", s.Email, "session expired", nil)
 		return session.Session{}, schema.ErrSessionExpired
 	}
 	user, err := ed.store.User(s.Email)

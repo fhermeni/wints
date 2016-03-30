@@ -39,7 +39,7 @@ func (n *Notifier) ReportPrivacyUpdated(from schema.User, stu, kind string, priv
 
 //ReportDeadlineUpdated logs a new deadline for a report
 func (n *Notifier) ReportDeadlineUpdated(from schema.User, stu, kind string, d time.Time, err error) error {
-	s := d.Format(config.DateTimeLayout)
+	s := d.Local().Format(config.DateLayout)
 	buf := fmt.Sprintf("set deadline for '%s' report of '%s' to '%s'", kind, stu, s)
 	userLog(from, buf, err)
 	return err

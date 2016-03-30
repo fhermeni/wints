@@ -7,6 +7,7 @@ import (
 
 	"github.com/fhermeni/wints/config"
 	"github.com/fhermeni/wints/feeder"
+	"github.com/fhermeni/wints/logger"
 	"github.com/fhermeni/wints/notifier"
 	"github.com/fhermeni/wints/sqlstore"
 
@@ -58,6 +59,7 @@ func (ed *HTTPd) home(w http.ResponseWriter, r *http.Request) {
 	}
 	s, err := ed.store.Session([]byte(c.Value))
 	if err != nil || s.Expire.Before(time.Now()) {
+		logger.Log("event", s.Email, "session expired", nil)
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 		return
 	}
