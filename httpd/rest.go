@@ -113,7 +113,7 @@ func (ed *EndPoints) openSession(w http.ResponseWriter, r *http.Request) (sessio
 		return session.Session{}, err
 	}
 	if s.Expire.Before(time.Now()) {
-		logger.Log("event", s.Email, "session expired", nil)
+		logger.Log("event", s.Email, "session expired at "+s.Expire.Format(config.DateTimeLayout), nil)
 		return session.Session{}, schema.ErrSessionExpired
 	}
 	user, err := ed.store.User(s.Email)
