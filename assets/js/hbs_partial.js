@@ -333,19 +333,19 @@ Handlebars.registerPartial("student-dashboard-report", Handlebars.template({"1":
     + alias4((helpers.dateFmt || (depth0 && depth0.dateFmt) || alias2).call(alias1,(depth0 != null ? depth0.Delivery : depth0),"D MMM YYYY HH:mm",{"name":"dateFmt","hash":{},"data":data}))
     + "</td>\n<td>"
     + alias4((helpers.grade || (depth0 && depth0.grade) || alias2).call(alias1,depth0,{"name":"grade","hash":{},"data":data}))
-    + "</td>\n<td class=\"text-right\">\n\n	<button type=\"button\" class=\"btn btn-success btn-sm btn-file\" title=\"upload\" "
+    + "</td>\n<td class=\"text-right\">\n\n	<a type=\"button\" class=\"btn btn-success btn-sm btn-file\" title=\"upload\" "
     + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.Open : depth0),{"name":"unless","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + ">\n    	<i class=\"glyphicon glyphicon-cloud-upload\"></i> <input type=\"file\" accept=\"application/pdf\" onchange=\"loadReport(this, '"
     + alias4(((helper = (helper = helpers.Kind || (depth0 != null ? depth0.Kind : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"Kind","hash":{},"data":data}) : helper)))
     + "')\" "
     + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.Open : depth0),{"name":"unless","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + ">\n	</button>\n	<a class=\"btn btn-primary btn-sm btn-file\" title=\"download\" \n	"
+    + ">\n	</a>\n	<a class=\"btn btn-primary btn-sm btn-file\" title=\"download\" \n	"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.Delivery : depth0),{"name":"if","hash":{},"fn":container.program(5, data, 0),"inverse":container.program(7, data, 0),"data":data})) != null ? stack1 : "")
-    + ">	\n    	<i class=\"glyphicon glyphicon-cloud-download\"></i>\n    	</a>	\n	<button onclick=\"showReportComment('"
+    + ">	\n    	<i class=\"glyphicon glyphicon-cloud-download\"></i>\n    	</a>	\n	<a onclick=\"showReportComment('"
     + alias4(((helper = (helper = helpers.Kind || (depth0 != null ? depth0.Kind : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"Kind","hash":{},"data":data}) : helper)))
     + "')\" type=\"button\" class=\"btn btn-primary btn-sm\" title=\"tutor review\" "
     + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.Comment : depth0),{"name":"unless","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + ">\n		<i class=\"glyphicon glyphicon-comment\"></i>\n	</button>\n</td>\n</tr>";
+    + ">\n		<i class=\"glyphicon glyphicon-comment\"></i>\n	</a>\n</td>\n</tr>";
 },"useData":true}));
 Handlebars.registerPartial("tutored-student", Handlebars.template({"1":function(container,depth0,helpers,partials,data) {
     return "            <span class=\"pull-right\">\n            <i class=\"glyphicon glyphicon-warning-sign text-warning\" title=\"never logged in\"></i>\n";
@@ -461,15 +461,15 @@ Handlebars.registerPartial("users-user", Handlebars.template({"1":function(conta
     + alias2((helpers.dateFmt || (depth0 && depth0.dateFmt) || alias4).call(alias3,(depth0 != null ? depth0.LastVisit : depth0),"X","0",{"name":"dateFmt","hash":{},"data":data}))
     + "'>"
     + alias2((helpers.dateFmt || (depth0 && depth0.dateFmt) || alias4).call(alias3,(depth0 != null ? depth0.LastVisit : depth0),"DD/MM/YY HH:mm",{"name":"dateFmt","hash":{},"data":data}))
-    + "</td>\n    <td>\n        <button type=\"button\" tabindex=\"0\" data-trigger=\"focus\" role=\"button\" data-user=\""
+    + "</td>\n    <td>\n        <a tabindex=\"0\" data-trigger=\"focus\" role=\"button\" data-user=\""
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.Person : depth0)) != null ? stack1.Email : stack1), depth0))
     + "\" class=\"pull-left btn btn-info btn-xs\" "
     + ((stack1 = helpers["if"].call(alias3,(depth0 != null ? depth0.Resetable : depth0),{"name":"if","hash":{},"fn":container.program(5, data, 0),"inverse":container.program(7, data, 0),"data":data})) != null ? stack1 : "")
-    + ">\n            <i class=\"glyphicon glyphicon-refresh\" title=\"re-invite ?\"></i>\n        </button>\n        <button type=\"button\" tabindex=\"0\" data-trigger=\"focus\" role=\"button\" data-user=\""
+    + ">\n            <i class=\"glyphicon glyphicon-refresh\" title=\"re-invite ?\"></i>\n        </a>\n        <a tabindex=\"0\" data-trigger=\"focus\" role=\"button\" data-user=\""
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.Person : depth0)) != null ? stack1.Email : stack1), depth0))
     + "\" class=\"pull-right btn btn-xs btn-danger\" "
     + ((stack1 = helpers["if"].call(alias3,(depth0 != null ? depth0.Blocked : depth0),{"name":"if","hash":{},"fn":container.program(7, data, 0),"inverse":container.program(9, data, 0),"data":data})) != null ? stack1 : "")
-    + ">\n            <i class=\"glyphicon glyphicon-remove\"></i>\n        </button>       \n    </td>\n</tr>";
+    + ">\n            <i class=\"glyphicon glyphicon-remove\"></i>\n        </a>       \n    </td>\n</tr>";
 },"useData":true}));
 Handlebars.registerPartial("watchlist-student", Handlebars.template({"1":function(container,depth0,helpers,partials,data) {
     return "        <span class=\"pull-right\">\n        <i class=\"glyphicon glyphicon-warning-sign text-warning\" title=\"never logged in\"></i>\n";

@@ -42,6 +42,8 @@ $(document).ready(function() {
 			user(cookie).done(loadSuccess).fail(function() {
 				window.location="/login#sessionExpired";
 			});
+		} else {
+			window.location="/login";
 		}
 	} else if (window.location.pathname == "/survey") {
 		setLang(".fr",".en");

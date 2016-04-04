@@ -5,15 +5,15 @@
 <td>{{grade this}}</td>
 <td class="text-right">
 
-	<button type="button" class="btn btn-success btn-sm btn-file" title="upload" {{#unless Open}}disabled{{/unless}}>
+	<a type="button" class="btn btn-success btn-sm btn-file" title="upload" {{#unless Open}}disabled{{/unless}}>
     	<i class="glyphicon glyphicon-cloud-upload"></i> <input type="file" accept="application/pdf" onchange="loadReport(this, '{{Kind}}')" {{#unless Open}}disabled{{/unless}}>
-	</button>
+	</a>
 	<a class="btn btn-primary btn-sm btn-file" title="download" 
 	{{#if Delivery}} href="api/v2/reports/{{Email}}/{{Kind}}/content"{{else}} disabled{{/if}}>	
     	<i class="glyphicon glyphicon-cloud-download"></i>
     	</a>	
-	<button onclick="showReportComment('{{Kind}}')" type="button" class="btn btn-primary btn-sm" title="tutor review" {{#unless Comment}}disabled{{/unless}}>
+	<a onclick="showReportComment('{{Kind}}')" type="button" class="btn btn-primary btn-sm" title="tutor review" {{#unless Comment}}disabled{{/unless}}>
 		<i class="glyphicon glyphicon-comment"></i>
-	</button>
+	</a>
 </td>
 </tr>

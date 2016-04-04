@@ -1,5 +1,4 @@
 # TODO
-- move to /home if already logged ?
 - summary for the tutored pane
 	- missed deadlines
 	- pending reviews
