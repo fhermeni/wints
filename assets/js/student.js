@@ -36,8 +36,8 @@ function showAlumniEditor() {
 }
 
 function updateCompany() {
-	if (empty("lbl-name") || empty("lbl-title") || empty("lbl-www")) {
-		return
+	if (empty("#lbl-name") || empty("#lbl-title") || empty("#lbl-www")) {
+		return;
 	}
 	var cpy = {
 		Name: $("#lbl-name").val(),
@@ -48,11 +48,11 @@ function updateCompany() {
 }
 
 function sendSupervisor() {	
-	if (empty("sup-fn") || empty("sup-ln") || empty("sup-tel") || empty("sup-email")) {
+	if (empty("#sup-fn") || empty("#sup-ln") || empty("#sup-tel") || empty("#sup-email")) {
 		return;
 	}
 
-	if (invalidEmail("sup-email")) {
+	if (invalidEmail("#sup-email")) {
 		return;
 	}
 	var sup = {
@@ -79,8 +79,8 @@ function refreshCompany(cpy) {
 }
 
 function sendAlumni() {
-	if (empty("#lbl-email")) {
-		return
+	if (invalidEmail("#lbl-email")) {
+		return;
 	}
 	a = {
 		Contact: $("#lbl-email").val(),

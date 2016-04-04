@@ -133,6 +133,9 @@ function signin(login, password) {
 }
 
 function delSession() {
+	if (!myself) {
+		window.location="/login";
+	}
 	return del("/users/" + myself.Person.Email + "/session");
 }
 

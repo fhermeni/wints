@@ -38,8 +38,10 @@ $(document).ready(function() {
 		$.tablesorter.defaults.headerTemplate = '{content} {icon}';
 
 		cookie = getCookie("login")		
-		if (cookie) { 			
-			user(cookie).done(loadSuccess).fail(logFail);
+		if (cookie) { 					
+			user(cookie).done(loadSuccess).fail(function() {
+				window.location="/login#sessionExpired";
+			});
 		}
 	} else if (window.location.pathname == "/survey") {
 		setLang(".fr",".en");

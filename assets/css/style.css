@@ -12,9 +12,9 @@
     position: relative;
     overflow: hidden;    
 }
-div.bootstrap-filestyle {
+/*div.bootstrap-filestyle {
 	display: inline;
-}
+}*/
 .btn-file input[type=file] {
     position: absolute;
     top: 0;
