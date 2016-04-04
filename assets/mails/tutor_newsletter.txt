@@ -6,6 +6,8 @@ some reports that are waiting for a review.
 If the deadline for a report is not appropriate, you must revise it properly
 on wints to prevent any un-justified late penalty.
 
+Dashboard URL: {{.WWW}}
+
 {{range $s := .Data -}}
 # {{ $s.Student.Fullname -}}
 {{range  $s.Status}}
@@ -14,3 +16,4 @@ on wints to prevent any un-justified late penalty.
 {{ end }}
 Regards,
 {{.Fullname}}
+

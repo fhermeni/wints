@@ -53,7 +53,12 @@ func (n *Notifier) AccountReseted(em string, token []byte, err error) error {
 	if err != nil {
 		return err
 	}
-	return n.mailer.Send(schema.Person{Email: em}, "reset.txt", string(token))
+	data := struct {
+		Email string
+		Token string
+	}{Email: em, Token: string(token)}
+
+	return n.mailer.Send(schema.Person{Email: em}, "reset.txt", data)
 }
 
 //ReportUploaded logs the upload and notify the student with the tutor in cc.
