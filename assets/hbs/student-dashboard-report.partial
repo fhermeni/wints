@@ -5,14 +5,14 @@
 <td>{{grade this}}</td>
 <td class="text-right">
 
-	<a type="button" class="btn btn-success btn-sm btn-file" title="upload" {{#unless Open}}disabled{{/unless}}>
-    	<i class="glyphicon glyphicon-cloud-upload"></i> <input type="file" accept="application/pdf" onchange="loadReport(this, '{{Kind}}')" {{#unless Open}}disabled{{/unless}}>
-	</a>
-	<a class="btn btn-primary btn-sm btn-file" title="download" 
-	{{#if Delivery}} href="api/v2/reports/{{Email}}/{{Kind}}/content"{{else}} disabled{{/if}}>	
+	<span class="{{#unless Open}}disabled{{/unless}} btn btn-success btn-sm btn-file" title="upload">
+    	<i class="glyphicon glyphicon-cloud-upload"></i> <input type="file" accept="application/pdf" onchange="loadReport(this, '{{Kind}}')">
+	</span>
+	<a class="btn btn-primary btn-sm btn-file {{#unless Delivery}}disabled{{/unless}}" title="download" 
+	{{#if Delivery}} href="api/v2/reports/{{Email}}/{{Kind}}/content"{{/if}}>	
     	<i class="glyphicon glyphicon-cloud-download"></i>
     	</a>	
-	<a onclick="showReportComment('{{Kind}}')" type="button" class="btn btn-primary btn-sm" title="tutor review" {{#unless Comment}}disabled{{/unless}}>
+	<a {{#if Comment}}onclick="showReportComment('{{Kind}}')"{{/if}} class="{{#unless Comment}}disabled{{/unless}} btn btn-primary btn-sm" title="tutor review" >
 		<i class="glyphicon glyphicon-comment"></i>
 	</a>
 </td>

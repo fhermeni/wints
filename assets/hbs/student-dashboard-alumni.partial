@@ -7,14 +7,14 @@ and an email address to contact you as an alumni.
 
 <div class="form-horizontal">
 <div class="form-group">
-    <label for="lbl-fn" class="col-sm-2 control-label">Email</label>
+    <label for="lbl-email" class="col-sm-2 control-label">Email</label>
         <div class="col-sm-8">
             <input type="email" class="form-control" id="lbl-email" value="{{Contact}}"/>
         </div>
 </div>
  
 <div class="form-group">
-    <label for="lbl-kind" class="col-sm-2 control-label">Kind</label>
+    <label for="position" class="col-sm-2 control-label">Kind</label>
         <div class="col-sm-8">
             <select class="form-control" id="position" onchange="syncAlumniEditor(this)">
                 <option value="looking" {{#ifEq Position "looking"}}selected{{/ifEq}}>Looking for a job</option>

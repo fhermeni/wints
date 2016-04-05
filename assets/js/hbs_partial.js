@@ -242,9 +242,9 @@ Handlebars.registerPartial("student-dashboard-alumni", Handlebars.template({"1":
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing;
 
-  return "<h3 class=\"page-header\">Your future</h3>\n<p>\nIt is important for us to know what you will become after your internship.\nPlease indicate what will be your profesional status after the internship\nand an email address to contact you as an alumni.\n</p>\n\n<div class=\"form-horizontal\">\n<div class=\"form-group\">\n    <label for=\"lbl-fn\" class=\"col-sm-2 control-label\">Email</label>\n        <div class=\"col-sm-8\">\n            <input type=\"email\" class=\"form-control\" id=\"lbl-email\" value=\""
+  return "<h3 class=\"page-header\">Your future</h3>\n<p>\nIt is important for us to know what you will become after your internship.\nPlease indicate what will be your profesional status after the internship\nand an email address to contact you as an alumni.\n</p>\n\n<div class=\"form-horizontal\">\n<div class=\"form-group\">\n    <label for=\"lbl-email\" class=\"col-sm-2 control-label\">Email</label>\n        <div class=\"col-sm-8\">\n            <input type=\"email\" class=\"form-control\" id=\"lbl-email\" value=\""
     + container.escapeExpression(((helper = (helper = helpers.Contact || (depth0 != null ? depth0.Contact : depth0)) != null ? helper : alias2),(typeof helper === "function" ? helper.call(alias1,{"name":"Contact","hash":{},"data":data}) : helper)))
-    + "\"/>\n        </div>\n</div>\n \n<div class=\"form-group\">\n    <label for=\"lbl-kind\" class=\"col-sm-2 control-label\">Kind</label>\n        <div class=\"col-sm-8\">\n            <select class=\"form-control\" id=\"position\" onchange=\"syncAlumniEditor(this)\">\n                <option value=\"looking\" "
+    + "\"/>\n        </div>\n</div>\n \n<div class=\"form-group\">\n    <label for=\"position\" class=\"col-sm-2 control-label\">Kind</label>\n        <div class=\"col-sm-8\">\n            <select class=\"form-control\" id=\"position\" onchange=\"syncAlumniEditor(this)\">\n                <option value=\"looking\" "
     + ((stack1 = (helpers.ifEq || (depth0 && depth0.ifEq) || alias2).call(alias1,(depth0 != null ? depth0.Position : depth0),"looking",{"name":"ifEq","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + ">Looking for a job</option>\n                <option value=\"sabbatical\" "
     + ((stack1 = (helpers.ifEq || (depth0 && depth0.ifEq) || alias2).call(alias1,(depth0 != null ? depth0.Position : depth0),"sabbatical",{"name":"ifEq","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
@@ -317,7 +317,11 @@ Handlebars.registerPartial("student-dashboard-report", Handlebars.template({"1":
     + alias4(((helper = (helper = helpers.Kind || (depth0 != null ? depth0.Kind : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"Kind","hash":{},"data":data}) : helper)))
     + "/content\"";
 },"7":function(container,depth0,helpers,partials,data) {
-    return " disabled";
+    var helper;
+
+  return "onclick=\"showReportComment('"
+    + container.escapeExpression(((helper = (helper = helpers.Kind || (depth0 != null ? depth0.Kind : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"Kind","hash":{},"data":data}) : helper)))
+    + "')\"";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
@@ -333,19 +337,19 @@ Handlebars.registerPartial("student-dashboard-report", Handlebars.template({"1":
     + alias4((helpers.dateFmt || (depth0 && depth0.dateFmt) || alias2).call(alias1,(depth0 != null ? depth0.Delivery : depth0),"D MMM YYYY HH:mm",{"name":"dateFmt","hash":{},"data":data}))
     + "</td>\n<td>"
     + alias4((helpers.grade || (depth0 && depth0.grade) || alias2).call(alias1,depth0,{"name":"grade","hash":{},"data":data}))
-    + "</td>\n<td class=\"text-right\">\n\n	<a type=\"button\" class=\"btn btn-success btn-sm btn-file\" title=\"upload\" "
+    + "</td>\n<td class=\"text-right\">\n\n	<span class=\""
     + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.Open : depth0),{"name":"unless","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + ">\n    	<i class=\"glyphicon glyphicon-cloud-upload\"></i> <input type=\"file\" accept=\"application/pdf\" onchange=\"loadReport(this, '"
+    + " btn btn-success btn-sm btn-file\" title=\"upload\">\n    	<i class=\"glyphicon glyphicon-cloud-upload\"></i> <input type=\"file\" accept=\"application/pdf\" onchange=\"loadReport(this, '"
     + alias4(((helper = (helper = helpers.Kind || (depth0 != null ? depth0.Kind : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"Kind","hash":{},"data":data}) : helper)))
-    + "')\" "
-    + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.Open : depth0),{"name":"unless","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + ">\n	</a>\n	<a class=\"btn btn-primary btn-sm btn-file\" title=\"download\" \n	"
-    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.Delivery : depth0),{"name":"if","hash":{},"fn":container.program(5, data, 0),"inverse":container.program(7, data, 0),"data":data})) != null ? stack1 : "")
-    + ">	\n    	<i class=\"glyphicon glyphicon-cloud-download\"></i>\n    	</a>	\n	<a onclick=\"showReportComment('"
-    + alias4(((helper = (helper = helpers.Kind || (depth0 != null ? depth0.Kind : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"Kind","hash":{},"data":data}) : helper)))
-    + "')\" type=\"button\" class=\"btn btn-primary btn-sm\" title=\"tutor review\" "
+    + "')\">\n	</span>\n	<a class=\"btn btn-primary btn-sm btn-file "
+    + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.Delivery : depth0),{"name":"unless","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\" title=\"download\" \n	"
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.Delivery : depth0),{"name":"if","hash":{},"fn":container.program(5, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + ">	\n    	<i class=\"glyphicon glyphicon-cloud-download\"></i>\n    	</a>	\n	<a "
+    + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.Comment : depth0),{"name":"if","hash":{},"fn":container.program(7, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + " class=\""
     + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.Comment : depth0),{"name":"unless","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + ">\n		<i class=\"glyphicon glyphicon-comment\"></i>\n	</a>\n</td>\n</tr>";
+    + " btn btn-primary btn-sm\" title=\"tutor review\" >\n		<i class=\"glyphicon glyphicon-comment\"></i>\n	</a>\n</td>\n</tr>";
 },"useData":true}));
 Handlebars.registerPartial("tutored-student", Handlebars.template({"1":function(container,depth0,helpers,partials,data) {
     return "            <span class=\"pull-right\">\n            <i class=\"glyphicon glyphicon-warning-sign text-warning\" title=\"never logged in\"></i>\n";
@@ -423,13 +427,13 @@ Handlebars.registerPartial("users-user", Handlebars.template({"1":function(conta
     + alias1(((helper = (helper = helpers.Role || (depth0 != null ? depth0.Role : depth0)) != null ? helper : helpers.helperMissing),(typeof helper === "function" ? helper.call(depth0 != null ? depth0 : {},{"name":"Role","hash":{},"data":data}) : helper)))
     + "</a>\n";
 },"5":function(container,depth0,helpers,partials,data) {
+    return "disabled";
+},"7":function(container,depth0,helpers,partials,data) {
     var stack1;
 
   return "data-toggle=\"confirmation\" data-on-confirm=\"startPasswordReset('"
     + container.escapeExpression(container.lambda(((stack1 = (depth0 != null ? depth0.Person : depth0)) != null ? stack1.Email : stack1), depth0))
-    + "')\" ";
-},"7":function(container,depth0,helpers,partials,data) {
-    return "disabled";
+    + "')\"";
 },"9":function(container,depth0,helpers,partials,data) {
     var stack1;
 
@@ -463,12 +467,16 @@ Handlebars.registerPartial("users-user", Handlebars.template({"1":function(conta
     + alias2((helpers.dateFmt || (depth0 && depth0.dateFmt) || alias4).call(alias3,(depth0 != null ? depth0.LastVisit : depth0),"DD/MM/YY HH:mm",{"name":"dateFmt","hash":{},"data":data}))
     + "</td>\n    <td>\n        <a tabindex=\"0\" data-trigger=\"focus\" role=\"button\" data-user=\""
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.Person : depth0)) != null ? stack1.Email : stack1), depth0))
-    + "\" class=\"pull-left btn btn-info btn-xs\" "
-    + ((stack1 = helpers["if"].call(alias3,(depth0 != null ? depth0.Resetable : depth0),{"name":"if","hash":{},"fn":container.program(5, data, 0),"inverse":container.program(7, data, 0),"data":data})) != null ? stack1 : "")
+    + "\" class=\"pull-left btn btn-info btn-xs "
+    + ((stack1 = helpers.unless.call(alias3,(depth0 != null ? depth0.Resetable : depth0),{"name":"unless","hash":{},"fn":container.program(5, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\" "
+    + ((stack1 = helpers["if"].call(alias3,(depth0 != null ? depth0.Resetable : depth0),{"name":"if","hash":{},"fn":container.program(7, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + ">\n            <i class=\"glyphicon glyphicon-refresh\" title=\"re-invite ?\"></i>\n        </a>\n        <a tabindex=\"0\" data-trigger=\"focus\" role=\"button\" data-user=\""
     + alias2(alias1(((stack1 = (depth0 != null ? depth0.Person : depth0)) != null ? stack1.Email : stack1), depth0))
-    + "\" class=\"pull-right btn btn-xs btn-danger\" "
-    + ((stack1 = helpers["if"].call(alias3,(depth0 != null ? depth0.Blocked : depth0),{"name":"if","hash":{},"fn":container.program(7, data, 0),"inverse":container.program(9, data, 0),"data":data})) != null ? stack1 : "")
+    + "\" class=\"pull-right btn btn-xs btn-danger "
+    + ((stack1 = helpers["if"].call(alias3,(depth0 != null ? depth0.Blocked : depth0),{"name":"if","hash":{},"fn":container.program(5, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\" "
+    + ((stack1 = helpers.unless.call(alias3,(depth0 != null ? depth0.Blocked : depth0),{"name":"unless","hash":{},"fn":container.program(9, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + ">\n            <i class=\"glyphicon glyphicon-remove\"></i>\n        </a>       \n    </td>\n</tr>";
 },"useData":true}));
 Handlebars.registerPartial("watchlist-student", Handlebars.template({"1":function(container,depth0,helpers,partials,data) {

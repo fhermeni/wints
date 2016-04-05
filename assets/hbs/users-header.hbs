@@ -1,21 +1,21 @@
 	<h3><span class="count">{{len this}}</span> registered user(s)</h3>
 
-<button type="button" class="btn btn-default btn-sm" onclick="userMailing('#table-users')">
+<a class="btn btn-default btn-sm" onclick="userMailing('#table-users')">
     <i class="glyphicon glyphicon-envelope"></i> mail selection
-</button>
+</a>
 
-<button type="button" onclick="showRawFullname('tbody','user')" data-toggle='modal' class="btn btn-default btn-sm">
+<a onclick="showRawFullname('tbody','user')" data-toggle='modal' class="btn btn-default btn-sm">
     <i class="glyphicon glyphicon-list"></i> fullname from selection
-</button>    
+</a>    
 
 
-<button type="button" onclick="showNewUser()" data-toggle='modal' class="btn btn-info btn-sm">
+<a onclick="showNewUser()" data-toggle='modal' class="btn btn-info btn-sm">
     <i class="glyphicon glyphicon-plus"></i> add user
-</button>    
+</a>    
 
-<button type="button" class="btn btn-info btn-sm btn-file">
+<span class="btn btn-info btn-sm btn-file">
     <i class="glyphicon glyphicon-plus"></i> import students <input id="csv-import" type="file">
-</button>
+</span>
 
 <a id="import-status" class="btn btn-danger btn-sm hidden" onclick="showImportError()">Show import errors</a>
 

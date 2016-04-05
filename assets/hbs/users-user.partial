@@ -11,10 +11,10 @@
     </td>
     <td data-text='{{dateFmt LastVisit "X" "0"}}'>{{dateFmt LastVisit "DD/MM/YY HH:mm"}}</td>
     <td>
-        <a tabindex="0" data-trigger="focus" role="button" data-user="{{Person.Email}}" class="pull-left btn btn-info btn-xs" {{#if Resetable}}data-toggle="confirmation" data-on-confirm="startPasswordReset('{{Person.Email}}')" {{else}}disabled{{/if}}>
+        <a tabindex="0" data-trigger="focus" role="button" data-user="{{Person.Email}}" class="pull-left btn btn-info btn-xs {{#unless Resetable}}disabled{{/unless}}" {{#if Resetable}}data-toggle="confirmation" data-on-confirm="startPasswordReset('{{Person.Email}}')"{{/if}}>
             <i class="glyphicon glyphicon-refresh" title="re-invite ?"></i>
         </a>
-        <a tabindex="0" data-trigger="focus" role="button" data-user="{{Person.Email}}" class="pull-right btn btn-xs btn-danger" {{#if Blocked}}disabled{{else}}data-toggle="confirmation" data-on-confirm='rmUser("{{Person.Email}}")'{{/if}}>
+        <a tabindex="0" data-trigger="focus" role="button" data-user="{{Person.Email}}" class="pull-right btn btn-xs btn-danger {{#if Blocked}}disabled{{/if}}" {{#unless Blocked}}data-toggle="confirmation" data-on-confirm='rmUser("{{Person.Email}}")'{{/unless}}>
             <i class="glyphicon glyphicon-remove"></i>
         </a>       
     </td>
