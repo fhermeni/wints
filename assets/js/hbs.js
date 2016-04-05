@@ -248,7 +248,7 @@ this["wints"]["templates"]["import-error"] = Handlebars.template({"1":function(c
 this["wints"]["templates"]["logs"] = Handlebars.template({"1":function(container,depth0,helpers,partials,data) {
     var alias1=container.lambda, alias2=container.escapeExpression;
 
-  return "                    <option name=\""
+  return "                    <option id=\""
     + alias2(alias1(depth0, depth0))
     + "\">"
     + alias2(alias1(depth0, depth0))

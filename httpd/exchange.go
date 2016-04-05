@@ -117,7 +117,7 @@ func (ex *Exchange) outFile(mime, filename string, cnt []byte, e error) error {
 	ex.w.Header().Set("Content-disposition", "attachment; filename="+filename)
 	_, err := ex.w.Write(cnt)
 	if err != nil {
-		logger.Log("event", ex.s.Me().Person.Email, "Unable to send the report", err)
+		logger.Log("event", ex.s.Me().Person.Email, "Unable to send '"+filename+"'", err)
 		http.Error(ex.w, "", http.StatusInternalServerError)
 	}
 	return err

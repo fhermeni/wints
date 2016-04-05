@@ -8,7 +8,7 @@ To activate your account, generate a password here: {{.WWW}}/password?token={{.D
 Once the account activated, please log in and checked your profile and all the contact data.
 It is expected you to provide accurate informations.
 
-Your login will be: {{.Data.Login}}
+Your login is: {{.Data.Login}}
 
 By default, the deadlines for the reports are:
 - Description of Work: 3 weeks from the beginning

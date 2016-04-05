@@ -4,7 +4,7 @@ Wints is the web application used to follow internships.
 This webapp allows you to follow the students you are tutoring, access their reports and grade them
 
 To activate your account, generate a password here: {{.WWW}}/password?token={{.Data.Token}}
-Your login will be: {{.Data.Login}}
+Your login is: {{.Data.Login}}
 
 Regards,
 {{.Fullname}}

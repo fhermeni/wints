@@ -10,6 +10,11 @@ $(document).ready(function() {
 
 	//Login part
 	if (window.location.pathname == "/login") {
+		cookie = getCookie("login");				
+		if (cookie) {
+			//Already identified, go to the dashboard
+			window.location="/home";
+		}
 		var em = $.urlParam("email")
 		if (em) {
 			$("#loginEmail").val(em);
