@@ -59,7 +59,12 @@ func (ed *HTTPd) home(w http.ResponseWriter, r *http.Request) {
 	}
 	s, err := ed.store.Session([]byte(c.Value))
 	if err != nil || s.Expire.Before(time.Now()) {
-		logger.Log("event", s.Email, "session expired", nil)
+		msg := "session expired"
+		if err != nil {
+			msg = "invalid session token"
+		}
+		logger.Log("event", s.Email, msg, err)
+		wipeCookies(w)
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 		return
 	}
@@ -69,6 +74,25 @@ func (ed *HTTPd) home(w http.ResponseWriter, r *http.Request) {
 //Listen starts listening
 func (ed *HTTPd) Listen() error {
 	return http.ListenAndServeTLS(ed.cfg.Listen, ed.cfg.Certificate, ed.cfg.PrivateKey, nil)
+}
+
+//Wipe the cookies
+func wipeCookies(w http.ResponseWriter) {
+	token := &http.Cookie{
+		Name:   "token",
+		Value:  "",
+		Path:   "/",
+		MaxAge: -1,
+	}
+
+	login := &http.Cookie{
+		Name:   "login",
+		Value:  "",
+		Path:   "/",
+		MaxAge: -1,
+	}
+	http.SetCookie(w, token)
+	http.SetCookie(w, login)
 }
 
 var (

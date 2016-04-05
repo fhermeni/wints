@@ -110,10 +110,12 @@ func (ed *EndPoints) openSession(w http.ResponseWriter, r *http.Request) (sessio
 	}
 	s, err := ed.store.Session([]byte(token.Value))
 	if err != nil {
+		wipeCookies(w)
 		return session.Session{}, err
 	}
 	if s.Expire.Before(time.Now()) {
 		logger.Log("event", s.Email, "session expired at "+s.Expire.Format(config.DateTimeLayout), nil)
+		wipeCookies(w)
 		return session.Session{}, schema.ErrSessionExpired
 	}
 	user, err := ed.store.User(s.Email)
@@ -458,21 +460,7 @@ func (ed *EndPoints) delSession(ex Exchange) error {
 	if err != nil {
 		return err
 	}
-	token := &http.Cookie{
-		Name:   "token",
-		Value:  "",
-		Path:   "/",
-		MaxAge: -1,
-	}
-
-	login := &http.Cookie{
-		Name:   "login",
-		Value:  "",
-		Path:   "/",
-		MaxAge: -1,
-	}
-	http.SetCookie(ex.w, token)
-	http.SetCookie(ex.w, login)
+	wipeCookies(ex.w)
 	http.Redirect(ex.w, ex.r, "/", http.StatusTemporaryRedirect)
 	return nil
 }
