@@ -5,7 +5,7 @@ $(document).ready(function() {
 
 	getConfig().done(function(c) {
 		config = c;
-		$(".release").html(config.Version)		
+		$(".release").html(config.Version);	
 	});
 
 	//Login part
@@ -38,11 +38,11 @@ $(document).ready(function() {
   				window.location = "/#sessionExpired";
   			}
 		});
-		$.tablesorter.defaults.widgets = ["uitheme"]
+		$.tablesorter.defaults.widgets = ["uitheme"];
 		$.tablesorter.defaults.theme = 'bootstrap';
 		$.tablesorter.defaults.headerTemplate = '{content} {icon}';
 
-		cookie = getCookie("login")		
+		cookie = getCookie("login");	
 		if (cookie) { 					
 			user(cookie).done(loadSuccess).fail(function() {
 				window.location="/login#sessionExpired";

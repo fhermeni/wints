@@ -120,6 +120,7 @@ func (ed *EndPoints) openSession(w http.ResponseWriter, r *http.Request) (sessio
 	}
 	user, err := ed.store.User(s.Email)
 	if err != nil {
+		wipeCookies(w)
 		return session.Session{}, err
 	}
 	ed.store.Visit(user.Person.Email)
@@ -488,14 +489,16 @@ func (ed *EndPoints) signin(ex Exchange) error {
 		return err
 	}
 	token := &http.Cookie{
-		Name:  "token",
-		Value: string(s.Token),
-		Path:  "/",
+		Name:   "token",
+		Value:  string(s.Token),
+		Path:   "/",
+		MaxAge: int(ed.cfg.SessionLifeTime.Duration.Seconds()),
 	}
 	login := &http.Cookie{
-		Name:  "login",
-		Value: s.Email,
-		Path:  "/",
+		Name:   "login",
+		Value:  s.Email,
+		Path:   "/",
+		MaxAge: int(ed.cfg.SessionLifeTime.Duration.Seconds()),
 	}
 	http.SetCookie(ex.w, token)
 	http.SetCookie(ex.w, login)
