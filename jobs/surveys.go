@@ -19,6 +19,9 @@ func MissingSurveys(provider schema.Internshipser, not *notifier.Notifier) {
 
 	now := time.Now()
 	for _, i := range ints {
+		if i.Convention.Skip {
+			continue
+		}
 		for _, s := range i.Surveys {
 			if s.Delivery == nil && s.Invitation.Before(now) {
 				//Its time to notify the supervisor

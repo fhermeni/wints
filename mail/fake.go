@@ -19,6 +19,7 @@ func (fake *Fake) Send(to schema.Person, tpl string, data interface{}, cc ...sch
 	path := fmt.Sprintf("%s%c%s", fake.Config.Path, os.PathSeparator, tpl)
 	dta := metaData{
 		WWW:      fake.WWW,
+		To:       to,
 		Fullname: fake.Config.Fullname,
 		Data:     data,
 	}

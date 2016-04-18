@@ -33,6 +33,7 @@ type Config struct {
 }
 
 type metaData struct {
+	To       schema.Person
 	WWW      string
 	Fullname string
 	Data     interface{}
@@ -60,6 +61,7 @@ func NewSMTP(cfg Config, www string) (*SMTP, error) {
 func (m *SMTP) Send(to schema.Person, tpl string, data interface{}, cc ...schema.Person) error {
 	path := fmt.Sprintf("%s%c%s", m.path, os.PathSeparator, tpl)
 	dta := metaData{
+		To:       to,
 		WWW:      m.www,
 		Fullname: m.fullname,
 		Data:     data,

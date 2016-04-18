@@ -7,31 +7,32 @@ function showLogs() {
   				$("html, body").animate({ scrollTop: 0 }, 500);
   				return false;
 			});
-			$("a[href='#bottom']").click(function() {				
+			$("a[href='#bottom']").click(function() {
 				showLog();
   				return false;
 			});
-	
+
 			events = list.filter(function (i) {
 				return i.indexOf("event") >= 0;
-			});			
-			toShow = events[events.length-1];			
+			});
+			toShow = events[events.length-1];
 			$("#logs").val(toShow);
 			showLog(toShow);
 		});
 	});
 }
 
+var dateTime = /(^\d+\/+\d+\/\d+.+\d+:\d+:\d+)/; //2016/04/18 12:47:05
+
 function showLog(f) {
 	if (!f) {
 		f = $("#logs").val();
-	}	
-	getLog(f).success(function (l) {			
+	}
+	getLog(f).success(function (l) {
 		l = l.split('\n').map(function (x) {
-			//Get rid of the day
-			return x.substring(x.indexOf(" ") + 1);
-		}).join("\n");	
+			return x.replace(dateTime,"");
+		}).join("\n");
 		$("#log").html(l);
-		$("html, body").animate({ scrollTop: $(document).height()-$(window).height()}, 500);		
+		$("html, body").animate({ scrollTop: $(document).height()-$(window).height()}, 500);
 	});
 }

@@ -18,6 +18,9 @@ func MissingReports(provider schema.Internshipser, not notifier.NewsLetter) {
 	byTutor := make(map[string][]schema.StudentReports)
 	tutors := make(map[string]schema.User)
 	for _, i := range ints {
+		if i.Convention.Skip {
+			continue
+		}
 		student := i.Convention.Student
 		em := i.Convention.Tutor.Person.Email
 		reports, ok := byTutor[em]

@@ -7,6 +7,7 @@ If the deadline for a report is not appropriate, you must revise it properly
 on wints to prevent any un-justified late penalty.
 
 Dashboard URL: {{.WWW}}
+(Login: {{.To.Email}})
 
 {{range $s := .Data -}}
 # {{ $s.Student.Fullname -}}
@@ -14,6 +15,7 @@ Dashboard URL: {{.WWW}}
   - {{. -}}
 {{ end }}
 {{ end }}
+
 Regards,
 {{.Fullname}}
 
