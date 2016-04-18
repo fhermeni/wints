@@ -1,16 +1,22 @@
 <div class="modal-dialog">
-<div class="modal-content"> 
+<div class="modal-content">
     <div class="modal-body">
         <button type="button" class="close" aria-hidden="true" onclick="hideModal()">×</button>
         <fieldset>
             <legend>
             {{> person I.Convention.Student.User.Person}}
             </legend>
-    <div class="form-horizontal">	        
+    <div class="form-horizontal">
+    <div class="form-group">
+            <label class="col-lg-3 control-label">Last visit</label>
+            <div class="col-lg-3">
+                <label class="form-control-static">{{dateFmt I.Convention.Student.User.LastVisit "DD/MM/YY HH:mm"}}</label>
+            </div>
+    </div>
     {{#if Editable}}
         <div class="form-group">
             <label class="col-lg-3 control-label">Promotion</label>
-            <div class="col-lg-3">                
+            <div class="col-lg-3">
                 <select class="form-control" id="promotion-selecter" onchange="updatePromotion('{{I.Convention.Student.User.Person.Email}}','{{I.Convention.Student.Promotion}}', this)">
                 {{optionPromotions I.Convention.Student.Promotion}}
                 </select>
@@ -18,18 +24,18 @@
         </div>
         <div class="form-group">
             <label class="col-lg-3 control-label">Major</label>
-            <div class="col-lg-3">                
+            <div class="col-lg-3">
                 <select class="form-control" id="major-selecter" onchange="updateMajor('{{I.Convention.Student.User.Person.Email}}','{{I.Convention.Student.Major}}', this)">
                 {{optionMajors I.Convention.Student.Major}}
                 </select>
             </div>
-        </div>                          
+        </div>
     {{else}}
      <div class="form-group">
         <label class="col-lg-3 control-label">Major/Promotion</label>
         <div class="col-lg-9">
          <label class="form-control-static">{{I.Convention.Student.Major}}/{{I.Convention.Student.Promotion}}</label>
-        </div>             
+        </div>
      </div>
     {{/if}}
     {{#unless Editable}}
@@ -40,19 +46,19 @@
                         <a href="{{I.Convention.Company.WWW}}">{{I.Convention.Company.Name}}</a>
                     </label>
                 </div>
-		</div>	
+		</div>
 		<div class="form-group">
 			<label class="col-lg-3 control-label">Title</label>
             <div class="col-lg-9">
                 <label class="form-control-static text-justify">{{I.Convention.Company.Title}}</label>
             </div>
-		</div>				
+		</div>
 		<div class="form-group">
 			<label class="col-lg-3 control-label">Period</label>
                 <div class="col-lg-9">
                 	<label class="form-control-static">
                 	{{dateFmt I.Convention.Begin "ddd DD MMM YY"}}
-                	- 
+                	-
                 	{{dateFmt I.Convention.End "ddd DD MMM YY"}}
                 	</label>
                 </div>
@@ -62,7 +68,7 @@
                 <div class="col-lg-9">
                 	<label class="form-control-static">{{I.Convention.Gratification}} €</label>
                 </div>
-		</div>				
+		</div>
 
         <div class="form-group" id="supervisor-group">
             <label class="col-lg-3 control-label">Supervisor</label>
@@ -71,16 +77,16 @@
                     {{> person I.Convention.Supervisor}}
                     </label>
                 </div>
-        </div>  
+        </div>
         {{/unless}}
 		<div class="form-group" id="tutor-group">
 			<label class="col-lg-3 control-label">Academic tutor</label>
                 <div class="col-lg-9">
                 	<label class="form-control-static fn">
-                    {{> person I.Convention.Tutor.Person}}                    
+                    {{> person I.Convention.Tutor.Person}}
                     </label>
                 </div>
-		</div>	    
+		</div>
         {{#if Editable}}
         <div class="form-group">
         <label class="col-lg-3 control-label">Switch to</label>
@@ -92,7 +98,7 @@
                 <span class="input-group-btn">
                 <button type="button" class="btn btn-warning" data-placement='right' data-toggle="confirmation" data-on-confirm="switchTutor('{{I.Convention.Student.User.Person.Email}}', '{{I.Convention.Tutor.Person.Email}}')">
                     <i class="glyphicon glyphicon-random"></i>
-                </button>                
+                </button>
                 </span>
                 </div>
             </div>
@@ -103,10 +109,10 @@
         <div class="form-group">
         <label class="col-lg-3 control-label">Reset surveys</label>
         <div class="col-lg-9">
-               {{#each I.Surveys}}                                        
+               {{#each I.Surveys}}
                     <button type="button" class="btn {{#if Delivery}}btn-danger{{else}}btn-default{{/if}} btn-sm" data-placement='bottom' data-toggle="confirmation" data-on-confirm="resetSurvey(this,'{{../I.Convention.Student.User.Person.Email}}','{{Kind}}')" {{#unless Delivery}}disabled title="not uploaded"{{/unless}}>
                         {{Kind}}
-                    </button>                    
+                    </button>
                 {{/each}}
         </div>
         </div>
@@ -114,23 +120,23 @@
         <div class="form-group">
         <label class="col-lg-3 control-label">Request surveys</label>
         <div class="col-lg-9">
-               {{#each I.Surveys}}                     
+               {{#each I.Surveys}}
                     {{#if Delivery}}
                     <button type="button" class="btn btn-default btn-sm" disabled title="already uploaded">{{Kind}}</button>
-                    {{else}}                    
+                    {{else}}
                     <button type="button" class="btn btn-danger btn-sm" data-placement='bottom' data-toggle="confirmation" data-on-confirm="requestSurvey(this,'{{../../I.Convention.Student.User.Person.Email}}','{{Kind}}')">
-                        {{Kind}}                        
+                        {{Kind}}
                         (<i class="glyphicon glyphicon-time"></i> {{daysSince LastInvitation}}  days.)
-                    </button>                    
-                    {{/if}}                    
+                    </button>
+                    {{/if}}
                 {{/each}}
         </div>
         </div>
-        {{/ifRole}}        
+        {{/ifRole}}
 </div>
     </fieldset>
     <div class="text-right">
-    <button type="button" class="btn btn-default" aria-hidden="true" onclick="hideModal()">Close</button></div>    
+    <button type="button" class="btn btn-default" aria-hidden="true" onclick="hideModal()">Close</button></div>
         </div>
         </div>
         </div>

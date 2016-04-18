@@ -43,19 +43,19 @@ this["wints"]["templates"]["company-editor"] = Handlebars.template({"compiler":[
 this["wints"]["templates"]["convention-detail"] = Handlebars.template({"1":function(container,depth0,helpers,partials,data) {
     var stack1, alias1=container.lambda, alias2=container.escapeExpression, alias3=depth0 != null ? depth0 : {}, alias4=helpers.helperMissing;
 
-  return "        <div class=\"form-group\">\n            <label class=\"col-lg-3 control-label\">Promotion</label>\n            <div class=\"col-lg-3\">                \n                <select class=\"form-control\" id=\"promotion-selecter\" onchange=\"updatePromotion('"
+  return "        <div class=\"form-group\">\n            <label class=\"col-lg-3 control-label\">Promotion</label>\n            <div class=\"col-lg-3\">\n                <select class=\"form-control\" id=\"promotion-selecter\" onchange=\"updatePromotion('"
     + alias2(alias1(((stack1 = ((stack1 = ((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.I : depth0)) != null ? stack1.Convention : stack1)) != null ? stack1.Student : stack1)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1), depth0))
     + "','"
     + alias2(alias1(((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.I : depth0)) != null ? stack1.Convention : stack1)) != null ? stack1.Student : stack1)) != null ? stack1.Promotion : stack1), depth0))
     + "', this)\">\n                "
     + alias2((helpers.optionPromotions || (depth0 && depth0.optionPromotions) || alias4).call(alias3,((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.I : depth0)) != null ? stack1.Convention : stack1)) != null ? stack1.Student : stack1)) != null ? stack1.Promotion : stack1),{"name":"optionPromotions","hash":{},"data":data}))
-    + "\n                </select>\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <label class=\"col-lg-3 control-label\">Major</label>\n            <div class=\"col-lg-3\">                \n                <select class=\"form-control\" id=\"major-selecter\" onchange=\"updateMajor('"
+    + "\n                </select>\n            </div>\n        </div>\n        <div class=\"form-group\">\n            <label class=\"col-lg-3 control-label\">Major</label>\n            <div class=\"col-lg-3\">\n                <select class=\"form-control\" id=\"major-selecter\" onchange=\"updateMajor('"
     + alias2(alias1(((stack1 = ((stack1 = ((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.I : depth0)) != null ? stack1.Convention : stack1)) != null ? stack1.Student : stack1)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1), depth0))
     + "','"
     + alias2(alias1(((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.I : depth0)) != null ? stack1.Convention : stack1)) != null ? stack1.Student : stack1)) != null ? stack1.Major : stack1), depth0))
     + "', this)\">\n                "
     + alias2((helpers.optionMajors || (depth0 && depth0.optionMajors) || alias4).call(alias3,((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.I : depth0)) != null ? stack1.Convention : stack1)) != null ? stack1.Student : stack1)) != null ? stack1.Major : stack1),{"name":"optionMajors","hash":{},"data":data}))
-    + "\n                </select>\n            </div>\n        </div>                          \n";
+    + "\n                </select>\n            </div>\n        </div>\n";
 },"3":function(container,depth0,helpers,partials,data) {
     var stack1, alias1=container.lambda, alias2=container.escapeExpression;
 
@@ -63,7 +63,7 @@ this["wints"]["templates"]["convention-detail"] = Handlebars.template({"1":funct
     + alias2(alias1(((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.I : depth0)) != null ? stack1.Convention : stack1)) != null ? stack1.Student : stack1)) != null ? stack1.Major : stack1), depth0))
     + "/"
     + alias2(alias1(((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.I : depth0)) != null ? stack1.Convention : stack1)) != null ? stack1.Student : stack1)) != null ? stack1.Promotion : stack1), depth0))
-    + "</label>\n        </div>             \n     </div>\n";
+    + "</label>\n        </div>\n     </div>\n";
 },"5":function(container,depth0,helpers,partials,data) {
     var stack1, alias1=container.lambda, alias2=container.escapeExpression, alias3=depth0 != null ? depth0 : {}, alias4=helpers.helperMissing;
 
@@ -71,17 +71,17 @@ this["wints"]["templates"]["convention-detail"] = Handlebars.template({"1":funct
     + alias2(alias1(((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.I : depth0)) != null ? stack1.Convention : stack1)) != null ? stack1.Company : stack1)) != null ? stack1.WWW : stack1), depth0))
     + "\">"
     + alias2(alias1(((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.I : depth0)) != null ? stack1.Convention : stack1)) != null ? stack1.Company : stack1)) != null ? stack1.Name : stack1), depth0))
-    + "</a>\n                    </label>\n                </div>\n		</div>	\n		<div class=\"form-group\">\n			<label class=\"col-lg-3 control-label\">Title</label>\n            <div class=\"col-lg-9\">\n                <label class=\"form-control-static text-justify\">"
+    + "</a>\n                    </label>\n                </div>\n		</div>\n		<div class=\"form-group\">\n			<label class=\"col-lg-3 control-label\">Title</label>\n            <div class=\"col-lg-9\">\n                <label class=\"form-control-static text-justify\">"
     + alias2(alias1(((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.I : depth0)) != null ? stack1.Convention : stack1)) != null ? stack1.Company : stack1)) != null ? stack1.Title : stack1), depth0))
-    + "</label>\n            </div>\n		</div>				\n		<div class=\"form-group\">\n			<label class=\"col-lg-3 control-label\">Period</label>\n                <div class=\"col-lg-9\">\n                	<label class=\"form-control-static\">\n                	"
+    + "</label>\n            </div>\n		</div>\n		<div class=\"form-group\">\n			<label class=\"col-lg-3 control-label\">Period</label>\n                <div class=\"col-lg-9\">\n                	<label class=\"form-control-static\">\n                	"
     + alias2((helpers.dateFmt || (depth0 && depth0.dateFmt) || alias4).call(alias3,((stack1 = ((stack1 = (depth0 != null ? depth0.I : depth0)) != null ? stack1.Convention : stack1)) != null ? stack1.Begin : stack1),"ddd DD MMM YY",{"name":"dateFmt","hash":{},"data":data}))
-    + "\n                	- \n                	"
+    + "\n                	-\n                	"
     + alias2((helpers.dateFmt || (depth0 && depth0.dateFmt) || alias4).call(alias3,((stack1 = ((stack1 = (depth0 != null ? depth0.I : depth0)) != null ? stack1.Convention : stack1)) != null ? stack1.End : stack1),"ddd DD MMM YY",{"name":"dateFmt","hash":{},"data":data}))
     + "\n                	</label>\n                </div>\n		</div>\n		<div class=\"form-group\">\n			<label class=\"col-lg-3 control-label\">Gratification</label>\n                <div class=\"col-lg-9\">\n                	<label class=\"form-control-static\">"
     + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.I : depth0)) != null ? stack1.Convention : stack1)) != null ? stack1.Gratification : stack1), depth0))
-    + " €</label>\n                </div>\n		</div>				\n\n        <div class=\"form-group\" id=\"supervisor-group\">\n            <label class=\"col-lg-3 control-label\">Supervisor</label>\n                <div class=\"col-lg-9\">\n                    <label class=\"form-control-static fn\">\n"
+    + " €</label>\n                </div>\n		</div>\n\n        <div class=\"form-group\" id=\"supervisor-group\">\n            <label class=\"col-lg-3 control-label\">Supervisor</label>\n                <div class=\"col-lg-9\">\n                    <label class=\"form-control-static fn\">\n"
     + ((stack1 = container.invokePartial(partials.person,((stack1 = ((stack1 = (depth0 != null ? depth0.I : depth0)) != null ? stack1.Convention : stack1)) != null ? stack1.Supervisor : stack1),{"name":"person","data":data,"indent":"                    ","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
-    + "                    </label>\n                </div>\n        </div>  \n";
+    + "                    </label>\n                </div>\n        </div>\n";
 },"7":function(container,depth0,helpers,partials,data) {
     var stack1, alias1=container.escapeExpression, alias2=container.lambda;
 
@@ -91,7 +91,7 @@ this["wints"]["templates"]["convention-detail"] = Handlebars.template({"1":funct
     + alias1(alias2(((stack1 = ((stack1 = ((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.I : depth0)) != null ? stack1.Convention : stack1)) != null ? stack1.Student : stack1)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1), depth0))
     + "', '"
     + alias1(alias2(((stack1 = ((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.I : depth0)) != null ? stack1.Convention : stack1)) != null ? stack1.Tutor : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1), depth0))
-    + "')\">\n                    <i class=\"glyphicon glyphicon-random\"></i>\n                </button>                \n                </span>\n                </div>\n            </div>\n        </div>\n";
+    + "')\">\n                    <i class=\"glyphicon glyphicon-random\"></i>\n                </button>\n                </span>\n                </div>\n            </div>\n        </div>\n";
 },"9":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, alias1=depth0 != null ? depth0 : {};
 
@@ -113,7 +113,7 @@ this["wints"]["templates"]["convention-detail"] = Handlebars.template({"1":funct
     + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.Delivery : depth0),{"name":"unless","hash":{},"fn":container.program(15, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + ">\n                        "
     + alias2(((helper = (helper = helpers.Kind || (depth0 != null ? depth0.Kind : depth0)) != null ? helper : alias3),(typeof helper === alias4 ? helper.call(alias1,{"name":"Kind","hash":{},"data":data}) : helper)))
-    + "\n                    </button>                    \n";
+    + "\n                    </button>\n";
 },"11":function(container,depth0,helpers,partials,data) {
     return "btn-danger";
 },"13":function(container,depth0,helpers,partials,data) {
@@ -139,24 +139,26 @@ this["wints"]["templates"]["convention-detail"] = Handlebars.template({"1":funct
     + alias1(((helper = (helper = helpers.Kind || (depth0 != null ? depth0.Kind : depth0)) != null ? helper : alias3),(typeof helper === alias4 ? helper.call(alias2,{"name":"Kind","hash":{},"data":data}) : helper)))
     + "')\">\n                        "
     + alias1(((helper = (helper = helpers.Kind || (depth0 != null ? depth0.Kind : depth0)) != null ? helper : alias3),(typeof helper === alias4 ? helper.call(alias2,{"name":"Kind","hash":{},"data":data}) : helper)))
-    + "                        \n                        (<i class=\"glyphicon glyphicon-time\"></i> "
+    + "\n                        (<i class=\"glyphicon glyphicon-time\"></i> "
     + alias1((helpers.daysSince || (depth0 && depth0.daysSince) || alias3).call(alias2,(depth0 != null ? depth0.LastInvitation : depth0),{"name":"daysSince","hash":{},"data":data}))
-    + "  days.)\n                    </button>                    \n";
+    + "  days.)\n                    </button>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
-    var stack1, alias1=depth0 != null ? depth0 : {};
+    var stack1, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing;
 
-  return "<div class=\"modal-dialog\">\n<div class=\"modal-content\"> \n    <div class=\"modal-body\">\n        <button type=\"button\" class=\"close\" aria-hidden=\"true\" onclick=\"hideModal()\">×</button>\n        <fieldset>\n            <legend>\n"
+  return "<div class=\"modal-dialog\">\n<div class=\"modal-content\">\n    <div class=\"modal-body\">\n        <button type=\"button\" class=\"close\" aria-hidden=\"true\" onclick=\"hideModal()\">×</button>\n        <fieldset>\n            <legend>\n"
     + ((stack1 = container.invokePartial(partials.person,((stack1 = ((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.I : depth0)) != null ? stack1.Convention : stack1)) != null ? stack1.Student : stack1)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1),{"name":"person","data":data,"indent":"            ","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
-    + "            </legend>\n    <div class=\"form-horizontal\">	        \n"
+    + "            </legend>\n    <div class=\"form-horizontal\">\n    <div class=\"form-group\">\n            <label class=\"col-lg-3 control-label\">Last visit</label>\n            <div class=\"col-lg-3\">\n                <label class=\"form-control-static\">"
+    + container.escapeExpression((helpers.dateFmt || (depth0 && depth0.dateFmt) || alias2).call(alias1,((stack1 = ((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.I : depth0)) != null ? stack1.Convention : stack1)) != null ? stack1.Student : stack1)) != null ? stack1.User : stack1)) != null ? stack1.LastVisit : stack1),"DD/MM/YY HH:mm",{"name":"dateFmt","hash":{},"data":data}))
+    + "</label>\n            </div>\n    </div>\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.Editable : depth0),{"name":"if","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.program(3, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
     + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.Editable : depth0),{"name":"unless","hash":{},"fn":container.program(5, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "		<div class=\"form-group\" id=\"tutor-group\">\n			<label class=\"col-lg-3 control-label\">Academic tutor</label>\n                <div class=\"col-lg-9\">\n                	<label class=\"form-control-static fn\">\n"
     + ((stack1 = container.invokePartial(partials.person,((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.I : depth0)) != null ? stack1.Convention : stack1)) != null ? stack1.Tutor : stack1)) != null ? stack1.Person : stack1),{"name":"person","data":data,"indent":"                    ","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
-    + "                    </label>\n                </div>\n		</div>	    \n"
+    + "                    </label>\n                </div>\n		</div>\n"
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.Editable : depth0),{"name":"if","hash":{},"fn":container.program(7, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "\n"
-    + ((stack1 = (helpers.ifRole || (depth0 && depth0.ifRole) || helpers.helperMissing).call(alias1,4,{"name":"ifRole","hash":{},"fn":container.program(9, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "</div>\n    </fieldset>\n    <div class=\"text-right\">\n    <button type=\"button\" class=\"btn btn-default\" aria-hidden=\"true\" onclick=\"hideModal()\">Close</button></div>    \n        </div>\n        </div>\n        </div>";
+    + ((stack1 = (helpers.ifRole || (depth0 && depth0.ifRole) || alias2).call(alias1,4,{"name":"ifRole","hash":{},"fn":container.program(9, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "</div>\n    </fieldset>\n    <div class=\"text-right\">\n    <button type=\"button\" class=\"btn btn-default\" aria-hidden=\"true\" onclick=\"hideModal()\">Close</button></div>\n        </div>\n        </div>\n        </div>";
 },"usePartial":true,"useData":true,"useDepths":true});
 this["wints"]["templates"]["convention-validator"] = Handlebars.template({"1":function(container,depth0,helpers,partials,data) {
     var stack1, alias1=container.lambda, alias2=container.escapeExpression;
