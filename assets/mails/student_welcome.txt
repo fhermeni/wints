@@ -1,4 +1,4 @@
-Subject:[Wints] Account created
+Subject: [Wints] Account created
 
 Wints is the web application used to follow your internship progress.
 It allows you to upload your reports for evaluation and access your tutor feedbacks.

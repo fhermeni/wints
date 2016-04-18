@@ -1,4 +1,4 @@
-Subject:[Wints] New academic tutor for your internship
+Subject: [Wints] New academic tutor for your internship
 
 Your academic tutor has changed.
 Now {{.Data.Now.Fullname}} ({{.Data.Now.Person.Email}}) supervises your internship

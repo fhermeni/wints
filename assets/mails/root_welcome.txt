@@ -1,4 +1,4 @@
-Subject:[Wints] Root account created
+Subject: [Wints] Root account created
 
 A root account has been created for you.
 Login: {{.Data.Login}}

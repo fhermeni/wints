@@ -1,4 +1,4 @@
-Subject:[Wints] New version of report '{{.Data.Kind}}' uploaded
+Subject: [Wints] New version of report '{{.Data.Kind}}' uploaded
 
 Dear {{.Data.Student.Fullname}},
 

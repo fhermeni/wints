@@ -1,4 +1,4 @@
-Subject:[Wints] Report {{.Data.Kind}} is now {{.Data.Status}}
+Subject: [Wints] Report {{.Data.Kind}} is now {{.Data.Status}}
 
 Regards,
 {{.Fullname}}

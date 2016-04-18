@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/smtp"
 	"os"
+	"strings"
 
 	"github.com/fhermeni/wints/logger"
 	"github.com/fhermeni/wints/schema"
@@ -101,24 +102,32 @@ func (m *SMTP) sendMail(to string, cc []string, msg []byte) error {
 		return err
 	}
 
+	for _, other := range cc {
+		if err = c.Rcpt(other); err != nil {
+			return err
+		}
+	}
 	w, err := c.Data()
 	if err != nil {
 		return err
 	}
 
-	write := func(buf []byte) {
+	write := func(buf string) {
 		if err != nil {
 			return
 		}
-		_, err = w.Write(buf)
+		_, err = w.Write([]byte(buf))
 	}
-
-	for _, em := range cc {
-		write([]byte("Cc: "))
-		write([]byte(em))
-		write([]byte("\n"))
+	write("To: " + to + "\n")
+	if len(cc) > 0 {
+		write("Cc: ")
+		write(strings.Join(cc, ","))
+		write("\n")
 	}
-	write(msg)
+	write(string(msg))
+	if err != nil {
+		return nil
+	}
 	if err = w.Close(); err != nil {
 		return err
 	}

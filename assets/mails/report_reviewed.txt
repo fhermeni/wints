@@ -1,4 +1,4 @@
-Subject:[Wints] {{.Data.Kind}} report reviewed
+Subject: [Wints] {{.Data.Kind}} report reviewed
 
 Log on your dashboard to access the comments: {{.WWW}}
 

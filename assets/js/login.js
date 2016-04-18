@@ -2,7 +2,7 @@
  * Created by fhermeni on 06/08/2014.
  */
 
-function flipForm(from, to) {	
+function flipForm(from, to) {
 	$('[data-toggle="popover"]').popover('hide').closest(".form-group").removeClass("has-error");
 	var em = from == 'login-diag' ? $("#loginEmail").val() : $("#lostEmail").val();
 	if (to == 'login-diag') {

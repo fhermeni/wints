@@ -512,8 +512,7 @@ func (ed *EndPoints) resetPassword(ex Exchange) error {
 		return err
 	}
 	token, err := ed.store.ResetPassword(email)
-	ed.notifier.AccountReseted(email, token, err)
-	return err
+	return ed.notifier.AccountReseted(email, token, err)
 }
 
 func (ed *EndPoints) config(ex Exchange) error {
