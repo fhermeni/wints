@@ -22,7 +22,7 @@ function showLogs() {
 	});
 }
 
-var dateTime = /(^\d+\/+\d+\/\d+.+\d+:\d+:\d+)/; //2016/04/18 12:47:05
+var dateTime = /(^\d+\/+\d+\/\d+)/; //2016/04/18 12:47:05
 
 function showLog(f) {
 	if (!f) {
