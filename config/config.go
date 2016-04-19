@@ -35,12 +35,13 @@ type Rest struct {
 
 //HTTPd configures the http daemon
 type HTTPd struct {
-	WWW         string
-	Assets      string
-	Listen      string
-	Certificate string
-	PrivateKey  string
-	Rest        Rest
+	InsecureListen string
+	WWW            string
+	Assets         string
+	Listen         string
+	Certificate    string
+	PrivateKey     string
+	Rest           Rest
 }
 
 //Journal configures the logging system

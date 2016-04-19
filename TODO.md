@@ -4,7 +4,7 @@
 	- pending reviews
 - warning gratification
 - wipe conventions once imported
-- do not remove student having a convention	
+- do not remove student having a convention
 - resilience to multi import with e-mail rewriting
 - server-side caching of the store
 	- store interface
@@ -13,10 +13,11 @@
 - test security ?
 - don't change the reset token if not needed
 PENDING statistics
-	
+
 
 
 #Year +1 todo
+- library for mailing (robustness issues)
 - structured logs to play with
 - generate link for the major head & the tutor to ack the convention
 - gin middleware ?	/ simplify a bit if possible

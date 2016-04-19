@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	"flag"
 	"log"
+	"net/http"
 	"os"
+	"time"
 
 	"github.com/BurntSushi/toml"
 	"github.com/fhermeni/wints/config"
@@ -108,6 +110,25 @@ func install() {
 	err := store.Install()
 	fatal("Creating tables", err)
 }
+
+func insecureServer(listenTo string) {
+	s := &http.Server{
+		Addr:           listenTo,
+		Handler:        http.HandlerFunc(redirectToSecure),
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
+	}
+	fatal("Insecure listening on "+cfg.HTTPd.InsecureListen, nil)
+	err := s.ListenAndServe()
+	fatal("Stop insecure listening on "+cfg.HTTPd.InsecureListen, err)
+}
+
+func redirectToSecure(w http.ResponseWriter, req *http.Request) {
+	logger.Log("event", "insecure", "redirection to "+cfg.HTTPd.WWW+req.RequestURI, nil)
+	http.Redirect(w, req, cfg.HTTPd.WWW+req.RequestURI, http.StatusMovedPermanently)
+}
+
 func main() {
 
 	makeRoot := flag.String("new-root", "", "Invite a root user")
@@ -144,6 +165,9 @@ func main() {
 
 	runSpies()
 	conventions := newFeeder(not)
+
+	//Insecure listen that only redirect
+	go insecureServer(cfg.HTTPd.InsecureListen)
 	fatal("Listening on "+cfg.HTTPd.WWW, nil)
 	httpd := httpd.NewHTTPd(not, store, conventions, cfg.HTTPd, cfg.Internships)
 	err = httpd.Listen()

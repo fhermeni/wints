@@ -46,7 +46,7 @@ func NewHTTPd(not *notifier.Notifier, store *sqlstore.Store, conventions feeder.
 
 func (ed *HTTPd) page(path string) func(http.ResponseWriter, *http.Request) {
 	return Mon(func(w http.ResponseWriter, r *http.Request) {
-
+		w.Header().Add("Strict-Transport-Security", "max-age=157680000; includeSubDomains; preload")
 		http.ServeFile(w, r, ed.cfg.Assets+path)
 	})
 }

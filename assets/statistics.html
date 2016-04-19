@@ -1,4 +1,61 @@
-<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>Statistics</title><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="assets/css/wints.css"></head><body><div class="alert alert-warning text-center"><p><strong>Warning:</strong> "There are three types of lies -- lies, damn lies, and statistics." -- Benjamin Disraeli</p></div><div class="container"><h1>Internships in a nutshell</h1><div class="row"><div class="col-sm-4"><div class="thumbnail text-center"><ul class="pagination pagination-sm"><li class="country all active"><a onclick="country()">all</a></li><li class="country promotion"><a onclick="country('promotion')">promotions</a></li><li class="country major"><a onclick="country('major')">majors</a></li></ul><h3>% in a foreign country</h3><div id="country"><canvas></canvas></div></div></div><div class="col-sm-4"><div class="thumbnail text-center"><ul class="pagination pagination-sm"><li class="sector all active"><a onclick="sector()">all</a></li><li class="sector promotion"><a onclick="sector('promotion')">promotions</a></li><li class="sector major"><a onclick="sector('major')">majors</a></li></ul><h3>% in industry</h3><div id="sector"><canvas></canvas></div></div></div><div class="col-sm-4"><div class="thumbnail text-center"><ul class="pagination pagination-sm"><li class="gratification all active"><a onclick="gratifications()">all</a></li><li class="gratification promotion"><a onclick="gratifications('promotion')">promotions</a></li><li class="gratification major"><a onclick="gratifications('major')">majors</a></li><li class="gratification sector"><a onclick="gratifications('sector')">lab / company</a></li><li class="gratification country"><a onclick="gratifications('country')">fr / other</a></li></ul><h3>Gratification</h3><h2 id="how-much"></h2></div></div></div><div class="row"><!--        <div class="col-sm-5">
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Statistics</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="assets/css/wints.css">
+</head>
+<body>      
+<div class="alert alert-warning text-center">
+        <p><strong>Warning: </strong> "There are three types of lies -- lies, damn lies, and statistics."
+        -- Benjamin Disraeli</p>
+</div>
+<div class="container">
+<h1>Internships in a nutshell</h1>
+<div class="row">
+    <div class="col-sm-4">        
+        <div class="thumbnail text-center">          
+        <ul class="pagination pagination-sm">            
+            <li class="country all active"><a onclick="country()">all</a></li>    
+            <li class="country promotion"><a onclick="country('promotion')">promotions</a></li>    
+            <li class="country major"><a onclick="country('major')">majors</a></li>
+        </ul>            
+        <h3>% in a foreign country</h3>
+            <div id="country"><canvas></canvas></div>
+        </div>
+    </div>
+
+    <div class="col-sm-4">
+        <div class="thumbnail text-center">
+        <ul class="pagination pagination-sm">            
+            <li class="sector all active"><a onclick="sector()">all</a></li>    
+            <li class="sector promotion"><a onclick="sector('promotion')">promotions</a></li>    
+            <li class="sector major"><a onclick="sector('major')">majors</a></li>            
+        </ul>                                
+        <h3>% in industry</h3>          
+            <div id="sector"><canvas></canvas></div>                                    
+        </div>
+    </div>
+
+    <div class="col-sm-4">
+        <div class="thumbnail text-center">
+            <ul class="pagination pagination-sm">
+            <li class="gratification all active"><a onclick="gratifications()">all</a></li>                
+            <li class="gratification promotion"><a onclick="gratifications('promotion')">promotions</a></li>
+            <li class="gratification major"><a onclick="gratifications('major')">majors</a></li>
+            <li class="gratification sector"><a onclick="gratifications('sector')">lab / company</a></li>
+            <li class="gratification country"><a onclick="gratifications('country')">fr / other</a></li>
+            </ul>                    
+            <h3>Gratification</h3>
+            <h2 id="how-much"></h2>            
+        </div>
+    </div>
+    </div>
+
+    <div class="row">
+<!--        <div class="col-sm-5">
         <div class="thumbnail text-center">
             <h3>Period</h3>
             <canvas id="periods"></canvas>
@@ -9,7 +66,54 @@
             <h3>Convention arrival</h3>
             <canvas id="conventions"></canvas>            
         </div>
-        </div>--><div class="col-sm-12"><div class="thumbnail text-center"><h3>Employers</h3><div class="text-justify" id="employers"></div></div></div></div><div class="row"><div class="col-sm-4 hidden"><div class="thumbnail text-center"><h3>Midterm report</h3><ul class="pagination pagination-sm"><li class="grades-Midterm all active"><a onclick="grades('Midterm')">all</a></li><li class="grades-Midterm promotion"><a onclick="grades('Midterm','promotion')">si / master</a></li><li class="grades-Midterm major"><a onclick="grades('Midterm','major')">by major</a></li></ul><h2 id="grades-Midterm"></h2></div></div><div class="col-sm-4 hidden"><div class="thumbnail text-center"><h3>Final report</h3><ul class="pagination pagination-sm"><li class="grades-Final all active"><a onclick="grades('Final')">all</a></li><li class="grades-Final promotion"><a onclick="grades('Final','promotion')">si / master</a></li><li class="grades-Final major"><a onclick="grades('Final','major')">by major</a></li></ul><h2 id="grades-Final"></h2></div></div><div class="col-sm-4 hidden"><div class="thumbnail text-center"><h3>Company appreciation</h3><ul class="pagination pagination-sm"><li class="surveys surveys-midterm active"><a onclick="surveys('midterm')">midterm</a></li><li class="surveys surveys-final"><a onclick="surveys('final')">final</a></li></ul><h1 class="survey" id="surveys"></h1></div></div><div class="row"><!--<div class="col-sm-7">
+        </div>-->
+
+        <div class="col-sm-12">
+        <div class="thumbnail text-center">
+            <h3>Employers</h3>            
+            <div class="text-justify" id="employers"></div>
+        </div>
+        </div>
+    </div>
+
+<div class="row">
+<div class="col-sm-4 hidden">
+        <div class="thumbnail text-center">
+            <h3>Midterm report</h3>
+            <ul class="pagination pagination-sm">
+            <li class="grades-Midterm all active"><a onclick="grades('Midterm')">all</a></li>    
+            <li class="grades-Midterm promotion"><a onclick="grades('Midterm','promotion')">si / master</a></li>
+            <li class="grades-Midterm major"><a onclick="grades('Midterm','major')">by major</a></li>
+            </ul>            
+            <h2 id="grades-Midterm"></h2>            
+        </div>
+</div>
+
+<div class="col-sm-4 hidden">
+        <div class="thumbnail text-center">
+            <h3>Final report</h3>
+            <ul class="pagination pagination-sm">
+            <li class="grades-Final all active"><a onclick="grades('Final')">all</a></li>    
+            <li class="grades-Final promotion"><a onclick="grades('Final','promotion')">si / master</a></li>
+            <li class="grades-Final major"><a onclick="grades('Final','major')">by major</a></li>
+            </ul>            
+            <h2 id="grades-Final"></h2>            
+        </div>
+</div>
+
+<div class="col-sm-4 hidden">
+        <div class="thumbnail text-center">            
+            <h3>Company appreciation</h3>
+        <ul class="pagination pagination-sm">
+            <li class="surveys surveys-midterm active"><a onclick="surveys('midterm')">midterm</a></li>    
+            <li class="surveys surveys-final"><a onclick="surveys('final')">final</a></li>            
+        </ul>            
+            <h1 class="survey" id="surveys"></h1>            
+        </div>
+    </div>
+
+<div class="row">
+<!--<div class="col-sm-7">
         <div class="thumbnail text-center">
             <h3>The future</h3>
         <ul class="pagination pagination-sm">            
@@ -23,10 +127,47 @@
             </div>
         </div>
     </div>
---><div class="col-sm-5 hidden"><div class="thumbnail text-center"><h3>Reporting delays</h3><ul class="pagination pagination-sm"><li class="delays DoW active"><a onclick="delays('DoW')">Dow</a></li><li class="delays Midterm"><a onclick="delays('Midterm')">Midterm</a></li><li class="delays Final"><a onclick="delays('Final')">Final</a></li></ul><ul class="pagination pagination-sm"><li class="delays Delivery active"><a onclick="delays(undefined, 'Delivery')">delivery</a></li><li class="delays Reviewing"><a onclick="delays(undefined, 'Reviewing')">review</a></li></ul><div id="delays"></div></div></div></div><footer><div class="container small"><p class="pull-left">Release: <span class="release"></span><br>Support: <a href="mailto:fabien.hermenier@unice.fr">Fabien Hermenier</a></p><p class="pull-right">© University Nice Sophia Antipolis 2015-2016</p></div></footer><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+-->
+
+<div class="col-sm-5 hidden">
+        <div class="thumbnail text-center">
+            <h3>Reporting delays</h3>                    
+        <ul class="pagination pagination-sm">            
+            <li class="delays DoW active"><a onclick="delays('DoW')">Dow</a></li>    
+            <li class="delays Midterm"><a onclick="delays('Midterm')">Midterm</a></li>    
+            <li class="delays Final"><a onclick="delays('Final')">Final</a></li>    
+        </ul>
+
+        <ul class="pagination pagination-sm">            
+            <li class="delays Delivery active"><a onclick="delays(undefined, 'Delivery')">delivery</a></li>    
+            <li class="delays Reviewing"><a onclick="delays(undefined, 'Reviewing')">review</a></li>    
+        </ul>
+        <div id="delays"></div>    
+        </div>
+</div>
+</div>
+
+    <footer>
+
+        <div class="container small">            
+            <p class="pull-left">
+                Release: <span class="release"></span><br>
+                Support: <a href="mailto:fabien.hermenier@unice.fr">Fabien Hermenier</a>                
+            </p>
+            <p class="pull-right">© University Nice Sophia Antipolis 2015-2016</p>            
+        </div>
+    </footer>
+    
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
   ga('create', 'UA-47650251-4', 'auto');
-  ga('send', 'pageview');</script><script src="assets/js/wints.min.js"></script></div></div></body></html>
+  ga('send', 'pageview');
+
+</script>
+<script src="assets/js/wints.min.js"></script>
+</body>
+</html>
