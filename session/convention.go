@@ -62,7 +62,10 @@ func (s *Session) Internships() (schema.Internships, error) {
 	if s.Role().Level() >= schema.HeadLevel {
 		return is, err
 	} else if s.Role().Level() == schema.MajorLevel {
-		return is.Filter(schema.InMajor(s.my.Role.SubRole())), err
+		//All the student that are in the major plus the tutored students
+		l1 := is.Filter(schema.InMajor(s.my.Role.SubRole()))
+		l2 := is.Filter(schema.Tutoring(s.my.Person.Email))
+		return append(l1, l2...), err
 	} else if s.Role().Level() == schema.TutorLevel {
 		return is.Filter(schema.Tutoring(s.my.Person.Email)), err
 	}
