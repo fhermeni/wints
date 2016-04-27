@@ -1,5 +1,4 @@
 # TODO
-- Bug visibilité quand major leader
 - mail for students that never connected (1 mail per week)
 - summary for the tutored pane
 	- missed deadlines

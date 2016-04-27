@@ -277,3 +277,8 @@ func (n *Notifier) TutorNewsLetter(tut schema.User, lates []schema.StudentReport
 	err := n.mailer.Send(tut.Person, "tutor_newsletter.txt", statuses)
 	logger.Log("event", "cron", buf, err)
 }
+
+func (n *Notifier) MissingStudentLogin(u schema.User) {
+	err := n.mailer.Send(u.Person, "student_welcome_reminder.txt", u)
+	logger.Log("event", "cron", "send a account reminder for "+u.Fullname(), err)
+}

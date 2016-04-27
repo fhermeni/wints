@@ -70,11 +70,15 @@ func (i *Internship) Anonymise() {
 //Internships aliases slices of internship to exhibit filtering methods
 type Internships []Internship
 
-//Filter returns the internships that pass the given filter
-func (ss Internships) Filter(filter func(Internship) bool) Internships {
+//Filter returns the internships that pass the given filters
+func (ss Internships) Filter(filters ...func(Internship) bool) Internships {
 	var res Internships
 	for _, i := range ss {
-		if filter(i) {
+		keep := false
+		for _, f := range filters {
+			keep = keep || f(i)
+		}
+		if keep {
 			res = append(res, i)
 		}
 	}
