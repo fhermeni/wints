@@ -1,0 +1,23 @@
+<h3 class="page-header">Oral defense <small>(<a href="assets/consignes-rapports.pdf">organisation</a>)</small></h3>
+<dl class="dl-horizontal">
+        <dt>Room</dt>
+        <dd>{{Room}}</dd>
+        <dt>Date</dt>
+        <dd>{{dateFmt Defense.Time "DD MMM HH:MM" 'Europe/Paris'}} (<i>Paris timezone</i>)</dd>
+        <dt>On site ?</dt>
+        <dd>{{#if Defense.Local}}on site{{else}}visio{{/if}}</dd>
+        <dt>Public ?</dt>
+        <dd>{{#if Defense.Public}}public{{else}}<span class="text-danger">confidential</span>{{/if}}</dd>
+        <dt>
+        Jury
+        </dt>
+        <dd>
+        <small>
+        {{#each Juries}}
+        {{fullname Person}}{{#unless @last}}; {{/unless}}
+        {{/each}}
+                <a href="mailto:{{#each Juries}}{{Person.Email}}{{#unless @last}},{{/unless}}{{/each}}"
+        class="btn btn-xs btn-default"><i class="glyphicon glyphicon-envelope"></i></a>
+        </small>
+        </dd>
+</dl>

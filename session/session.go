@@ -93,11 +93,19 @@ func (s *Session) InMyMajor(student string) bool {
 	return s.my.Role.SubRole() == stu.Major
 }
 
-//JuryOf checks if I attend to the student defense
+//JuryOf checks if I am in a jury for a defense.
+//That if indeed I am in the jury, or an admin
 func (s *Session) JuryOf(student string) bool {
-	_, err := s.store.Defense(student)
+	if s.my.Role.Level() >= schema.AdminLevel {
+		return true
+	}
+	def, err := s.store.Defense(student)
 	if err != nil {
 		return false
 	}
-	return false
+	mySession, err := s.store.DefenseSession(def.Room, def.SessionId)
+	if err != nil {
+		return false
+	}
+	return mySession.InJury(s.my.Person.Email)
 }

@@ -16,5 +16,23 @@ unique(#(date, am|pm), room)
  #student, (datetime, location), private/public, remote/local
 
  #juries
- teacher, location, 
+ teacher, location,
+
+
+
+ # Frontend:
+ visu permettant de voir a fond
+Par etudiant:
+-> publique/privée
+-> local/remote
+
+Par groupe:
+-> jury
+-> salle
+-> date
+
+DB:
+
+defense_sessions(#id, room, date)
+defense_juries(#id, email)
 

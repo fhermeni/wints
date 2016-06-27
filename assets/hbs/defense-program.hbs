@@ -1,0 +1,37 @@
+{{#if this}}
+<div style="@media print{@page {size: landscape}}">
+{{#each this}}
+
+{{#if Defenses}}
+<h3 class="text-center">{{dateFmt Day "DD MMMM YYYY" "Europe/Paris"}}</h3>
+<h4>Salle: {{Room}}</h4>
+<h4>Jury:
+<small>
+{{#if Juries}}
+	{{#each Juries}}
+	<span class="fn">{{fullname Person}}</span>{{#unless @last}}; {{/unless}}
+	{{/each}}
+{{else}}
+	<span class="fn">TBA.</span>
+{{/if}}
+</small>
+</h4>
+<h4>Agenda</h4>
+<div style="page-break-after: always;">
+	{{#each Defenses}}
+		<div>
+		{{dateFmt Time "HH:mm" "Europe/Paris"}}
+		<span class="header">{{fullname Student.User.Person}} [{{Student.Promotion}}/{{Student.Major}}]</span>
+		{{#unless Local}}<b><i class="glyphicon glyphicon-facetime-video"></i> visio</b>{{/unless}}
+		{{#unless Public}}<b class="text-danger"> <i class="glyphicon glyphicon-eye-close"></i> confidentielle</b>{{/unless}}
+		<p class="descr">{{Company.Name}}. <i>{{Company.Title}}.</i></p>
+		</div>
+	{{/each}}
+</div>
+{{/if}}
+{{/each}}
+
+</div>
+{{else}}
+<h1> Soon come ...</h1>
+{{/if}}

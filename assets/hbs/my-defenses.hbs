@@ -1,0 +1,62 @@
+<h3>My defenses</h3>
+
+<a class="btn btn-default" onclick="userMailing('table')">
+      <i class="glyphicon glyphicon-envelope"></i> mail selection
+</a>
+<p>
+This is the defenses you are attending as a jury member.
+<ul>
+<li>Click on a grade to enter the value</li>
+<li>If the defense is <i>private</i> (<i class="glyphicon glyphicon-eye-close"></i>), no one except the student, the jury, the supervisors (optional) can attend the defense.</li>
+<li>If the defense is performed as a <i>visio-conference</i> (<i class="glyphicon glyphicon-facetime-video"></i>), the student must contact you in advance to agree on a solution</li>
+</ul>
+</p>
+
+{{#each this}}
+<table class="table table-hover">
+    <thead>
+    <tr>
+      <th colspan="6">
+      <i class="glyphicon glyphicon-calendar"></i>{{Id}}, <i class="glyphicon glyphicon-map-marker"></i>{{Room}}
+      <span class="pull-right">
+        {{#each Juries}}
+          <input type="checkbox" data-email="{{Person.Email}}">{{fullname Person true}}{{#unless @last}}; {{/unless}}
+        {{/each}}
+      </span>
+      </th>
+    </tr>
+    <tr>
+        <th></th>
+        <th>Time</th>
+        <th>Student</th>
+        <th>Promotion / Major</th>
+        <th class="text-center">Grade</th>
+        <th>Alumni</th>
+    </tr>
+    </thead>
+    <tbody>
+    {{#each Defenses}}
+      <tr>
+      <td><input type="checkbox" data-email="{{Student.User.Person.Email}}"></td>
+      <td>{{dateFmt Time "HH:mm"}}</td>
+      <td>{{fullname Student.User.Person true}}
+      <span class="pull-right">
+      {{#unless Local}}
+      <i class="glyphicon glyphicon-facetime-video" title="visio"></i>
+      {{/unless}}
+      {{#unless Public}}
+      <i class="glyphicon glyphicon-eye-close" title="private"></i>
+      {{/unless}}
+      </span>
+      </td>
+      <td>{{Student.Promotion}}/{{Student.Major}}</td>
+      <td class="text-center">
+      <span class="editable-grade" data-student="{{Student.User.Person.Email}}" data-type="text" data-original-title="Enter the grade">{{Grade}}
+      </span>
+      </td>
+      <td>-</td>
+      </tr>
+    {{/each}}
+    </tbody>
+</table>
+{{/each}}

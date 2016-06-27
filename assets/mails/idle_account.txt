@@ -1,0 +1,13 @@
+Subject: [Wints] Don't forget to connect !
+
+Wints is the only software we use to manage internships.
+You have to connect to know the deadlines, set the contact informations, etc.
+
+You have received a email stating how to connect. If not, you can still go to
+the welcome page to generate a new password by saying you lost yours.
+
+Login: {{.Data.Person.Email}}
+Welcom page: {{.WWW}}/login
+
+Regards,
+{{.Fullname}}

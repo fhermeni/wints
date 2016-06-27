@@ -1,10 +1,18 @@
-/*$(document).ready(function() {
-	defenseProgram(function(sessions) {
-		for (var i = 0; i < sessions.length; i++) {
-			sessions[i].Date = new Date(sessions[i].Date)
+function loadDefenseProgram() {
+	program().done(function (dd) {
+		moment.locale('fr');
+		$("#cnt").render("defense-program", idsToDay(dd), function() {
+			ui();
+			moment.locale('en');
+		});
+	});
+}
+
+function idsToDay(dd) {
+	dd.forEach(function (d, idx) {
+		if (d.Defenses.length > 0) {
+			dd[idx].Day = d.Defenses[0].Time;
 		}
-		var html = Handlebars.getTemplate("defense-program")(sessions);
-		var root = $("#cnt");
-		root.html(html);
-	})
-});*/
+	});
+	return dd;
+}

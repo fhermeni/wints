@@ -1,7 +1,7 @@
 {{#if this}}
 <div style="@media print{@page {size: landscape}}">
 {{#each this}}
-<h3 class="text-center">{{longDate this.Date}}</h3>
+<h3 class="text-center">{{dateFmt this.Date "D mmm"}}</h3>
 <h4>Salle: {{Room}}</h4>
 <h4>Jury:
 <small>
@@ -11,19 +11,19 @@
 	{{/each}}
 {{else}}
 	<span class="fn">TBA.</span>
-{{/if}}	
+{{/if}}
 </small>
 </h4>
 <h4>Agenda</h4>
-<div style="page-break-after: always;"> 
+<div style="page-break-after: always;">
 	{{#each Defenses}}
 		<div>
 		<div class="offset" title="Heure localisée: {{offset_local ../Date Offset}}">{{offset ../Date Offset}}</div>
 		<div class="cnt">
 		<span class="header"><span class="fn">{{fullname Student}}</span> [{{Promotion}}/{{Major}}]</span>
 		{{#if Remote}}<b><i class="glyphicon glyphicon-facetime-video"></i> visio</b>{{/if}}
-		{{#if Private}}<b class="text-danger"> <i class="glyphicon glyphicon-eye-close"></i> confidentielle</b>{{/if}}		
-		<p class="descr">{{Cpy.Name}}. <i>{{Title}}.</i></p>	
+		{{#if Private}}<b class="text-danger"> <i class="glyphicon glyphicon-eye-close"></i> confidentielle</b>{{/if}}
+		<p class="descr">{{Cpy.Name}}. <i>{{Title}}.</i></p>
 		</div>
 		</div>
 	{{/each}}

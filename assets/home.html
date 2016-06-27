@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Wints dashboard</title>    
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">        
+    <title>Wints dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="assets/css/wints.css">
 <body>
         <nav class="navbar navbar-default navbar-embossed">
@@ -42,11 +42,11 @@
                                 Tutored students
                             </a>
                         </li>
-                        <!--<li class="role-1 hidden">
-                            <a onclick="showMyDefenses()"> <i class="glyphicon glyphicon-facetime-video"> </i>
+                        <li class="role-1 hidden">
+                            <a onclick="showJuries()"> <i class="glyphicon glyphicon-facetime-video"> </i>
                             My defenses
                             </a>
-                        </li> -->                       
+                        </li>
                         <li class="role-2 hidden">
                             <a onclick="showWatchlist();">
                                 <i class="glyphicon glyphicon-eye-open"></i>
@@ -63,21 +63,27 @@
                                 <li>
                                     <a onclick="showConventionValidator()">
                                         <i class="glyphicon glyphicon-filter"></i>
-                                        Conventions                                        
+                                        Conventions
                                     </a>
-                                </li>                                                                
+                                </li>
+                                <li>
+                                    <a onclick="showDefensePlanner()">
+                                        <i class="glyphicon glyphicon-blackboard"></i>
+                                        Defenses
+                                    </a>
+                                </li>
                                 <li class="role-3 hidden">
                                     <a onclick="showService()">
                                         <i class="glyphicon glyphicon-euro"></i>
                                         Service
                                     </a>
                                 </li>
-                                <!--<li class="role-4 hidden">
-                                    <a onclick="showDefenses()">
+                                <li class="role-4 hidden">
+                                    <a onclick="showJuries()">
                                         <i class="glyphicon glyphicon-calendar"></i>
                                         Defenses
                                     </a>
-                                </li>-->
+                                </li>
                                 <li class="role-5 hidden" >
                                     <a onclick="showUsers()">
                                         <i class="glyphicon glyphicon-user"></i>
@@ -95,12 +101,12 @@
 
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
-                        <!--<li>
+                        <li>
                             <a href="/defense-program" target="_blank">
                                 <i class="glyphicon glyphicon-calendar"></i>
                                 Defense program
                             </a>
-                        </li>-->
+                        </li>
                         <li>
                             <a href="/statistics" target="_blank">
                                 <i class="glyphicon glyphicon-dashboard"></i>
@@ -116,18 +122,18 @@
         <div class="page" id="cnt">
             <div class="text-center">
                 <img class="waiting" src="/assets/img/gears.gif" alt="Loading ..."/>
-            </div>            
-        </div>        
+            </div>
+        </div>
     </div>
     <div id="modal" class="modal fade" data-backdrop="static" data-keyboard="false"></div>
     <footer>
 
-        <div class="container small">            
+        <div class="container small">
             <p class="pull-left">
                 Release: <span class="release"></span><br>
-                Support: <a href="mailto:fabien.hermenier@unice.fr">Fabien Hermenier</a>                
+                Support: <a href="mailto:fabien.hermenier@unice.fr">Fabien Hermenier</a>
             </p>
-            <p class="pull-right">© University Nice Sophia Antipolis 2015-2016</p>            
+            <p class="pull-right">© University Nice Sophia Antipolis 2015-2016</p>
         </div>
     </footer>
 
@@ -141,7 +147,6 @@
   ga('send', 'pageview');
 
 </script>
-
     <script src="assets/js/wints.min.js"></script>
 </body>
 </html>

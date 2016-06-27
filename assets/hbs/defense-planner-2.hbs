@@ -1,0 +1,8 @@
+<div class="defense-groups">
+{{#each .}}
+{{> session-group this}}
+{{/each}}
+</div>
+<button type="button" title="new session" class="btn-block btn btn-primary" onclick="showNewSession()">
+    <i class="click glyphicon glyphicon-plus"></i> session
+</button>

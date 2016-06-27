@@ -3,17 +3,19 @@ Subject: {{.Data.Student.Fullname}} - {{.Data.Survey.Kind}} Evaluation
 Bonjour
 
 Vous encadrez actuellement {{.Data.Student.Fullname}}.
-À ce titre, je me permets de vous communiquer l'adresse Web où déposer votre fiche d'évaluation:
+À ce titre, je me permets de vous communiquer l'adresse Web où déposer
+votre fiche d'évaluation:
 
 {{.WWW}}/survey?kind={{.Data.Survey.Kind}}&token={{.Data.Survey.Token}}
 
 Remplir cette fiche d'évaluation devrait vous prendre 10 minutes.
-Cette évaluation nous est indispensable pour évaluer correctement le travail de nos étudiants.
+Cette évaluation nous est indispensable pour évaluer correctement le travail
+de nos étudiants.
 À ce titre, pourriez-vous la remplir avant le {{.Data.FrDate}} ?
 
 
-La saisie de la fiche d'évaluation a été testée sur Mozilla Firefox et sur Chrome.
-Internet Explorer 8 n'est pas supporté.
+La saisie de la fiche d'évaluation a été testée sur Mozilla Firefox
+et sur Chrome. Internet Explorer 8 n'est pas supporté.
 
 Cordialement,
 {{.Fullname}} - responsable des stages informatique.

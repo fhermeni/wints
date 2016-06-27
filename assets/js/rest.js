@@ -41,9 +41,9 @@ function invalidEmail() {
 		} else {
 			$(arguments[i]).closest(".form-group").removeClass("has-error");
 			$(arguments[i]).popover("hide");
-		}		
+		}
 
-	}	
+	}
     return count != 0;
 }
 
@@ -105,6 +105,15 @@ var ROOT_API = "/api/v2";
 function post(URL, data, sync) {
 	return $.ajax({
 		method: "POST",
+		data: JSON.stringify(data),
+		url: ROOT_API + URL,
+		async: sync ? false: true,
+	});
+}
+
+function put(URL, data, sync) {
+	return $.ajax({
+		method: "PUT",
 		data: JSON.stringify(data),
 		url: ROOT_API + URL,
 		async: sync ? false: true,
@@ -257,7 +266,16 @@ function postRequestSurvey(student, kind) {
 	return post("/surveys/" + student + "/" + kind)
 }
 
-function logFail(xhr) {	
+function defenses() {
+	return get("/defenses/");
+}
+
+function program() {
+	return get("/program/");
+}
+
+
+function logFail(xhr) {
 	if (xhr.status == 403 || xhr.status == 401) {
 		$("#modal").render("error", xhr.responseText, showModal)
 	}
@@ -345,4 +363,67 @@ function postReview(e, k, c, g) {
 		buf.Grade = g;
 	}
 	return post("/reports/" + e + "/" + k + "/grade", buf);
+}
+
+//defense management
+function postDefense(d) {
+	return post("/defenses/", d)
+}
+
+function delDefenseSession(room, id) {
+	return del("/defenses/" + encodeURIComponent(id) + "/" + encodeURIComponent(room));
+}
+
+function getDefenseSession(room, id) {
+	return get("/defenses/" + encodeURIComponent(id) + "/" + encodeURIComponent(room) + "/");
+}
+
+function newDefenseJury(room, id, em) {
+	return post("/defenses/" + encodeURIComponent(id) + "/" + encodeURIComponent(room) + "/jury/", em);
+}
+
+function postStudentDefense(room, id, em, public, local, time) {
+	var def = {
+		Local: local,
+		Public: public,
+		Room: room,
+		SessionId: id,
+		Time: time,
+	};
+	console.log(def)
+	return post("/internships/" + em + "/defense", def);
+}
+
+function postDefenseGrade(stu, g) {
+	return post("/internships/" + stu + "/defense/grade", parseInt(g));
+}
+function putStudentDefense(em, public, local, time) {
+	var def = {
+		Local: local,
+		Public: public,
+		Time: time,
+	};
+	return put("/internships/" + em + "/defense", def);
+}
+
+
+function getDefense(em) {
+	return get("/internships/" + em + "/defense");
+}
+
+
+function rmStudentDefense(em) {
+	return del("/internships/" + em + "/defense");
+}
+
+function rmDefenseJury(room, id, em) {
+	return del("/defenses/" + encodeURIComponent(id) + "/" + encodeURIComponent(room) + "/jury/" + em);
+}
+
+function postDefenseLocalStatus(em, state) {
+return post("/internships/" + em + "/defense/remote", state);
+}
+
+function postDefensePrivacyStatus(em, state) {
+return post("/internships/" + em + "/defense/private", state);
 }

@@ -1,8 +1,6 @@
 <h3 class="page-header">Your future</h3>
 <p>
-It is important for us to know what you will become after your internship.
-Please indicate what will be your profesional status after the internship
-and an email address to contact you as an alumni.
+What will be your profesional status and your contact email after the internship ?
 </p>
 
 <div class="form-horizontal">
@@ -12,7 +10,7 @@ and an email address to contact you as an alumni.
             <input type="email" class="form-control" id="lbl-email" value="{{Contact}}"/>
         </div>
 </div>
- 
+
 <div class="form-group">
     <label for="position" class="col-sm-2 control-label">Kind</label>
         <div class="col-sm-8">
@@ -22,7 +20,7 @@ and an email address to contact you as an alumni.
                 <option value="company" {{#ifEq Position "company"}}selected{{/ifEq}}>Working in a company</option>
                 <option value="entrepreneurship" {{#ifEq Position "entrepreneurship"}}selected{{/ifEq}}>Entrepreneurship</option>
                 <option value="study" {{#ifEq Position "study"}}selected{{/ifEq}}>Pursuit of higher education</option>
-            </select>                            
+            </select>
         </div>
 </div>
 
@@ -31,36 +29,36 @@ and an email address to contact you as an alumni.
     <div class="col-sm-8">
         <label class="checkbox-inline">
             <input type="radio" name="permanent" value='false' {{#unless Permanent}}checked{{/unless}}> Fixed (CDD)
-        </label>                        
+        </label>
         <label class="checkbox-inline">
             <input type="radio" name='permanent' value='true' {{#if Permanent}}checked{{/if}}> Permanent (CDI)
-        </label>                        
+        </label>
     </div>
-</div>   
+</div>
 
 <div class="form-group hidden" id="company">
     <label class="col-sm-2 control-label">Company</label>
     <div class="col-sm-8">
         <label class="checkbox-inline">
             <input type="radio" name='sameCompany' value='true' {{#if SameCompany}}checked{{/if}}> internship company
-        </label>                        
+        </label>
         <label class="checkbox-inline">
             <input type="radio" name='sameCompany' value='false' {{#unless SameCompany}}checked{{/unless}}> other
-        </label>                        
+        </label>
     </div>
-</div> 
+</div>
 
 <div class="form-group hidden" id="country">
     <label class="col-sm-2 control-label">Country</label>
     <div class="col-sm-8">
         <label class="checkbox-inline">
             <input type="radio" name='france' value='true' {{#if France}}checked{{/if}}> France
-        </label>                        
+        </label>
         <label class="checkbox-inline">
             <input type="radio" name='france' value='false' {{#unless France}}checked{{/unless}}> Foreign country
-        </label>                        
+        </label>
     </div>
-</div>                            
+</div>
 
 <div class="text-center">
 <button type="button" class="btn btn-default" onclick="sendAlumni()">Update</button>

@@ -1,0 +1,71 @@
+<div class="modal-dialog">
+<div class="modal-content">
+
+<div class="modal-header">
+    <h4 class="modal-title">
+        <i class="glyphicon glyphicon-calendar"></i> {{SessionId}}, <i class="glyphicon glyphicon-map-marker"></i> {{Room}}
+    </h4>
+</div>
+
+
+<div class="modal-body">
+
+<div class="form-horizontal">
+<div class="form-group">
+    <label class="col-lg-3 control-label">Student</label>
+    <div class="col-lg-6">
+        {{#if Student}}
+        <p class="form-control-static">{{fullname Student.User.Person true}} ({{Student.Promotion}}/{{Student.Major}})</p>
+        {{else}}
+        <select class="fn form-control" id="student-selecter">
+        {{#each Students}}
+            <option value="{{User.Person.Email}}">{{fullname User.Person true}} {{Promotion}}/{{Major}}</option>
+        {{/each}}
+        </select>
+        {{/if}}
+    </div>
+</div>
+
+<div class="form-group">
+    <label for="time" class="col-sm-3 control-label">Time</label>
+    <div class="col-sm-9">
+        <div class="input-group time" id="deadline">
+            <input id="defense-time" type="text" data-old-date="{{Time}}" class="form-control"
+            data-timeZone="Europe/Paris"
+            data-date-format="HH:mm" value="{{dateFmt Time 'HH:mm'}}" />
+        </div>
+    </div>
+</div>
+
+<div class="form-group">
+    <div class="col-sm-3 control-label">Properties</div>
+    <div class="col-sm-9">
+        <div class="checkbox">
+            <label for="remote">
+                <input type="checkbox" id="remote" {{#unless Local}}checked{{/unless}}>
+                <i>visio</i>
+            </label>
+            <label for="private">
+                <input type="checkbox" id="private" {{#unless Public}}checked{{/unless}}>
+                <i>private</i>
+            </label>
+        </div>
+    </div>
+</div>
+</div>
+
+</div> <!-- /modal-body -->
+<div class="modal-footer">
+    {{#if Student}}
+    <div class="pull-left">
+        <button type="button" class="btn btn-danger" onclick="delStudentDefense('{{Student.User.Person.Email}}', '{{Room}}', '{{SessionId}}')">Delete</button>
+    </div>
+    {{/if}}
+    <div class="text-right">
+        <button type="button" class="btn btn-default" onclick="hideModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" onclick="setStudentDefense('{{Room}}','{{Id}}')">Done</button>
+    </div>
+</div>
+
+</div>
+</div>

@@ -1,0 +1,37 @@
+<div class="col-md-3 panel panel-defense">
+<div class="panel-heading">
+	<div class="panel-title">
+		{{Room}}
+		<i class="click glyphicon glyphicon-plus-sign" onclick="newDefenseSlot(this,'{{Id}}','{{Room}}')"></i>
+		<span class="pull-right"><i class="text-danger click glyphicon glyphicon-remove-sign" onclick="rmDefenseSession('{{Room}}','{{Id}}',this)"></i></span>
+	</div>
+	<div class="panel-body>">
+		<ul class="list-unstyled defense-list">
+		{{#each Defenses}}
+				<li data-student="{{Student.User.Person.Email}}"  data-time="{{Time}}">
+				<input type="checkbox" data-email="{{Student.User.Person.Email}}"
+				<span class="time">[{{dateFmt Time "HH:mm" "Europe/Paris"}}]</span>
+				<i class="glyphicon {{#if Local}}glyphicon-picture{{else}}glyphicon-facetime-video{{/if}}"></i>
+				<i class="glyphicon {{#if Public}}glyphicon-eye-open{{else}} text-danger glyphicon-eye-close{{/if}}"></i>
+				<span class="click" onclick="editStudentDefense(this, '{{Student.User.Person.Email}}', '{{../Room}}','{{../Id}}')" ">{{Student.User.Person.Lastname}} ({{Student.Major}})</span>
+</li>
+			{{/each}}
+		</ul>
+Jury:
+		<ul class="defense-list">
+{{#each Juries}}
+<li>
+	<input type="checkbox" data-email="{{Person.Email}}"> {{fullname Person}}
+		<span class="pull-right">
+		<i class="click glyphicon glyphicon-remove" onclick="delDefenseJury(this, '{{../Room}}', '{{../Id}}', '{{Person.Email}}')"></i>
+		</span>
+</li>			{{/each}}
+<li>
+	<select class="jury-selecter"></select>
+	<i class="click glyphicon glyphicon-plus-sign pull-right" onclick="addDefenseJury('{{Room}}','{{Id}}', this)"></i>
+</li>
+</ul>
+
+</div>
+</div>
+</div>

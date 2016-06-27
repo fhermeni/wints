@@ -63,6 +63,11 @@ func NewEndPoints(not *notifier.Notifier, store *sqlstore.Store, convs feeder.Co
 	ed.post("/internships/:s/company", setCompany)
 	ed.post("/internships/:s/supervisor", setSupervisor)
 	ed.post("/internships/:s/tutor", setTutor)
+	ed.del("/internships/:s/defense", rmDefense)
+	ed.post("/internships/:s/defense", setStudentDefense)
+	ed.put("/internships/:s/defense", updateStudentDefense)
+	ed.get("/internships/:s/defense", studentDefense)
+	ed.post("/internships/:s/defense/grade", setDefenseGrade)
 	ed.post("/internships/", ed.newInternship)
 
 	ed.del("/surveys/:s/:k", resetSurvey)
@@ -79,6 +84,15 @@ func NewEndPoints(not *notifier.Notifier, store *sqlstore.Store, convs feeder.Co
 
 	ed.get("/logs/:k", streamLog)
 	ed.get("/logs/", logs)
+
+	ed.get("/defenses/", defenseSessions)
+	ed.post("/defenses/", newDefenseSession)
+	ed.get("/defenses/:id/:r/", defenseSession)
+	ed.del("/defenses/:id/:r", rmDefenseSession)
+	ed.post("/defenses/:id/:r/jury/", newDefenseSessionJury)
+	ed.del("/defenses/:id/:r/jury/:j", rmDefenseSessionJury)
+
+	ed.router.GET(ed.prefix+"/program/", ed.anon(ed.program))
 	ed.router.POST(ed.prefix+"/signin", ed.anon(ed.signin))
 	ed.router.POST(ed.prefix+"/resetPassword", ed.anon(ed.resetPassword))
 	ed.router.POST(ed.prefix+"/newPassword", ed.anon(ed.newPassword))
@@ -97,6 +111,10 @@ func (ed *EndPoints) get(path string, handler EndPoint) {
 
 func (ed *EndPoints) post(path string, handler EndPoint) {
 	ed.router.POST(ed.prefix+path, ed.wrap(handler))
+}
+
+func (ed *EndPoints) put(path string, handler EndPoint) {
+	ed.router.PUT(ed.prefix+path, ed.wrap(handler))
 }
 
 func (ed *EndPoints) del(path string, handler EndPoint) {
@@ -573,4 +591,107 @@ func (ed *EndPoints) setSurvey(ex Exchange) error {
 	}
 	err = ex.not.SurveyUploaded(i.Convention.Student.User, i.Convention.Tutor, i.Convention.Supervisor, s.Kind, err)
 	return ex.outJSON(s, err)
+}
+
+//Defense management
+func defenseSessions(ex Exchange) error {
+	return ex.outJSON(ex.s.DefenseSessions())
+}
+
+func (ed *EndPoints) program(ex Exchange) error {
+	return ex.outJSON(ex.s.DefenseProgram())
+}
+
+func newDefenseSession(ex Exchange) error {
+	var d schema.DefenseSession
+	err := ex.inJSON(&d)
+	if err != nil {
+		return err
+	}
+	d, err = ex.s.NewDefenseSession(d.Room, d.Id)
+	return ex.outJSON(d, err)
+}
+
+func rmDefenseSession(ex Exchange) error {
+	id := ex.V("id")
+	room := ex.V("r")
+	return ex.s.RmDefenseSession(room, id)
+}
+
+func newDefenseSessionJury(ex Exchange) error {
+	id := ex.V("id")
+	room := ex.V("r")
+	var jury string
+	if err := ex.inJSON(&jury); err != nil {
+		return err
+	}
+	if err := ex.s.AddJuryToDefenseSession(room, id, jury); err != nil {
+		return err
+	}
+	return ex.outJSON(ex.s.DefenseSession(room, id))
+}
+
+func defenseSession(ex Exchange) error {
+	id := ex.V("id")
+	room := ex.V("r")
+	return ex.outJSON(ex.s.DefenseSession(room, id))
+}
+
+func rmDefenseSessionJury(ex Exchange) error {
+	id := ex.V("id")
+	room := ex.V("r")
+	jury := ex.V("j")
+	if err := ex.s.DelJuryToDefenseSession(room, id, jury); err != nil {
+		return err
+	}
+	return ex.outJSON(ex.s.DefenseSession(room, id))
+}
+
+func setDefenseGrade(ex Exchange) error {
+	stu := ex.V("s")
+	var grade int
+	if err := ex.inJSON(&grade); err != nil {
+		return err
+	}
+	if err := ex.s.SetDefenseGrade(stu, grade); err != nil {
+		return err
+	}
+	return nil
+}
+
+func rmDefense(ex Exchange) error {
+	stu := ex.V("s")
+	return ex.s.RmDefense(stu)
+}
+
+func studentDefense(ex Exchange) error {
+	stu := ex.V("s")
+	def, err := ex.s.Defense(stu)
+	return ex.outJSON(def, err)
+}
+
+func setStudentDefense(ex Exchange) error {
+	stu := ex.V("s")
+	def := schema.Defense{}
+	if err := ex.inJSON(&def); err != nil {
+		return err
+	}
+	if err := ex.s.SetStudentDefense(def.SessionId, def.Room, stu, def.Time, def.Public, def.Local); err != nil {
+		return err
+	}
+	def, err := ex.s.Defense(stu)
+	return ex.outJSON(def, err)
+}
+
+func updateStudentDefense(ex Exchange) error {
+	stu := ex.V("s")
+	def := schema.Defense{}
+	if err := ex.inJSON(&def); err != nil {
+		return err
+	}
+	if err := ex.s.UpdateStudentDefense(stu, def.Time, def.Public, def.Local); err != nil {
+		return err
+	}
+	def, err := ex.s.Defense(stu)
+	return ex.outJSON(def, err)
 }

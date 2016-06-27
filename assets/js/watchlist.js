@@ -22,5 +22,6 @@ function loadWatchlist(interns) {
 				showReport(em, k, updateInternshipRow);
 			});
 		});
+		editableDefenseGrade(".editable-defense-grade");
 	});
 }

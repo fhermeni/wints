@@ -8,6 +8,7 @@ type NewsLetter interface {
 	TutorNewsLetter(tut schema.User, reminders []schema.StudentReports)
 }
 
+//SupervisorLetter allows to requests the missing surveys
 type SupervisorLetter interface {
 	//SurveyRequest sends the survey request to the supervisor
 	SurveyRequest(sup schema.Person, tutor schema.User, student schema.Student, survey schema.SurveyHeader, err error)

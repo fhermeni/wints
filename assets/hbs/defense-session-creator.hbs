@@ -1,0 +1,45 @@
+<div class="modal-dialog">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Defense session</h3>
+        </div>
+            <div class="modal-body">
+                <div class="form-horizontal">
+                    {{#if Id}}
+                    <label class="col-md-2 control-label">Session</label>
+                    <p class="control-static">{{Id}}</p>
+                    {{else}}
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Date</label>
+                        <div class="col-sm-9">
+                        <input id="date" type="text" data-date-format="D MMM YYYY">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">Period</label>
+                        <div class="col-sm-9">
+<label class="radio-inline">
+  <input type="radio" name="period" id="period-am" value="AM" checked> AM
+</label>
+<label class="radio-inline">
+  <input type="radio" name="period" id="period-pm" value="PM"> PM
+</label>
+                        </div>
+                    </div>
+                    {{/if}}
+                    <div class="form-group">
+                        <label for="room" class="col-sm-2 control-label">Room</label>
+                        <div class="col-sm-9">
+                            <input type="text" class="form-control" id="room" value="{{Room}}" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+            <div class="text-right">
+            <button type="button" class="btn btn-default" onclick="hideModal()">Cancel</button>
+            <button type="button" class="btn btn-success" onclick="addDefenseSession({{#if Id}}'{{Id}}'{{/if}})">Ok</button>
+            </div>
+            </div>
+    </div>
+</div>

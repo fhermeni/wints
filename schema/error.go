@@ -63,4 +63,10 @@ var (
 	ErrInvalidEmail = errors.New("Invalid email")
 	//ErrUnknownDefense declares the defense is unknown
 	ErrUnknownDefense = errors.New("Unknown defense")
+
+	//ErrDefenseSessionConflit declares a session that is in conflict with another
+	ErrDefenseSessionConflit = errors.New("There is already a session for that slot")
+	ErrDefenseExists         = errors.New("The defense is already planned")
+	ErrDefenseConflict       = errors.New("A defense is already planned for that slot")
+	ErrDefenseJuryConflict   = errors.New("The teacher is already in a jury for that period")
 )

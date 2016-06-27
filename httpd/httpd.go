@@ -36,7 +36,7 @@ func NewHTTPd(not *notifier.Notifier, store *sqlstore.Store, conventions feeder.
 		store: store,
 	}
 	//the pages
-	for _, p := range []string{"home", "login", "password", "statistics"} {
+	for _, p := range []string{"home", "login", "password", "statistics", "defense-program"} {
 		http.HandleFunc("/"+p, httpd.page(p+".html"))
 	}
 	http.HandleFunc("/", httpd.home)

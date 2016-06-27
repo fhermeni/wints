@@ -124,7 +124,7 @@
                     {{#if Delivery}}
                     <button type="button" class="btn btn-default btn-sm" disabled title="already uploaded">{{Kind}}</button>
                     {{else}}
-                    <button type="button" class="btn btn-danger btn-sm" data-placement='bottom' data-toggle="confirmation" data-on-confirm="requestSurvey(this,'{{../../I.Convention.Student.User.Person.Email}}','{{Kind}}')">
+                    <button type="button" class="btn btn-danger btn-sm" data-placement='bottom' data-toggle="confirmation" data-on-confirm="requestSurvey(this,'{{../I.Convention.Student.User.Person.Email}}','{{Kind}}')">
                         {{Kind}}
                         (<i class="glyphicon glyphicon-time"></i> {{daysSince LastInvitation}}  days.)
                     </button>

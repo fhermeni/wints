@@ -868,7 +868,7 @@ h4 {
 /* file upload */
 .btn-file {
     position: relative;
-    overflow: hidden;    
+    overflow: hidden;
 }
 /*div.bootstrap-filestyle {
 	display: inline;
@@ -889,7 +889,7 @@ h4 {
     display: block;
 }
 
-.skip {	
+.skip {
 	opacity: 0.3;
 }
 
@@ -898,12 +898,55 @@ h4 {
 }
 
 table {
-	margin-top: 2em;	
+	margin-top: 2em;
 }
 
 .waiting {
     margin-top: 2em;
     margin-bottom: 2em;
+}
+
+td.defense-planner {
+    padding-top: 2px;
+    padding-bottom: 0px
+}
+
+.defense-planner ul{
+    margin-bottom: 0px;
+    display: inline;
+}
+
+.panel-defense {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+.draggable-students li.placeholder {
+  position: relative;
+  /** More li styles **/
+  background-color:red;
+}
+.draggable-students li.placeholder:before {
+  position: absolute;
+  /** Define arrowhead **/
+  background-color:red;
+}
+
+body.dragging, body.dragging * {
+  cursor: move !important;
+}
+
+.dragged {
+  position: absolute;
+  opacity: 0.5;
+  z-index: 2000;
+}
+
+.defense-list li {
+  font-size: 9pt;
+}
+
+.student-row {
+  margin-bottom: 0em;
 }
 .has-error {
 	color: #f04124;

@@ -1,15 +1,15 @@
-<div class="row">
-<div class="col-md-6" id="dashboard-company">	
-	{{> student-dashboard-company Internship}}		
+<div class="row student-row">
+<div class="col-md-6" id="dashboard-company">
+	{{> student-dashboard-company Internship}}
 </div>
 
-<div class="col-md-6" id="student-dashboard-contacts">	
+<div class="col-md-6" id="student-dashboard-contacts">
 	{{> student-dashboard-contacts Internship}}
 </div>
 </div>
 
-<div class="row">
-<div class="col-md-6">	
+<div class="row student-row">
+<div class="col-md-6">
 <h3 class="page-header">Reports</h3>
 <p class="text-justify">
 PDF files, 10 MB max.
@@ -37,6 +37,9 @@ There is a {{Config.LatePenalty}} point penalty per day late.
 </tbody>
 </table>
 </div>
+<div class="col-md-6" id="dashboard-defense">
+</div>
+
 <div class="col-md-6" id="dashboard-alumni">
 {{> student-dashboard-alumni Internship.Convention.Student.Alumni}}
 </div>

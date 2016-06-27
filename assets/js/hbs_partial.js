@@ -137,6 +137,77 @@ Handlebars.registerPartial("conventions-convention", Handlebars.template({"1":fu
     + ((stack1 = helpers["if"].call(alias3,(depth0 != null ? depth0.Skip : depth0),{"name":"if","hash":{},"fn":container.program(13, data, 0),"inverse":container.program(15, data, 0),"data":data})) != null ? stack1 : "")
     + "\"></i>\n    </td>    \n</tr>";
 },"useData":true}));
+Handlebars.registerPartial("defense-session-3", Handlebars.template({"1":function(container,depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, helper, alias1=container.lambda, alias2=container.escapeExpression, alias3=depth0 != null ? depth0 : {}, alias4=helpers.helperMissing;
+
+  return "				<li data-student=\""
+    + alias2(alias1(((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.Student : depth0)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1), depth0))
+    + "\"  data-time=\""
+    + alias2(((helper = (helper = helpers.Time || (depth0 != null ? depth0.Time : depth0)) != null ? helper : alias4),(typeof helper === "function" ? helper.call(alias3,{"name":"Time","hash":{},"data":data}) : helper)))
+    + "\">\n				<input type=\"checkbox\" data-email=\""
+    + alias2(alias1(((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.Student : depth0)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1), depth0))
+    + "\"\n				<span class=\"time\">["
+    + alias2((helpers.dateFmt || (depth0 && depth0.dateFmt) || alias4).call(alias3,(depth0 != null ? depth0.Time : depth0),"HH:mm","Europe/Paris",{"name":"dateFmt","hash":{},"data":data}))
+    + "]</span>\n				<i class=\"glyphicon "
+    + ((stack1 = helpers["if"].call(alias3,(depth0 != null ? depth0.Local : depth0),{"name":"if","hash":{},"fn":container.program(2, data, 0, blockParams, depths),"inverse":container.program(4, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
+    + "\"></i>\n				<i class=\"glyphicon "
+    + ((stack1 = helpers["if"].call(alias3,(depth0 != null ? depth0.Public : depth0),{"name":"if","hash":{},"fn":container.program(6, data, 0, blockParams, depths),"inverse":container.program(8, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
+    + "\"></i>\n				<span class=\"click\" onclick=\"editStudentDefense(this, '"
+    + alias2(alias1(((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.Student : depth0)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1), depth0))
+    + "', '"
+    + alias2(alias1((depths[1] != null ? depths[1].Room : depths[1]), depth0))
+    + "','"
+    + alias2(alias1((depths[1] != null ? depths[1].Id : depths[1]), depth0))
+    + "')\" \">"
+    + alias2(alias1(((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.Student : depth0)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Lastname : stack1), depth0))
+    + " ("
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.Student : depth0)) != null ? stack1.Major : stack1), depth0))
+    + ")</span>\n</li>\n";
+},"2":function(container,depth0,helpers,partials,data) {
+    return "glyphicon-picture";
+},"4":function(container,depth0,helpers,partials,data) {
+    return "glyphicon-facetime-video";
+},"6":function(container,depth0,helpers,partials,data) {
+    return "glyphicon-eye-open";
+},"8":function(container,depth0,helpers,partials,data) {
+    return " text-danger glyphicon-eye-close";
+},"10":function(container,depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, alias1=container.lambda, alias2=container.escapeExpression;
+
+  return "<li>\n	<input type=\"checkbox\" data-email=\""
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.Person : depth0)) != null ? stack1.Email : stack1), depth0))
+    + "\"> "
+    + alias2((helpers.fullname || (depth0 && depth0.fullname) || helpers.helperMissing).call(depth0 != null ? depth0 : {},(depth0 != null ? depth0.Person : depth0),{"name":"fullname","hash":{},"data":data}))
+    + "\n		<span class=\"pull-right\">\n		<i class=\"click glyphicon glyphicon-remove\" onclick=\"delDefenseJury(this, '"
+    + alias2(alias1((depths[1] != null ? depths[1].Room : depths[1]), depth0))
+    + "', '"
+    + alias2(alias1((depths[1] != null ? depths[1].Id : depths[1]), depth0))
+    + "', '"
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.Person : depth0)) != null ? stack1.Email : stack1), depth0))
+    + "')\"></i>\n		</span>\n</li>			";
+},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
+    var stack1, helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
+
+  return "<div class=\"col-md-3 panel panel-defense\">\n<div class=\"panel-heading\">\n	<div class=\"panel-title\">\n		"
+    + alias4(((helper = (helper = helpers.Room || (depth0 != null ? depth0.Room : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"Room","hash":{},"data":data}) : helper)))
+    + "\n		<i class=\"click glyphicon glyphicon-plus-sign\" onclick=\"newDefenseSlot(this,'"
+    + alias4(((helper = (helper = helpers.Id || (depth0 != null ? depth0.Id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"Id","hash":{},"data":data}) : helper)))
+    + "','"
+    + alias4(((helper = (helper = helpers.Room || (depth0 != null ? depth0.Room : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"Room","hash":{},"data":data}) : helper)))
+    + "')\"></i>\n		<span class=\"pull-right\"><i class=\"text-danger click glyphicon glyphicon-remove-sign\" onclick=\"rmDefenseSession('"
+    + alias4(((helper = (helper = helpers.Room || (depth0 != null ? depth0.Room : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"Room","hash":{},"data":data}) : helper)))
+    + "','"
+    + alias4(((helper = (helper = helpers.Id || (depth0 != null ? depth0.Id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"Id","hash":{},"data":data}) : helper)))
+    + "',this)\"></i></span>\n	</div>\n	<div class=\"panel-body>\">\n		<ul class=\"list-unstyled defense-list\">\n"
+    + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.Defenses : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "		</ul>\nJury:\n		<ul class=\"defense-list\">\n"
+    + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.Juries : depth0),{"name":"each","hash":{},"fn":container.program(10, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\n<li>\n	<select class=\"jury-selecter\"></select>\n	<i class=\"click glyphicon glyphicon-plus-sign pull-right\" onclick=\"addDefenseJury('"
+    + alias4(((helper = (helper = helpers.Room || (depth0 != null ? depth0.Room : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"Room","hash":{},"data":data}) : helper)))
+    + "','"
+    + alias4(((helper = (helper = helpers.Id || (depth0 != null ? depth0.Id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"Id","hash":{},"data":data}) : helper)))
+    + "', this)\"></i>\n</li>\n</ul>\n\n</div>\n</div>\n</div>";
+},"useData":true,"useDepths":true}));
 Handlebars.registerPartial("person", Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
 
@@ -235,6 +306,23 @@ Handlebars.registerPartial("placement-student", Handlebars.template({"1":functio
     + ((stack1 = helpers["if"].call(alias3,(depth0 != null ? depth0.Skip : depth0),{"name":"if","hash":{},"fn":container.program(13, data, 0),"inverse":container.program(15, data, 0),"data":data})) != null ? stack1 : "")
     + "</tr>";
 },"useData":true}));
+Handlebars.registerPartial("session-group", Handlebars.template({"1":function(container,depth0,helpers,partials,data) {
+    var stack1;
+
+  return ((stack1 = container.invokePartial(partials["defense-session-3"],depth0,{"name":"defense-session-3","data":data,"helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "");
+},"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+    var stack1, helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3="function", alias4=container.escapeExpression;
+
+  return "<div id=\""
+    + alias4(((helper = (helper = helpers.B64 || (depth0 != null ? depth0.B64 : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"B64","hash":{},"data":data}) : helper)))
+    + "\">\n<h3 class=\"text-center\">\n    <i class=\"glyphicon glyphicon-calendar\"></i> "
+    + alias4(((helper = (helper = helpers.Id || (depth0 != null ? depth0.Id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"Id","hash":{},"data":data}) : helper)))
+    + "\n<span class=\"pull-right\">\n	<a class=\"btn btn-default\" onclick=\"userMailing('.defense-groups')\">\n    	<i class=\"glyphicon glyphicon-envelope\"></i> mail selection\n	</a>\n    <button type=\"button\" title=\"new session\" class=\"btn btn-primary\" onclick=\"showNewSession('"
+    + alias4(((helper = (helper = helpers.Id || (depth0 != null ? depth0.Id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"Id","hash":{},"data":data}) : helper)))
+    + "')\">\n    <i class=\"click glyphicon glyphicon-plus\"></i> session\n    </button>\n</span>\n</h3>\n<div class=\"row\">\n"
+    + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.Sessions : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "</div>\n</div>\n";
+},"usePartial":true,"useData":true}));
 Handlebars.registerPartial("student-dashboard-alumni", Handlebars.template({"1":function(container,depth0,helpers,partials,data) {
     return "selected";
 },"3":function(container,depth0,helpers,partials,data) {
@@ -242,9 +330,9 @@ Handlebars.registerPartial("student-dashboard-alumni", Handlebars.template({"1":
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing;
 
-  return "<h3 class=\"page-header\">Your future</h3>\n<p>\nIt is important for us to know what you will become after your internship.\nPlease indicate what will be your profesional status after the internship\nand an email address to contact you as an alumni.\n</p>\n\n<div class=\"form-horizontal\">\n<div class=\"form-group\">\n    <label for=\"lbl-email\" class=\"col-sm-2 control-label\">Email</label>\n        <div class=\"col-sm-8\">\n            <input type=\"email\" class=\"form-control\" id=\"lbl-email\" value=\""
+  return "<h3 class=\"page-header\">Your future</h3>\n<p>\nWhat will be your profesional status and your contact email after the internship ?\n</p>\n\n<div class=\"form-horizontal\">\n<div class=\"form-group\">\n    <label for=\"lbl-email\" class=\"col-sm-2 control-label\">Email</label>\n        <div class=\"col-sm-8\">\n            <input type=\"email\" class=\"form-control\" id=\"lbl-email\" value=\""
     + container.escapeExpression(((helper = (helper = helpers.Contact || (depth0 != null ? depth0.Contact : depth0)) != null ? helper : alias2),(typeof helper === "function" ? helper.call(alias1,{"name":"Contact","hash":{},"data":data}) : helper)))
-    + "\"/>\n        </div>\n</div>\n \n<div class=\"form-group\">\n    <label for=\"position\" class=\"col-sm-2 control-label\">Kind</label>\n        <div class=\"col-sm-8\">\n            <select class=\"form-control\" id=\"position\" onchange=\"syncAlumniEditor(this)\">\n                <option value=\"looking\" "
+    + "\"/>\n        </div>\n</div>\n\n<div class=\"form-group\">\n    <label for=\"position\" class=\"col-sm-2 control-label\">Kind</label>\n        <div class=\"col-sm-8\">\n            <select class=\"form-control\" id=\"position\" onchange=\"syncAlumniEditor(this)\">\n                <option value=\"looking\" "
     + ((stack1 = (helpers.ifEq || (depth0 && depth0.ifEq) || alias2).call(alias1,(depth0 != null ? depth0.Position : depth0),"looking",{"name":"ifEq","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + ">Looking for a job</option>\n                <option value=\"sabbatical\" "
     + ((stack1 = (helpers.ifEq || (depth0 && depth0.ifEq) || alias2).call(alias1,(depth0 != null ? depth0.Position : depth0),"sabbatical",{"name":"ifEq","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
@@ -254,19 +342,19 @@ Handlebars.registerPartial("student-dashboard-alumni", Handlebars.template({"1":
     + ((stack1 = (helpers.ifEq || (depth0 && depth0.ifEq) || alias2).call(alias1,(depth0 != null ? depth0.Position : depth0),"entrepreneurship",{"name":"ifEq","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + ">Entrepreneurship</option>\n                <option value=\"study\" "
     + ((stack1 = (helpers.ifEq || (depth0 && depth0.ifEq) || alias2).call(alias1,(depth0 != null ? depth0.Position : depth0),"study",{"name":"ifEq","hash":{},"fn":container.program(1, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + ">Pursuit of higher education</option>\n            </select>                            \n        </div>\n</div>\n\n<div class=\"form-group hidden\" id=\"contract\">\n    <label class=\"col-sm-2 control-label\">Contract</label>\n    <div class=\"col-sm-8\">\n        <label class=\"checkbox-inline\">\n            <input type=\"radio\" name=\"permanent\" value='false' "
+    + ">Pursuit of higher education</option>\n            </select>\n        </div>\n</div>\n\n<div class=\"form-group hidden\" id=\"contract\">\n    <label class=\"col-sm-2 control-label\">Contract</label>\n    <div class=\"col-sm-8\">\n        <label class=\"checkbox-inline\">\n            <input type=\"radio\" name=\"permanent\" value='false' "
     + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.Permanent : depth0),{"name":"unless","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "> Fixed (CDD)\n        </label>                        \n        <label class=\"checkbox-inline\">\n            <input type=\"radio\" name='permanent' value='true' "
+    + "> Fixed (CDD)\n        </label>\n        <label class=\"checkbox-inline\">\n            <input type=\"radio\" name='permanent' value='true' "
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.Permanent : depth0),{"name":"if","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "> Permanent (CDI)\n        </label>                        \n    </div>\n</div>   \n\n<div class=\"form-group hidden\" id=\"company\">\n    <label class=\"col-sm-2 control-label\">Company</label>\n    <div class=\"col-sm-8\">\n        <label class=\"checkbox-inline\">\n            <input type=\"radio\" name='sameCompany' value='true' "
+    + "> Permanent (CDI)\n        </label>\n    </div>\n</div>\n\n<div class=\"form-group hidden\" id=\"company\">\n    <label class=\"col-sm-2 control-label\">Company</label>\n    <div class=\"col-sm-8\">\n        <label class=\"checkbox-inline\">\n            <input type=\"radio\" name='sameCompany' value='true' "
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.SameCompany : depth0),{"name":"if","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "> internship company\n        </label>                        \n        <label class=\"checkbox-inline\">\n            <input type=\"radio\" name='sameCompany' value='false' "
+    + "> internship company\n        </label>\n        <label class=\"checkbox-inline\">\n            <input type=\"radio\" name='sameCompany' value='false' "
     + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.SameCompany : depth0),{"name":"unless","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "> other\n        </label>                        \n    </div>\n</div> \n\n<div class=\"form-group hidden\" id=\"country\">\n    <label class=\"col-sm-2 control-label\">Country</label>\n    <div class=\"col-sm-8\">\n        <label class=\"checkbox-inline\">\n            <input type=\"radio\" name='france' value='true' "
+    + "> other\n        </label>\n    </div>\n</div>\n\n<div class=\"form-group hidden\" id=\"country\">\n    <label class=\"col-sm-2 control-label\">Country</label>\n    <div class=\"col-sm-8\">\n        <label class=\"checkbox-inline\">\n            <input type=\"radio\" name='france' value='true' "
     + ((stack1 = helpers["if"].call(alias1,(depth0 != null ? depth0.France : depth0),{"name":"if","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "> France\n        </label>                        \n        <label class=\"checkbox-inline\">\n            <input type=\"radio\" name='france' value='false' "
+    + "> France\n        </label>\n        <label class=\"checkbox-inline\">\n            <input type=\"radio\" name='france' value='false' "
     + ((stack1 = helpers.unless.call(alias1,(depth0 != null ? depth0.France : depth0),{"name":"unless","hash":{},"fn":container.program(3, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "> Foreign country\n        </label>                        \n    </div>\n</div>                            \n\n<div class=\"text-center\">\n<button type=\"button\" class=\"btn btn-default\" onclick=\"sendAlumni()\">Update</button>\n</div>\n</div>";
+    + "> Foreign country\n        </label>\n    </div>\n</div>\n\n<div class=\"text-center\">\n<button type=\"button\" class=\"btn btn-default\" onclick=\"sendAlumni()\">Update</button>\n</div>\n</div>";
 },"useData":true}));
 Handlebars.registerPartial("student-dashboard-company", Handlebars.template({"1":function(container,depth0,helpers,partials,data) {
     var stack1, alias1=container.lambda, alias2=container.escapeExpression;
@@ -494,27 +582,13 @@ Handlebars.registerPartial("watchlist-student", Handlebars.template({"1":functio
     + container.escapeExpression((helpers.survey || (depth0 && depth0.survey) || helpers.helperMissing).call(depth0 != null ? depth0 : {},depth0,((stack1 = ((stack1 = ((stack1 = ((stack1 = (depths[1] != null ? depths[1].Convention : depths[1])) != null ? stack1.Student : stack1)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1),{"name":"survey","hash":{},"data":data}))
     + "\n";
 },"7":function(container,depth0,helpers,partials,data) {
-    var stack1, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3=container.escapeExpression;
-
-  return "    <td class=\"text-center "
-    + alias3((helpers.defenseStatus || (depth0 && depth0.defenseStatus) || alias2).call(alias1,(depth0 != null ? depth0.Defense : depth0),{"name":"defenseStatus","hash":{},"data":data}))
-    + "\"><a href=\"#\" data-value=\""
-    + alias3((helpers.defenseGrade || (depth0 && depth0.defenseGrade) || alias2).call(alias1,(depth0 != null ? depth0.Defense : depth0),{"name":"defenseGrade","hash":{},"data":data}))
-    + "\" data-type=\"text\" data-email=\""
-    + alias3(container.lambda(((stack1 = (depth0 != null ? depth0.Student : depth0)) != null ? stack1.Email : stack1), depth0))
-    + "\" class=\"grade\">"
-    + alias3((helpers.defenseGrade || (depth0 && depth0.defenseGrade) || alias2).call(alias1,(depth0 != null ? depth0.Defense : depth0),{"name":"defenseGrade","hash":{},"data":data}))
-    + "</a></td>\n";
-},"9":function(container,depth0,helpers,partials,data) {
-    return "    <td class=\"text-center\"><i>n/a</i></td>\n";
-},"11":function(container,depth0,helpers,partials,data) {
     var stack1;
 
   return "    <td class=\"text-center\" data-text=\"1\">\n        <a href=\"#\" onclick=\"showAlumni('"
     + container.escapeExpression(container.lambda(((stack1 = ((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1), depth0))
     + "')\">\n            <i class=\"glyphicon glyphicon-star-empty\"></i>\n        </a>\n    </td>\n";
-},"13":function(container,depth0,helpers,partials,data) {
-    return "    <td class=\"text-center\" data-text=\"0\"></td>           \n";
+},"9":function(container,depth0,helpers,partials,data) {
+    return "    <td class=\"text-center\" data-text=\"0\"></td>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data,blockParams,depths) {
     var stack1, alias1=container.lambda, alias2=container.escapeExpression, alias3=depth0 != null ? depth0 : {}, alias4=helpers.helperMissing;
 
@@ -532,7 +606,7 @@ Handlebars.registerPartial("watchlist-student", Handlebars.template({"1":functio
     + alias2(alias1(((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Supervisor : stack1)) != null ? stack1.Email : stack1), depth0))
     + "' data-sup-fn='"
     + alias2((helpers.fullname || (depth0 && depth0.fullname) || alias4).call(alias3,((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Supervisor : stack1),true,{"name":"fullname","hash":{},"data":data}))
-    + "'/>  \n    </td>\n    <td>\n    <a class='click fn' onclick=\"showInternship('"
+    + "'/>\n    </td>\n    <td>\n    <a class='click fn' onclick=\"showInternship('"
     + alias2(alias1(((stack1 = ((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1), depth0))
     + "')\">\n    "
     + alias2((helpers.fullname || (depth0 && depth0.fullname) || alias4).call(alias3,((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1),{"name":"fullname","hash":{},"data":data}))
@@ -550,13 +624,15 @@ Handlebars.registerPartial("watchlist-student", Handlebars.template({"1":functio
     + alias2((helpers.fullname || (depth0 && depth0.fullname) || alias4).call(alias3,((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Tutor : stack1)) != null ? stack1.Person : stack1),{"name":"fullname","hash":{},"data":data}))
     + "'>"
     + alias2((helpers.fullname || (depth0 && depth0.fullname) || alias4).call(alias3,((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Tutor : stack1)) != null ? stack1.Person : stack1),{"name":"fullname","hash":{},"data":data}))
-    + "</td>            \n"
+    + "</td>\n"
     + ((stack1 = helpers.each.call(alias3,(depth0 != null ? depth0.Reports : depth0),{"name":"each","hash":{},"fn":container.program(3, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "    \n"
-    + ((stack1 = helpers.each.call(alias3,(depth0 != null ? depth0.Surveys : depth0),{"name":"each","hash":{},"fn":container.program(5, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "\n"
-    + ((stack1 = helpers["if"].call(alias3,((stack1 = (depth0 != null ? depth0.Defense : depth0)) != null ? stack1.Defenses : stack1),{"name":"if","hash":{},"fn":container.program(7, data, 0, blockParams, depths),"inverse":container.program(9, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
-    + "                \n"
-    + ((stack1 = helpers["if"].call(alias3,((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.Alumni : stack1),{"name":"if","hash":{},"fn":container.program(11, data, 0, blockParams, depths),"inverse":container.program(13, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
-    + "</tr>    ";
+    + ((stack1 = helpers.each.call(alias3,(depth0 != null ? depth0.Surveys : depth0),{"name":"each","hash":{},"fn":container.program(5, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
+    + "\n\n    <td class=\"text-center\">\n    <span class=\"editable-defense-grade\" data-student=\""
+    + alias2(alias1(((stack1 = ((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1), depth0))
+    + "\" data-type=\"text\" data-original-title=\"Enter the grade\">\n    "
+    + alias2(alias1(((stack1 = (depth0 != null ? depth0.Defense : depth0)) != null ? stack1.Grade : stack1), depth0))
+    + "\n    </span>\n    </td>\n\n"
+    + ((stack1 = helpers["if"].call(alias3,((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.Alumni : stack1),{"name":"if","hash":{},"fn":container.program(7, data, 0, blockParams, depths),"inverse":container.program(9, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
+    + "</tr>";
 },"useData":true,"useDepths":true}));

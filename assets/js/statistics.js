@@ -1,10 +1,6 @@
 var ints;
 
-var ccountry = undefined,
-	csector = undefined,
-	calumni = undefined,
-	cMidtermDelay = undefined,
-	barGratification;
+var calumni = undefined;
 
 function loadStatistics() {
 	//IE8 stuff
@@ -22,7 +18,7 @@ function loadStatistics() {
 		ints = ii;
 		Chart.defaults.global.responsive = true;
 		Chart.defaults.global.pointDot = false;
-		Chart.defaults.global.pointDotRadius = 2;			
+		Chart.defaults.global.pointDotRadius = 2;
 
 		//Clean a bit the values
 		for (var i = 0; i < ints.length; i++) {
@@ -37,6 +33,9 @@ function loadStatistics() {
 		gratifications();
 		country();
 		sector();
+		grades('midterm');
+		grades('final');
+		surveys('midterm');
 	});
 }
 
@@ -44,121 +43,6 @@ String.prototype.endsWith = function(suffix) {
 	return this.indexOf(suffix, this.length - suffix.length) !== -1;
 };
 
-function delays(kind, type) {
-	$("li.delays").removeClass("active")
-	if (kind) {
-		delayKind = kind;
-	} else {
-		kind = delayKind;
-	}
-
-	if (type) {
-		delayType = type;
-	} else {
-		type = delayType;
-	}
-
-	$("li.delays." + kind).addClass("active")
-	$("li.delays." + type).addClass("active")
-
-	var dates = []
-	var now = new Date();
-	var missing = 0;
-	stats.forEach(function(s) {
-		s.Reports.forEach(function(r) {
-			if (r.Kind != kind) {
-				return
-			}
-			var from = new Date(r.Deadline)
-			if (type == "Delivery") {
-				if (moment(from).isAfter(moment(now))) {
-					//not passed						
-					return
-				}
-				if (new Date(r.Delivery).getTime() > 0) {
-					//delivered
-					var d = nbDays(from, new Date(r.Delivery))
-					if (d < 0) {
-						d = 0;
-					}
-					if (d > 14) {
-						d = 14
-					}
-					dates[d] = dates[d] ? dates[d] + 1 : 1
-				} else {
-					//not delivered
-					missing++;
-				}
-			} else {
-				var del = new Date(r.Delivery)
-				var rev = new Date(r.Reviewed)
-
-				if (del.getTime() > 0) {
-					if (rev.getTime() <= 0) {
-						if (r.Grade < 0) {
-							//negative means not reviewed.
-							//>0 means reviewed but no timestamp
-							missing++;
-						}
-					} else {
-						d = Math.round(nbDays(del, rev) / 7) //per week
-						dates[d] = dates[d] ? dates[d] + 1 : 1
-					}
-				}
-				/*else if (moment(from).isBefore(moment(now))) {
-					//not delivered
-					if (r.Grade >= 0 || rev.getTime() > 0) {
-						//but reviewed
-						d = Math.round(nbDays(del, rev) / 7) //per week
-						console.log(d);
-						dates[d] = dates[d] ? dates[d] + 1 : 1
-					}
-				}*/
-			}
-		})
-	});
-	$("#delays").closest(".hidden").removeClass('hidden')
-	var keys = Object.keys(dates).map(function(x) {
-		if (type == "Delivery") {
-			return x + " d.";
-		} else {
-			return x + " w.";
-		}
-	})
-	if (type == "Delivery") {
-		keys[keys.length - 1] = "14 d. +";
-	}
-	keys.push("missing")
-	var values = Object.keys(dates).map(function(x) {
-		return dates[x];
-	})
-	values.push(missing)
-
-	var late = $("#delays").html("").append("<canvas></canvas>").find("canvas").get(0).getContext("2d");
-	var data = {
-		labels: keys,
-		datasets: [line(values)]
-	}
-	cMidtermDelay = new Chart(late).Bar(data, {
-		showTooltip: false
-	});
-}
-
-function nbDays(from, to) {
-	return moment(to).dayOfYear() - moment(from).dayOfYear();
-}
-
-function ddply(arr) {
-	var res = [arr[0]];
-	for (var i = 1; i < arr.length; i++) {
-		if (arr[i] == arr[i - 1]) {
-			res[i] = "";
-		} else {
-			res[i] = arr[i];
-		}
-	}
-	return res
-}
 
 function gratifications(filter) {
 	$("li.gratification").removeClass("active")
@@ -167,111 +51,81 @@ function gratifications(filter) {
 	} else {
 		$("li.gratification." + filter).addClass("active")
 	}
-	
+
 	var qty = [];
 	var all = 0;
 	ints.forEach(function(s) {
 		g = s.Convention.Gratification;
 		all += g;
-		var idx = index(s, filter);		
+		var idx = index(s, filter);
 		if (!qty[idx]) {
 			qty[idx] = [];
-		}			
+		}
 		qty[idx].push(g);
-	});		
+	});
 	for (var i = 0; i < qty.length; i++) {
 		qty[i] = Math.round(avg(qty[i]));
-	}	
+	}
 	if (!filter) {
 		$("#how-much").html(Math.round(qty[0]) + "€");
 	} else {
 		if (filter == "country" || filter == "sector") {
 			$("#how-much").html("<h1>" + Math.round(qty[0]) + "€ / " + Math.round(qty[1]) + "€</h1>");
-		} else {			
+		} else {
 			c = $("<canvas>");
-			data = dataset(filter == "promotion" ? config.Promotions : config.Majors, "gratifications", qty);	
-			c = $("#how-much").html(c).find("canvas");			
+			data = dataset(filter == "promotion" ? config.Promotions : config.Majors, "gratifications", qty);
+			c = $("#how-much").html(c).find("canvas");
 			ctx = c.get(0).getContext("2d");
 			new Chart(ctx).Bar(data);
-		} 
+		}
 	}
 }
 
 function grades(kind, filter) {
-	$("li.grades-" + kind).removeClass("active")
+	//Toggles coordination
+	$("li.grades-"+kind).removeClass("active");
 	if (!filter) {
-		$("li.grades-" + kind + ".all").addClass("active")
+		$("li.grades-"+kind+".all").addClass("active");
 	} else {
-		$("li.grades-" + kind + "." + filter).addClass("active")
+		$("li.grades-"+kind+".filter").addClass("active");
 	}
 
-	var byMajor = [];
-	var qty = [
-		[],
-		[]
-	];
-	for (var i = 0; i < allMajors.length; i++) {
-		byMajor.push([])
-	}
-	var all = 0
-	var nb = 0
-	stats.forEach(function(s) {
-		s.Reports.forEach(function(r) {
-			if (r.Kind == kind && r.Grade > 0 && new Date(r.Delivery).getTime() > 0) {
-				g = r.Grade
-				nb++
-				all += g
-				if (filter == "promotion") {
-					qty[s.Promotion == "SI" ? 0 : 1].push(g)
-				} else if (filter == "major") {
-					byMajor[allMajors.indexOf(s.Major)].push(g);
+	var qty = [];
+	var done = 0;
+	ints.forEach(function(s) {
+		s.Reports.forEach(function (r) {
+			if (r.Kind != kind) {
+				return;
+			}
+			if (r.Reviewed) {
+				var idx = index(s, filter);
+				if (!qty[idx]) {
+					qty[idx] = [];
 				}
+				qty[idx].push(r.Grade);
+				done++;
 			}
 		})
 	});
-	//Hide when no data
-	if (nb) {
-		$("#grades-" + kind).closest(".hidden").removeClass('hidden')
+	for (var i = 0; i < qty.length; i++) {
+		qty[i] = avg(qty[i]);
+		if (qty[i] != undefined) {
+			qty[i] = qty[i].toFixed(1);
+		}
 	}
 
+	if (done < ints.length / 2) {
+		$("#grades-" + kind).html("<h4>Not enough data</h4>");
+		return;
+	}
 	if (!filter) {
-		num = all / nb
-		$("#grades-" + kind).html(num.toFixed(2) + " / 20");
+		$("#grades-" + kind).html("<h1>" + qty[0] + " / 20</h1>");
 	} else {
-		if (filter == "major") {
-			var avgs = []
-			for (var i = 0; i < byMajor.length; i++) {
-				avgs.push(avg(byMajor[i]).toFixed(2))
-			}
-			c = $("<canvas>")
-			data = {
-				labels: allMajors,
-				datasets: [{
-					label: "Gratification",
-					fillColor: "#F7464A",
-					highlightFill: "#FF5A5E",
-					data: avgs
-				}, ]
-			}
-			c = $("#grades-" + kind).html("").append(c).find("canvas")
-			ctx = c.get(0).getContext("2d");
-			grat = new Chart(ctx).Bar(data);
-		} else {
-			avgs = [avg(qty[0]).toFixed(2), avg(qty[1]).toFixed(2)]
-			c = $("<canvas>")
-			data = {
-				labels: ["SI", "master"],
-				datasets: [{
-					label: "Gratification",
-					fillColor: "#F7464A",
-					highlightFill: "#FF5A5E",
-					data: avgs
-				}, ]
-			}
-			c = $("#grades-" + kind).html("").append(c).find("canvas")
-			ctx = c.get(0).getContext("2d");
-			grat = new Chart(ctx).Bar(data);
-		}
+		c = $("<canvas>");
+		data = dataset(filter == "promotion" ? config.Promotions : config.Majors, "Grade", qty);
+		c = $("#grades-" + kind).html(c).find("canvas");
+		ctx = c.get(0).getContext("2d");
+		new Chart(ctx).Bar(data);
 	}
 }
 
@@ -279,42 +133,42 @@ function surveys(kind) {
 	$("li.surveys").removeClass("active")
 	$("li.surveys-" + kind).addClass("active")
 
-	var all = 0
-	var nb = 0
-	var grades = 0;
-	stats.forEach(function(stat) {
+	var res={};
+	ints.forEach(function(stat) {
 		stat.Surveys.forEach(function(s) {
-			if (s.Kind != kind) {
+			if (!res[kind]) {
+				res[kind] = [];
+			}
+			if (s.Kind != kind ||!s.Delivery) {
 				return
 			}
-			var q = s.Answers
-			if (q && Object.keys(q).length > 0) {
-				nb++
-				if (kind == "midterm" && q[19] == "true") {
-					all++
-				} else if (kind == "final") {
-					grades += parseInt(q["q17"])
-				}
+
+			var mark = s.Cnt["__MARK__"];
+			if (mark === "false") {
+				res[kind].push(0);
+			} else if (mark === "true") {
+				res[kind].push(100);
+			} else {
+				res[kind].push(mark);
 			}
 		})
 	});
-	//Hide when no data
-	if (nb) {
-		var num = Math.round(all / nb * 100)
+	//Hide when there is less than 50% of answers
+	var output = "<h4>not enough data</h4>";
+	if (res[kind].length > ints.length / 2) {
 		if (kind == "midterm") {
-			$("#surveys").html(num + "%");
-		} else if (kind == "final") {
-			var avg = grades / nb;
-			$("#surveys").html(avg.toFixed(2) + " / 20");
-		}
-		$("#surveys").closest(".hidden ").removeClass('hidden')
+			output = "<h1>"+Math.round(avg(res[kind]))+"%</h1><h4>are satisfied by their intern</h4>";
+		} else if(kind=="final") {
 
+			output = "<h1>"+avg(res[kind]).toFixed(2) + " / 20</h1>";
+		}
 	}
+	$("#surveys").html(output);
 }
 
 
 function employers(ints) {
-	var c2 = {}	
+	var c2 = {}
 	ints.forEach(function(s) {
 		www = s.Convention.Company.WWW;
 		if (www) {
@@ -331,7 +185,7 @@ function employers(ints) {
 }
 
 
-function country(filter) {	
+function country(filter) {
 	//Toggles coordination
 	$("li.country").removeClass("active")
 	if (!filter) {
@@ -342,30 +196,30 @@ function country(filter) {
 
 	var qty = [];
 	var total = [];
-	
+
 	ints.forEach(function(s) {
-		var idx = index(s, filter);		
+		var idx = index(s, filter);
 		if (!qty[idx]) {
 			qty[idx] = 0;
 			total[idx] = 0;
-		}	
+		}
 		if (s.Convention.ForeignCountry) {
 			qty[idx]++;
-		}		
+		}
 		total[idx]++;
-	});	
+	});
 
-	
+
 	for (var i = 0; i < qty.length; i++) {
 		qty[i] = pct(qty[i],total[i]);
 	}
-	
+
 	if (!filter) {
 		$("#country").html("<h1>" + qty[0] + "%</h1>");
-	} else {		
+	} else {
 		c = $("<canvas>");
-		data = dataset(filter == "promotion" ? config.Promotions : config.Majors, "foreign country", qty);	
-		c = $("#country").html(c).find("canvas");			
+		data = dataset(filter == "promotion" ? config.Promotions : config.Majors, "foreign country", qty);
+		c = $("#country").html(c).find("canvas");
 		ctx = c.get(0).getContext("2d");
 		new Chart(ctx).Bar(data);
 	}
@@ -387,7 +241,7 @@ var possiblePositions = [
 var colors = ["#4D4D4D", "#5DA5DA", '#FAA43A', '#60BD68', '#F17CB0', '#B2912F', '#B276B2', '#DECF3F', '#F15854', "#DDDDDD"];
 
 
-function showAlumni(filter) {
+function showAlumniStatistics(filter) {
 	if (!filter) filter = "all"
 	$("li.alumni.filter").removeClass("active")
 	$("li.alumni.filter." + filter).addClass("active")
@@ -425,7 +279,7 @@ function showAlumni(filter) {
 	}
 }
 
-function sector(filter) {	
+function sector(filter) {
 	$("li.sector").removeClass("active")
 	if (!filter) {
 		$("li.sector.all").addClass("active")
@@ -435,29 +289,29 @@ function sector(filter) {
 
 	var qty = [];
 	var total = [];
-	
+
 	ints.forEach(function(s) {
-		var idx = index(s, filter);		
+		var idx = index(s, filter);
 		if (!qty[idx]) {
 			qty[idx] = 0;
 			total[idx] = 0;
-		}	
+		}
 		if (!s.Convention.Lab) {
 			qty[idx]++;
-		}		
+		}
 		total[idx]++;
-	});	
-	
+	});
+
 	for (var i = 0; i < qty.length; i++) {
 		qty[i] = pct(qty[i],total[i]);
 	}
-	
+
 	if (!filter) {
 		$("#sector").html("<h1>" + qty[0] + "%</h1>");
 	} else {
 		c = $("<canvas>");
-		data = dataset(filter == "promotion" ? config.Promotions : config.Majors, "in company", qty);	
-		c = $("#sector").html(c).find("canvas");			
+		data = dataset(filter == "promotion" ? config.Promotions : config.Majors, "in company", qty);
+		c = $("#sector").html(c).find("canvas");
 		ctx = c.get(0).getContext("2d");
 		new Chart(ctx).Bar(data);
 	}
@@ -475,14 +329,14 @@ function sector(filter) {
 function index(i, filter) {
 		if (filter == "promotion") {
 			return config.Promotions.indexOf(i.Convention.Student.Promotion);
-		} else if (filter == "sector") {			
+		} else if (filter == "sector") {
 			return i.Convention.Lab ? 0 : 1;
 		} else if (filter == "country") {
 			return i.Convention.ForeignCountry ? 0 : 1;
 		} else if (filter == "major") {
 			return config.Majors.indexOf(i.Convention.Student.Major);
-		}			
-		return 0	
+		}
+		return 0
 }
 
 function avg(values) {
@@ -499,10 +353,7 @@ function avg(values) {
 }
 
 function pct(a, b) {
-	if (a === undefined) {
-		return a;
-	}
-	return Math.round(a / b * 100);
+	return a === undefined ? a : Math.round(a / b * 100);
 }
 
 function zeroes(nb) {
@@ -514,11 +365,11 @@ function zeroes(nb) {
 }
 
 function dataset(labels, title, d) {
-	var i = d.length;	
+	var i = d.length;
 	while (i--) {
-		if (isNaN(d[i])) {			
-			d.splice(i, 1);			
-			labels.splice(i, 1);			
+		if (isNaN(d[i])) {
+			d.splice(i, 1);
+			labels.splice(i, 1);
 		}
 	}
 	return { labels: labels,
@@ -530,18 +381,5 @@ function dataset(labels, title, d) {
             		highlightStroke: "rgba(220,220,220,1)",
 					data: d,
 				}, ]
-	};		
-}
-
-function line(dta) {
-	return {
-		label: "Pick up date",
-		fillColor: "rgba(220,220,220,0.2)",
-		strokeColor: "rgba(220,220,220,1)",
-		pointColor: "rgba(220,220,220,1)",
-		pointStrokeColor: "#fff",
-		pointHighlightFill: "#fff",
-		pointHighlightStroke: "rgba(220,220,220,1)",
-		data: dta
 	};
 }

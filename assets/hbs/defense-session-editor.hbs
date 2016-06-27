@@ -1,0 +1,54 @@
+<div class="modal-dialog">
+<div class="modal-content">
+    <div class="modal-header">
+        <h3 class="modal-title">Session <i class="glyphicon glyphicon-calendar"></i> {{dateFmt Date "DD MMM A"}}, <i class="glyphicon glyphicon-map-marker"></i> {{Room}}
+        </h3>
+    </div>
+    <div class="modal-body">
+
+<h4>Students</h4>
+<ul class="agenda list-unstyled">
+    {{#each Defenses}}
+        {{> defense-editable this}}
+    {{/each}}
+
+    <li>
+        <select id="student-selecter">
+        {{#each Internships}}
+            <option value="{{Convention.Student.User.Person.Email}}">{{fullname Convention.Student.User.Person}} {{Convention.Student.Promotion}} / {{Convention.Student.Major}}</option>
+        {{/each}}
+        </select>
+        <span class="pull-right">
+            <i onclick="setStudentDefense(this, '{{Room}}','{{Date}}')" class="click glyphicon glyphicon-plus"></i>
+        </span>
+    </li>
+</ul>
+
+<h4>Jury</h4>
+<ul>
+    {{#each Juries}}
+    <li data-jury="{{Person.Email}}">{{fullname Person true}}
+            <span class="pull-right">
+                <i onclick="delDefenseJury(this, '{{../Room}}','{{../Date}}', '{{Person.Email}}')" class="click glyphicon glyphicon-remove"></i>
+            </span>
+    </li>
+    {{/each}}
+    <li>
+        <select id="jury-selecter" class="available-jury">
+        {{#each Teachers}}
+            <option value="{{Person.Email}}">{{fullname Person true}}</option>
+        {{/each}}
+        </select>
+        <span class="pull-right">
+            <i onclick="addDefenseJury(this, '{{Room}}','{{Date}}')" class="click glyphicon glyphicon-plus"></i>
+        </span>
+    </li>
+</ul>
+
+</div>
+<div class="modal-footer">
+    <div class="text-right">
+        <button type="button" class="btn btn-default" onclick="hideModal()">Done</button>
+    </div>
+</div>
+</div>

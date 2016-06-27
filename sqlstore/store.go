@@ -125,6 +125,12 @@ func mapCstrToError(err error) error {
 			return schema.ErrUnknownStudent
 		case "fk_conventions_tutor":
 			return schema.ErrUserTutoring
+		case "pk_defensejuries", "pk_jury":
+			return schema.ErrDefenseJuryConflict
+		case "pk_defenses_student":
+			return schema.ErrDefenseExists
+		case "pk_defensesessions":
+			return schema.ErrDefenseConflict
 		}
 	}
 	return err

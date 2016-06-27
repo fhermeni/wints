@@ -1,0 +1,18 @@
+<div id="{{B64}}">
+<h3 class="text-center">
+    <i class="glyphicon glyphicon-calendar"></i> {{Id}}
+<span class="pull-right">
+	<a class="btn btn-default" onclick="userMailing('.defense-groups')">
+    	<i class="glyphicon glyphicon-envelope"></i> mail selection
+	</a>
+    <button type="button" title="new session" class="btn btn-primary" onclick="showNewSession('{{Id}}')">
+    <i class="click glyphicon glyphicon-plus"></i> session
+    </button>
+</span>
+</h3>
+<div class="row">
+{{#each Sessions}}
+{{> defense-session-3 this}}
+{{/each}}
+</div>
+</div>

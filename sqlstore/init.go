@@ -2,7 +2,7 @@ package sqlstore
 
 const (
 	create = `drop table if exists aliases cascade;
-drop table if exists users cascade;        
+drop table if exists users cascade;
 drop table if exists sessions cascade;
 drop table if exists password_renewal cascade;
 drop table if exists students cascade;
@@ -26,7 +26,7 @@ create table users(
 
 create table aliases(
     email text,
-    real text,    
+    real text,
     constraint fk_aliases_real FOREIGN KEY(real) REFERENCES users(email) on delete cascade on update cascade
 );
 create table sessions(
@@ -39,7 +39,7 @@ create table sessions(
 
 
 create table password_renewal(
-    email text,    
+    email text,
     token text unique,
     constraint pk_password_renewal_email PRIMARY KEY(email),
     constraint fk_password_renewal_email FOREIGN KEY(email) REFERENCES users(email) on delete cascade on update cascade
@@ -61,7 +61,7 @@ create table students(
 );
 
 create table conventions(
-    student text,    
+    student text,
     startTime timestamp without time zone,
     endTime timestamp without time zone,
     tutor text,
@@ -94,7 +94,7 @@ create table reports(
     comment text,
     private boolean,
     cnt bytea,
-    toGrade bool,                        
+    toGrade bool,
     constraint pk_reports_student PRIMARY KEY(student, kind),
     constraint fk_reports_student FOREIGN KEY(student) REFERENCES students(email) on delete cascade on update cascade
 );
@@ -116,29 +116,31 @@ create table surveys(
 create index surveys_deadline on surveys(deadline asc);
 
 create table defenseSessions(
-    date timestamp without time zone,
-    room text,    
-    constraint pk_defenseSessions PRIMARY KEY(date, room)
+    id text,
+    room text,
+    constraint pk_defenseSessions PRIMARY KEY(id, room)
 );
 
 create table defenseJuries(
-    date timestamp without time zone,
+    id text,
     room text,
     jury text,
     constraint fk_defenseJuries FOREIGN KEY(jury) REFERENCES users(email) on delete cascade on update cascade,
-    constraint pk_defenseJuries PRIMARY KEY(date, room, jury),
-    constraint fk_defenseJuries_session FOREIGN KEY(date, room) REFERENCES defenseSessions(date, room) on delete cascade    
+    constraint pk_defenseJuries PRIMARY KEY(id, jury), -- cannot be on multiple jury at the same period
+    constraint fk_defenseJuries_session FOREIGN KEY(id, room) REFERENCES defenseSessions(id, room) on delete cascade on update cascade
 );
 
 create table defenses(
-    date timeStamp without time zone,
+    id text,
     room text,
     student text,
     grade integer,
     private bool,
     local bool,
+    date timestamp without time zone,
     constraint pk_defenses_student PRIMARY KEY(student),
+    constraint unique_defense UNIQUE(date, room, id), --soft no conflict
     constraint fk_defenses_student FOREIGN KEY(student) REFERENCES students(email) on delete cascade on update cascade,
-    constraint fk_defenses_session FOREIGN KEY(date, room) REFERENCES defenseSessions(date, room) on delete cascade on update cascade
+    constraint fk_defenses_session FOREIGN KEY(id, room) REFERENCES defenseSessions(id, room) on delete cascade on update cascade
 );`
 )

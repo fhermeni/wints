@@ -16,8 +16,8 @@ function showWait() {
 	$("#cnt").html(waitingBlock);
 }
 
-function loadSuccess(data) {	
-	myself = data;	
+function loadSuccess(data) {
+	myself = data;
 	$("#fullname").html(myself.Person.Lastname + ", " + myself.Person.Firstname);
 
 	//my options
@@ -25,7 +25,7 @@ function loadSuccess(data) {
 		$(".role-" + i).removeClass("hidden");
 	}
 
-	//homepage	
+	//homepage
 	if (level(myself.Role) == STUDENT_LEVEL) {
 		showStudent();
 	} else if (level(myself.Role) >= MAJOR_LEVEL) {
@@ -94,9 +94,10 @@ function ui() {
 }
 
 function showAlumni(student) {
-	internship(student).done(function(i) {		
+	internship(student).done(function(i) {
 		$("#modal").render("alumni-modal", i.Convention.Student, function() {
 			var val = i.Convention.Student.Alumni.Position;
+
 			if (val == "sabbatical") {
 				$("#country").addClass("hidden");
 				$("#contract").addClass("hidden");
@@ -141,7 +142,7 @@ function updateInternshipRow(em) {
 
 function showInternship(em, edit) {
 	if (!edit || level(myself.Role) < ADMIN_LEVEL) {
-		internship(em).done(function(i) {			
+		internship(em).done(function(i) {
 			internshipModal(i, [], edit && level(myself.Role) >= ADMIN_LEVEL);
 		}).fail(logFail);
 	} else {
@@ -149,7 +150,7 @@ function showInternship(em, edit) {
 			i = i[0];
 			uss = uss[0].filter(function(u) {
 				return level(u.Role) != STUDENT_LEVEL && u.Person.Email != i.Convention.Tutor.Person.Email;
-			});			
+			});
 			internshipModal(i, uss, edit);
 		}).fail(logFail);
 	}
@@ -163,7 +164,7 @@ function resetSurvey(btn, student, kind) {
 }
 
 function requestSurvey(btn, student, kind) {
-	postRequestSurvey(student, kind).done(function(data, status, xhr) {		
+	postRequestSurvey(student, kind).done(function(data, status, xhr) {
 		defaultSuccess(data, status, xhr);
 		$(btn).html(kind);
 	}).fail(notifyError);
@@ -174,6 +175,6 @@ function internshipModal(i, uss, edit) {
 		I: i,
 		Editable: edit,
 		Teachers: uss
-	}	
+	}
 	$("#modal").render("convention-detail", dta, showModal);
 }

@@ -98,6 +98,10 @@ type Survey struct {
 type Crons struct {
 	//NewsLetters is the waiting time between two news letters
 	NewsLetters string
+	//Surveys is the waiting time between two scan for missing surveys
+	Surveys string
+	//Idles is the waiting time between two scan for missing student connections
+	Idles string
 }
 
 //Config aggregates all the subcomponents configuration parameters

@@ -13,13 +13,14 @@ function showStudentDashboard(m) {
 	};
 	Object.keys(mine.Reports).forEach(function(kind) {
 		var passed = moment(mine.Reports[kind].Deadline).isBefore(moment());
-		var r = mine.Reports[kind];		
-		mine.Reports[kind].Open = isReportUpdloadeable(r);		
+		var r = mine.Reports[kind];
+		mine.Reports[kind].Open = isReportUpdloadeable(r);
 		mine.Reports[kind].Email = myself.Person.Email;
 	});
 	$("#cnt").render("student-dashboard", data, function() {
 		syncAlumniEditor($("#position"))
 		ui()
+		showMyDefense();
 	});
 }
 
@@ -35,6 +36,15 @@ function showAlumniEditor() {
 	$("#modal").render("student-dashboard-alumni-editor", mine.Convention.Student.Alumni, showModal);
 }
 
+function showMyDefense() {
+	getDefense(myself.Person.Email).done(function (def) {
+		getDefenseSession(def.Room, def.SessionId).done(function(ss) {
+			console.log(ss);
+			ss.Defense = def;
+			$("#dashboard-defense").render("student-dashboard-defense",ss);
+		});
+	});
+}
 function updateCompany() {
 	if (empty("#lbl-name") || empty("#lbl-title") || empty("#lbl-www")) {
 		return;
@@ -47,7 +57,7 @@ function updateCompany() {
 	postCompany(myself.Person.Email, cpy).done(refreshCompany).fail(notifyError);
 }
 
-function sendSupervisor() {	
+function sendSupervisor() {
 	if (empty("#sup-fn") || empty("#sup-ln") || empty("#sup-tel") || empty("#sup-email")) {
 		return;
 	}
@@ -132,7 +142,7 @@ function loadReport(input, kind) {
 		return
 	}
 	var reader = new FileReader();
-	reader.onload = function(e) {			
+	reader.onload = function(e) {
 		return reportLoaded(kind, reader.result);
 	};
 	reader.readAsArrayBuffer(file);
@@ -148,7 +158,7 @@ function reportLoaded(kind, cnt) {
 }
 
 //can upload if not reviewed and either the deadline passed or not passed but not uploaded
-function isReportUpdloadeable(r) {	
+function isReportUpdloadeable(r) {
 	var passed = moment(r.Deadline).isBefore(moment());
 	return !r.Reviewed && (!passed || !r.Delivery);
 }
@@ -158,7 +168,7 @@ function isReportReviewable(r) {
 	return passed;
 }
 
-function refreshReports(r) {	
+function refreshReports(r) {
 	hideModal();
 	r.Open = isReportUpdloadeable(r);
 	r.Email = myself.Person.Email;
@@ -167,7 +177,7 @@ function refreshReports(r) {
 }
 
 
-function progress(ev) {	
+function progress(ev) {
 	var val = (ev.loaded / ev.total) * 100;
 	$("#progress-value")
 		.attr('aria-valuenow', Math.round(val))
@@ -177,7 +187,7 @@ function progress(ev) {
 
 function showReportComment(kind) {
 	mine.Reports.forEach(function(r) {
-		if (r.Kind == kind) {		
+		if (r.Kind == kind) {
 			$("#modal").render("raw", {
 				Title: "Comments for report '" + kind + "'",
 				Cnt: r.Comment

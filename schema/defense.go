@@ -4,17 +4,22 @@ import "time"
 
 //Defense depicts the defense of a student
 type Defense struct {
-	Private bool
-	Local   bool
-	Grade   int
-	Time    time.Time
-	Room    string
+	Room      string
+	SessionId string
+	Public    bool
+	Local     bool
+	Grade     int
+	Time      time.Time
+	Student   Student
+	Company   Company
 }
 
 //DefenseSession groups all the defenses that occurs during a session
 type DefenseSession struct {
 	Juries   []User
-	Defenses map[string]Defense
+	Defenses []Defense
+	Id       string
+	Room     string
 }
 
 //InJury check if a user is a part of a jury
@@ -25,4 +30,21 @@ func (s DefenseSession) InJury(em string) bool {
 		}
 	}
 	return false
+}
+
+func (d Defense) Anonymise() {
+	d.Grade = -1
+	d.Student.User.Person.Email = ""
+	d.Student.User.LastVisit = nil
+}
+
+func (s DefenseSession) Anonymise() {
+	for idx, d := range s.Defenses {
+		d.Anonymise()
+		s.Defenses[idx] = d
+	}
+	for idx, j := range s.Juries {
+		j.Person.Email = ""
+		s.Juries[idx] = j
+	}
 }
