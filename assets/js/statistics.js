@@ -82,7 +82,6 @@ function gratifications(filter) {
 }
 
 function grades(kind, filter) {
-	//Toggles coordination
 	$("li.grades-"+kind).removeClass("active");
 	if (!filter) {
 		$("li.grades-"+kind+".all").addClass("active");
@@ -113,7 +112,7 @@ function grades(kind, filter) {
 			qty[i] = qty[i].toFixed(1);
 		}
 	}
-
+	console.log(qty);
 	if (done < ints.length / 2) {
 		$("#grades-" + kind).html("<h4>Not enough data</h4>");
 		return;

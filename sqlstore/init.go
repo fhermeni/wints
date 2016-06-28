@@ -135,7 +135,7 @@ create table defenses(
     room text,
     student text,
     grade integer,
-    private bool,
+    public bool,
     local bool,
     date timestamp without time zone,
     constraint pk_defenses_student PRIMARY KEY(student),
