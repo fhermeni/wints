@@ -100,9 +100,9 @@ func runSpies() {
 	if err := c.AddFunc(cfg.Crons.Surveys, func() { jobs.MissingSurveys(store, not) }); err != nil {
 		fatal("Unable to cron the missing survey scanner", err)
 	}
-	if err := c.AddFunc(cfg.Crons.Idles, func() { jobs.NeverLogged(store, not) }); err != nil {
+	/*if err := c.AddFunc(cfg.Crons.Idles, func() { jobs.NeverLogged(store, not) }); err != nil {
 		fatal("Unable to cron the idle student scanner", err)
-	}
+	}*/
 
 	c.Start()
 }

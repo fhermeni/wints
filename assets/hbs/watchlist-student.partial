@@ -29,7 +29,7 @@ data-sup='{{Convention.Supervisor.Email}}' data-sup-fn='{{fullname Convention.Su
 
     <td class="text-center">
     <span class="editable-defense-grade" data-student="{{Convention.Student.User.Person.Email}}" data-type="text" data-original-title="Enter the grade">
-    {{Defense.Grade}}
+    {{defenseGrade Defense}}
     </span>
     </td>
 

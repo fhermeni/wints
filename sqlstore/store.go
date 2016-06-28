@@ -100,6 +100,13 @@ func nullableBool(t sql.NullBool, def bool) bool {
 	return def
 }
 
+func nullableInt(t sql.NullInt64, def int) int {
+	if t.Valid {
+		return int(t.Int64)
+	}
+	return def
+}
+
 func noRowsTo(got error, with error) error {
 	if got == sql.ErrNoRows {
 		return with

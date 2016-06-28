@@ -221,6 +221,27 @@ Handlebars.registerHelper('grade', function(r) {
 	return new Handlebars.SafeString(buf);
 });
 
+Handlebars.registerHelper('defenseGrade', function(d) {
+	var buf = "";
+	if (!d.Time) {
+		return "-"; //no defense planned
+	}
+	if (d.Grade == -1) {
+		return "?"
+	}
+	return d.Grade;
+});
+
+/*
+	if (d.Grade == -1) {
+		return "<td data-text='-1'>?</span>"; //not passed
+	} else {
+		if (d.Grade < 10) {
+			return "<td data-text='" + d.Grade + "' class='bg-danger'>" + d.Grade + "</span>"; //baad
+		}
+		return "<td data-text='" + d.Grade + "' class='bg-danger'>" + d.Grade + "</span>"; //baad
+	}
+*/
 
 Handlebars.registerHelper('survey', function(s, stu) {
 	var value = -10;

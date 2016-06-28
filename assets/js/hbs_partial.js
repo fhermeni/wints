@@ -631,7 +631,7 @@ Handlebars.registerPartial("watchlist-student", Handlebars.template({"1":functio
     + "\n\n    <td class=\"text-center\">\n    <span class=\"editable-defense-grade\" data-student=\""
     + alias2(alias1(((stack1 = ((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1), depth0))
     + "\" data-type=\"text\" data-original-title=\"Enter the grade\">\n    "
-    + alias2(alias1(((stack1 = (depth0 != null ? depth0.Defense : depth0)) != null ? stack1.Grade : stack1), depth0))
+    + alias2((helpers.defenseGrade || (depth0 && depth0.defenseGrade) || alias4).call(alias3,(depth0 != null ? depth0.Defense : depth0),{"name":"defenseGrade","hash":{},"data":data}))
     + "\n    </span>\n    </td>\n\n"
     + ((stack1 = helpers["if"].call(alias3,((stack1 = ((stack1 = (depth0 != null ? depth0.Convention : depth0)) != null ? stack1.Student : stack1)) != null ? stack1.Alumni : stack1),{"name":"if","hash":{},"fn":container.program(7, data, 0, blockParams, depths),"inverse":container.program(9, data, 0, blockParams, depths),"data":data})) != null ? stack1 : "")
     + "</tr>";

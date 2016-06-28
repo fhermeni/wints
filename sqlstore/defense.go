@@ -64,9 +64,7 @@ func (s *Store) Defense(student string) (schema.Defense, error) {
 	if err != nil {
 		return d, err
 	}
-	if grade.Valid {
-		d.Grade = int(grade.Int64)
-	}
+	d.Grade = nullableInt(grade, -1)
 
 	ints, err := s.Internship(student)
 	if err != nil {
@@ -96,9 +94,7 @@ func (s *Store) defenses() (map[string]schema.Defense, error) {
 			&d.Public,
 			&d.Local,
 		)
-		if grade.Valid {
-			d.Grade = int(grade.Int64)
-		}
+		d.Grade = nullableInt(grade, -1)
 		if err != nil {
 			return defs, err
 		}
