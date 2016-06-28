@@ -124,7 +124,7 @@ function get(URL) {
 	return $.ajax({
 		method: "GET",
 		url: ROOT_API + URL,
-	}).fail(notifyError)
+	});
 }
 
 function del(URL, ok, no) {

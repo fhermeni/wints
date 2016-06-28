@@ -39,7 +39,6 @@ function showAlumniEditor() {
 function showMyDefense() {
 	getDefense(myself.Person.Email).done(function (def) {
 		getDefenseSession(def.Room, def.SessionId).done(function(ss) {
-			console.log(ss);
 			ss.Defense = def;
 			$("#dashboard-defense").render("student-dashboard-defense",ss);
 		});
