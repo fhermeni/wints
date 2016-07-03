@@ -679,8 +679,7 @@ func setStudentDefense(ex Exchange) error {
 	if err := ex.s.SetStudentDefense(def.SessionId, def.Room, stu, def.Time, def.Public, def.Local); err != nil {
 		return err
 	}
-	def, err := ex.s.Defense(stu)
-	return ex.outJSON(def, err)
+	return ex.outJSON(ex.s.Defense(stu))
 }
 
 func updateStudentDefense(ex Exchange) error {
@@ -692,6 +691,5 @@ func updateStudentDefense(ex Exchange) error {
 	if err := ex.s.UpdateStudentDefense(stu, def.Time, def.Public, def.Local); err != nil {
 		return err
 	}
-	def, err := ex.s.Defense(stu)
-	return ex.outJSON(def, err)
+	return ex.outJSON(ex.s.Defense(stu))
 }
