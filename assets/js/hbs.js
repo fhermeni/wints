@@ -830,7 +830,7 @@ this["wints"]["templates"]["student-dashboard-defense"] = Handlebars.template({"
   return "<h3 class=\"page-header\">Oral defense <small>(<a href=\"assets/consignes-rapports.pdf\">organisation</a>)</small></h3>\n<dl class=\"dl-horizontal\">\n        <dt>Room</dt>\n        <dd>"
     + alias3(((helper = (helper = helpers.Room || (depth0 != null ? depth0.Room : depth0)) != null ? helper : alias2),(typeof helper === "function" ? helper.call(alias1,{"name":"Room","hash":{},"data":data}) : helper)))
     + "</dd>\n        <dt>Date</dt>\n        <dd>"
-    + alias3((helpers.dateFmt || (depth0 && depth0.dateFmt) || alias2).call(alias1,((stack1 = (depth0 != null ? depth0.Defense : depth0)) != null ? stack1.Time : stack1),"DD MMM HH:MM","Europe/Paris",{"name":"dateFmt","hash":{},"data":data}))
+    + alias3((helpers.dateFmt || (depth0 && depth0.dateFmt) || alias2).call(alias1,((stack1 = (depth0 != null ? depth0.Defense : depth0)) != null ? stack1.Time : stack1),"DD MMM HH:mm","Europe/Paris",{"name":"dateFmt","hash":{},"data":data}))
     + " (<i>Paris timezone</i>)</dd>\n        <dt>On site ?</dt>\n        <dd>"
     + ((stack1 = helpers["if"].call(alias1,((stack1 = (depth0 != null ? depth0.Defense : depth0)) != null ? stack1.Local : stack1),{"name":"if","hash":{},"fn":container.program(1, data, 0),"inverse":container.program(3, data, 0),"data":data})) != null ? stack1 : "")
     + "</dd>\n        <dt>Public ?</dt>\n        <dd>"
