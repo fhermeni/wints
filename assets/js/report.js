@@ -34,11 +34,18 @@ function showReportModal(i, kind) {
 			return false;
 		}
 	});
+	if (!r) {
+		notifyError("No '"+ kind + "' report available");
+		return;
+	}
+	console.log(r);
 	r.Email = i.Convention.Student.User.Person.Email;
 	r.Tutor = i.Convention.Tutor.Person.Email;
 	$("#modal").render("report-modal", r, function() {
 		$("#report-deadline").datetimepicker();
-		showModal();
+		showModal(function () {
+			$("#report-deadline").data("DateTimePicker").date(moment(r.Deadline));
+		});
 	});
 }
 
@@ -60,10 +67,10 @@ function netGrade(r) {
 function review(student, kind, toGrade) {
 	if (empty("#comment")|| (toGrade && empty("#grade"))) {
 		return;
-	}	
+	}
 
 	var comment = $("#comment").val();
-	var g = $("#grade").val();	
+	var g = $("#grade").val();
 	postReview(student, kind, comment, parseInt(g)).done(function(dta, status, xhr) {
 		updateInternshipRow(student);
 		defaultSuccess({}, status, xhr);
