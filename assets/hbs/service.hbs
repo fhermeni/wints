@@ -23,7 +23,7 @@
     {{#each this}}
         <tr data-email="{{@key}}">
             <td>
-                <input class="shiftSelectable" type='checkbox' data-user-fn='{{fullname U.Person true}}'/>
+                <input class="shiftSelectable" type='checkbox' data-user-fn='{{fullname U.Person true}}' data-email='{{U.Person.Email}}' />
             </td>
             <td class="text-left fn">
                 {{> person U.Person}}

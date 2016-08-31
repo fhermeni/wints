@@ -752,7 +752,9 @@ this["wints"]["templates"]["service"] = Handlebars.template({"1":function(contai
     + alias4(((helper = (helper = helpers.key || (data && data.key)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"key","hash":{},"data":data}) : helper)))
     + "\">\n            <td>\n                <input class=\"shiftSelectable\" type='checkbox' data-user-fn='"
     + alias4((helpers.fullname || (depth0 && depth0.fullname) || alias2).call(alias1,((stack1 = (depth0 != null ? depth0.U : depth0)) != null ? stack1.Person : stack1),true,{"name":"fullname","hash":{},"data":data}))
-    + "'/>\n            </td>\n            <td class=\"text-left fn\">\n"
+    + "' data-email='"
+    + alias4(container.lambda(((stack1 = ((stack1 = (depth0 != null ? depth0.U : depth0)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1), depth0))
+    + "' />\n            </td>\n            <td class=\"text-left fn\">\n"
     + ((stack1 = container.invokePartial(partials.person,((stack1 = (depth0 != null ? depth0.U : depth0)) != null ? stack1.Person : stack1),{"name":"person","data":data,"indent":"                ","helpers":helpers,"partials":partials,"decorators":container.decorators})) != null ? stack1 : "")
     + "            </td>\n            <td data-text=\""
     + alias4(((helper = (helper = helpers.TotalInts || (depth0 != null ? depth0.TotalInts : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"TotalInts","hash":{},"data":data}) : helper)))
