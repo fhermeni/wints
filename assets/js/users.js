@@ -1,5 +1,5 @@
-$(document).on('change', '.btn-file :file', function() {	
-	var input = $(this);	
+$(document).on('change', '.btn-file :file', function() {
+	var input = $(this);
 	var numFiles = input.get(0).files ? input.get(0).files.length : 1,
 		label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
 	input.trigger('fileselect', [numFiles, label]);
@@ -88,7 +88,7 @@ function usersUI() {
 	ui();
 }
 
-function loadUsers(uss, ints) {	
+function loadUsers(uss, ints) {
 	if (!ints[0]) {
 		ints[0] = [];
 	}
@@ -102,10 +102,10 @@ function loadUsers(uss, ints) {
 		blocked[i.Convention.Tutor.Person.Email] = true;
 	});
 	var allUsers = uss[0];
-	allUsers.forEach(function(u, idx) {		
+	allUsers.forEach(function(u, idx) {
 		allUsers[idx].Resetable = (level(u.Role) != STUDENT_LEVEL || got[u.Person.Email]);
 		allUsers[idx].Blocked = blocked[u.Person.Email];
-	});	
+	});
 	$("#cnt").render("users-header", allUsers, usersUI);
 }
 
@@ -198,20 +198,20 @@ function parseCSV(e) {
 			Promotion: among(fields[3].toLowerCase(), config.Promotions),
 			Major: among(fields[4].toLowerCase(), config.Majors)
 		};
-		var req = postStudent(p).done(doneStudentImport, true).fail(function(xhr) {			
+		var req = postStudent(p).done(doneStudentImport, true).fail(function(xhr) {
 			failStudentImport(p, xhr)
 		});
 	});
 	$("#csv-import").val("");
 }
 
-function updateImportStatus() {	
+function updateImportStatus() {
 	if (stats.Errors.length + stats.Ignored.length != 0) {
 		$("#import-status").removeClass("hidden")
 	}
 }
 
-function showImportError() {	
+function showImportError() {
 	$("#modal").render("import-error", stats, showModal)
 }
 
@@ -225,10 +225,10 @@ function failStudentImport(student, xhr) {
 		stats.Ignored.push({
 			Student: student,
 			Reason: xhr.responseText
-		});		
+		});
 	} else {
 		notifyError(xhr);
-	}	
+	}
 	updateImportStatus()
 }
 
