@@ -426,7 +426,7 @@ this["wints"]["templates"]["defense-session-editor"] = Handlebars.template({"1":
     + alias3(((helper = (helper = helpers.Date || (depth0 != null ? depth0.Date : depth0)) != null ? helper : alias2),(typeof helper === alias4 ? helper.call(alias1,{"name":"Date","hash":{},"data":data}) : helper)))
     + "')\" class=\"click glyphicon glyphicon-plus\"></i>\n        </span>\n    </li>\n</ul>\n\n<h4>Jury</h4>\n<ul>\n"
     + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.Juries : depth0),{"name":"each","hash":{},"fn":container.program(5, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "    <li>\n        <select id=\"jury-selecter\" class=\"available-jury\">\n"
+    + "    <li>\n        <select id=\"jury-selecter\" class=\"available-jury fn\">\n"
     + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.Teachers : depth0),{"name":"each","hash":{},"fn":container.program(7, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "        </select>\n        <span class=\"pull-right\">\n            <i onclick=\"addDefenseJury(this, '"
     + alias3(((helper = (helper = helpers.Room || (depth0 != null ? depth0.Room : depth0)) != null ? helper : alias2),(typeof helper === alias4 ? helper.call(alias1,{"name":"Room","hash":{},"data":data}) : helper)))

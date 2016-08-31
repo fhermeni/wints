@@ -27,6 +27,7 @@ function groupById(sessions) {
 function showDefenses(defs, us) {
 	//split students and potential juries
 	teachers = us[0].filter(function(u) { return level(u.Role) != STUDENT_LEVEL});
+	teachers.sort(function(a, b) { a.Person.Lastname.localeCompare(b.Person.Lastname);});
 	if (defs[0] == null) {
 		defs[0] = [];
 	}

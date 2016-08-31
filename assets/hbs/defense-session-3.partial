@@ -27,7 +27,7 @@ Jury:
 		</span>
 </li>			{{/each}}
 <li>
-	<select class="jury-selecter"></select>
+	<select class="jury-selecter fn"></select>
 	<i class="click glyphicon glyphicon-plus-sign pull-right" onclick="addDefenseJury('{{Room}}','{{Id}}', this)"></i>
 </li>
 </ul>

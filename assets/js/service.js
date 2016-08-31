@@ -17,8 +17,6 @@ function computeService(ints, ss) {
 	ints = ints[0];
 	ss = ss[0];
 
-	console.log(ints);
-	console.log(ss);
 	var service = {};
 	ints.forEach(function(i) {
 		var em = i.Convention.Tutor.Person.Email;

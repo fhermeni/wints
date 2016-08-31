@@ -202,7 +202,7 @@ Handlebars.registerPartial("defense-session-3", Handlebars.template({"1":functio
     + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.Defenses : depth0),{"name":"each","hash":{},"fn":container.program(1, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "		</ul>\nJury:\n		<ul class=\"defense-list\">\n"
     + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.Juries : depth0),{"name":"each","hash":{},"fn":container.program(10, data, 0, blockParams, depths),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "\n<li>\n	<select class=\"jury-selecter\"></select>\n	<i class=\"click glyphicon glyphicon-plus-sign pull-right\" onclick=\"addDefenseJury('"
+    + "\n<li>\n	<select class=\"jury-selecter fn\"></select>\n	<i class=\"click glyphicon glyphicon-plus-sign pull-right\" onclick=\"addDefenseJury('"
     + alias4(((helper = (helper = helpers.Room || (depth0 != null ? depth0.Room : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"Room","hash":{},"data":data}) : helper)))
     + "','"
     + alias4(((helper = (helper = helpers.Id || (depth0 != null ? depth0.Id : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"Id","hash":{},"data":data}) : helper)))
