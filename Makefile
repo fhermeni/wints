@@ -7,11 +7,11 @@ all: install test
 
 
 build:
-	@echo "==== go build ===="		
+	@echo "==== go build ===="
 	@go build $(GOFLAGS) ./...
 
 install:
-	@echo "==== install ===="	
+	@echo "==== install ===="
 	@go install -ldflags "-X main.Version=${VERSION}" $(GOFLAGS) .
 
 vet:
@@ -22,19 +22,19 @@ lint:
 	@echo "==== go lint ===="
 	@golint ./**/*.go
 
-test: build vet lint	
+test: build vet lint
 	@echo "==== go test ===="
-	@go test $(GOFLAGS) ./...	
+	@go test $(GOFLAGS) ./...
 
 test-integration: install
 	@echo "==== integration test ===="
 	@go test -v -tags "integration" ./...
 
-errcheck:	
+errcheck:
 	@echo "==== errcheck ===="
 	@errcheck ./...
 
-cov: install	
+cov: install
 	@echo "==== coverage ===="
 	$(eval COVER := $(shell mktemp))
 	@echo $(COVER)
@@ -51,9 +51,9 @@ clean:
 assets:
 	@echo "=== production level assets ==="
 	@gulp assets --production
-	
+
 deploy: install assets
 	@git add assets
-	@git commit -m "production level assets"	
+	@git commit -m "production level assets"
 	@echo "=== deploy ==="
 	@git push wints
