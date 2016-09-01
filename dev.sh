@@ -35,6 +35,7 @@ install)
 	go get -u github.com/kisielk/errcheck
 	go get -u golang.org/x/text/encoding/charmap
 	go get -u github.com/maruel/panicparse/cmd/pp
+	go get -u github.com/stathat/go
 	;;
 *)
 	echo "usage $0 (run|install)"

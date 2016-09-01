@@ -38,6 +38,7 @@ type Convention struct {
 func (c *Convention) Anonymise() {
 	c.Company.Anonymise()
 	c.Student.User.Person.Anonymise()
+	c.Student.Alumni = nil
 	c.Tutor.Person.Anonymise()
 	c.Supervisor.Anonymise()
 }
