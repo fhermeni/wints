@@ -2,6 +2,7 @@
 package logger
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -10,11 +11,14 @@ import (
 	"sort"
 	"sync"
 	"time"
+
+	"github.com/stathat/go"
 )
 
 type defaultLogger struct {
 	path  string
 	mutex sync.Mutex
+	key   string
 }
 
 //MultiLogger specifies an interface to log multiple sources than can be streamed
@@ -23,6 +27,9 @@ type MultiLogger interface {
 	Read(kind string) (io.ReadCloser, error)
 	Logs() ([]string, error)
 	Log(kind, tag, msg string, err error)
+	ReportHit(lbl string)
+	ReportValue(lbl string, v int)
+	Trace(key string)
 }
 
 var (
@@ -36,7 +43,12 @@ func init() {
 	Default = &defaultLogger{
 		path:  "./",
 		mutex: sync.Mutex{},
+		key:   "",
 	}
+}
+
+func (m *defaultLogger) Trace(key string) {
+	m.key = key
 }
 
 //SetRoot set the folder where the log files will be stored
@@ -104,6 +116,23 @@ func (m *defaultLogger) Log(kind, tag, msg string, e error) {
 	out.Printf("%s - %s %s\n", tag, msg, status)
 }
 
+func (m *defaultLogger) ReportHit(label string) {
+	if len(m.key) > 0 {
+		stathat.PostEZCount(label, m.key, 1)
+	} else {
+		m.Log("trace", "hit", label, nil)
+	}
+}
+
+func (m *defaultLogger) ReportValue(label string, v int) {
+	if len(m.key) > 0 {
+		stathat.PostEZCount(label, m.key, v)
+	} else {
+		s := fmt.Sprintf("%s : %d", label, v)
+		m.Log("trace", "value", s, nil)
+	}
+}
+
 //SetRoot set the folder where the log files will be stored
 func SetRoot(p string) error {
 	return Default.SetRoot(p)
@@ -122,4 +151,12 @@ func Logs() ([]string, error) {
 //Read stream the required log file
 func Read(kind string) (io.ReadCloser, error) {
 	return Default.Read(kind)
+}
+
+func ReportHit(label string) {
+	Default.ReportHit(label)
+}
+
+func ReportValue(label string, v int) {
+	Default.ReportValue(label, v)
 }

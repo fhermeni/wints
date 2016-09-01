@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/fhermeni/wints/logger"
-	"github.com/stathat/go"
 )
 
 //MonResponseWriter embeds a responsewriter to save the status code
@@ -54,16 +53,31 @@ func Mon(h http.HandlerFunc) http.HandlerFunc {
 			ms := int(time.Since(start).Nanoseconds() / 1000000)
 			msg := fmt.Sprintf("\"%s\" %d %d", r.URL.String(), myRw.Status(), ms)
 			logger.Log("access", r.Method, msg, nil)
-			stathat.PostEZValue("API latency", "fabien.hermenier@unice.fr", float64(ms))
-			if myRw.Status() >= 500 {
-				stathat.PostEZCount("HTTP 5xx", "fabien.hermenier@unice.fr", 1)
-			} else if myRw.Status() >= 400 {
-				stathat.PostEZCount("HTTP 4xx", "fabien.hermenier@unice.fr", 1)
-			} else if myRw.Status() >= 200 {
-				stathat.PostEZCount("HTTP 2xx", "fabien.hermenier@unice.fr", 1)
-			}
 
+			codeFamily := myRw.Status() / 100
+			logApi(r.Method, codeFamily, ms)
 		}()
 		h(myRw, r)
 	}
+}
+
+func logApi(method string, family, latency int) {
+
+	//operation nature
+	op := "write"
+	if method == "GET" || method == "HEAD" {
+		op = "read"
+	}
+
+	//The hit (2 metrics)
+	lbl := fmt.Sprintf("API %s hit", op)
+	logger.ReportHit(lbl)
+
+	//The associated latency (2 metrics)
+	lbl = fmt.Sprintf("API %s latency", op)
+	logger.ReportValue(lbl, latency)
+
+	//The status code
+	lbl = fmt.Sprintf("Status %dxx", family)
+	logger.ReportHit(lbl)
 }

@@ -31,7 +31,6 @@ type Rest struct {
 	RenewalRequestLifetime Duration
 	//The endpoints prefix
 	Prefix string
-	Trace  bool
 }
 
 //HTTPd configures the http daemon
@@ -48,6 +47,7 @@ type HTTPd struct {
 //Journal configures the logging system
 type Journal struct {
 	Path string
+	Key  string
 }
 
 //Internships declare the internship organization

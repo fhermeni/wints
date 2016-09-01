@@ -14,7 +14,6 @@ import (
 	"github.com/fhermeni/wints/schema"
 	"github.com/fhermeni/wints/session"
 	"github.com/fhermeni/wints/sqlstore"
-	"github.com/stathat/go"
 )
 
 //EndPoints is a wrapper to embeds a set of Rest endpoints
@@ -107,10 +106,6 @@ func NewEndPoints(not *notifier.Notifier, store *sqlstore.Store, convs feeder.Co
 type EndPoint func(Exchange) error
 
 func (ed *EndPoints) get(path string, handler EndPoint) {
-	ed.getAndTrace(path, handler, false)
-}
-
-func (ed *EndPoints) getAndTrace(path string, handler EndPoint, trace bool) {
 	ed.router.GET(ed.prefix+path, ed.wrap(handler))
 }
 
@@ -171,7 +166,7 @@ func (ed *EndPoints) anon(fn EndPoint) httptreemux.HandlerFunc {
 
 func (ed *EndPoints) wrap(fn EndPoint) httptreemux.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request, ps map[string]string) {
-		stathat.PostEZCount("API hit", "fabien.hermenier@unice.fr", 1)
+
 		//Create a session
 		s, err := ed.openSession(w, r)
 		if err != nil {
@@ -322,7 +317,7 @@ func internships(ex Exchange) error {
 
 	ms := int(time.Since(start).Nanoseconds() / 1000000)
 	e := ex.outJSON(ss, err)
-	stathat.PostEZValue("GET /internships/", "fabien.hermenier@unice.fr", float64(ms))
+	logger.ReportValue("GET internships/", ms)
 	return e
 }
 
@@ -331,7 +326,8 @@ func internship(ex Exchange) error {
 	ss, err := ex.s.Internship(ex.V("s"))
 	ms := int(time.Since(start).Nanoseconds() / 1000000)
 	e := ex.outJSON(ss, err)
-	stathat.PostEZValue("GET /internships/%s", "fabien.hermenier@unice.fr", float64(ms))
+
+	logger.ReportValue("GET /internships/%s", ms)
 	return e
 }
 
