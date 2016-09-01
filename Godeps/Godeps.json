@@ -1,6 +1,7 @@
 {
 	"ImportPath": "github.com/fhermeni/wints",
 	"GoVersion": "go1.7",
+	"GodepVersion": "v74",
 	"Deps": [
 		{
 			"ImportPath": "code.google.com/p/go.crypto/bcrypt",
@@ -32,19 +33,19 @@
 		},
 		{
 			"ImportPath": "github.com/klauspost/compress/flate",
-			"Rev": "2dd54ae854d6f6f64cc1171fb1df2a633eba4356"
+			"Rev": "f9625351863b5e94c1da72862187b8fe9a91af90"
 		},
 		{
 			"ImportPath": "github.com/klauspost/compress/gzip",
-			"Rev": "2dd54ae854d6f6f64cc1171fb1df2a633eba4356"
+			"Rev": "f9625351863b5e94c1da72862187b8fe9a91af90"
 		},
 		{
 			"ImportPath": "github.com/klauspost/cpuid",
-			"Rev": "349c675778172472f5e8f3a3e0fe187e302e5a10"
+			"Rev": "2c698c6aef5976c7860074cc7040e8af7866aa21"
 		},
 		{
 			"ImportPath": "github.com/klauspost/crc32",
-			"Rev": "a3b15ae34567abb20a22992b989cd76f48d09c47"
+			"Rev": "19b0b332c9e4516a6370a0456e6182c3b5036720"
 		},
 		{
 			"ImportPath": "github.com/lib/pq",
