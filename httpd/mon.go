@@ -57,8 +57,10 @@ func Mon(h http.HandlerFunc) http.HandlerFunc {
 			stathat.PostEZValue("API latency", "fabien.hermenier@unice.fr", float64(ms))
 			if myRw.Status() >= 500 {
 				stathat.PostEZCount("HTTP 5xx", "fabien.hermenier@unice.fr", 1)
-			} else if myRw.Status() >= 500 {
+			} else if myRw.Status() >= 400 {
 				stathat.PostEZCount("HTTP 4xx", "fabien.hermenier@unice.fr", 1)
+			} else if myRw.Status() >= 200 {
+				stathat.PostEZCount("HTTP 2xx", "fabien.hermenier@unice.fr", 1)
 			}
 
 		}()
