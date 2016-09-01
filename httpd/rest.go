@@ -14,6 +14,7 @@ import (
 	"github.com/fhermeni/wints/schema"
 	"github.com/fhermeni/wints/session"
 	"github.com/fhermeni/wints/sqlstore"
+	"github.com/stathat/go"
 )
 
 //EndPoints is a wrapper to embeds a set of Rest endpoints
@@ -106,6 +107,10 @@ func NewEndPoints(not *notifier.Notifier, store *sqlstore.Store, convs feeder.Co
 type EndPoint func(Exchange) error
 
 func (ed *EndPoints) get(path string, handler EndPoint) {
+	ed.getAndTrace(path, handler, false)
+}
+
+func (ed *EndPoints) getAndTrace(path string, handler EndPoint, trace bool) {
 	ed.router.GET(ed.prefix+path, ed.wrap(handler))
 }
 
@@ -310,13 +315,23 @@ func newStudent(ex Exchange) error {
 }
 
 func internships(ex Exchange) error {
+	start := time.Now()
+
 	ss, err := ex.s.Internships()
-	return ex.outJSON(ss, err)
+
+	ms := int(time.Since(start).Nanoseconds() / 1000000)
+	e := ex.outJSON(ss, err)
+	stathat.PostEZValue("GET /internships/", "fabien.hermenier@unice.fr", float64(ms))
+	return e
 }
 
 func internship(ex Exchange) error {
+	start := time.Now()
 	ss, err := ex.s.Internship(ex.V("s"))
-	return ex.outJSON(ss, err)
+	ms := int(time.Since(start).Nanoseconds() / 1000000)
+	e := ex.outJSON(ss, err)
+	stathat.PostEZValue("GET /internships/%s", "fabien.hermenier@unice.fr", float64(ms))
+	return e
 }
 
 func reportContent(ex Exchange) error {

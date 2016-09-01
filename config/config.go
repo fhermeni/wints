@@ -31,6 +31,7 @@ type Rest struct {
 	RenewalRequestLifetime Duration
 	//The endpoints prefix
 	Prefix string
+	Trace  bool
 }
 
 //HTTPd configures the http daemon

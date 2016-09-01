@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/fhermeni/wints",
-	"GoVersion": "go1.6",
+	"GoVersion": "go1.7",
 	"Deps": [
 		{
 			"ImportPath": "code.google.com/p/go.crypto/bcrypt",
@@ -60,6 +60,10 @@
 			"ImportPath": "github.com/robfig/cron",
 			"Comment": "v1-2-g67823cd",
 			"Rev": "67823cd24dece1b04cced3a0a0b3ca2bc84d875e"
+		},
+		{
+			"ImportPath": "github.com/stathat/go",
+			"Rev": "74669b9f388d9d788c97399a0824adbfee78400e"
 		},
 		{
 			"ImportPath": "golang.org/x/text/encoding",
