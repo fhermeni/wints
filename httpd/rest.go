@@ -171,6 +171,7 @@ func (ed *EndPoints) anon(fn EndPoint) httptreemux.HandlerFunc {
 
 func (ed *EndPoints) wrap(fn EndPoint) httptreemux.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request, ps map[string]string) {
+		stathat.PostEZCount("API hit", "fabien.hermenier@unice.fr", 1)
 		//Create a session
 		s, err := ed.openSession(w, r)
 		if err != nil {
