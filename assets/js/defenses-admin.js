@@ -186,9 +186,11 @@ function editStudentDefense(elmt,stu, room, id) {
 	$(elmt).closest(".panel").addClass("active");
 	getDefense(stu).done(function (def) {
 		$("#modal").render("defense-editor",def, function () {
-			$("#defense-time").datetimepicker();
+			$("#defense-time").datetimepicker({stepping: 30, timeZone: 'Europe/Paris'})
 			$("#modal").find(".btn-primary").attr("onclick", "updateStudentDefense('"+ stu + "','" + room + "','" + id + "')").html("Update");
-			showModal();
+			showModal(function() {
+				$("#defense-time").data("DateTimePicker").date(moment(def.Time));
+			})
 		});
 	});
 }
