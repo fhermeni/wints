@@ -147,6 +147,9 @@ func main() {
 	}
 
 	err = logger.SetRoot(cfg.Journal.Path)
+	if len(cfg.Journal.Key) > 0 {
+		logger.Trace(cfg.Journal.Key)
+	}
 	fatal("Initiating the logger", err)
 	fatal("Running Version '"+Version+"'", nil)
 	cfg.Internships.Version = Version
