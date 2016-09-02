@@ -160,3 +160,7 @@ func ReportHit(label string) {
 func ReportValue(label string, v int) {
 	Default.ReportValue(label, v)
 }
+
+func Trace(key string) {
+	Default.Trace(key)
+}
