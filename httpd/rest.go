@@ -317,7 +317,7 @@ func internships(ex Exchange) error {
 
 	ms := int(time.Since(start).Nanoseconds() / 1000000)
 	e := ex.outJSON(ss, err)
-	logger.ReportValue("list internships", ms)
+	logger.ReportValue("list internships", float64(ms))
 	return e
 }
 
@@ -327,7 +327,7 @@ func internship(ex Exchange) error {
 	ms := int(time.Since(start).Nanoseconds() / 1000000)
 	e := ex.outJSON(ss, err)
 
-	logger.ReportValue("one internship", ms)
+	logger.ReportValue("one internship", float64(ms))
 	return e
 }
 

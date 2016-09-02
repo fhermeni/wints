@@ -75,7 +75,7 @@ func logApi(method string, family, latency int) {
 
 	//The associated latency (2 metrics)
 	lbl = fmt.Sprintf("API %s latency", op)
-	logger.ReportValue(lbl, latency)
+	logger.ReportValue(lbl, float64(latency))
 
 	//The status code
 	lbl = fmt.Sprintf("Status %dxx", family)

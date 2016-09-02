@@ -124,9 +124,9 @@ func (m *defaultLogger) ReportHit(label string) {
 	}
 }
 
-func (m *defaultLogger) ReportValue(label string, v int) {
+func (m *defaultLogger) ReportValue(label string, v float64) {
 	if len(m.key) > 0 {
-		stathat.PostEZCount(label, m.key, v)
+		stathat.PostEZValue(label, m.key, v)
 	} else {
 		s := fmt.Sprintf("%s : %d", label, v)
 		m.Log("trace", "value", s, nil)
@@ -157,7 +157,7 @@ func ReportHit(label string) {
 	Default.ReportHit(label)
 }
 
-func ReportValue(label string, v int) {
+func ReportValue(label string, v float64) {
 	Default.ReportValue(label, v)
 }
 
