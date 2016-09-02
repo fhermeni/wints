@@ -235,7 +235,7 @@ func (n *Notifier) SurveyRequest(sup schema.Person, tutor schema.User, student s
 		EnDate: survey.Deadline.Format("Mon, 02 Jan 2006"),
 	}
 	if err == nil {
-		err = n.mailer.Send(sup, "survey_request.txt", dta, tutor.Person)
+		err = n.mailer.Send(sup, "survey_request.txt", dta)
 	}
 	logger.Log("event", "cron", "send invitation for survey '"+student.User.Person.Email+"/"+survey.Kind+"' to '"+sup.Email+"'", err)
 	return err
