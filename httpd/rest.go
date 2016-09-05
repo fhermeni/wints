@@ -611,7 +611,18 @@ func defenseSessions(ex Exchange) error {
 }
 
 func (ed *EndPoints) program(ex Exchange) error {
-	return ex.outJSON(ex.s.DefenseProgram())
+	p, err := ex.s.DefenseProgram()
+	if err == nil {
+		for i, session := range p {
+			for ii, d := range session.Defenses {
+				d.Grade = -10
+				d.Student.Alumni = nil
+				session.Defenses[ii] = d
+			}
+			p[i] = session
+		}
+	}
+	return ex.outJSON(p, err)
 }
 
 func newDefenseSession(ex Exchange) error {

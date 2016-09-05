@@ -32,10 +32,16 @@ func (s DefenseSession) InJury(em string) bool {
 	return false
 }
 
-func (d Defense) Anonymise() {
+func (d *Defense) Anonymise() {
 	d.Grade = -1
 	d.Student.User.Person.Email = ""
 	d.Student.User.LastVisit = nil
+	d.Room = ""
+	d.SessionId = ""
+	d.Public = true
+	d.Local = true
+	d.Time = time.Now()
+	d.Student.Alumni = nil
 }
 
 func (s DefenseSession) Anonymise() {

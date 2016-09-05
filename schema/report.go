@@ -32,8 +32,7 @@ func (m *ReportHeader) In() bool {
 	return m.Delivery != nil
 }
 
-//Anonymise the report grade and comment
+//Anonymise the report comment
 func (m *ReportHeader) Anonymise() {
-	m.Grade = -10
 	m.Comment = ""
 }

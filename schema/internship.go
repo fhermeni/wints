@@ -66,6 +66,7 @@ func (i *Internship) Anonymise() {
 		hdr.Anonymise()
 		i.Surveys[idx] = hdr
 	}
+	i.Defense.Anonymise()
 }
 
 //Internships aliases slices of internship to exhibit filtering methods
