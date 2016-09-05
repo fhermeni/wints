@@ -31,7 +31,7 @@ This is the defenses you are attending as a jury member.
         <th>Student</th>
         <th>Promotion / Major</th>
         <th class="text-center">Grade</th>
-        <th>Alumni</th>
+        <th class="text-center">Alumni</th>
     </tr>
     </thead>
     <tbody>
@@ -54,7 +54,16 @@ This is the defenses you are attending as a jury member.
       <span class="editable-grade" data-student="{{Student.User.Person.Email}}" data-type="text" data-original-title="Enter the grade">{{Grade}}
       </span>
       </td>
-      <td>-</td>
+
+      {{#if Student.Alumni}}
+        <td class="text-center" data-text="1">
+          <a href="#" onclick="showAlumni('{{Student.User.Person.Email}}')">
+              <i class="glyphicon glyphicon-star-empty"></i>
+          </a>
+        </td>
+      {{else}}
+        <td class="text-center" data-text="0"></td>
+      {{/if}}
       </tr>
     {{/each}}
     </tbody>

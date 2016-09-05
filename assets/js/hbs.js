@@ -516,7 +516,7 @@ this["wints"]["templates"]["my-defenses"] = Handlebars.template({"1":function(co
     + alias4(((helper = (helper = helpers.Room || (depth0 != null ? depth0.Room : depth0)) != null ? helper : alias2),(typeof helper === alias3 ? helper.call(alias1,{"name":"Room","hash":{},"data":data}) : helper)))
     + "\n      <span class=\"pull-right\">\n"
     + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.Juries : depth0),{"name":"each","hash":{},"fn":container.program(2, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
-    + "      </span>\n      </th>\n    </tr>\n    <tr>\n        <th></th>\n        <th>Time</th>\n        <th>Student</th>\n        <th>Promotion / Major</th>\n        <th class=\"text-center\">Grade</th>\n        <th>Alumni</th>\n    </tr>\n    </thead>\n    <tbody>\n"
+    + "      </span>\n      </th>\n    </tr>\n    <tr>\n        <th></th>\n        <th>Time</th>\n        <th>Student</th>\n        <th>Promotion / Major</th>\n        <th class=\"text-center\">Grade</th>\n        <th class=\"text-center\">Alumni</th>\n    </tr>\n    </thead>\n    <tbody>\n"
     + ((stack1 = helpers.each.call(alias1,(depth0 != null ? depth0.Defenses : depth0),{"name":"each","hash":{},"fn":container.program(5, data, 0),"inverse":container.noop,"data":data})) != null ? stack1 : "")
     + "    </tbody>\n</table>\n";
 },"2":function(container,depth0,helpers,partials,data) {
@@ -550,11 +550,21 @@ this["wints"]["templates"]["my-defenses"] = Handlebars.template({"1":function(co
     + alias2(alias1(((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.Student : depth0)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1), depth0))
     + "\" data-type=\"text\" data-original-title=\"Enter the grade\">"
     + alias2(((helper = (helper = helpers.Grade || (depth0 != null ? depth0.Grade : depth0)) != null ? helper : alias4),(typeof helper === "function" ? helper.call(alias3,{"name":"Grade","hash":{},"data":data}) : helper)))
-    + "\n      </span>\n      </td>\n      <td>-</td>\n      </tr>\n";
+    + "\n      </span>\n      </td>\n\n"
+    + ((stack1 = helpers["if"].call(alias3,((stack1 = (depth0 != null ? depth0.Student : depth0)) != null ? stack1.Alumni : stack1),{"name":"if","hash":{},"fn":container.program(10, data, 0),"inverse":container.program(12, data, 0),"data":data})) != null ? stack1 : "")
+    + "      </tr>\n";
 },"6":function(container,depth0,helpers,partials,data) {
     return "      <i class=\"glyphicon glyphicon-facetime-video\" title=\"visio\"></i>\n";
 },"8":function(container,depth0,helpers,partials,data) {
     return "      <i class=\"glyphicon glyphicon-eye-close\" title=\"private\"></i>\n";
+},"10":function(container,depth0,helpers,partials,data) {
+    var stack1;
+
+  return "        <td class=\"text-center\" data-text=\"1\">\n          <a href=\"#\" onclick=\"showAlumni('"
+    + container.escapeExpression(container.lambda(((stack1 = ((stack1 = ((stack1 = (depth0 != null ? depth0.Student : depth0)) != null ? stack1.User : stack1)) != null ? stack1.Person : stack1)) != null ? stack1.Email : stack1), depth0))
+    + "')\">\n              <i class=\"glyphicon glyphicon-star-empty\"></i>\n          </a>\n        </td>\n";
+},"12":function(container,depth0,helpers,partials,data) {
+    return "        <td class=\"text-center\" data-text=\"0\"></td>\n";
 },"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1;
 
