@@ -22,6 +22,12 @@ type SurveyHeader struct {
 //Anonymise removes the token
 func (s *SurveyHeader) Anonymise() {
 	s.Token = ""
+	//Remove everything but the key  "__MARK__"
+	for k, _ := range s.Cnt {
+		if k != "__MARK__" {
+			delete(s.Cnt, k)
+		}
+	}
 }
 
 //Survey agglomerates Cateogies with a title in French or English
