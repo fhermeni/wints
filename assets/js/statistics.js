@@ -147,7 +147,7 @@ function surveys(kind) {
 			} else if (mark === "true") {
 				res[kind].push(100);
 			} else {
-				res[kind].push(mark);
+				res[kind].push(parseInt(mark));
 			}
 		})
 	});
