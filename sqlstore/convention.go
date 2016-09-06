@@ -164,13 +164,16 @@ func (s *Store) Internships() (schema.Internships, error) {
 	if err != nil {
 		return schema.Internships{}, err
 	}
+
+	reports, err := s.allReports()
+	if err != nil {
+		return schema.Internships{}, err
+	}
+
 	ints := make([]schema.Internship, 0, 0)
 	for _, c := range conventions {
 		stu := c.Student.User.Person.Email
-		i, e := s.toInternship(c)
-		if e != nil {
-			return schema.Internships{}, err
-		}
+		i := schema.Internship{Convention: c}
 		d, ok := defs[stu]
 		if ok {
 			i.Defense = d
@@ -178,6 +181,10 @@ func (s *Store) Internships() (schema.Internships, error) {
 		s, ok := surveys[stu]
 		if ok {
 			i.Surveys = s
+		}
+		r, ok := reports[stu]
+		if ok {
+			i.Reports = r
 		}
 		ints = append(ints, i)
 	}
