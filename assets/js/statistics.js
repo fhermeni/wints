@@ -157,9 +157,6 @@ function surveys(kind) {
 		if (kind == "midterm") {
 			output = "<h1>"+Math.round(avg(res[kind]))+"%</h1><h4>are satisfied by their intern</h4>";
 		} else if(kind=="final") {
-			console.log(res[kind]);
-			console.log(avg(res[kind]));
-			console.log(avg(res[kind]).toFixed(2));
 			output = "<h1>"+avg(res[kind]).toFixed(2) + " / 20</h1>";
 		}
 	}
