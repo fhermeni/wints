@@ -79,10 +79,10 @@ func (s *Session) DefenseProgram() ([]schema.DefenseSession, error) {
 	if err != nil {
 		return []schema.DefenseSession{}, err
 	}
-	for idx, x := range ss {
+	/*for idx, x := range ss {
 		x.Anonymise()
 		ss[idx] = x
-	}
+	}*/
 	return ss, nil
 }
 func (s *Session) DefenseSession(room, id string) (schema.DefenseSession, error) {
