@@ -16,7 +16,7 @@ go get github.com/tools/godep
 	
 In your `$GOPATH`:
 
-- `git clone git@scm-oasis.inria.fr:fhermeni/wints.git src/scm-oasis.inria.fr/fhermeni/wints` to get the source
+- `git clone https://github.com/fhermeni/wints.git src/github.com/fhermeni/wints` to get the source
 - `cd src/scm-oasis.inria.fr/fhermeni/wints/wintsd; godep restore` to restore the dependencies.
 - `go install scm-oasis.inria.fr/fhermeni/wints/wintsd` to build the executable.
 
