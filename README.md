@@ -7,7 +7,7 @@ A web application to manage final internships at Polytech.
 - A postgreSQL database
 - [Golang](https://golang.org/)
 - [GoDep](https://github.com/tools/godep) to handle the dependencies
-- [node.js](nodejs.org) to build the frontend
+- [node.js](https://nodejs.org) to build the frontend
 
 ## Installation
 
