@@ -1,3 +1,4 @@
+
 package sqlstore
 
 import (
@@ -6,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"code.google.com/p/go.crypto/bcrypt"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/fhermeni/wints/schema"
 	"github.com/lib/pq"

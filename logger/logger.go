@@ -128,7 +128,7 @@ func (m *defaultLogger) ReportValue(label string, v float64) {
 	if len(m.key) > 0 {
 		stathat.PostEZValue(label, m.key, v)
 	} else {
-		s := fmt.Sprintf("%s : %d", label, v)
+		s := fmt.Sprintf("%s : %f", label, v)
 		m.Log("trace", "value", s, nil)
 	}
 }
