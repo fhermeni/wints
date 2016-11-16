@@ -22,6 +22,7 @@ In your `$GOPATH`:
 - `go install github.com/fhermeni/wints/wintsd` to build the executable.
 
 ## Usage of ./bin/wints:  
+```Shell
   -conf string  
         Wints configuration file (default "wints.conf")  
   -fake-mailer  
@@ -30,7 +31,7 @@ In your `$GOPATH`:
         install the database  
   -new-root string  
         Invite a root user  
-
+```
 ## Running
 - `wints` launches the daemon. For test purposes, it is preferable to launch it with the `--fakeMailer` option to prevent to send mails (they will be logged into logs/mailer... instead)
 
