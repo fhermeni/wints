@@ -1,18 +1,8 @@
 {
 	"ImportPath": "github.com/fhermeni/wints",
 	"GoVersion": "go1.7",
-	"GodepVersion": "v74",
+	"GodepVersion": "v75",
 	"Deps": [
-		{
-			"ImportPath": "code.google.com/p/go.crypto/bcrypt",
-			"Comment": "null-191",
-			"Rev": "'7aa593ce8ceaf0199504fff27455bbb60eedabc7'"
-		},
-		{
-			"ImportPath": "code.google.com/p/go.crypto/blowfish",
-			"Comment": "null-191",
-			"Rev": "'7aa593ce8ceaf0199504fff27455bbb60eedabc7'"
-		},
 		{
 			"ImportPath": "github.com/BurntSushi/toml",
 			"Comment": "v0.1.0-21-g056c9bc",
@@ -65,6 +55,14 @@
 		{
 			"ImportPath": "github.com/stathat/go",
 			"Rev": "74669b9f388d9d788c97399a0824adbfee78400e"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/bcrypt",
+			"Rev": "9477e0b78b9ac3d0b03822fd95422e2fe07627cd"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/blowfish",
+			"Rev": "9477e0b78b9ac3d0b03822fd95422e2fe07627cd"
 		},
 		{
 			"ImportPath": "golang.org/x/text/encoding",
