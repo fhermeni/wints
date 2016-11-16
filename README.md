@@ -11,22 +11,24 @@ A web application to manage final internships at Polytech.
 - [gulp](http://gulpjs.com/) to manage installation workflow
 
 ## Installation
-
+```Shell
 go get github.com/pierrre/gotestcover  
 go get github.com/tools/godep  
-	
-In your `$GOPATH`:
+```
 
-- `git clone https://github.com/fhermeni/wints.git src/github.com/fhermeni/wints` to get the source
-- `cd src/github.com/fhermeni/wints/; godep restore` to restore the dependencies.
-- `go install github.com/fhermeni/wints/wintsd` to build the executable.
+In your `$GOPATH`:
+```Shell
+git clone https://github.com/fhermeni/wints.git src/github.com/fhermeni/wints # to get the source
+cd src/github.com/fhermeni/wints/; godep restore # to restore the dependencies.
+go install github.com/fhermeni/wints/wintsd # to build the executable.
+```
 
 ## Usage of ./bin/wints:  
 ```Shell
   -conf string  
         Wints configuration file (default "wints.conf")  
   -fake-mailer  
-        Don't send emails. Print them out stdout  
+        Do not send emails. Print them out stdout  
   -install-db  
         install the database  
   -new-root string  
