@@ -86,13 +86,13 @@ func (s *Store) NewInternship(c schema.Convention) (schema.Internship, []byte, e
 
 	i.Surveys = make([]schema.SurveyHeader, len(s.config.Surveys))
 	for idx, survey := range s.config.Surveys {
-		token = randomBytes(16)
+		token16 := randomBytes(16)
 		inv := survey.Invitation.Value(c.Begin).Truncate(time.Minute).UTC()
 		dead := inv.Add(survey.Deadline.Duration).Truncate(time.Minute).UTC()
-		tx.Exec(insertSurvey, c.Student.User.Person.Email, survey.Kind, token, inv, inv, dead)
+		tx.Exec(insertSurvey, c.Student.User.Person.Email, survey.Kind, token16, inv, inv, dead)
 		i.Surveys[idx] = schema.SurveyHeader{
 			Kind:           survey.Kind,
-			Token:          string(token),
+			Token:          string(token16),
 			Deadline:       dead,
 			Invitation:     inv,
 			LastInvitation: inv,
@@ -104,12 +104,12 @@ func (s *Store) NewInternship(c schema.Convention) (schema.Internship, []byte, e
 	stu, err := s.Student(c.Student.User.Person.Email)
 	if err != nil {
 		tx.err = err
-		return i, []byte{}, tx.Done()
+		return i, []byte{}, tx.err
 	}
 	tut, err := s.User(c.Tutor.Person.Email)
 	if err != nil {
 		tx.err = err
-		return i, []byte{}, tx.Done()
+		return i, []byte{}, tx.err
 	}
 	i.Convention.Tutor = tut
 	i.Convention.Student = stu
