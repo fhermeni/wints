@@ -1,0 +1,55 @@
+# github.com/BurntSushi/toml v0.1.1-0.20150501104042-056c9bc7be71
+## explicit
+github.com/BurntSushi/toml
+# github.com/daaku/go.httpgzip v0.0.0-20140814204418-3f59977b58c6
+## explicit
+github.com/daaku/go.httpgzip
+# github.com/davecgh/go-spew v1.1.0
+github.com/davecgh/go-spew/spew
+# github.com/dimfeld/httppath v0.0.0-20140515164737-c8e499c3ef3c
+## explicit
+github.com/dimfeld/httppath
+# github.com/dimfeld/httptreemux v0.0.0-20150808211449-89abad647066
+## explicit
+github.com/dimfeld/httptreemux
+# github.com/klauspost/compress v0.0.0-20160219151715-f9625351863b
+## explicit
+github.com/klauspost/compress/flate
+github.com/klauspost/compress/gzip
+# github.com/klauspost/cpuid v0.0.0-20160219142657-2c698c6aef59
+## explicit
+github.com/klauspost/cpuid
+# github.com/klauspost/crc32 v0.0.0-20160219142609-19b0b332c9e4
+## explicit
+github.com/klauspost/crc32
+# github.com/lib/pq v0.0.0-20150805090526-b269bd035a72
+## explicit
+github.com/lib/pq
+github.com/lib/pq/oid
+# github.com/pmezard/go-difflib v1.0.0
+github.com/pmezard/go-difflib/difflib
+# github.com/robfig/cron v1.0.1-0.20141203011048-67823cd24dec
+## explicit
+github.com/robfig/cron
+# github.com/stathat/go v1.0.0
+## explicit
+github.com/stathat/go
+# github.com/stretchr/testify v1.7.0
+## explicit
+github.com/stretchr/testify/assert
+# golang.org/x/crypto v0.0.0-20161031180806-9477e0b78b9a
+## explicit
+golang.org/x/crypto/bcrypt
+golang.org/x/crypto/blowfish
+# golang.org/x/text v0.0.0-20151217213507-cf4986612c83
+## explicit
+golang.org/x/text/encoding
+golang.org/x/text/encoding/charmap
+golang.org/x/text/encoding/internal
+golang.org/x/text/encoding/internal/identifier
+golang.org/x/text/encoding/unicode
+golang.org/x/text/internal/utf8internal
+golang.org/x/text/runes
+golang.org/x/text/transform
+# gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
+gopkg.in/yaml.v3
