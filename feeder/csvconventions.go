@@ -14,29 +14,29 @@ import (
 )
 
 const (
-	timestamp       = 0
+	timestamp       = 62
 	stuPromotion    = 1
-	foreignCountry  = 2
-	lab             = 3
-	gender          = 4
-	stuFn           = 5
-	stuLn           = 6
-	stuEmail        = 17
-	stuTel          = 18
-	company         = 22
-	companyWWW      = 23
-	begin           = 38
-	end             = 39
-	gratification   = 47
-	titleIdx        = 50
-	supervisorFn    = 61
-	supervisorLn    = 62
-	supervisorEmail = 63
-	supervisorTel   = 64
-	tutorFn         = 67
-	tutorLn         = 68
-	tutorEmail      = 69
-	tutorTel        = 70
+	foreignCountry  = 41
+	lab             = 40
+	gender          = 63
+	stuFn           = 65
+	stuLn           = 64
+	stuEmail        = 67
+	stuTel          = 69
+	company         = 11
+	companyWWW      = 2
+	begin           = 26
+	end             = 27
+	gratification   = 35
+	titleIdx        = 19
+	supervisorFn    = 47
+	supervisorLn    = 46
+	supervisorEmail = 48
+	supervisorTel   = 49
+	tutorFn         = 54
+	tutorLn         = 53
+	tutorEmail      = 55
+	tutorTel        = 56
 )
 
 var (
@@ -127,8 +127,8 @@ func (f *CsvConventions) scan(prom string) ([]schema.Convention, *ImportError) {
 		supervisor := cleanPerson(record[supervisorFn], record[supervisorLn], record[supervisorEmail], record[supervisorTel])
 		tutor := cleanPerson(record[tutorFn], record[tutorLn], record[tutorEmail], record[tutorTel])
 		cpy := cleanCompany(record[company], record[companyWWW], record[titleIdx])
-		foreign := clean(record[foreignCountry]) != "non"
-		inLab := clean(record[lab]) != "non"
+		foreign := clean(record[foreignCountry]) != "fr"
+		inLab := clean(record[lab]) != "0"
 		male := clean(record[gender]) == "m."
 		gratif := cleanInt(record[gratification])
 
@@ -141,17 +141,24 @@ func (f *CsvConventions) scan(prom string) ([]schema.Convention, *ImportError) {
 			Skip:      false,
 			Male:      male,
 		}
-		ts, err := parseTime("2006-01-02 15:04", record[timestamp], stu)
+		var lastEdit string = ""
+		if record[timestamp] != ""{
+			lastEdit =record[timestamp]
+		}else{
+			lastEdit =record[timestamp-1]
+		}
+
+		ts, err := parseTime("2006-01-02", lastEdit, stu)
 		if err != nil {
 			ierr.NewWarning("(" + prom + ") " + stu.User.Fullname() + ": " + err.Error())
 			continue
 		}
-		startTime, err := parseTime("02/01/2006", record[begin], stu)
+		startTime, err := parseTime("2006-01-02", record[begin], stu)
 		if err != nil {
 			ierr.NewWarning("(" + prom + ") " + stu.User.Fullname() + ": " + err.Error())
 			continue
 		}
-		endTime, err := parseTime("02/01/2006", record[end], stu)
+		endTime, err := parseTime("2006-01-02", record[end], stu)
 		if err != nil {
 			ierr.NewWarning("(" + prom + ") " + stu.User.Fullname() + ": " + err.Error())
 			continue

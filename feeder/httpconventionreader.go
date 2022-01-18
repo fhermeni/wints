@@ -1,11 +1,12 @@
 package feeder
 
 import (
+	"crypto/tls"
 	"errors"
 	"fmt"
+	"golang.org/x/text/encoding/unicode"
 	"io"
 	"net/http"
-	"net/url"
 	"time"
 
 	"golang.org/x/text/encoding/charmap"
@@ -31,9 +32,17 @@ func NewHTTPConventionReader(url, login, password string) *HTTPConventionReader 
 
 //Reader read all the conventions for a given year and promotion
 func (h *HTTPConventionReader) Reader(year int, promotion string) (io.Reader, error) {
-	client := &http.Client{}
+	//only in dev mode
+		tr := &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+		}
+		client := &http.Client{Transport : tr}
+	/* in non dev mode}
+	else{
+		client := &http.Client{}
+	}*/
 	client.Timeout = time.Duration(10) * time.Second
-	query := fmt.Sprintf("%s?action=down&filiere=%s&annee=%d", h.url, url.QueryEscape(promotion), year)
+	query := fmt.Sprintf("%s%s&parcours=*", h.url, promotion)
 	req, err := http.NewRequest("GET", query, nil)
 	if err != nil {
 		return nil, err
@@ -48,6 +57,9 @@ func (h *HTTPConventionReader) Reader(year int, promotion string) (io.Reader, er
 	}
 	if h.Encoding == "windows-1252" {
 		return charmap.Windows1252.NewDecoder().Reader(res.Body), nil
+	}
+	if h.Encoding == "UTF-8" {
+		return unicode.UTF8.NewDecoder().Reader(res.Body), nil
 	}
 	return nil, errors.New("Unsupported encoding: " + h.Encoding)
 }
