@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package sqlstore
@@ -6,6 +7,7 @@ import (
 	"database/sql"
 	"flag"
 	"log"
+	"os"
 	"testing"
 	"time"
 
@@ -109,7 +111,8 @@ func convention(t *testing.T, u schema.User) schema.Convention {
 	return c2
 }
 
-func init() {
+func TestMain(m *testing.M) {
+	flag.Parse()
 	log.Println("Initiate database connexion using url '" + *dbURL + "'")
 	DB, err := sql.Open("postgres", *dbURL)
 	if err != nil {
@@ -121,6 +124,10 @@ func init() {
 	if err != nil {
 		log.Fatalln("Unable to install the DB: " + err.Error())
 	}
+
+	code := m.Run()
+
+	os.Exit(code)
 }
 
 func user(t *testing.T, email string) schema.User {

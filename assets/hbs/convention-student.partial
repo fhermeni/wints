@@ -5,7 +5,7 @@ data-stu='{{Convention.Student.User.Person.Email}}' data-stu-fn='{{fullname Conv
 data-sup='{{Convention.Supervisor.Email}}' data-sup-fn='{{fullname Convention.Supervisor true}}'/>  
     </td>
     <td>
-    <a class='click fn' onclick="showInternship('{{Convention.Student.User.Person.Email}}')">
+    <a class='click fn' onclick="showInternship(this.dataset.name)" data-name="{{Convention.Student.User.Person.Email}}">
     {{fullname Convention.Student.User.Person}}            
     </td>
     <td>{{Convention.Student.Promotion}}</td>

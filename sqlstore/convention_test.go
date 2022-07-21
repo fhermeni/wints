@@ -1,3 +1,4 @@
+//go:build integration
 // +build integration
 
 package sqlstore
@@ -68,7 +69,7 @@ func TestInternships(t *testing.T) {
 	assert.Equal(t, 2, len(ints))
 	assert.Contains(t, ints, i1, i2)
 
-	cc, err := store.Conventions()
+	cc, err := store.conventions()
 	assert.Nil(t, err)
 	assert.Equal(t, 2, len(cc))
 	assert.Contains(t, cc, i1.Convention, i2.Convention)

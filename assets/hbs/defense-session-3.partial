@@ -10,7 +10,7 @@
 		{{#each Defenses}}
 				<li data-student="{{Student.User.Person.Email}}"  data-time="{{Time}}">
 				<input type="checkbox" data-email="{{Student.User.Person.Email}}"
-				<span class="time">[{{dateFmt Time "HH:mm" "Europe/Paris"}}]</span>
+				<span class="time">[{{dateFmt Time "HH:mm"}}]</span>
 				<i class="glyphicon {{#if Local}}glyphicon-picture{{else}}glyphicon-facetime-video{{/if}}"></i>
 				<i class="glyphicon {{#if Public}}glyphicon-eye-open{{else}} text-danger glyphicon-eye-close{{/if}}"></i>
 				<span class="click" onclick="editStudentDefense(this, '{{Student.User.Person.Email}}', '{{../Room}}','{{../Id}}')" ">{{Student.User.Person.Lastname}} ({{Student.Major}})</span>

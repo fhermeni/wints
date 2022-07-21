@@ -87,14 +87,12 @@ gulp.task('css', function() {
     .pipe(livereload());
 });
 
-gulp.task('assets', function () {
-  return gulp.start(['css','html','partials','templates','js']);
-});
+gulp.task('assets', gulp.series(['css','html','partials','templates','js']));
 
 gulp.task('watch', function(){
   livereload.listen();
-  gulp.watch(['assets/js/**/*.js', '!assets/js/**/*.min.js', '!assets/js/wints.js', '!assets/js/!hbs*.js'], ['js']);
-  gulp.watch(['assets/css/**/*.css', '!assets/css/**/*.min.css', '!assets/css/wints.css'], ['css']);
-  gulp.watch('assets/html/*.html', ['html']);
-  gulp.watch('assets/hbs/*', ['partials','templates']);
+  gulp.watch(['assets/js/**/*.js', '!assets/js/**/*.min.js', '!assets/js/wints.js', '!assets/js/!hbs*.js'], gulp.series('js'));
+  gulp.watch(['assets/css/**/*.css', '!assets/css/**/*.min.css', '!assets/css/wints.css'], gulp.series('css'));
+  gulp.watch('assets/html/*.html', gulp.series('html'));
+  gulp.watch('assets/hbs/*', gulp.parallel('partials','templates'));
 })

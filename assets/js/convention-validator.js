@@ -178,7 +178,7 @@ function updateStudentSkipable(stu, btn) {
 		if (s.User.Person.Email == stu) {
 			postStudentSkippable(stu, !s.Skip).done(function(dta, status, xhr) {
 				s.Skip = !s.Skip;
-				var row = $("#table-placement").find("tr[data-email='" + stu + "']");
+				var row = $("#table-placement").find(`tr[data-email="${stu}"]`);
 				s.I = undefined;
 				
 				internship(stu).done(function(i) {
@@ -320,7 +320,7 @@ function commitValidation(c, tut) {
 function updateConventionTable(i) {
 	//Catch the line, remove it by the new one
 	var em = $("legend").data("email");
-	var row = $("#table-placement").find("tr[data-email='" + em + "']");
+	var row = $("#table-placement").find(`tr[data-email="${em}"]`);
 	var dta = i.Convention.Student;
 	dta.I = i;
 	dta.Warn = !i && !dta.Skip;
@@ -375,10 +375,10 @@ function propose(u, us) {
 
 function updateInternship(xhr, em) {
 	internship(em).done(function(i) {
-		var row = $("#table-placement").find("tr[data-email='" + em + "']");
+		var row = $("#table-placement").find(`tr[data-email="${em}"]`);
 		var dta = i.Convention.Student;
 		dta.I = i;
-		dta.Warn = !i && !dta.Skip
+		dta.Warn = !i && !dta.Skip;
 		var cnt = Handlebars.partials['placement-student'](dta);
 		row.replaceWith(cnt);
 		$('.tablesorter').trigger("update").trigger("updateCache");

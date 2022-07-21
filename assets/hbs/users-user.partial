@@ -1,6 +1,6 @@
 <tr data-email='{{Person.Email}}'>
     <td><input type='checkbox' data-email='{{Person.Email}}' data-user-fn='{{fullname Person true}}' class="shiftSelectable"/></td>
-    <td class="fn click" onclick="showLongProfileEditor('{{Person.Email}}')">{{fullname Person}}</td>    
+    <td class="fn click" onclick="showLongProfileEditor(this.dataset.name)" data-name="{{Person.Email}}">{{fullname Person}}</td>
     <td><a href="mailto:{{Person.Email}}">{{Person.Email}}</a></td>
     <td data-text="{{roleLevel Role}}">
     	{{#ifEq Role "student"}}

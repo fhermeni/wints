@@ -66,7 +66,7 @@ function newDefenseSlot(elmt, id, room) {
 		};
 		$("#modal").render("defense-editor",def,
 			function () {
-				$("#defense-time").datetimepicker({stepping: 30, timeZone: 'Europe/Paris'});
+				$("#defense-time").datetimepicker({stepping: 30, timeZone: ''});
 				showModal()
 			}
 		);

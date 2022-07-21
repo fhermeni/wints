@@ -132,7 +132,7 @@ function hideModal() {
 
 function updateInternshipRow(em) {
 	var partial = $("table").data("partial");
-	var row = $("table").find("tr[data-email='" + em + "']");
+	var row = $("table").find(`tr[data-email="${em}"]`);
 	internship(em).done(function(u) {
 		var cnt = Handlebars.partials[partial](u);
 		row.replaceWith(cnt);

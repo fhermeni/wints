@@ -2,7 +2,7 @@
     <td><input type='checkbox' data-email='{{User.Person.Email}}' class="shiftSelectable" data-stu-fn='{{fullname User.Person true}}'/></td>
     <td class="fn">    
      {{#if I}}
-        <a href="#" class="click" onclick="showInternship('{{User.Person.Email}}', true)">
+        <a href="#" class="click" onclick="showInternship(this.dataset.name, true)" data-name="{{User.Person.Email}}">
             {{User.Person.Lastname}}, {{User.Person.Firstname}}
         </a>
      {{else}}

@@ -28,6 +28,7 @@ function updateReportDeadline(em, kind) {
 
 function showReportModal(i, kind) {
 	var r;
+	console.log("showReportModal1: "+i);
 	i.Reports.forEach(function (rr) {
 		if (rr.Kind == kind) {
 			r = rr;
@@ -38,7 +39,7 @@ function showReportModal(i, kind) {
 		notifyError("No '"+ kind + "' report available");
 		return;
 	}
-	console.log(r);
+	console.log("showReportModal2: "+r);
 	r.Email = i.Convention.Student.User.Person.Email;
 	r.Tutor = i.Convention.Tutor.Person.Email;
 	$("#modal").render("report-modal", r, function() {

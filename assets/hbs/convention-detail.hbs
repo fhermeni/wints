@@ -17,7 +17,7 @@
         <div class="form-group">
             <label class="col-lg-3 control-label">Promotion</label>
             <div class="col-lg-3">
-                <select class="form-control" id="promotion-selecter" onchange="updatePromotion('{{I.Convention.Student.User.Person.Email}}','{{I.Convention.Student.Promotion}}', this)">
+                <select class="form-control" id="promotion-selecter" onchange="updatePromotion(this.dataset.name,this.dataset.prom, this)" data-name="{{I.Convention.Student.User.Person.Email}}" data-prom="{{I.Convention.Student.Promotion}}">
                 {{optionPromotions I.Convention.Student.Promotion}}
                 </select>
             </div>
@@ -25,7 +25,7 @@
         <div class="form-group">
             <label class="col-lg-3 control-label">Major</label>
             <div class="col-lg-3">
-                <select class="form-control" id="major-selecter" onchange="updateMajor('{{I.Convention.Student.User.Person.Email}}','{{I.Convention.Student.Major}}', this)">
+                <select class="form-control" id="major-selecter" onchange="updateMajor(this.dataset.name,this.dataset.maj, this)" data-name="{{I.Convention.Student.User.Person.Email}}" data-maj="{{I.Convention.Student.Major}}">
                 {{optionMajors I.Convention.Student.Major}}
                 </select>
             </div>

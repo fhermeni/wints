@@ -141,6 +141,10 @@ func main() {
 	conf := flag.String("conf", "wints.conf", "Wints configuration file")
 	flag.Parse()
 
+	if *fakeMailer {
+		log.Println("using fake mailer")
+	}
+	
 	_, err := toml.DecodeFile(*conf, &cfg)
 	if err != nil {
 		log.Fatalf("reading configuration '%s': %s\n", *conf, err.Error())

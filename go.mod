@@ -10,7 +10,7 @@ require (
 	github.com/klauspost/compress v0.0.0-20160219151715-f9625351863b
 	github.com/klauspost/cpuid v0.0.0-20160219142657-2c698c6aef59 // indirect
 	github.com/klauspost/crc32 v0.0.0-20160219142609-19b0b332c9e4 // indirect
-	github.com/lib/pq v0.0.0-20150805090526-b269bd035a72
+	github.com/lib/pq v1.10.4
 	github.com/robfig/cron v1.0.1-0.20141203011048-67823cd24dec
 	github.com/stathat/go v1.0.0
 	github.com/stretchr/testify v1.7.0
